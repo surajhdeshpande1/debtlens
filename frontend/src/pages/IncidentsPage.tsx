@@ -119,42 +119,42 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
   const severityBadge = (sev: IncidentSeverity) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
+        return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
       case 'HIGH':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
       case 'MEDIUM':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
       case 'LOW':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
     }
   };
 
   const statusBadge = (stat: IncidentStatus) => {
     switch (stat) {
       case 'OPEN':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
+        return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
       case 'INVESTIGATING':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
       case 'RESOLVED':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]';
     }
   };
 
   const getModuleBadge = (moduleName: string) => {
     const m = (moduleName || '').toLowerCase().replace(/[\s-]/g, '_');
-    if (m.includes('payment')) return 'bg-blue-50 text-blue-700 border-blue-200';
-    if (m.includes('database')) return 'bg-amber-50 text-amber-700 border-amber-200';
-    if (m.includes('settlement')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    if (m.includes('checkout')) return 'bg-sky-50 text-sky-700 border-sky-200';
-    if (m.includes('auth')) return 'bg-rose-50 text-rose-700 border-rose-200';
-    if (m.includes('notification')) return 'bg-teal-50 text-teal-700 border-teal-200';
-    return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (m.includes('payment')) return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
+    if (m.includes('database')) return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
+    if (m.includes('settlement')) return 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]';
+    if (m.includes('checkout')) return 'bg-[#F0F4FA] text-[#2C3E50] border-[#CBD8E8]';
+    if (m.includes('auth')) return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
+    if (m.includes('notification')) return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
+    return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
   };
 
   const getSimilarityBadge = (score: number) => {
-    if (score >= 0.7) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
-    if (score >= 0.4) return 'text-blue-700 bg-blue-50 border-blue-200';
-    return 'text-amber-700 bg-amber-50 border-amber-200';
+    if (score >= 0.7) return 'text-[#1E4E38] bg-[#EDF6F1] border-[#BCD8C7]';
+    if (score >= 0.4) return 'text-[#0C1A2E] bg-[#F0F4FA] border-[#CBD8E8]';
+    return 'text-[#8A6112] bg-[#FEF9EE] border-[#EBD8A3]';
   };
 
   return (
@@ -165,7 +165,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Incident Intake & Lifecycle</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F5EFEB] text-blue-900 border border-[#EADBCE] font-bold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8] font-bold font-mono">
               Module M2
             </span>
           </h2>
@@ -177,7 +177,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white border border-[#EADBCE] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white border border-[#E5DFD5] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
             title="Export incidents dataset as CSV"
           >
             <Download className="w-3.5 h-3.5 text-stone-500" />
@@ -186,7 +186,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
 
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Report New Incident</span>
@@ -282,7 +282,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                     key={inc.id}
                     onClick={() => handleSelectIncident(inc)}
                     className={`p-3.5 hover:bg-[#FAF8F5] transition-colors cursor-pointer flex flex-col space-y-2 ${
-                      isSelected ? 'bg-[#F5EFEB]/70 border-l-4 border-blue-700' : ''
+                      isSelected ? 'bg-[#F0F4FA] border-l-4 border-[#0C1A2E]' : ''
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -317,12 +317,12 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         </div>
 
         {/* Selected Incident Detail Inspector */}
-        <div className="lg:col-span-5 bg-white/95 rounded-md border border-[#EADBCE] p-5 shadow-xs sticky top-20 space-y-5">
+        <div className="lg:col-span-5 bg-white/95 rounded-md border border-[#E5DFD5] p-5 shadow-xs sticky top-20 space-y-5">
           {selectedIncident ? (
             <>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-blue-900 bg-[#F5EFEB] border border-[#EADBCE] px-2.5 py-0.5 rounded-sm">
+                  <span className="font-mono text-xs font-bold text-[#0C1A2E] bg-[#F0F4FA] border border-[#CBD8E8] px-2.5 py-0.5 rounded-sm">
                     {selectedIncident.incident_number}
                   </span>
                   <div className="flex items-center space-x-1.5">
@@ -330,7 +330,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                     <select
                       value={selectedIncident.status}
                       onChange={(e) => handleUpdateStatus(selectedIncident.id, e.target.value as IncidentStatus)}
-                      className="text-xs font-bold px-2 py-1 rounded-md border border-[#EADBCE] bg-[#FAF8F5] text-slate-900 cursor-pointer"
+                      className="text-xs font-bold px-2 py-1 rounded-md border border-[#E5DFD5] bg-[#FAF8F5] text-slate-900 cursor-pointer"
                     >
                       <option value="OPEN">OPEN</option>
                       <option value="INVESTIGATING">INVESTIGATING</option>
@@ -340,7 +340,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                 </div>
 
                 {/* Interactive Lifecycle Workflow Stepper */}
-                <div className="my-3 bg-[#FAF8F5] p-2.5 rounded-md border border-[#EADBCE]">
+                <div className="my-3 bg-[#FAF8F5] p-2.5 rounded-md border border-[#E5DFD5]">
                   <div className="flex items-center justify-between text-[11px] mb-1.5">
                     <span className="font-bold text-slate-950">Lifecycle State</span>
                     <span className="text-[10px] text-stone-500">Click to transition</span>
@@ -357,13 +357,13 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                           className={`px-2 py-1.5 rounded-md text-[11px] font-bold flex items-center justify-center space-x-1 transition-all cursor-pointer ${
                             isCurrent
                               ? st === 'RESOLVED' 
-                                ? 'bg-emerald-600 text-white shadow-xs'
+                                ? 'bg-[#1E4E38] text-white shadow-xs'
                                 : st === 'INVESTIGATING'
-                                ? 'bg-amber-600 text-white shadow-xs'
-                                : 'bg-rose-600 text-white shadow-xs'
+                                ? 'bg-[#8A6112] text-white shadow-xs'
+                                : 'bg-[#8E2825] text-white shadow-xs'
                               : isPast
-                              ? 'bg-[#EADBCE] text-stone-800 hover:bg-[#D8CEBE]'
-                              : 'bg-white text-stone-600 border border-[#EADBCE] hover:bg-[#FAF8F5]'
+                              ? 'bg-[#E5DFD5] text-stone-800 hover:bg-[#DCD6CC]'
+                              : 'bg-white text-stone-600 border border-[#E5DFD5] hover:bg-[#FAF8F5]'
                           }`}
                         >
                           <span>{idx + 1}. {st.charAt(0) + st.slice(1).toLowerCase()}</span>
@@ -375,18 +375,18 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                 </div>
 
                 <h3 className="text-sm font-extrabold text-slate-950 leading-snug">{selectedIncident.title}</h3>
-                <p className="mt-2 text-xs text-stone-700 leading-relaxed bg-[#FAF8F5] p-3 rounded-md border border-[#EADBCE] font-medium">
+                <p className="mt-2 text-xs text-stone-700 leading-relaxed bg-[#FAF8F5] p-3 rounded-md border border-[#E5DFD5] font-medium">
                   {selectedIncident.description}
                 </p>
               </div>
 
               {/* Metadata Badges */}
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 rounded-md bg-[#FAF8F5] border border-[#EADBCE]">
+                <div className="p-2.5 rounded-md bg-[#FAF8F5] border border-[#E5DFD5]">
                   <div className="text-[10px] text-stone-500 font-bold uppercase">Affected Module</div>
                   <div className="font-bold text-slate-900 mt-0.5">{selectedIncident.affected_module}</div>
                 </div>
-                <div className="p-2.5 rounded-md bg-[#FAF8F5] border border-[#EADBCE]">
+                <div className="p-2.5 rounded-md bg-[#FAF8F5] border border-[#E5DFD5]">
                   <div className="text-[10px] text-stone-500 font-bold uppercase">Resolution Effort</div>
                   <div className="font-bold text-slate-900 mt-0.5">{selectedIncident.resolution_effort_hours} Hours</div>
                 </div>
@@ -394,10 +394,10 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
 
               {/* Convert to Debt Item Action Button */}
               {onConvertIncidentToDebt && (
-                <div className="p-3 bg-emerald-50/80 rounded-md border border-emerald-200 flex items-center justify-between">
+                <div className="p-3 bg-[#EDF6F1] rounded-md border border-[#BCD8C7] flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-emerald-950">Quantify Underlying Debt</div>
-                    <div className="text-[10px] text-emerald-800 font-medium">Convert incident finding into a scheduled debt item</div>
+                    <div className="text-xs font-bold text-[#1E4E38]">Quantify Underlying Debt</div>
+                    <div className="text-[10px] text-stone-600 font-medium">Convert incident finding into a scheduled debt item</div>
                   </div>
                   <button
                     onClick={() => onConvertIncidentToDebt({
@@ -407,7 +407,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                       effort_principal: Math.max(8.0, selectedIncident.resolution_effort_hours * 1.5),
                       linked_incident_id: selectedIncident.id
                     })}
-                    className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-bold shadow-xs flex items-center space-x-1 cursor-pointer transition-colors"
+                    className="px-3 py-1.5 bg-[#0C1A2E] hover:bg-[#142B4B] text-white rounded-md text-xs font-bold shadow-xs flex items-center space-x-1 cursor-pointer transition-colors"
                   >
                     <Coins className="w-3.5 h-3.5" />
                     <span>Convert to Debt</span>
@@ -416,17 +416,17 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
               )}
 
               {/* Similar Incidents (M6 Hybrid Similarity Engine) */}
-              <div className="pt-3 border-t border-[#F5EFEB]">
+              <div className="pt-3 border-t border-[#F4EFE6]">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-700" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#0C1A2E]" />
                     <span className="text-xs font-bold text-slate-950">Hybrid Similar Incidents</span>
                   </div>
-                  <span className="text-[10px] font-mono text-blue-900 bg-[#F5EFEB] px-1.5 py-0.5 rounded-sm border border-[#EADBCE] font-bold">TF-IDF + Semantics</span>
+                  <span className="text-[10px] font-mono text-[#0C1A2E] bg-[#F0F4FA] px-1.5 py-0.5 rounded-sm border border-[#CBD8E8] font-bold">TF-IDF + Semantics</span>
                 </div>
 
                 {similarIncidents.length === 0 ? (
-                  <div className="p-3 text-center text-[11px] text-stone-500 bg-[#FAF8F5] rounded-md border border-[#EADBCE] font-medium">
+                  <div className="p-3 text-center text-[11px] text-stone-500 bg-[#FAF8F5] rounded-md border border-[#E5DFD5] font-medium">
                     No related incidents exceeding similarity threshold.
                   </div>
                 ) : (

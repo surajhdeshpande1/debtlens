@@ -359,33 +359,33 @@ And with one click on the Export PDF button, our system produces an executive co
     <div className="space-y-6 max-w-6xl mx-auto pb-12 select-none">
       
       {/* Top Banner & Control Deck */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-slate-800 relative overflow-hidden">
+      <div className="bg-[#0C1A2E] text-white rounded-md p-5 sm:p-6 shadow-md border border-[#142B4B] relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-semibold">
-                <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-white/10 text-stone-200 border border-white/20 text-[10px] font-mono font-semibold">
+                <GraduationCap className="w-3.5 h-3.5 text-stone-300" />
                 <span>BEC BAGALKOTE • BISA531P MINI PROJECT</span>
               </span>
-              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">
+              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-[#1E4E38]/50 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>AUTO-PILOT THEATER READY</span>
+                <span>AUTONOMOUS PIPELINE READY</span>
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
               <span>One-Click Autonomous Demo Control Room</span>
             </h1>
-            <p className="mt-1 text-xs text-slate-300 max-w-2xl leading-relaxed">
+            <p className="mt-1 text-xs text-stone-300 max-w-2xl leading-relaxed">
               Click <strong className="text-white">"Start 1-Click Auto-Run"</strong> to let the entire DebtLens platform autonomously execute, demonstrate, and verify every formula, chart, and algorithm while you explain each stage to your faculty.
             </p>
           </div>
 
           {/* Master 1-Click Playback Control Deck */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-slate-800/80 p-2.5 rounded-md border border-slate-700/80 shadow-inner">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-[#081220] p-2.5 rounded-md border border-[#1E3048] shadow-inner">
             {!isRunning ? (
               <button
                 onClick={handleStartAutoRun}
-                className="px-5 py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
+                className="px-5 py-2 rounded-md bg-[#1E4E38] hover:bg-[#163B2A] text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
               >
                 <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
                 <span>Start 1-Click Auto-Run</span>
@@ -393,7 +393,7 @@ And with one click on the Export PDF button, our system produces an executive co
             ) : (
               <button
                 onClick={handlePause}
-                className="px-5 py-2.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="px-5 py-2 rounded-md bg-[#8A6112] hover:bg-[#724F0C] text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
               >
                 <Pause className="w-4 h-4 fill-white text-white" />
                 <span>Pause Simulation</span>
@@ -402,18 +402,18 @@ And with one click on the Export PDF button, our system produces an executive co
 
             <button
               onClick={handleReset}
-              className="p-2 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-md bg-[#142B4B] hover:bg-[#1A375F] text-stone-300 hover:text-white transition-colors cursor-pointer"
               title="Reset simulation to Stage 1"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
 
             {/* Speed Toggle */}
-            <div className="flex items-center bg-slate-900 rounded-md p-0.5 border border-slate-700 text-[11px] font-mono">
+            <div className="flex items-center bg-[#0C1A2E] rounded-md p-0.5 border border-[#1E3048] text-[11px] font-mono">
               <button
                 onClick={() => setSimSpeed(1)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 1 ? 'bg-blue-700 text-white font-bold' : 'text-slate-400 hover:text-white'
+                  simSpeed === 1 ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
                 }`}
               >
                 1x
@@ -421,7 +421,7 @@ And with one click on the Export PDF button, our system produces an executive co
               <button
                 onClick={() => setSimSpeed(2)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 2 ? 'bg-blue-700 text-white font-bold' : 'text-slate-400 hover:text-white'
+                  simSpeed === 2 ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
                 }`}
               >
                 2x Fast
@@ -431,25 +431,23 @@ And with one click on the Export PDF button, our system produces an executive co
         </div>
 
         {/* Dynamic Progress Bar */}
-        <div className="mt-5 pt-3 border-t border-slate-800 flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+        <div className="mt-4 pt-3 border-t border-[#1E3048] flex flex-col space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-mono text-stone-400">
             <span className="flex items-center space-x-1.5">
-              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-ping' : 'bg-slate-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-ping' : 'bg-stone-500'}`} />
               <strong className="text-white">Stage {currentStage.id} of {stages.length}:</strong>
               <span>{currentStage.name}</span>
             </span>
             <span>{Math.round(stageProgress)}% of stage completed</span>
           </div>
 
-          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+          <div className="w-full h-1.5 bg-[#081220] rounded-sm overflow-hidden border border-[#1E3048]">
             <div 
-              className="h-full bg-gradient-to-r from-blue-700 via-sky-500 to-emerald-400 rounded-full transition-all duration-100 ease-linear"
+              className="h-full bg-[#1E4E38] transition-all duration-100 ease-linear"
               style={{ width: `${stageProgress}%` }}
             />
           </div>
         </div>
-
-        <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Horizontal Stage Stepper Pills */}
@@ -461,16 +459,16 @@ And with one click on the Export PDF button, our system produces an executive co
             <button
               key={st.id}
               onClick={() => handleJumpToStage(idx)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
                 isCurrent 
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                  ? 'bg-[#0C1A2E] text-white border-[#0C1A2E] shadow-xs'
                   : isDone
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7] hover:bg-[#E0EFE7]'
+                  : 'bg-white text-stone-600 border-[#E5DFD5] hover:bg-[#F4EFE6] hover:text-[#0C1A2E]'
               }`}
             >
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                isCurrent ? 'bg-indigo-500 text-white' : isDone ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'
+              <div className={`w-4 h-4 rounded-sm flex items-center justify-center text-[10px] font-bold ${
+                isCurrent ? 'bg-white/20 text-white' : isDone ? 'bg-[#E0EFE7] text-[#1E4E38]' : 'bg-[#F4EFE6] text-stone-500'
               }`}>
                 {isDone ? <Check className="w-2.5 h-2.5" /> : st.id}
               </div>
@@ -481,26 +479,26 @@ And with one click on the Export PDF button, our system produces an executive co
       </div>
 
       {/* Main Two-Column Stage Demonstration Deck */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
         {/* Left Column: Visual Simulation Stage Card & What to Say (7 Cols) */}
-        <div className="lg:col-span-7 space-y-5">
+        <div className="lg:col-span-7 space-y-4">
           
           {/* Active Simulation Stage Canvas */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
+          <div className="bg-white rounded-md border border-[#E5DFD5] p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[#F4EFE6]">
               <div>
-                <span className="text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100">
+                <span className="text-[10px] font-mono font-bold text-[#0C1A2E] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-[#F0F4FA] border border-[#CBD8E8]">
                   {currentStage.moduleBadge}
                 </span>
-                <h2 className="text-lg font-bold text-slate-900 mt-1">
+                <h2 className="text-base font-extrabold text-[#0C1A2E] mt-1">
                   {currentStage.heading}
                 </h2>
               </div>
 
               <button
                 onClick={() => onNavigateTab(currentStage.tab)}
-                className="self-start sm:self-auto px-3.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200 flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
+                className="self-start sm:self-auto px-3 py-1.5 rounded-md bg-[#F0F4FA] hover:bg-[#E4ECF6] text-[#0C1A2E] text-xs font-bold border border-[#CBD8E8] flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
                 title="Jump directly into full module view"
               >
                 <span>Jump to {currentStage.moduleBadge.split(' ')[0]}</span>
@@ -509,29 +507,29 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Narrative Explanation */}
-            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+            <p className="text-xs text-stone-700 leading-relaxed bg-[#FAF8F5] p-3 rounded-md border border-[#E5DFD5]">
               {currentStage.narrative}
             </p>
 
             {/* Simulated Live Visual Card */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+            <div className="p-3.5 rounded-md border border-[#E5DFD5] bg-[#FAF8F5] space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-900">
                 <span className="flex items-center space-x-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  <Zap className="w-3.5 h-3.5 text-[#8A6112]" />
                   <span>Real-Time Simulated Telemetry:</span>
                 </span>
-                <span className="font-mono text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                <span className="font-mono text-[10px] text-[#1E4E38] bg-[#EDF6F1] px-2 py-0.5 rounded-sm border border-[#BCD8C7] font-bold">
                   ● ACTIVE PIPELINE
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {currentStage.metrics.map((m, idx) => (
-                  <div key={idx} className="p-3 rounded-lg bg-white border border-slate-200/90 shadow-2xs">
-                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{m.label}</div>
-                    <div className="text-sm font-bold text-slate-900 font-mono mt-1">{m.value}</div>
+                  <div key={idx} className="p-2.5 rounded-md bg-white border border-[#E5DFD5] shadow-2xs">
+                    <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">{m.label}</div>
+                    <div className="text-sm font-bold text-[#0C1A2E] font-mono mt-1">{m.value}</div>
                     {m.badge && (
-                      <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
                         {m.badge}
                       </span>
                     )}
@@ -541,44 +539,44 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Word-for-Word Faculty Presentation Script */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="space-y-2 pt-2 border-t border-[#F4EFE6]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="text-xs font-bold text-[#0C1A2E] flex items-center space-x-1.5">
+                  <Terminal className="w-3.5 h-3.5 text-[#0C1A2E]" />
                   <span>What to Say to Faculty Right Now (Speaker Script):</span>
                 </span>
                 <button
                   onClick={handleCopyScript}
-                  className="inline-flex items-center space-x-1 text-[11px] font-medium text-slate-500 hover:text-indigo-600 cursor-pointer"
+                  className="inline-flex items-center space-x-1 text-[11px] font-semibold text-stone-500 hover:text-[#0C1A2E] cursor-pointer"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-[#1E4E38]" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900 text-slate-100 text-xs leading-relaxed font-sans whitespace-pre-line border border-slate-800 shadow-inner">
+              <div className="p-3.5 rounded-md bg-[#0C1A2E] text-stone-100 text-xs leading-relaxed font-sans whitespace-pre-line border border-[#142B4B] shadow-inner">
                 {currentStage.speakingScript}
               </div>
             </div>
 
             {/* Stepper Navigation */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between pt-2 border-t border-[#F4EFE6]">
               <button
                 disabled={currentStageIndex === 0}
                 onClick={handlePrevStage}
-                className="px-3 py-1.5 rounded-md border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-30 cursor-pointer"
+                className="px-3 py-1.5 rounded-md border border-[#E5DFD5] text-xs font-semibold text-stone-700 hover:bg-[#F4EFE6] disabled:opacity-30 cursor-pointer"
               >
                 ← Prev Stage
               </button>
 
-              <div className="text-xs text-slate-400 font-mono">
+              <div className="text-xs text-stone-500 font-mono font-semibold">
                 Stage {currentStageIndex + 1} of {stages.length}
               </div>
 
               <button
                 disabled={currentStageIndex === stages.length - 1}
                 onClick={handleNextStage}
-                className="px-3 py-1.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold disabled:opacity-30 cursor-pointer flex items-center space-x-1"
+                className="px-3.5 py-1.5 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold disabled:opacity-30 cursor-pointer flex items-center space-x-1 shadow-xs"
               >
                 <span>Next Stage</span>
                 <SkipForward className="w-3.5 h-3.5" />
@@ -587,18 +585,18 @@ And with one click on the Export PDF button, our system produces an executive co
           </div>
 
           {/* Quick PDF Trigger Bar */}
-          <div className="p-4 rounded-md bg-blue-50/70 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="p-4 rounded-md bg-[#F0F4FA] border border-[#CBD8E8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center space-x-3">
-              <FileDown className="w-5 h-5 text-blue-700 shrink-0" />
+              <FileDown className="w-5 h-5 text-[#0C1A2E] shrink-0" />
               <div>
-                <div className="text-xs font-bold text-slate-900">Executive Technical Debt Audit Report PDF</div>
-                <div className="text-[11px] text-slate-600">Download formatted compliance evidence generated during this run</div>
+                <div className="text-xs font-bold text-[#0C1A2E]">Executive Technical Debt Audit Report PDF</div>
+                <div className="text-[11px] text-stone-600">Download formatted compliance evidence generated during this run</div>
               </div>
             </div>
 
             <button
               onClick={handleDownloadPdf}
-              className="px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
+              className="px-3.5 py-2 bg-[#0C1A2E] hover:bg-[#142B4B] text-white rounded-md text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               Export Report PDF
             </button>
@@ -607,32 +605,32 @@ And with one click on the Export PDF button, our system produces an executive co
         </div>
 
         {/* Right Column: Live Terminal Telemetry Log (5 Cols) */}
-        <div className="lg:col-span-5 space-y-5 sticky top-20">
+        <div className="lg:col-span-5 space-y-4 sticky top-20">
           
-          <div className="bg-slate-950 rounded-xl border border-slate-800 shadow-xl overflow-hidden flex flex-col h-[520px]">
+          <div className="bg-[#081220] rounded-md border border-[#1E3048] shadow-md overflow-hidden flex flex-col h-[520px]">
             {/* Terminal Window Header */}
-            <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+            <div className="px-4 py-2.5 bg-[#0C1A2E] border-b border-[#1E3048] flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] font-mono text-slate-400 pl-2">debtlens-telemetry-console</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#8E2825]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#8A6112]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1E4E38]" />
+                <span className="text-[11px] font-mono text-stone-300 pl-2">debtlens-telemetry-console</span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 animate-pulse">● LIVE 200 OK</span>
+              <span className="text-[10px] font-mono text-emerald-400 font-bold">● LIVE 200 OK</span>
             </div>
 
             {/* Terminal Body Stream */}
             <div 
               ref={logContainerRef}
-              className="flex-1 p-4 font-mono text-xs text-slate-300 space-y-1.5 overflow-y-auto scrollbar-thin select-text"
+              className="flex-1 p-4 font-mono text-xs text-stone-300 space-y-1.5 overflow-y-auto scrollbar-thin select-text"
             >
-              <div className="text-slate-500 text-[11px] pb-1 border-b border-slate-800">
+              <div className="text-stone-500 text-[11px] pb-1 border-b border-[#1E3048]">
                 # DebtLens Core Autonomous Pipeline Engine (FastAPI + NetworkX + Scikit-Learn)
                 <br /># Cloud Firestore asia-south1 cluster connected
               </div>
 
               {terminalLogs.length === 0 ? (
-                <div className="text-slate-600 italic pt-4">
+                <div className="text-stone-500 italic pt-4">
                   Waiting for simulation trigger... Click "Start 1-Click Auto-Run" above.
                 </div>
               ) : (
@@ -643,7 +641,7 @@ And with one click on the Export PDF button, our system produces an executive co
                     <div 
                       key={i} 
                       className={`leading-relaxed text-[11px] ${
-                        isError ? 'text-rose-400 font-semibold' : isHighlight ? 'text-amber-300 font-semibold' : 'text-slate-300'
+                        isError ? 'text-[#E8B4B2] font-semibold' : isHighlight ? 'text-[#EBD8A3] font-semibold' : 'text-stone-300'
                       }`}
                     >
                       {log}
@@ -654,20 +652,20 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Terminal Status Bar */}
-            <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <div className="px-4 py-2 bg-[#0C1A2E] border-t border-[#1E3048] flex items-center justify-between text-[10px] font-mono text-stone-400">
               <span>asia-south1 (Mumbai)</span>
               <span>NetworkX 3.2 • Scikit-Learn 1.5</span>
             </div>
           </div>
 
           {/* College Endorsement Card */}
-          <div className="p-4 bg-white rounded-xl border border-slate-200 text-slate-700 shadow-2xs space-y-1">
-            <div className="flex items-center space-x-1.5 font-bold text-xs text-slate-900">
-              <GraduationCap className="w-4 h-4 text-indigo-600" />
+          <div className="p-4 bg-white rounded-md border border-[#E5DFD5] text-stone-700 shadow-2xs space-y-1">
+            <div className="flex items-center space-x-1.5 font-bold text-xs text-[#0C1A2E]">
+              <GraduationCap className="w-4 h-4 text-[#0C1A2E]" />
               <span>Basaveshwar Engineering College, Bagalkote</span>
             </div>
-            <div className="text-xs text-slate-500">Department of Information Science & Engineering</div>
-            <div className="text-xs font-semibold text-indigo-700 pt-1">
+            <div className="text-xs text-stone-500">Department of Information Science & Engineering</div>
+            <div className="text-xs font-semibold text-[#0C1A2E] pt-1">
               Guide: Prof. P. R. Muttannavar • BISA531P (2026-27)
             </div>
           </div>

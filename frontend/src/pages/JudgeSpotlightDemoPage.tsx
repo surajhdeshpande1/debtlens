@@ -153,12 +153,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'The engineering team has spent 182.2h responding to payment checkout failures—over double the 90h needed to permanently refactor the database connection pool.'
     },
     moduleChartData: [
-      { name: 'payments', interest: 48.5, blastRadius: 6, color: '#1D4ED8' },
-      { name: 'database', interest: 36.0, blastRadius: 4, color: '#D97706' },
-      { name: 'settlement', interest: 28.0, blastRadius: 3, color: '#7C3AED' },
-      { name: 'checkout', interest: 22.5, blastRadius: 4, color: '#C026D3' },
-      { name: 'auth', interest: 19.0, blastRadius: 5, color: '#DC2626' },
-      { name: 'notification', interest: 14.0, blastRadius: 2, color: '#0F172A' }
+      { name: 'payments', interest: 48.5, blastRadius: 6, color: '#0C1A2E' }, // Deep Navy
+      { name: 'database', interest: 36.0, blastRadius: 4, color: '#8A6112' }, // Amber Ochre
+      { name: 'settlement', interest: 28.0, blastRadius: 3, color: '#2C3E50' }, // Steel Slate
+      { name: 'checkout', interest: 22.5, blastRadius: 4, color: '#4A3B69' }, // Muted Plum
+      { name: 'auth', interest: 19.0, blastRadius: 5, color: '#8E2825' }, // Deep Oxblood
+      { name: 'notification', interest: 14.0, blastRadius: 2, color: '#374151' } // Charcoal
     ],
     incident: {
       code: 'INC-101',
@@ -190,9 +190,9 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       riskPointsReduced: 142,
       roiMultiplier: '3.69x',
       items: [
-        { code: 'DEBT-101: Pool Refactor', effort: 16, risk: 55, color: 'bg-indigo-600', widthPct: '40%' },
-        { code: 'DEBT-102: Async Tax Webhook', effort: 14, risk: 48, color: 'bg-blue-600', widthPct: '35%' },
-        { code: 'DEBT-104: Settlement Indexing', effort: 8.5, risk: 39, color: 'bg-teal-600', widthPct: '21.2%' }
+        { code: 'DEBT-101: Pool Refactor', effort: 16, risk: 55, color: 'bg-[#0C1A2E]', widthPct: '40%' },
+        { code: 'DEBT-102: Async Tax Webhook', effort: 14, risk: 48, color: 'bg-[#2C3E50]', widthPct: '35%' },
+        { code: 'DEBT-104: Settlement Indexing', effort: 8.5, risk: 39, color: 'bg-[#1E4E38]', widthPct: '21.2%' }
       ]
     },
     audit: {
@@ -230,12 +230,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'Hospital IT expended 214.5h fighting ICU vitals telemetry queue drops—nearly triple the 75h required to refactor the unindexed patient query schema.'
     },
     moduleChartData: [
-      { name: 'vitals_stream', interest: 62.0, blastRadius: 7, color: '#DC2626' }, // Crimson Red
-      { name: 'patient_fhir', interest: 44.5, blastRadius: 5, color: '#D97706' },  // Dark Yellow
-      { name: 'icu_alerts', interest: 38.0, blastRadius: 4, color: '#0284C7' },    // Sky / Steel Blue
-      { name: 'emr_records', interest: 29.0, blastRadius: 3, color: '#1D4ED8' },   // Royal Blue
-      { name: 'hipaa_audit', interest: 24.0, blastRadius: 6, color: '#C026D3' },   // Magenta
-      { name: 'lab_sync', interest: 17.0, blastRadius: 2, color: '#0F172A' }       // Black
+      { name: 'vitals_stream', interest: 62.0, blastRadius: 7, color: '#8E2825' }, // Deep Oxblood
+      { name: 'patient_fhir', interest: 44.5, blastRadius: 5, color: '#8A6112' },  // Amber Ochre
+      { name: 'icu_alerts', interest: 38.0, blastRadius: 4, color: '#2C3E50' },    // Steel Slate
+      { name: 'emr_records', interest: 29.0, blastRadius: 3, color: '#0C1A2E' },   // Deep Navy
+      { name: 'hipaa_audit', interest: 24.0, blastRadius: 6, color: '#4A3B69' },   // Muted Plum
+      { name: 'lab_sync', interest: 17.0, blastRadius: 2, color: '#374151' }       // Charcoal
     ],
     incident: {
       code: 'INC-204',
@@ -267,9 +267,9 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       riskPointsReduced: 158,
       roiMultiplier: '4.15x',
       items: [
-        { code: 'EHR-201: JSONB Indexing', effort: 15, risk: 62, color: 'bg-rose-600', widthPct: '39.5%' },
-        { code: 'EHR-203: Async HL7 Ingestion', effort: 12, risk: 51, color: 'bg-amber-600', widthPct: '31.5%' },
-        { code: 'EHR-205: Vitals Ring Buffer', effort: 11, risk: 45, color: 'bg-blue-600', widthPct: '29%' }
+        { code: 'EHR-201: JSONB Indexing', effort: 15, risk: 62, color: 'bg-[#8E2825]', widthPct: '39.5%' },
+        { code: 'EHR-203: Async HL7 Ingestion', effort: 12, risk: 51, color: 'bg-[#8A6112]', widthPct: '31.5%' },
+        { code: 'EHR-205: Vitals Ring Buffer', effort: 11, risk: 45, color: 'bg-[#0C1A2E]', widthPct: '29%' }
       ]
     },
     audit: {
@@ -307,12 +307,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'Logistics engineering burned 168.0h in post-incident stock reconciliation—over 2.5x the 65h needed to replace distributed database deadlocks.'
     },
     moduleChartData: [
-      { name: 'inventory_core', interest: 54.0, blastRadius: 6, color: '#1D4ED8' }, // Royal Blue
-      { name: 'dispatch_route', interest: 38.5, blastRadius: 4, color: '#0284C7' }, // Sky / Steel Blue
-      { name: 'carrier_sync', interest: 31.0, blastRadius: 4, color: '#D97706' },  // Dark Yellow
-      { name: 'warehouse_pick', interest: 22.0, blastRadius: 3, color: '#C026D3' }, // Magenta
-      { name: 'order_tracking', interest: 14.5, blastRadius: 2, color: '#DC2626' }, // Crimson Red
-      { name: 'customs_intl', interest: 8.0, blastRadius: 1, color: '#0F172A' }    // Black
+      { name: 'inventory_core', interest: 54.0, blastRadius: 6, color: '#0C1A2E' }, // Deep Navy
+      { name: 'dispatch_route', interest: 38.5, blastRadius: 4, color: '#2C3E50' }, // Steel Slate
+      { name: 'carrier_sync', interest: 31.0, blastRadius: 4, color: '#8A6112' },  // Amber Ochre
+      { name: 'warehouse_pick', interest: 22.0, blastRadius: 3, color: '#4A3B69' }, // Muted Plum
+      { name: 'order_tracking', interest: 14.5, blastRadius: 2, color: '#8E2825' }, // Deep Oxblood
+      { name: 'customs_intl', interest: 8.0, blastRadius: 1, color: '#374151' }    // Charcoal
     ],
     incident: {
       code: 'INC-309',
@@ -344,9 +344,9 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       riskPointsReduced: 138,
       roiMultiplier: '3.63x',
       items: [
-        { code: 'LOG-301: Lock Hierarchy', effort: 18, risk: 58, color: 'bg-blue-600', widthPct: '47%' },
-        { code: 'LOG-302: Optimistic Stock Check', effort: 12, risk: 44, color: 'bg-emerald-600', widthPct: '31.5%' },
-        { code: 'LOG-304: Carrier Webhook Retry', effort: 8, risk: 36, color: 'bg-blue-600', widthPct: '21.5%' }
+        { code: 'LOG-301: Lock Hierarchy', effort: 18, risk: 58, color: 'bg-[#0C1A2E]', widthPct: '47%' },
+        { code: 'LOG-302: Optimistic Stock Check', effort: 12, risk: 44, color: 'bg-[#1E4E38]', widthPct: '31.5%' },
+        { code: 'LOG-304: Carrier Webhook Retry', effort: 8, risk: 36, color: 'bg-[#2C3E50]', widthPct: '21.5%' }
       ]
     },
     audit: {
@@ -547,7 +547,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           {/* Brand & Guide Info */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-md bg-blue-700 flex items-center justify-center text-white shadow-xs">
+              <div className="w-8 h-8 rounded-md bg-[#0C1A2E] flex items-center justify-center text-white shadow-xs">
                 <Layers className="w-4 h-4" />
               </div>
               <div>
@@ -566,17 +566,17 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             {/* Mobile Exit */}
             <button
               onClick={onExitDemo}
-              className="md:hidden px-3 py-1.5 rounded-md bg-rose-600 text-[11px] font-bold text-white flex items-center space-x-1"
+              className="md:hidden px-3 py-1.5 rounded-md bg-[#8E2825] text-[11px] font-bold text-white flex items-center space-x-1"
             >
               <X className="w-3 h-3" />
               <span>Exit</span>
             </button>
           </div>
 
-          {/* Center: Scenario Switcher (At Least 3 Domain Examples: FinTech, HealthTech, Supply Chain) */}
-          <div className="flex items-center space-x-1.5 bg-[#FAF8F5] p-1 rounded-md border border-[#EADBCE] self-center">
-            <span className="text-[10px] uppercase font-bold text-stone-500 px-2 hidden lg:inline">
-              Select Domain:
+          {/* Center: Scenario Switcher (3 Institutional Domains: FinTech, HealthTech, Supply Chain) */}
+          <div className="flex items-center space-x-1 bg-[#F4EFE6] p-1 rounded-md border border-[#E5DFD5] self-center">
+            <span className="text-[10px] uppercase font-bold text-stone-500 px-2 font-mono hidden lg:inline">
+              Domain Scope:
             </span>
 
             {(Object.keys(SCENARIOS) as ScenarioId[]).map((id) => {
@@ -589,8 +589,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   onClick={() => handleSwitchScenario(id)}
                   className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-700 text-white shadow-xs font-bold'
-                      : 'text-stone-700 hover:text-slate-950 hover:bg-[#F5EFEB]'
+                      ? 'bg-[#0C1A2E] text-white shadow-xs font-bold'
+                      : 'text-stone-700 hover:text-[#0C1A2E] hover:bg-[#EAE4D7]'
                   }`}
                   title={sc.tagline}
                 >
@@ -605,17 +605,17 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           <div className="hidden md:flex items-center space-x-2">
             <button
               onClick={() => setIsConceptModalOpen(true)}
-              className="px-3 py-1.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-md bg-[#F0F4FA] hover:bg-[#E4ECF6] text-[#0C1A2E] border border-[#CBD8E8] text-xs font-bold transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
               title="Explain what DebtLens is and why it applies to any software domain"
             >
-              <Info className="w-3.5 h-3.5 text-blue-700" />
+              <Info className="w-3.5 h-3.5 text-[#0C1A2E]" />
               <span>What is DebtLens?</span>
             </button>
 
             <button
               onClick={() => setCurrentStep(1)}
               title="Restart walkthrough from stage 1"
-              className="p-1.5 px-2.5 rounded-md bg-white hover:bg-[#F5EFEB] text-stone-700 hover:text-slate-950 border border-[#EADBCE] transition-colors cursor-pointer text-xs font-semibold flex items-center space-x-1"
+              className="p-1.5 px-2.5 rounded-md bg-white hover:bg-[#F6F3EB] text-stone-700 hover:text-[#0C1A2E] border border-[#E5DFD5] transition-colors cursor-pointer text-xs font-semibold flex items-center space-x-1"
             >
               <RotateCcw className="w-3 h-3 text-stone-500" />
               <span>Restart</span>
@@ -623,7 +623,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
             <button
               onClick={onExitDemo}
-              className="px-3.5 py-1.5 rounded-md bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white transition-colors flex items-center space-x-1 cursor-pointer shadow-xs"
+              className="px-3.5 py-1.5 rounded-md bg-[#8E2825] hover:bg-[#78211F] text-xs font-bold text-white transition-colors flex items-center space-x-1 cursor-pointer shadow-xs"
             >
               <X className="w-3.5 h-3.5" />
               <span>Exit Demo</span>
@@ -637,15 +637,15 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       {/* CONCEPT GUIDE MODAL: Explains project to faculty / "Sir"                  */}
       {/* ========================================================================= */}
       {isConceptModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#FCFAF7] rounded-md max-w-2xl w-full p-6 shadow-2xl border border-[#EADBCE] space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EADBCE] pb-3">
+        <div className="fixed inset-0 z-50 bg-[#0C1A2E]/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#FAF8F5] rounded-md max-w-2xl w-full p-6 shadow-2xl border border-[#E5DFD5] space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E5DFD5] pb-3">
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-md bg-blue-100 flex items-center justify-center text-blue-700 border border-blue-200">
+                <div className="w-8 h-8 rounded-md bg-[#F0F4FA] flex items-center justify-center text-[#0C1A2E] border border-[#CBD8E8]">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-950">
+                  <h3 className="text-base font-extrabold text-[#0C1A2E]">
                     What is DebtLens?
                   </h3>
                   <p className="text-[11px] text-stone-500 font-medium">
@@ -655,16 +655,16 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               </div>
               <button 
                 onClick={() => setIsConceptModalOpen(false)}
-                className="p-1.5 rounded-md text-stone-400 hover:text-slate-950 hover:bg-[#F5EFEB] transition-colors"
+                className="p-1.5 rounded-md text-stone-400 hover:text-[#0C1A2E] hover:bg-[#F2ECE2] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs sm:text-sm text-stone-700 leading-relaxed">
-              <div className="p-3.5 bg-blue-50/70 rounded-md border border-blue-200">
-                <h4 className="font-bold text-blue-950 mb-1 flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+              <div className="p-3.5 bg-[#F0F4FA] rounded-md border border-[#CBD8E8]">
+                <h4 className="font-bold text-[#0C1A2E] mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0C1A2E]" />
                   <span>1. Universal Software Domain Agnostic</span>
                 </h4>
                 <p className="text-stone-700 text-xs leading-relaxed">
@@ -672,9 +672,9 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 </p>
               </div>
 
-              <div className="p-3.5 bg-amber-50/80 rounded-md border border-amber-200">
-                <h4 className="font-bold text-amber-950 mb-1 flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-600" />
+              <div className="p-3.5 bg-[#FEF9EE] rounded-md border border-[#EBD8A3]">
+                <h4 className="font-bold text-[#8A6112] mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#8A6112]" />
                   <span>2. Why Traditional Linters (SonarQube) Fail</span>
                 </h4>
                 <p className="text-stone-700 text-xs leading-relaxed">
@@ -682,9 +682,9 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-100 rounded-md border border-[#EADBCE]">
-                <h4 className="font-bold text-slate-950 mb-1 flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+              <div className="p-3.5 bg-white rounded-md border border-[#E5DFD5]">
+                <h4 className="font-bold text-[#0C1A2E] mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0C1A2E]" />
                   <span>3. The 4 Mathematical Pillars of DebtLens</span>
                 </h4>
                 <ul className="list-disc list-inside space-y-1 text-xs text-stone-700">
@@ -696,10 +696,10 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               </div>
             </div>
 
-            <div className="pt-2 border-t border-[#EADBCE] flex justify-end">
+            <div className="pt-2 border-t border-[#E5DFD5] flex justify-end">
               <button
                 onClick={() => setIsConceptModalOpen(false)}
-                className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-md shadow-xs cursor-pointer"
+                className="px-4 py-2 bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold rounded-md shadow-xs cursor-pointer"
               >
                 Close & Return to Walkthrough
               </button>
@@ -711,7 +711,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       {/* ========================================================================= */}
       {/* VISUAL NAVIGATING TOOL: COMPACT HORIZONTAL PIPELINE STEPPER                */}
       {/* ========================================================================= */}
-      <div className="sticky top-[55px] z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EADBCE] px-4 sm:px-6 py-2 shadow-xs overflow-x-auto">
+      <div className="sticky top-[55px] z-40 bg-[#FAF8F5]/98 backdrop-blur-md border-b border-[#E5DFD5] px-4 sm:px-6 py-2 shadow-2xs overflow-x-auto">
         <div className="max-w-7xl mx-auto flex items-center justify-between min-w-[700px] gap-1.5">
           {steps.map((s, idx) => {
             const Icon = s.icon;
@@ -724,21 +724,21 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   onClick={() => setCurrentStep(s.step)}
                   className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md transition-all cursor-pointer text-left shrink-0 ${
                     isActive
-                      ? 'bg-blue-700 text-white font-bold ring-1 ring-blue-500 shadow-xs'
+                      ? 'bg-[#0C1A2E] text-white font-bold ring-1 ring-[#142B4B] shadow-xs'
                       : isCompleted
-                      ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 font-semibold'
-                      : 'bg-white text-stone-600 border border-[#EADBCE] hover:bg-[#F5EFEB] hover:text-slate-950 font-medium'
+                      ? 'bg-[#EDF6F1] text-[#1E4E38] border border-[#BCD8C7] hover:bg-[#E0EFE7] font-semibold'
+                      : 'bg-white text-stone-600 border border-[#E5DFD5] hover:bg-[#F4EFE6] hover:text-[#0C1A2E] font-medium'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded-sm flex items-center justify-center shrink-0 ${
                     isActive 
                       ? 'bg-white/20 text-white' 
                       : isCompleted 
-                      ? 'bg-emerald-100 text-emerald-700' 
+                      ? 'bg-[#E0EFE7] text-[#1E4E38]' 
                       : 'text-stone-400'
                   }`}>
                     {isCompleted ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                      <CheckCircle2 className="w-3 h-3 text-[#1E4E38]" />
                     ) : (
                       <Icon className="w-3 h-3" />
                     )}
@@ -749,8 +749,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 </button>
 
                 {idx < steps.length - 1 && (
-                  <div className={`h-0.5 flex-1 min-w-[8px] rounded-full ${
-                    isCompleted ? 'bg-emerald-500' : 'bg-[#EADBCE]'
+                  <div className={`h-0.5 flex-1 min-w-[8px] rounded-sm ${
+                    isCompleted ? 'bg-[#1E4E38]' : 'bg-[#E5DFD5]'
                   }`} />
                 )}
               </React.Fragment>
@@ -769,12 +769,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-header"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('header')
-              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('header') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 1 Focus • Production Telemetry Stream ({activeScenario.name})</span>
             </div>
@@ -787,8 +787,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 <span>/</span>
                 <span className="text-slate-950 font-bold">{activeScenario.portfolioName}</span>
                 <span className="text-stone-300">•</span>
-                <span className="inline-flex items-center space-x-1 text-xs text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center space-x-1.5 text-xs text-[#1E4E38] font-bold bg-[#EDF6F1] px-2 py-0.5 rounded-sm border border-[#BCD8C7] font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1E4E38] animate-pulse" />
                   <span>Real-time Telemetry Live</span>
                 </span>
               </div>
@@ -815,12 +815,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-kpis"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('kpis')
-              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('kpis') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-700 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 2 Focus • Debt Balance Sheet: Principal P(d) vs Accrued Interest I(d)</span>
             </div>
@@ -832,6 +832,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               value={activeScenario.kpis.activeIncidents}
               subtitle={activeScenario.kpis.openIncidentsSubtitle}
               icon={AlertTriangle}
+              accentColor="amber"
               badge={{ text: `${activeScenario.kpis.activeIncidents} Open`, variant: 'warning' }}
             />
             <StatCard
@@ -839,6 +840,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               value={`${activeScenario.kpis.principalHours}h`}
               subtitle={activeScenario.kpis.principalSubtitle}
               icon={Clock}
+              accentColor="navy"
               badge={{ text: 'Baseline Effort', variant: 'neutral' }}
             />
             <StatCard
@@ -846,6 +848,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               value={`${activeScenario.kpis.interestHours}h`}
               subtitle={activeScenario.kpis.interestSubtitle}
               icon={Coins}
+              accentColor="oxblood"
               badge={{ text: `+${activeScenario.kpis.netDragHours}h Drag`, variant: 'negative' }}
             />
             <StatCard
@@ -853,6 +856,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               value={`${activeScenario.kpis.breakevenPercent}%`}
               subtitle={activeScenario.kpis.breakevenSubtitle}
               icon={Flame}
+              accentColor="oxblood"
               badge={{ text: 'Action Urgent', variant: 'negative' }}
             />
           </div>
@@ -865,36 +869,36 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-alert"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('alert')
-              ? 'relative z-40 bg-white/98 ring-2 ring-rose-600 shadow-[0_0_40px_rgba(220,38,38,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#8E2825] shadow-[0_0_35px_rgba(142,40,37,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('alert') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-rose-700 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#8E2825] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 3 Focus • Mathematical Break-Even Violation Trigger</span>
             </div>
           )}
 
-          <div className="p-3.5 sm:p-4 rounded-md border-2 border-rose-300 bg-[#FFF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-xs">
+          <div className="p-4 rounded-md border-l-4 border-l-[#8E2825] border border-[#E8B4B2] bg-[#FDF2F2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-xs">
             <div className="flex items-start sm:items-center space-x-3">
-              <div className="w-9 h-9 rounded-md bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
-                <ShieldAlert className="w-5 h-5 text-rose-600" />
+              <div className="w-9 h-9 rounded-md bg-[#FADBD8] flex items-center justify-center shrink-0 border border-[#E8B4B2]">
+                <ShieldAlert className="w-5 h-5 text-[#8E2825]" />
               </div>
               <div>
-                <div className="text-sm sm:text-base font-bold text-slate-950">
+                <div className="text-sm sm:text-base font-bold text-[#8E2825]">
                   {activeScenario.breakevenAlert.title}
                 </div>
-                <div className="text-xs text-stone-600 mt-0.5 font-medium leading-relaxed">
+                <div className="text-xs text-stone-700 mt-0.5 font-medium leading-relaxed">
                   {activeScenario.breakevenAlert.description}
                 </div>
               </div>
             </div>
             <div className="flex flex-col sm:items-end shrink-0">
-              <span className="px-2.5 py-1 bg-rose-600 text-white text-xs font-bold rounded-sm shadow-2xs font-mono">
+              <span className="px-2.5 py-1 bg-[#8E2825] text-white text-xs font-bold rounded-sm shadow-2xs font-mono">
                 Net Drag: +{activeScenario.kpis.netDragHours} hrs
               </span>
-              <span className="text-[10px] font-mono text-rose-700 font-bold mt-0.5">
+              <span className="text-[10px] font-mono text-[#8E2825] font-bold mt-0.5">
                 Criterion: I(d) &gt; P(d)
               </span>
             </div>
@@ -908,12 +912,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-dragchart"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('dragchart')
-              ? 'relative z-40 bg-white/98 ring-2 ring-amber-600 shadow-[0_0_40px_rgba(217,119,6,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#8A6112] shadow-[0_0_35px_rgba(138,97,18,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('dragchart') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-amber-700 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#8A6112] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 4 Focus • Partitioned Failure Drag & Blast Radius ({activeScenario.name})</span>
             </div>
@@ -955,12 +959,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-incidents"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('incidents')
-              ? 'relative z-40 bg-white/98 ring-2 ring-fuchsia-600 shadow-[0_0_40px_rgba(192,38,211,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('incidents') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-fuchsia-700 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 5 Focus • Automated 5-Whys Diagnostic Decomposition ({activeScenario.incident.code})</span>
             </div>
@@ -969,7 +973,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           <div className="bg-white rounded-md border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-md bg-amber-100 flex items-center justify-center text-amber-800">
+                <div className="w-7 h-7 rounded-md bg-[#FEF9EE] flex items-center justify-center text-[#8A6112] border border-[#EBD8A3]">
                   <AlertTriangle className="w-4 h-4" />
                 </div>
                 <div>
@@ -979,7 +983,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   <p className="text-[11px] text-stone-500">Production outage converted into structured causal evidence</p>
                 </div>
               </div>
-              <span className="text-xs font-mono font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-sm border border-rose-200">
+              <span className="text-xs font-mono font-bold text-[#8E2825] bg-[#FDF2F2] px-2 py-0.5 rounded-sm border border-[#E8B4B2]">
                 {activeScenario.incident.effort}h Effort • Severity: {activeScenario.incident.multiplier}
               </span>
             </div>
@@ -988,7 +992,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             <div className="space-y-1.5">
               {activeScenario.incident.whys.map((w, idx) => (
                 <div key={idx} className="p-2 rounded-md border border-[#EADBCE] bg-[#FAF8F5] flex items-start space-x-2">
-                  <span className="px-1.5 py-0.5 rounded-sm bg-blue-100 text-blue-950 font-mono font-bold text-[10px] shrink-0">
+                  <span className="px-1.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] font-mono font-bold text-[10px] shrink-0 border border-[#CBD8E8]">
                     {w.level}
                   </span>
                   <div className="flex-1 text-xs">
@@ -1008,12 +1012,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-causal"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('causal')
-              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('causal') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-700 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 6 Focus • NetworkX Directed Causal Graph Centrality</span>
             </div>
@@ -1022,7 +1026,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           <div className="bg-white rounded-md border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-md bg-blue-100 flex items-center justify-center text-blue-700">
+                <div className="w-7 h-7 rounded-md bg-[#F0F4FA] flex items-center justify-center text-[#0C1A2E] border border-[#CBD8E8]">
                   <GitFork className="w-4 h-4" />
                 </div>
                 <div>
@@ -1032,32 +1036,32 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   <p className="text-[11px] text-stone-500">Topological shortest path centrality isolating highest-impact bottleneck</p>
                 </div>
               </div>
-              <span className="text-xs font-mono text-blue-900 font-bold bg-blue-50 px-2 py-0.5 rounded-sm border border-blue-200">
+              <span className="text-xs font-mono text-[#0C1A2E] font-bold bg-[#F0F4FA] px-2 py-0.5 rounded-sm border border-[#CBD8E8]">
                 {activeScenario.causalGraph.edgeCount}
               </span>
             </div>
 
             <div className="p-3.5 rounded-md border border-[#EADBCE] bg-[#FAF8F5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-blue-100 text-blue-950">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
                   RANK #1 SYSTEMIC BOTTLENECK
                 </span>
                 <h4 className="text-sm font-bold text-slate-950 mt-1">
                   {activeScenario.causalGraph.nodeTitle}
                 </h4>
                 <p className="text-xs text-stone-700 mt-0.5 font-medium">
-                  Category: <strong className="text-blue-900 font-bold">{activeScenario.causalGraph.category}</strong> • {activeScenario.causalGraph.affectedServices}
+                  Category: <strong className="text-[#0C1A2E] font-bold">{activeScenario.causalGraph.category}</strong> • {activeScenario.causalGraph.affectedServices}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-center shrink-0">
                 <div className="p-2 bg-white rounded-md border border-[#EADBCE] shadow-2xs">
                   <div className="text-[9px] text-stone-500 font-bold uppercase">Betweenness CB(v)</div>
-                  <div className="text-base font-bold font-mono text-blue-900 mt-0.5">{activeScenario.causalGraph.betweenness}</div>
+                  <div className="text-base font-bold font-mono text-[#0C1A2E] mt-0.5">{activeScenario.causalGraph.betweenness}</div>
                 </div>
                 <div className="p-2 bg-white rounded-md border border-[#EADBCE] shadow-2xs">
                   <div className="text-[9px] text-stone-500 font-bold uppercase">Degree Centrality</div>
-                  <div className="text-base font-bold font-mono text-blue-700 mt-0.5">{activeScenario.causalGraph.degree}</div>
+                  <div className="text-base font-bold font-mono text-[#2C3E50] mt-0.5">{activeScenario.causalGraph.degree}</div>
                 </div>
               </div>
             </div>
@@ -1071,12 +1075,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-knapsack"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('knapsack')
-              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('knapsack') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-800 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 7 Focus • Bounded 0/1 Knapsack Dynamic Programming Optimizer</span>
             </div>
@@ -1085,7 +1089,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           <div className="bg-white rounded-md border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-md bg-blue-100 flex items-center justify-center text-blue-800">
+                <div className="w-7 h-7 rounded-md bg-[#F0F4FA] flex items-center justify-center text-[#0C1A2E] border border-[#CBD8E8]">
                   <Calculator className="w-4 h-4" />
                 </div>
                 <div>
@@ -1095,7 +1099,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   <p className="text-[11px] text-stone-500">Globally optimal refactoring selection under sprint capacity constraint B = {activeScenario.knapsack.capacity}h</p>
                 </div>
               </div>
-              <span className="text-xs font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-sm border border-blue-200">
+              <span className="text-xs font-mono font-bold text-[#0C1A2E] bg-[#F0F4FA] px-2 py-0.5 rounded-sm border border-[#CBD8E8]">
                 Capacity B = {activeScenario.knapsack.capacity}h • Utilization: 95.0%
               </span>
             </div>
@@ -1130,12 +1134,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 <div className="text-sm font-bold font-mono text-slate-950 mt-0.5">{activeScenario.knapsack.packedEffort} / {activeScenario.knapsack.capacity}h</div>
               </div>
               <div className="p-2.5 bg-[#FAF8F5] rounded-md border border-[#EADBCE] text-center">
-                <div className="text-[9px] text-blue-800 font-bold uppercase">Risk Points Remediated</div>
-                <div className="text-sm font-bold font-mono text-blue-900 mt-0.5">{activeScenario.knapsack.riskPointsReduced} pts</div>
+                <div className="text-[9px] text-[#0C1A2E] font-bold uppercase">Risk Points Remediated</div>
+                <div className="text-sm font-bold font-mono text-[#0C1A2E] mt-0.5">{activeScenario.knapsack.riskPointsReduced} pts</div>
               </div>
               <div className="p-2.5 bg-[#FAF8F5] rounded-md border border-[#EADBCE] text-center">
-                <div className="text-[9px] text-blue-800 font-bold uppercase">Payoff Return ROI</div>
-                <div className="text-sm font-bold font-mono text-blue-900 mt-0.5">{activeScenario.knapsack.roiMultiplier} ROI</div>
+                <div className="text-[9px] text-[#0C1A2E] font-bold uppercase">Payoff Return ROI</div>
+                <div className="text-sm font-bold font-mono text-[#0C1A2E] mt-0.5">{activeScenario.knapsack.roiMultiplier} ROI</div>
               </div>
             </div>
           </div>
@@ -1148,12 +1152,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-audit"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('audit')
-              ? 'relative z-40 bg-white/98 ring-2 ring-slate-900 shadow-[0_0_40px_rgba(15,23,42,0.22)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
+              ? 'relative z-40 bg-white/98 ring-2 ring-[#0C1A2E] shadow-[0_0_35px_rgba(12,26,46,0.18)] rounded-md p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('audit') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-slate-950 text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-[#0C1A2E] text-white px-2.5 py-0.5 rounded-sm shadow-xs text-xs font-bold uppercase tracking-wider font-mono">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 8 Focus • Technical Debt Audit & Governance Export</span>
             </div>
@@ -1161,7 +1165,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
           <div className="bg-white rounded-md border border-[#EADBCE] p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-md bg-[#F5EFEB] flex items-center justify-center text-blue-800 shrink-0 border border-[#EADBCE]">
+              <div className="w-9 h-9 rounded-md bg-[#F0F4FA] flex items-center justify-center text-[#0C1A2E] shrink-0 border border-[#CBD8E8]">
                 <FileDown className="w-4 h-4" />
               </div>
               <div>
@@ -1176,7 +1180,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
             <button
               onClick={handleDownloadPdf}
-              className="px-3.5 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-md text-xs font-bold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
+              className="px-3.5 py-2 bg-[#0C1A2E] hover:bg-[#142B4B] text-white rounded-md text-xs font-bold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
             >
               <FileDown className="w-3.5 h-3.5" />
               <span>Download Audit Report PDF</span>
@@ -1193,17 +1197,17 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#FCFAF7]/98 backdrop-blur-md border-t border-[#EADBCE] shadow-[0_-8px_30px_rgba(15,23,42,0.12)]">
         
         {/* Sleek Toggle Header for Minimal View */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-[#F5EFEB] py-1 text-[11px] text-stone-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-[#F4EFE6] py-1 text-[11px] text-stone-500">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-bold text-slate-950 uppercase tracking-wider text-[10px]">Presenter Console</span>
-            <span className="text-[#EADBCE]">|</span>
-            <span className="font-mono text-blue-800 font-bold">{activeScenario.name}</span>
+            <span className="w-2 h-2 rounded-full bg-[#1E4E38] animate-pulse" />
+            <span className="font-bold text-[#0C1A2E] uppercase tracking-wider text-[10px] font-mono">Presenter Console</span>
+            <span className="text-[#E5DFD5]">|</span>
+            <span className="font-mono text-[#0C1A2E] font-bold">{activeScenario.name}</span>
           </div>
 
           <button
             onClick={() => setIsBottomBarCollapsed(!isBottomBarCollapsed)}
-            className="flex items-center space-x-1 text-stone-600 hover:text-slate-950 cursor-pointer font-semibold transition-colors"
+            className="flex items-center space-x-1 text-stone-600 hover:text-[#0C1A2E] cursor-pointer font-semibold transition-colors"
           >
             <span>{isBottomBarCollapsed ? 'Expand Controller' : 'Minimize Controller'}</span>
             {isBottomBarCollapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -1214,23 +1218,23 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
         {isBottomBarCollapsed ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 rounded-sm bg-blue-700 text-white font-mono font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded-sm bg-[#0C1A2E] text-white font-mono font-bold text-[10px]">
                 {currentStep} / {totalSteps}
               </span>
-              <span className="text-xs font-bold text-slate-950">{currentConfig.stageName}</span>
+              <span className="text-xs font-bold text-[#0C1A2E]">{currentConfig.stageName}</span>
             </div>
 
             <div className="flex items-center space-x-2">
               <button
                 disabled={currentStep === 1}
                 onClick={handlePrev}
-                className="px-2.5 py-1 rounded-md border border-[#EADBCE] text-xs font-semibold text-stone-700 hover:bg-[#F5EFEB] disabled:opacity-30 cursor-pointer"
+                className="px-2.5 py-1 rounded-md border border-[#E5DFD5] text-xs font-semibold text-stone-700 hover:bg-[#F4EFE6] disabled:opacity-30 cursor-pointer"
               >
                 Prev
               </button>
               <button
                 onClick={handleNext}
-                className="px-4 py-1 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs cursor-pointer"
+                className="px-4 py-1 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold shadow-xs cursor-pointer"
               >
                 {currentConfig.nextLabel}
               </button>
@@ -1243,20 +1247,20 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             {/* Left: Stage Title & Clear Q&A Explanation */}
             <div className="flex-1 w-full md:w-auto">
               <div className="flex items-center space-x-2 mb-1 flex-wrap gap-1">
-                <span className="px-2 py-0.5 rounded-sm bg-blue-700 text-white font-mono font-bold text-[9px] tracking-wider uppercase">
+                <span className="px-2 py-0.5 rounded-sm bg-[#0C1A2E] text-white font-mono font-bold text-[9px] tracking-wider uppercase">
                   {currentConfig.badge}
                 </span>
-                <span className="text-xs font-bold text-slate-950">
+                <span className="text-xs font-bold text-[#0C1A2E]">
                   Stage {currentStep} of {totalSteps}: {currentConfig.stageName}
                 </span>
                 <span className="text-stone-300 hidden sm:inline">•</span>
-                <span className="text-[10px] font-mono text-blue-900 bg-blue-50 px-2 py-0.5 rounded-sm border border-blue-200 font-bold truncate max-w-sm">
+                <span className="text-[10px] font-mono text-[#0C1A2E] bg-[#F0F4FA] px-2 py-0.5 rounded-sm border border-[#CBD8E8] font-bold truncate max-w-sm">
                   {currentConfig.mathematicalProof}
                 </span>
               </div>
 
-              <div className="text-xs font-bold text-slate-950 flex items-baseline space-x-1.5">
-                <span className="text-blue-700 font-extrabold shrink-0">Q:</span>
+              <div className="text-xs font-bold text-[#0C1A2E] flex items-baseline space-x-1.5">
+                <span className="text-[#0C1A2E] font-extrabold shrink-0">Q:</span>
                 <span className="text-slate-950 font-semibold">{currentConfig.inquiry}</span>
               </div>
 
@@ -1266,11 +1270,11 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             </div>
 
             {/* Right: Master 1-Click Advance Controls */}
-            <div className="flex items-center justify-end space-x-2 shrink-0 w-full md:w-auto pt-1.5 md:pt-0 border-t md:border-t-0 border-[#F5EFEB]">
+            <div className="flex items-center justify-end space-x-2 shrink-0 w-full md:w-auto pt-1.5 md:pt-0 border-t md:border-t-0 border-[#F4EFE6]">
               <button
                 disabled={currentStep === 1}
                 onClick={handlePrev}
-                className="px-2.5 py-1.5 rounded-md border border-[#EADBCE] text-xs font-semibold text-stone-700 hover:bg-[#F5EFEB] disabled:opacity-30 cursor-pointer flex items-center space-x-1 transition-colors"
+                className="px-2.5 py-1.5 rounded-md border border-[#E5DFD5] text-xs font-semibold text-stone-700 hover:bg-[#F4EFE6] disabled:opacity-30 cursor-pointer flex items-center space-x-1 transition-colors"
               >
                 <ArrowLeft className="w-3 h-3" />
                 <span>Prev</span>
@@ -1279,7 +1283,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               {/* Master ONE-CLICK Step Advance Button */}
               <button
                 onClick={handleNext}
-                className="px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs hover:shadow-sm flex items-center space-x-1.5 transition-all cursor-pointer active:scale-[0.99]"
+                className="px-4 py-2 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold shadow-xs hover:shadow-sm flex items-center space-x-1.5 transition-all cursor-pointer active:scale-[0.99]"
               >
                 <span>{currentConfig.nextLabel}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

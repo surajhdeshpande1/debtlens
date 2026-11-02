@@ -4,7 +4,8 @@ interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string }>;
+  accentColor?: 'navy' | 'oxblood' | 'forest' | 'amber';
   badge?: {
     text: string;
     variant: 'positive' | 'negative' | 'neutral' | 'warning';
@@ -16,33 +17,43 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   subtitle,
   icon: Icon,
+  accentColor = 'navy',
   badge
 }) => {
+  const accentTopBorders = {
+    navy: 'border-t-2 border-t-[#0C1A2E]',
+    oxblood: 'border-t-2 border-t-[#8E2825]',
+    forest: 'border-t-2 border-t-[#1E4E38]',
+    amber: 'border-t-2 border-t-[#8A6112]'
+  };
+
   const badgeColors = {
-    positive: 'bg-blue-50 text-blue-900 border-blue-200 ring-1 ring-blue-500/20',
-    negative: 'bg-rose-50 text-rose-900 border-rose-200 ring-1 ring-rose-500/20',
-    warning: 'bg-amber-50 text-amber-900 border-amber-200 ring-1 ring-amber-500/20',
-    neutral: 'bg-slate-100 text-slate-800 border-slate-300 ring-1 ring-slate-400/20'
+    positive: 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]',
+    negative: 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]',
+    warning: 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]',
+    neutral: 'bg-[#F4EFE6] text-stone-700 border-[#DDD5C7]'
   };
 
   return (
-    <div className="bg-white/95 rounded-md border border-[#EADBCE] p-4 sm:p-5 shadow-xs hover:border-[#D1BFA8] hover:shadow-sm transition-all duration-150 flex flex-col justify-between">
+    <div className={`bg-white rounded-md border border-[#E5DFD5] ${accentTopBorders[accentColor]} p-4 sm:p-5 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between`}>
       <div>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
             {title}
           </span>
-          <div className="w-8 h-8 rounded-md bg-[#F5EFEB] flex items-center justify-center text-blue-700 border border-[#EADBCE] shadow-2xs">
-            <Icon className="w-4 h-4 text-blue-700" />
-          </div>
+          {Icon && (
+            <div className="w-6 h-6 rounded-sm bg-[#F4EFE6] flex items-center justify-center text-[#0C1A2E] border border-[#E5DFD5]">
+              <Icon className="w-3.5 h-3.5" />
+            </div>
+          )}
         </div>
 
-        <div className="mt-3 flex items-baseline justify-between gap-2 flex-wrap">
-          <span className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight font-mono">
+        <div className="mt-2.5 flex items-baseline justify-between gap-2 flex-wrap">
+          <span className="text-2xl sm:text-3xl font-extrabold text-[#0C1A2E] tracking-tight font-mono">
             {value}
           </span>
           {badge && (
-            <span className={`text-xs font-bold px-2 py-0.5 rounded-sm border shadow-2xs ${badgeColors[badge.variant]}`}>
+            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm border shadow-2xs ${badgeColors[badge.variant]}`}>
               {badge.text}
             </span>
           )}
@@ -50,7 +61,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-2 text-xs text-stone-600 font-medium leading-relaxed border-t border-[#F5EFEB] pt-2">
+        <p className="mt-2.5 text-xs text-stone-600 font-medium leading-relaxed border-t border-[#F2ECE2] pt-2">
           {subtitle}
         </p>
       )}

@@ -37,161 +37,179 @@ export const Sidebar: React.FC<SidebarProps> = ({
   breakevenDebtCount = 0,
   regressionsCount = 0
 }) => {
-  const navItems: { 
+  const coreNavItems: { 
     id: NavTab; 
     label: string; 
     icon: React.ComponentType<{ className?: string }>; 
     badge?: number; 
-    badgeVariant?: 'rose' | 'amber' | 'neutral' | 'magenta';
+    badgeVariant?: 'oxblood' | 'ochre' | 'navy' | 'neutral';
     moduleCode: string;
-    iconColor: string;
   }[] = [
     {
       id: 'dashboard',
       label: 'Executive Overview',
       icon: LayoutDashboard,
-      moduleCode: 'M8',
-      iconColor: 'text-blue-700'
+      moduleCode: 'M8'
     },
     {
       id: 'incidents',
       label: 'Incident Management',
       icon: AlertCircle,
       badge: openIncidentsCount,
-      badgeVariant: 'amber',
-      moduleCode: 'M2',
-      iconColor: 'text-amber-600'
+      badgeVariant: 'ochre',
+      moduleCode: 'M2'
     },
     {
       id: 'causal',
       label: 'Causal Graph (5 Whys)',
       icon: GitFork,
-      moduleCode: 'M3',
-      iconColor: 'text-blue-700'
+      moduleCode: 'M3'
     },
     {
       id: 'debt',
       label: 'Technical Debt Ledger',
       icon: Coins,
       badge: breakevenDebtCount,
-      badgeVariant: 'rose',
-      moduleCode: 'M4',
-      iconColor: 'text-rose-600'
+      badgeVariant: 'oxblood',
+      moduleCode: 'M4'
+    }
+  ];
+
+  const remediationNavItems: {
+    id: NavTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: number;
+    badgeVariant?: 'oxblood' | 'ochre' | 'navy' | 'neutral';
+    moduleCode: string;
+  }[] = [
+    {
+      id: 'optimiser',
+      label: 'Payoff Optimiser (0/1)',
+      icon: Calculator,
+      moduleCode: 'M7'
     },
     {
       id: 'repository',
       label: 'Repository Evidence',
       icon: GitBranch,
-      moduleCode: 'M5',
-      iconColor: 'text-slate-850'
+      moduleCode: 'M5'
     },
     {
       id: 'intelligence',
       label: 'Incident Intelligence',
       icon: Sparkles,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
-      badgeVariant: 'magenta',
-      moduleCode: 'M6',
-      iconColor: 'text-fuchsia-600'
-    },
-    {
-      id: 'optimiser',
-      label: 'Payoff Optimiser (0/1)',
-      icon: Calculator,
-      moduleCode: 'M7',
-      iconColor: 'text-blue-600'
+      badgeVariant: 'navy',
+      moduleCode: 'M6'
     },
     {
       id: 'knowledge',
       label: 'Knowledge & Audit',
       icon: BookOpen,
-      moduleCode: 'M8',
-      iconColor: 'text-slate-700'
+      moduleCode: 'M8'
     }
   ];
 
-  const getBadgeClass = (variant?: 'rose' | 'amber' | 'neutral' | 'magenta') => {
+  const getBadgeClass = (variant?: 'oxblood' | 'ochre' | 'navy' | 'neutral') => {
     switch (variant) {
-      case 'rose':
-        return 'bg-rose-50 text-rose-800 border-rose-200';
-      case 'amber':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
-      case 'magenta':
-        return 'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-200';
+      case 'oxblood':
+        return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
+      case 'ochre':
+        return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
+      case 'navy':
+        return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
       default:
-        return 'bg-stone-100 text-stone-700 border-stone-200';
+        return 'bg-[#F4EFE6] text-stone-700 border-[#E5DFD5]';
     }
   };
 
+  const renderNavGroup = (items: typeof coreNavItems) => (
+    <div className="space-y-1">
+      {items.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentTab === item.id;
+        return (
+          <button
+            key={item.id}
+            onClick={() => setCurrentTab(item.id)}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
+              isActive
+                ? 'bg-white text-[#0C1A2E] font-bold border border-[#E5DFD5] border-l-4 border-l-[#0C1A2E] shadow-2xs'
+                : 'text-stone-700 hover:bg-[#F4EFE6] hover:text-[#0C1A2E] font-medium'
+            }`}
+          >
+            <div className="flex items-center space-x-2.5 truncate">
+              <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                isActive ? 'text-[#0C1A2E]' : 'text-stone-400 group-hover:text-[#0C1A2E]'
+              }`} />
+              <span className="truncate">{item.label}</span>
+            </div>
+
+            <div className="flex items-center space-x-1.5 shrink-0">
+              <span className="text-[10px] text-stone-400 font-mono font-medium">{item.moduleCode}</span>
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
+                  {item.badge}
+                </span>
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
-    <aside className="w-64 bg-[#FCFAF7] border-r border-[#EADBCE] shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
-      <div className="space-y-1">
+    <aside className="w-64 bg-[#FAF8F5] border-r border-[#E5DFD5] shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
+      <div className="space-y-4">
         
-        {/* Prominent Live Demo Mode Button - Regular Shaped with Corners */}
+        {/* Prominent Live Demo Mode Button - Deep Navy with Crisp Corners */}
         <button
           onClick={() => setCurrentTab('demo')}
-          className={`w-full mb-3.5 px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer ${
+          className={`w-full px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer border ${
             currentTab === 'demo'
-              ? 'bg-slate-950 text-white shadow-md'
-              : 'bg-blue-700 hover:bg-blue-800 text-white shadow-xs'
+              ? 'bg-[#142B4B] text-white border-[#142B4B] shadow-md ring-1 ring-white/20'
+              : 'bg-[#0C1A2E] hover:bg-[#142B4B] text-white border-[#142B4B] shadow-xs'
           }`}
         >
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-            <span>Live Demo Walkthrough</span>
+            <Sparkles className="w-4 h-4 text-[#E5B54F] animate-pulse" />
+            <span>Interactive Demo</span>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono bg-white/20 text-white">
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm font-mono bg-white/15 text-white tracking-wider">
             1-CLICK
           </span>
         </button>
 
-        <div className="px-3 py-1.5 text-xs font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
-          <span>Platform Modules</span>
-          <span className="font-mono text-[10px] text-stone-400">8 CORE</span>
+        {/* Section 1: Core Intelligence */}
+        <div>
+          <div className="px-3 pb-1.5 text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Core Intelligence</span>
+            <span className="font-mono text-[9px] text-stone-400">LEDGER</span>
+          </div>
+          {renderNavGroup(coreNavItems)}
         </div>
 
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setCurrentTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
-                isActive
-                  ? 'bg-white text-slate-950 font-bold border border-[#EADBCE] shadow-xs'
-                  : 'text-stone-700 hover:bg-[#F5EFEB] hover:text-slate-950 font-medium'
-              }`}
-            >
-              <div className="flex items-center space-x-2.5 truncate">
-                <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                  isActive ? item.iconColor : 'text-stone-400 group-hover:' + item.iconColor
-                }`} />
-                <span className="truncate">{item.label}</span>
-              </div>
-
-              <div className="flex items-center space-x-1.5 shrink-0">
-                <span className="text-xs text-stone-400 font-mono font-medium">{item.moduleCode}</span>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`px-2 py-0.5 text-[11px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-            </button>
-          );
-        })}
+        {/* Section 2: Remediation & Architecture */}
+        <div>
+          <div className="px-3 pb-1.5 text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Remediation Engine</span>
+            <span className="font-mono text-[9px] text-stone-400">SOLVER</span>
+          </div>
+          {renderNavGroup(remediationNavItems)}
+        </div>
       </div>
 
-      {/* College & Department Endorsement Footer */}
-      <div className="pt-3 border-t border-[#EADBCE]">
-        <div className="p-3 bg-[#F5EFEB]/90 rounded-md border border-[#EADBCE] text-stone-700">
+      {/* Institutional Department Endorsement Footer */}
+      <div className="pt-3 border-t border-[#E5DFD5]">
+        <div className="p-3 bg-[#F4EFE6] rounded-md border border-[#E5DFD5] text-stone-700 text-xs">
           <div className="flex items-center space-x-1.5 mb-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-700" />
-            <span className="text-[11px] font-bold text-slate-950">BEC Bagalkote — ISE</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0C1A2E]" />
+            <span className="text-[11px] font-bold text-[#0C1A2E]">BEC Bagalkote — Dept of ISE</span>
           </div>
-          <div className="text-[10px] text-stone-500">Mini Project BISA531P</div>
-          <div className="text-[10px] text-slate-800 font-semibold mt-0.5">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-[10px] text-stone-500 font-mono">5th Sem Mini Project • BISA531P</div>
+          <div className="text-[10px] text-stone-800 font-medium mt-0.5">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

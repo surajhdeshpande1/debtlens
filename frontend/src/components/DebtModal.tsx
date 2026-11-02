@@ -108,9 +108,9 @@ export const DebtModal: React.FC<DebtModalProps> = ({
       <div className="bg-[#FAF8F5] rounded-md border border-[#EADBCE] shadow-2xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[#EADBCE] flex items-center justify-between bg-white">
+        <div className="px-6 py-4 border-b border-[#E5DFD5] flex items-center justify-between bg-white">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+            <div className="p-2 rounded-md bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
               <Coins className="w-5 h-5" />
             </div>
             <div>
@@ -120,7 +120,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-slate-950 p-1 rounded-md hover:bg-[#F5EFEB] transition-colors cursor-pointer"
+            className="text-stone-400 hover:text-slate-950 p-1 rounded-md hover:bg-[#F4EFE6] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -138,7 +138,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Refactor Connection Pool to HikariCP with Dynamic Backpressure"
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
             />
           </div>
 
@@ -150,7 +150,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as DebtCategory)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
               >
                 <option value="ARCHITECTURAL">ARCHITECTURAL</option>
                 <option value="CODE_SMELL">CODE_SMELL</option>
@@ -168,7 +168,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               <select
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
               >
                 <option value="database">database</option>
                 <option value="payments">payments</option>
@@ -194,7 +194,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
                 required
                 value={principal}
                 onChange={(e) => setPrincipal(parseFloat(e.target.value) || 1)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
               />
             </div>
 
@@ -207,7 +207,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
                 value={assignee}
                 onChange={(e) => setAssignee(e.target.value)}
                 placeholder="Assignee developer..."
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
               />
             </div>
           </div>
@@ -216,13 +216,13 @@ export const DebtModal: React.FC<DebtModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center space-x-1">
-                <Link2 className="w-3 h-3 text-blue-700" />
+                <Link2 className="w-3 h-3 text-[#0C1A2E]" />
                 <span>Link Systemic Root Cause</span>
               </label>
               <select
                 value={selectedCauseId || ''}
                 onChange={(e) => setSelectedCauseId(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#EADBCE] bg-white cursor-pointer"
+                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
               >
                 <option value="">None (Unlinked)</option>
                 {causes.map((c) => (
@@ -235,13 +235,13 @@ export const DebtModal: React.FC<DebtModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center space-x-1">
-                <Link2 className="w-3 h-3 text-blue-700" />
+                <Link2 className="w-3 h-3 text-[#0C1A2E]" />
                 <span>Link Tracing Incident</span>
               </label>
               <select
                 value={selectedIncidentId || ''}
                 onChange={(e) => setSelectedIncidentId(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#EADBCE] bg-white cursor-pointer"
+                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
               >
                 <option value="">None (Independent)</option>
                 {incidents.map((i) => (
@@ -262,7 +262,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={filePath}
               onChange={(e) => setFilePath(e.target.value)}
               placeholder="e.g. database/connection_pool.py"
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
             />
           </div>
 
@@ -276,23 +276,23 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the structural compromise, corrective architecture refactoring, and acceptance criteria..."
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
             />
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-[#EADBCE] flex items-center justify-end space-x-2">
+          <div className="pt-4 border-t border-[#E5DFD5] flex items-center justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-md text-xs font-medium text-stone-700 hover:bg-[#F5EFEB] transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-medium text-stone-700 hover:bg-[#F4EFE6] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-bold bg-[#0C1A2E] hover:bg-[#142B4B] text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? 'Registering...' : 'Register Debt Item'}
             </button>

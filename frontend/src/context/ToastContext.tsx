@@ -41,20 +41,20 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       case 'warning':
         return <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />;
       case 'info':
-        return <Info className="w-5 h-5 text-indigo-600 shrink-0" />;
+        return <Info className="w-5 h-5 text-[#0C1A2E] shrink-0" />;
     }
   };
 
   const getBorderColor = (type: ToastType) => {
     switch (type) {
       case 'success':
-        return 'border-emerald-200 bg-emerald-50/90 text-emerald-950';
+        return 'border-[#BCD8C7] bg-[#EDF6F1] text-[#1E4E38]';
       case 'error':
-        return 'border-rose-200 bg-rose-50/90 text-rose-950';
+        return 'border-[#E8B4B2] bg-[#FDF2F2] text-[#8E2825]';
       case 'warning':
-        return 'border-amber-200 bg-amber-50/90 text-amber-950';
+        return 'border-[#EBD8A3] bg-[#FEF9EE] text-[#8A6112]';
       case 'info':
-        return 'border-indigo-200 bg-indigo-50/90 text-indigo-950';
+        return 'border-[#CBD8E8] bg-[#F0F4FA] text-[#0C1A2E]';
     }
   };
 
@@ -66,7 +66,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-3.5 rounded-xl border shadow-lg backdrop-blur-md transition-all flex items-start space-x-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ${getBorderColor(
+            className={`pointer-events-auto p-3.5 rounded-md border shadow-lg backdrop-blur-md transition-all flex items-start space-x-3 animate-in fade-in slide-in-from-bottom-3 duration-200 ${getBorderColor(
               toast.type
             )}`}
           >

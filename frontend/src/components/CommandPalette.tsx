@@ -308,8 +308,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Results List */}
         <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-slate-50">
           {filteredItems.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
-              No results found for &ldquo;<span className="font-semibold text-slate-800">{query}</span>&rdquo;. Try searching for an incident ID like <code className="px-1.5 py-0.5 rounded-sm bg-slate-100 font-mono text-indigo-600">INC-101</code> or debt keyword like <code className="px-1.5 py-0.5 rounded-sm bg-slate-100 font-mono text-indigo-600">connection pool</code>.
+            <div className="p-8 text-center text-xs text-stone-500">
+              No results found for &ldquo;<span className="font-semibold text-slate-800">{query}</span>&rdquo;. Try searching for an incident ID like <code className="px-1.5 py-0.5 rounded-sm bg-[#F4EFE6] font-mono text-[#0C1A2E]">INC-101</code> or debt keyword like <code className="px-1.5 py-0.5 rounded-sm bg-[#F4EFE6] font-mono text-[#0C1A2E]">connection pool</code>.
             </div>
           ) : (
             filteredItems.map((item, index) => {
@@ -320,17 +320,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   key={item.id}
                   onClick={item.action}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-md cursor-pointer transition-colors ${
                     isSelected 
-                      ? 'bg-indigo-50 text-indigo-900' 
-                      : 'hover:bg-slate-50/80 text-slate-700'
+                      ? 'bg-[#F0F4FA] text-[#0C1A2E]' 
+                      : 'hover:bg-[#FAF8F5] text-slate-700'
                   }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <div className={`p-2 rounded-lg border ${
+                    <div className={`p-2 rounded-md border ${
                       isSelected 
-                        ? 'bg-indigo-600 text-white border-indigo-600' 
-                        : 'bg-white text-slate-500 border-slate-200'
+                        ? 'bg-[#0C1A2E] text-white border-[#0C1A2E]' 
+                        : 'bg-white text-stone-500 border-[#E5DFD5]'
                     }`}>
                       <Icon className="w-3.5 h-3.5" />
                     </div>
@@ -341,12 +341,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           {item.title}
                         </span>
                         {item.badge && (
-                          <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-sm border uppercase ${
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-sm border uppercase ${
                             item.badge.includes('BREAK-EVEN')
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              ? 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]'
                               : isSelected
-                              ? 'bg-indigo-100 text-indigo-800 border-indigo-200'
-                              : 'bg-slate-100 text-slate-600 border-slate-200'
+                              ? 'bg-[#E4ECF6] text-[#0C1A2E] border-[#CBD8E8]'
+                              : 'bg-[#F4EFE6] text-stone-600 border-[#E5DFD5]'
                           }`}>
                             {item.badge}
                           </span>
@@ -354,7 +354,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       </div>
 
                       {item.subtitle && (
-                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                        <p className="text-[11px] text-stone-500 truncate mt-0.5">
                           {item.subtitle}
                         </p>
                       )}
@@ -362,10 +362,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
 
                   <div className="flex items-center space-x-2 pl-3 shrink-0">
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-stone-400 font-mono">
                       {item.category}
                     </span>
-                    <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-600' : 'text-slate-300'}`} />
+                    <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-[#0C1A2E]' : 'text-stone-300'}`} />
                   </div>
                 </div>
               );

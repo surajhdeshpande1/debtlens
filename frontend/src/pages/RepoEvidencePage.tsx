@@ -215,9 +215,9 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
         return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'TODO':
       case 'OPTIMIZE':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
     }
   };
 
@@ -229,7 +229,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Repository Evidence & Static Code Hotspots</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F5EFEB] text-blue-900 border border-[#EADBCE] font-bold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8] font-bold font-mono">
               Module M5
             </span>
           </h2>
@@ -240,11 +240,11 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab toggle */}
-          <div className="flex items-center bg-[#FAF8F5] border border-[#EADBCE] rounded-md p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-[#FAF8F5] border border-[#E5DFD5] rounded-md p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('matrix')}
               className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
-                activeTab === 'matrix' ? 'bg-blue-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
+                activeTab === 'matrix' ? 'bg-[#0C1A2E] text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               Repository Matrix
@@ -255,7 +255,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                 if (!snippetResult) handleAnalyzeSnippet();
               }}
               className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
-                activeTab === 'playground' ? 'bg-blue-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
+                activeTab === 'playground' ? 'bg-[#0C1A2E] text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               <Code2 className="w-3.5 h-3.5" />
@@ -266,9 +266,9 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
           <button
             onClick={handleScanWorkspace}
             disabled={isScanning}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-blue-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-white' : ''}`} />
             <span>{isScanning ? 'Scanning...' : 'Scan Repo'}</span>
           </button>
         </div>
@@ -277,13 +277,13 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
       {activeTab === 'matrix' ? (
         <>
           {/* Churn vs Complexity Matrix Scatter Plot */}
-          <div className="bg-white/95 rounded-md border border-[#EADBCE] p-5 shadow-xs">
+          <div className="bg-white/95 rounded-md border border-[#E5DFD5] p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-950">Code Churn vs. Cyclomatic Complexity Hotspots</h3>
                 <p className="text-xs text-stone-500 font-medium">High Churn + High Complexity files indicate severe architectural risk hotspots</p>
               </div>
-              <span className="text-xs font-mono text-blue-900 bg-[#F5EFEB] px-2 py-0.5 rounded-sm border border-[#EADBCE] font-bold">McCabe AST Visitor</span>
+              <span className="text-xs font-mono text-[#0C1A2E] bg-[#F0F4FA] px-2 py-0.5 rounded-sm border border-[#CBD8E8] font-bold">McCabe AST Visitor</span>
             </div>
 
             <div className="h-72 w-full">
@@ -313,19 +313,19 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                       if (payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 rounded-lg border border-[#EADBCE] shadow-lg text-xs space-y-1">
+                          <div className="bg-white p-3 rounded-md border border-[#E5DFD5] shadow-lg text-xs space-y-1">
                             <div className="font-bold text-slate-950 font-mono">{data.name}</div>
                             <div className="text-stone-500 font-medium">Module: <span className="font-bold text-slate-900">{data.module}</span></div>
                             <div className="text-stone-500 font-medium">Cyclomatic Complexity: <span className="font-bold text-slate-900">{data.complexity}</span></div>
                             <div className="text-stone-500 font-medium">Churn Count: <span className="font-bold text-slate-900">{data.churn}</span></div>
-                            <div className="text-indigo-600 font-bold">Composite Risk: {data.risk}</div>
+                            <div className="text-[#0C1A2E] font-bold">Composite Risk: {data.risk}</div>
                           </div>
                         );
                       }
                       return null;
                     }}
                   />
-                  <Scatter name="Files" data={scatterData} fill="#4F46E5" />
+                  <Scatter name="Files" data={scatterData} fill="#0C1A2E" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
@@ -335,21 +335,21 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Hotspots Table */}
-            <div className="lg:col-span-7 bg-white rounded-md border border-slate-200 shadow-xs overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="lg:col-span-7 bg-white rounded-md border border-[#E5DFD5] shadow-xs overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#F4EFE6] flex items-center justify-between bg-[#FAF8F5]">
                 <h3 className="text-xs font-bold text-slate-900">Risk-Ranked Hotspot Files</h3>
-                <span className="text-[11px] text-slate-400 font-mono">Ranked by (CC×1.8 + Churn×0.25)</span>
+                <span className="text-[11px] text-stone-500 font-mono">Ranked by (CC×1.8 + Churn×0.25)</span>
               </div>
 
-              <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+              <div className="divide-y divide-[#F4EFE6] max-h-96 overflow-y-auto">
                 {hotspots.map((h) => (
-                  <div key={h.id} className="p-3.5 hover:bg-slate-50 transition-colors flex items-center justify-between text-xs">
+                  <div key={h.id} className="p-3.5 hover:bg-[#FAF8F5] transition-colors flex items-center justify-between text-xs">
                     <div className="min-w-0 pr-3">
                       <div className="flex items-center space-x-2">
-                        <FileCode className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                        <FileCode className="w-3.5 h-3.5 text-[#0C1A2E] shrink-0" />
                         <span className="font-mono font-bold text-slate-900 truncate">{h.file_path}</span>
                       </div>
-                      <div className="mt-1 flex items-center space-x-3 text-[11px] text-slate-500 font-mono">
+                      <div className="mt-1 flex items-center space-x-3 text-[11px] text-stone-500 font-mono">
                         <span>Module: {h.module_name}</span>
                         <span>•</span>
                         <span>Blast Radius: {h.blast_radius}</span>
@@ -357,8 +357,8 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-mono font-bold text-blue-700">{h.risk_score}</div>
-                      <div className="text-[10px] text-slate-400">CC: {h.cyclomatic_complexity} | Churn: {h.churn_count}</div>
+                      <div className="font-mono font-bold text-[#0C1A2E]">{h.risk_score}</div>
+                      <div className="text-[10px] text-stone-400">CC: {h.cyclomatic_complexity} | Churn: {h.churn_count}</div>
                     </div>
                   </div>
                 ))}
@@ -366,10 +366,10 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
             </div>
 
             {/* Self-Admitted Technical Debt (SATD) Table */}
-            <div className="lg:col-span-5 bg-white rounded-md border border-slate-200 shadow-xs overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="lg:col-span-5 bg-white rounded-md border border-[#E5DFD5] shadow-xs overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#F4EFE6] flex items-center justify-between bg-[#FAF8F5]">
                 <div className="flex items-center space-x-2">
-                  <Tag className="w-3.5 h-3.5 text-blue-700" />
+                  <Tag className="w-3.5 h-3.5 text-[#0C1A2E]" />
                   <h3 className="text-xs font-bold text-slate-900">Self-Admitted Debt (SATD)</h3>
                 </div>
                 
@@ -424,17 +424,17 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Code Editor Column */}
-          <div className="lg:col-span-7 bg-white rounded-md border border-slate-200 shadow-xs overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="lg:col-span-7 bg-white rounded-md border border-[#E5DFD5] shadow-xs overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#F4EFE6] flex items-center justify-between bg-[#FAF8F5]">
               <div className="flex items-center space-x-2">
-                <Code2 className="w-4 h-4 text-blue-700" />
+                <Code2 className="w-4 h-4 text-[#0C1A2E]" />
                 <h3 className="text-xs font-bold text-slate-900">Python Source Code Input</h3>
               </div>
 
               <button
                 onClick={() => handleAnalyzeSnippet()}
                 disabled={isAnalyzingSnippet}
-                className="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-semibold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-1.5 bg-[#0C1A2E] hover:bg-[#142B4B] text-white rounded-md text-xs font-bold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>{isAnalyzingSnippet ? 'Analyzing AST...' : 'Analyze AST & SATD'}</span>
@@ -442,16 +442,16 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
             </div>
 
             {/* Quick Presets */}
-            <div className="px-3 py-2 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center gap-1.5 text-xs">
-              <span className="text-[11px] font-semibold text-slate-500 mr-1">Presets:</span>
+            <div className="px-3 py-2 bg-[#FAF8F5] border-b border-[#F4EFE6] flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="text-[11px] font-bold text-stone-500 mr-1">Presets:</span>
               {PRESET_SNIPPETS.map((preset, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSelectPreset(preset.code)}
-                  className="px-2.5 py-1 text-[11px] font-medium rounded-md bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs transition-colors flex items-center space-x-1.5 cursor-pointer"
+                  className="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-white hover:bg-[#F4EFE6] text-stone-700 border border-[#E5DFD5] shadow-2xs transition-colors flex items-center space-x-1.5 cursor-pointer"
                 >
                   <span>{preset.name}</span>
-                  <span className="font-mono text-[9px] font-bold text-blue-700 bg-blue-50 px-1 rounded-sm border border-blue-200">
+                  <span className="font-mono text-[9px] font-bold text-[#0C1A2E] bg-[#F0F4FA] px-1 rounded-sm border border-[#CBD8E8]">
                     {preset.badge}
                   </span>
                 </button>
@@ -463,40 +463,40 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                 rows={16}
                 value={snippetCode}
                 onChange={(e) => setSnippetCode(e.target.value)}
-                className="w-full font-mono text-xs p-3 rounded-md border border-slate-200 bg-slate-900 text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-600 leading-relaxed"
+                className="w-full font-mono text-xs p-3 rounded-md border border-[#E5DFD5] bg-[#0C1A2E] text-stone-100 focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] leading-relaxed"
               />
             </div>
           </div>
 
           {/* AST Results Column */}
-          <div className="lg:col-span-5 bg-white rounded-md border border-slate-200 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="lg:col-span-5 bg-white rounded-md border border-[#E5DFD5] p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#F4EFE6]">
               <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-blue-700" />
+                <Sparkles className="w-4 h-4 text-[#0C1A2E]" />
                 <h3 className="text-xs font-bold text-slate-900">AST Control-Flow Telemetry</h3>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">McCabe AST NodeVisitor</span>
+              <span className="text-[10px] font-mono text-stone-400">McCabe AST NodeVisitor</span>
             </div>
 
             {snippetResult ? (
               <div className="space-y-4 text-xs">
                 {/* Score & Risk Badge */}
-                <div className="p-4 bg-slate-50 rounded-md border border-slate-200 flex items-center justify-between">
+                <div className="p-4 bg-[#FAF8F5] rounded-md border border-[#E5DFD5] flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Cyclomatic Complexity</div>
-                    <div className="text-3xl font-extrabold font-mono text-blue-700 mt-1">
+                    <div className="text-[10px] font-bold text-stone-500 uppercase">Cyclomatic Complexity</div>
+                    <div className="text-3xl font-extrabold font-mono text-[#0C1A2E] mt-1">
                       {snippetResult.cyclomatic_complexity}
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Risk Level</div>
+                    <div className="text-[10px] font-bold text-stone-500 uppercase">Risk Level</div>
                     <span className={`inline-block mt-1 font-bold px-2.5 py-1 rounded-sm text-xs border ${
                       snippetResult.risk_level === 'VERY HIGH' || snippetResult.risk_level === 'HIGH'
-                        ? 'bg-rose-50 text-rose-700 border-rose-300'
+                        ? 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]'
                         : snippetResult.risk_level === 'MODERATE'
-                        ? 'bg-amber-50 text-amber-700 border-amber-300'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                        ? 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]'
+                        : 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]'
                     }`}>
                       {snippetResult.risk_level}
                     </span>
@@ -504,23 +504,23 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                 </div>
 
                 {/* Branch Breakdown Table */}
-                <div className="p-3 bg-white rounded-md border border-slate-200 space-y-2">
+                <div className="p-3 bg-white rounded-md border border-[#E5DFD5] space-y-2">
                   <div className="font-bold text-slate-800 text-[11px]">Branch & Operator Breakdown:</div>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    <div className="p-2 bg-slate-50 rounded-sm">
-                      <span className="text-slate-500">Conditional Branches (if/elif):</span>
+                    <div className="p-2 bg-[#FAF8F5] rounded-sm border border-[#E5DFD5]">
+                      <span className="text-stone-500">Conditional Branches (if/elif):</span>
                       <strong className="block text-slate-900 font-mono mt-0.5">{snippetResult.branch_breakdown.if_branches}</strong>
                     </div>
-                    <div className="p-2 bg-slate-50 rounded-sm">
-                      <span className="text-slate-500">Loop Statements (for/while):</span>
+                    <div className="p-2 bg-[#FAF8F5] rounded-sm border border-[#E5DFD5]">
+                      <span className="text-stone-500">Loop Statements (for/while):</span>
                       <strong className="block text-slate-900 font-mono mt-0.5">{snippetResult.branch_breakdown.loops}</strong>
                     </div>
-                    <div className="p-2 bg-slate-50 rounded-sm">
-                      <span className="text-slate-500">Exception Blocks (try/except):</span>
+                    <div className="p-2 bg-[#FAF8F5] rounded-sm border border-[#E5DFD5]">
+                      <span className="text-stone-500">Exception Blocks (try/except):</span>
                       <strong className="block text-slate-900 font-mono mt-0.5">{snippetResult.branch_breakdown.exception_handlers}</strong>
                     </div>
-                    <div className="p-2 bg-slate-50 rounded-sm">
-                      <span className="text-slate-500">Boolean Operators (and/or):</span>
+                    <div className="p-2 bg-[#FAF8F5] rounded-sm border border-[#E5DFD5]">
+                      <span className="text-stone-500">Boolean Operators (and/or):</span>
                       <strong className="block text-slate-900 font-mono mt-0.5">{snippetResult.branch_breakdown.boolean_conditions}</strong>
                     </div>
                   </div>
@@ -530,37 +530,37 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                 <div>
                   <div className="font-bold text-slate-800 text-[11px] mb-1.5 flex items-center justify-between">
                     <span>Self-Admitted Debt Markers Detected:</span>
-                    <span className="font-mono text-blue-700 font-bold">{snippetResult.satd_markers.length} found</span>
+                    <span className="font-mono text-[#0C1A2E] font-bold">{snippetResult.satd_markers.length} found</span>
                   </div>
 
                   <div className="space-y-1.5 max-h-36 overflow-y-auto">
                     {snippetResult.satd_markers.map((m: any, idx: number) => (
-                      <div key={idx} className="p-2 rounded-sm border border-slate-200 bg-slate-50 text-[11px] space-y-0.5">
+                      <div key={idx} className="p-2 rounded-sm border border-[#E5DFD5] bg-[#FAF8F5] text-[11px] space-y-0.5">
                         <div className="flex items-center space-x-1.5">
-                          <span className={`font-mono font-bold text-[9px] px-1.5 py-0.2 rounded-sm border ${markerColor(m.marker_type)}`}>
+                          <span className={`font-mono font-bold text-[9px] px-1.5 py-0.5 rounded-sm border ${markerColor(m.marker_type)}`}>
                             {m.marker_type}
                           </span>
-                          <span className="font-mono text-[10px] text-slate-400">Line {m.line_number}</span>
+                          <span className="font-mono text-[10px] text-stone-400">Line {m.line_number}</span>
                         </div>
-                        <div className="text-slate-700 italic">"{m.comment_text}"</div>
+                        <div className="text-stone-700 italic">"{m.comment_text}"</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Recommendation */}
-                <div className="p-3 rounded-md bg-blue-50/70 border border-blue-200 text-blue-900 space-y-1">
+                <div className="p-3 rounded-md bg-[#F0F4FA] border border-[#CBD8E8] text-[#0C1A2E] space-y-1">
                   <div className="font-bold flex items-center space-x-1">
-                    <Info className="w-3.5 h-3.5 text-blue-700" />
+                    <Info className="w-3.5 h-3.5 text-[#0C1A2E]" />
                     <span>Engineering Recommendation:</span>
                   </div>
-                  <p className="text-[11px] text-blue-800 leading-relaxed">
+                  <p className="text-[11px] text-stone-700 leading-relaxed">
                     {snippetResult.recommendation}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center text-xs text-slate-400">
+              <div className="p-8 text-center text-xs text-stone-400">
                 Click "Analyze AST & SATD" to inspect this snippet.
               </div>
             )}

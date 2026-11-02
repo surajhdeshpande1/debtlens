@@ -81,7 +81,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Incident Intelligence & Defect Analytics</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F5EFEB] text-blue-900 border border-[#EADBCE] font-bold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8] font-bold font-mono">
               Module M6
             </span>
           </h2>
@@ -92,11 +92,11 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab switcher */}
-          <div className="flex items-center bg-[#FAF8F5] border border-[#EADBCE] rounded-md p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-[#FAF8F5] border border-[#E5DFD5] rounded-md p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('clusters')}
               className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
-                activeTab === 'clusters' ? 'bg-blue-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
+                activeTab === 'clusters' ? 'bg-[#0C1A2E] text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               Clusters & Regressions
@@ -104,7 +104,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
             <button
               onClick={() => setActiveTab('comparator')}
               className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
-                activeTab === 'comparator' ? 'bg-blue-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
+                activeTab === 'comparator' ? 'bg-[#0C1A2E] text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               <GitCompare className="w-3.5 h-3.5" />
@@ -117,10 +117,10 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
       {activeTab === 'clusters' ? (
         <>
           {/* Interactive Formulation Tuning Bar */}
-          <div className="bg-white/95 rounded-md border border-[#EADBCE] p-4 shadow-xs space-y-3">
+          <div className="bg-white/95 rounded-md border border-[#E5DFD5] p-4 shadow-xs space-y-3">
             <div className="flex items-center justify-between text-xs font-bold text-slate-950">
               <div className="flex items-center space-x-1.5">
-                <Sliders className="w-4 h-4 text-blue-700" />
+                <Sliders className="w-4 h-4 text-[#0C1A2E]" />
                 <span>Interactive Algorithmic Hyperparameter Tuning</span>
               </div>
               <span className="text-[11px] font-medium text-stone-500">Adjust thresholds to observe sensitivity</span>
@@ -128,10 +128,10 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               {/* Tau Slider */}
-              <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#EADBCE] space-y-1.5">
+              <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#E5DFD5] space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="font-bold text-slate-900">Regression Similarity Threshold (τ):</span>
-                  <strong className="font-mono text-blue-900 font-extrabold">{tau.toFixed(2)}</strong>
+                  <strong className="font-mono text-[#0C1A2E] font-extrabold">{tau.toFixed(2)}</strong>
                 </div>
                 <input
                   type="range"
@@ -140,7 +140,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                   step="0.05"
                   value={tau}
                   onChange={(e) => setTau(parseFloat(e.target.value))}
-                  className="w-full accent-blue-700 h-1.5 bg-[#F5EFEB] rounded-md cursor-pointer"
+                  className="w-full accent-[#0C1A2E] h-1.5 bg-[#F4EFE6] rounded-md cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-stone-400 font-mono font-medium">
                   <span>0.20 (Broad)</span>
@@ -150,10 +150,10 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
               </div>
 
               {/* DBSCAN Eps Slider */}
-              <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#EADBCE] space-y-1.5">
+              <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#E5DFD5] space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="font-bold text-slate-900">DBSCAN Clustering Radius (ε):</span>
-                  <strong className="font-mono text-blue-900 font-extrabold">{eps.toFixed(2)}</strong>
+                  <strong className="font-mono text-[#0C1A2E] font-extrabold">{eps.toFixed(2)}</strong>
                 </div>
                 <input
                   type="range"
@@ -162,7 +162,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                   step="0.05"
                   value={eps}
                   onChange={(e) => setEps(parseFloat(e.target.value))}
-                  className="w-full accent-blue-700 h-1.5 bg-[#F5EFEB] rounded-md cursor-pointer"
+                  className="w-full accent-[#0C1A2E] h-1.5 bg-[#F4EFE6] rounded-md cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-stone-400 font-mono font-medium">
                   <span>0.30 (Tight Clusters)</span>
@@ -239,29 +239,28 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
           <div className="bg-white rounded-md border border-slate-200 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Layers className="w-5 h-5 text-blue-700" />
+                <Layers className="w-5 h-5 text-[#0C1A2E]" />
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">DBSCAN Root Cause Semantic Clusters</h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-stone-500">
                     Density-based spatial clustering grouping semantically equivalent causes without predetermined k
                   </p>
                 </div>
               </div>
 
-              <span className="text-xs font-mono text-slate-400">eps={eps}, min_samples=2</span>
+              <span className="text-xs font-mono text-stone-400">eps={eps}, min_samples=2</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {clusters.map((c, cIdx) => {
                 const clusterThemes = [
-                  { border: 'border-blue-200 hover:border-blue-300', bg: 'bg-blue-50/40', badge: 'bg-blue-100 text-blue-800 border-blue-200', dot: 'text-blue-600', text: 'text-blue-700' },
-                  { border: 'border-sky-200 hover:border-sky-300', bg: 'bg-sky-50/40', badge: 'bg-sky-100 text-sky-800 border-sky-200', dot: 'text-sky-600', text: 'text-sky-700' },
-                  { border: 'border-teal-200 hover:border-teal-300', bg: 'bg-teal-50/40', badge: 'bg-teal-100 text-teal-800 border-teal-200', dot: 'text-teal-600', text: 'text-teal-700' },
-                  { border: 'border-amber-200 hover:border-amber-300', bg: 'bg-amber-50/40', badge: 'bg-amber-100 text-amber-800 border-amber-200', dot: 'text-amber-600', text: 'text-amber-700' },
-                  { border: 'border-emerald-200 hover:border-emerald-300', bg: 'bg-emerald-50/40', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200', dot: 'text-emerald-600', text: 'text-emerald-700' }
+                  { border: 'border-[#CBD8E8] hover:border-[#93B4D7]', bg: 'bg-[#F0F4FA]/50', badge: 'bg-[#E4ECF6] text-[#0C1A2E] border-[#CBD8E8]', dot: 'text-[#0C1A2E]', text: 'text-[#0C1A2E]' },
+                  { border: 'border-[#EBD8A3] hover:border-[#D4B974]', bg: 'bg-[#FEF9EE]/50', badge: 'bg-[#FDF3DB] text-[#8A6112] border-[#EBD8A3]', dot: 'text-[#8A6112]', text: 'text-[#8A6112]' },
+                  { border: 'border-[#BCD8C7] hover:border-[#86BFA0]', bg: 'bg-[#EDF6F1]/50', badge: 'bg-[#DDEEE4] text-[#1E4E38] border-[#BCD8C7]', dot: 'text-[#1E4E38]', text: 'text-[#1E4E38]' },
+                  { border: 'border-[#E8B4B2] hover:border-[#D98280]', bg: 'bg-[#FDF2F2]/50', badge: 'bg-[#F8D2D1] text-[#8E2825] border-[#E8B4B2]', dot: 'text-[#8E2825]', text: 'text-[#8E2825]' }
                 ];
                 const theme = c.is_noise 
-                  ? { border: 'border-slate-200', bg: 'bg-slate-50/60', badge: 'bg-slate-200 text-slate-700 border-slate-300', dot: 'text-slate-400', text: 'text-slate-600' }
+                  ? { border: 'border-[#E5DFD5]', bg: 'bg-stone-50/60', badge: 'bg-stone-200 text-stone-700 border-stone-300', dot: 'text-stone-400', text: 'text-stone-600' }
                   : clusterThemes[cIdx % clusterThemes.length];
 
                 return (
@@ -284,9 +283,9 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                       </span>
                     </div>
 
-                    <div className="mt-3 space-y-1.5 pt-2 border-t border-slate-200/60">
+                    <div className="mt-3 space-y-1.5 pt-2 border-t border-[#E5DFD5]/60">
                       {c.causes.map((cause, idx) => (
-                        <div key={idx} className="text-[11px] text-slate-600 flex items-start space-x-1.5">
+                        <div key={idx} className="text-[11px] text-stone-600 flex items-start space-x-1.5">
                           <span className={`${theme.dot} font-bold shrink-0`}>•</span>
                           <span>{cause}</span>
                         </div>
@@ -301,13 +300,13 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
       ) : (
         /* Pairwise Incident Comparator Tool */
         <div className="space-y-6">
-          <div className="bg-white rounded-md border border-slate-200 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-white rounded-md border border-[#E5DFD5] p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#F4EFE6]">
               <div className="flex items-center space-x-2">
-                <GitCompare className="w-5 h-5 text-blue-700" />
+                <GitCompare className="w-5 h-5 text-[#0C1A2E]" />
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">Pairwise Incident Similarity Comparator</h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-stone-500">
                     Compare any two historical or open incidents to verify hybrid TF-IDF and semantic subword cosine similarity
                   </p>
                 </div>
@@ -315,7 +314,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
 
               {/* Alpha Weight Slider */}
               <div className="flex items-center space-x-2 text-xs">
-                <span className="font-semibold text-slate-700">Lexical Weight (α):</span>
+                <span className="font-semibold text-stone-700">Lexical Weight (α):</span>
                 <input
                   type="range"
                   min="0.0"
@@ -323,9 +322,9 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                   step="0.05"
                   value={alpha}
                   onChange={(e) => setAlpha(parseFloat(e.target.value))}
-                  className="w-24 accent-blue-700 h-1.5 bg-slate-200 rounded-md cursor-pointer"
+                  className="w-24 accent-[#0C1A2E] h-1.5 bg-[#F4EFE6] rounded-md cursor-pointer"
                 />
-                <span className="font-mono font-bold text-blue-700">{alpha.toFixed(2)}</span>
+                <span className="font-mono font-bold text-[#0C1A2E]">{alpha.toFixed(2)}</span>
               </div>
             </div>
 
@@ -338,7 +337,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                 <select
                   value={selectedIncA || ''}
                   onChange={(e) => setSelectedIncA(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 text-xs rounded-md border border-slate-200 bg-white cursor-pointer"
+                  className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
                 >
                   {incidents.map((i) => (
                     <option key={i.id} value={i.id}>
@@ -355,7 +354,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                 <select
                   value={selectedIncB || ''}
                   onChange={(e) => setSelectedIncB(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 text-xs rounded-md border border-slate-200 bg-white cursor-pointer"
+                  className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
                 >
                   {incidents.map((i) => (
                     <option key={i.id} value={i.id}>
@@ -370,38 +369,38 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
             {comparisonResult && (
               <div className="pt-4 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-                  <div className="p-3 bg-slate-50 rounded-md border border-slate-200">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Lexical Cosine Score</div>
+                  <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#E5DFD5]">
+                    <div className="text-[10px] font-bold text-stone-500 uppercase">Lexical Cosine Score</div>
                     <div className="text-xl font-bold font-mono text-slate-900 mt-1">
                       {(comparisonResult.lexical_score * 100).toFixed(1)}%
                     </div>
-                    <div className="text-[10px] text-slate-400 font-mono">cos(tfidf_a, tfidf_b)</div>
+                    <div className="text-[10px] text-stone-400 font-mono">cos(tfidf_a, tfidf_b)</div>
                   </div>
 
-                  <div className="p-3 bg-slate-50 rounded-md border border-slate-200">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Semantic Subword Score</div>
+                  <div className="p-3 bg-[#FAF8F5] rounded-md border border-[#E5DFD5]">
+                    <div className="text-[10px] font-bold text-stone-500 uppercase">Semantic Subword Score</div>
                     <div className="text-xl font-bold font-mono text-slate-900 mt-1">
                       {(comparisonResult.semantic_score * 100).toFixed(1)}%
                     </div>
-                    <div className="text-[10px] text-slate-400 font-mono">cos(emb_a, emb_b)</div>
+                    <div className="text-[10px] text-stone-400 font-mono">cos(emb_a, emb_b)</div>
                   </div>
 
-                  <div className="p-3 bg-blue-50/80 rounded-md border border-blue-200">
-                    <div className="text-[10px] font-bold text-blue-700 uppercase">Hybrid Formulation Score</div>
-                    <div className="text-2xl font-black font-mono text-blue-700 mt-0.5">
+                  <div className="p-3 bg-[#F0F4FA] rounded-md border border-[#CBD8E8]">
+                    <div className="text-[10px] font-bold text-[#0C1A2E] uppercase">Hybrid Formulation Score</div>
+                    <div className="text-2xl font-black font-mono text-[#0C1A2E] mt-0.5">
                       {(comparisonResult.hybrid_score * 100).toFixed(1)}%
                     </div>
-                    <div className="text-[10px] text-blue-600 font-mono">α·lex + (1-α)·sem</div>
+                    <div className="text-[10px] text-[#0C1A2E]/70 font-mono">α·lex + (1-α)·sem</div>
                   </div>
                 </div>
 
                 {/* Shared Tokens */}
                 {comparisonResult.common_tokens.length > 0 && (
-                  <div className="p-3 bg-white rounded-md border border-slate-200 space-y-1.5 text-xs">
+                  <div className="p-3 bg-white rounded-md border border-[#E5DFD5] space-y-1.5 text-xs">
                     <div className="font-bold text-slate-800 text-[11px]">Overlapping Linguistic / Domain Tokens:</div>
                     <div className="flex flex-wrap gap-1.5">
                       {comparisonResult.common_tokens.map((tok: string, idx: number) => (
-                        <span key={idx} className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-blue-50 text-blue-700 border border-blue-200">
+                        <span key={idx} className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
                           {tok}
                         </span>
                       ))}

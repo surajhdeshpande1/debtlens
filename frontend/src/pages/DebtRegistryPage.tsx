@@ -119,41 +119,41 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
   const statusBadge = (s: DebtStatus) => {
     switch (s) {
       case 'IDENTIFIED':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
       case 'PRIORITIZED':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
       case 'IN_PROGRESS':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
       case 'REMEDIATED':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]';
     }
   };
 
   const getCategoryBadge = (cat: string) => {
     const c = (cat || '').toUpperCase();
-    if (c.includes('ARCHITECTURAL')) return 'bg-blue-50 text-blue-700 border-blue-200';
-    if (c.includes('CODE_SMELL')) return 'bg-amber-50 text-amber-700 border-amber-200';
-    if (c.includes('INFRASTRUCTURE')) return 'bg-sky-50 text-sky-700 border-sky-200';
-    if (c.includes('SECURITY')) return 'bg-rose-50 text-rose-700 border-rose-200';
-    if (c.includes('TEST')) return 'bg-teal-50 text-teal-700 border-teal-200';
-    return 'bg-slate-100 text-slate-700 border-slate-200';
+    if (c.includes('ARCHITECTURAL')) return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
+    if (c.includes('CODE_SMELL')) return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
+    if (c.includes('INFRASTRUCTURE')) return 'bg-[#F0F4FA] text-[#2C3E50] border-[#CBD8E8]';
+    if (c.includes('SECURITY')) return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
+    if (c.includes('TEST')) return 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]';
+    return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
   };
 
   const getModuleBadge = (moduleName: string) => {
     const m = (moduleName || '').toLowerCase().replace(/[\s-]/g, '_');
-    if (m.includes('payment')) return 'bg-blue-50 text-blue-700 border-blue-200';
-    if (m.includes('database')) return 'bg-amber-50 text-amber-700 border-amber-200';
-    if (m.includes('settlement')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    if (m.includes('checkout')) return 'bg-sky-50 text-sky-700 border-sky-200';
-    if (m.includes('auth')) return 'bg-rose-50 text-rose-700 border-rose-200';
-    if (m.includes('notification')) return 'bg-teal-50 text-teal-700 border-teal-200';
-    return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (m.includes('payment')) return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
+    if (m.includes('database')) return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
+    if (m.includes('settlement')) return 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7]';
+    if (m.includes('checkout')) return 'bg-[#F0F4FA] text-[#2C3E50] border-[#CBD8E8]';
+    if (m.includes('auth')) return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
+    if (m.includes('notification')) return 'bg-stone-100 text-stone-700 border-[#E5DFD5]';
+    return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
   };
 
   const getRiskBadge = (score: number) => {
-    if (score >= 50) return 'text-rose-700 bg-rose-50 border-rose-200';
-    if (score >= 25) return 'text-amber-700 bg-amber-50 border-amber-200';
-    return 'text-blue-700 bg-blue-50 border-blue-200';
+    if (score >= 50) return 'text-[#8E2825] bg-[#FDF2F2] border-[#E8B4B2]';
+    if (score >= 25) return 'text-[#8A6112] bg-[#FEF9EE] border-[#EBD8A3]';
+    return 'text-[#0C1A2E] bg-[#F0F4FA] border-[#CBD8E8]';
   };
 
   return (
@@ -164,19 +164,19 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Technical Debt Registry & Financial Ledger</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F5EFEB] text-blue-900 border border-[#EADBCE] font-bold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8] font-bold font-mono">
               Module M4
             </span>
           </h2>
           <p className="text-xs text-stone-500 font-medium">
-            Pricing technical debt as a ledger of principal <span className="font-mono text-blue-900 font-bold">P(d)</span> and accruing interest <span className="font-mono text-rose-700 font-bold">I(d)</span> driven by incident cost and churn
+            Pricing technical debt as a ledger of principal <span className="font-mono text-[#0C1A2E] font-bold">P(d)</span> and accruing interest <span className="font-mono text-[#8E2825] font-bold">I(d)</span> driven by incident cost and churn
           </p>
         </div>
 
         <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white border border-[#EADBCE] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white border border-[#E5DFD5] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
             title="Export debt items as CSV"
           >
             <Download className="w-3.5 h-3.5 text-stone-500" />
@@ -185,7 +185,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
           <button
             onClick={onOpenDebtModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Register Debt Item</span>
@@ -300,7 +300,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         key={d.id} 
                         onClick={() => setSelectedDebt(d)}
                         className={`hover:bg-[#FAF8F5] transition-colors cursor-pointer ${
-                          isSelected ? 'bg-[#F5EFEB]/70 border-l-4 border-blue-700' : ''
+                          isSelected ? 'bg-[#F0F4FA] border-l-4 border-[#0C1A2E]' : ''
                         }`}
                       >
                         {/* Key & Module */}
@@ -321,7 +321,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
                         {/* Principal P(d) */}
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-900">
-                          <span className="bg-blue-50 text-blue-900 px-2 py-0.5 rounded-sm border border-blue-200">
+                          <span className="bg-[#F0F4FA] text-[#0C1A2E] px-2 py-0.5 rounded-sm border border-[#CBD8E8]">
                             {d.effort_principal}h
                           </span>
                         </td>
@@ -330,8 +330,8 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold">
                           <span className={`px-2 py-0.5 rounded-sm border ${
                             d.break_even_status 
-                              ? 'bg-rose-50 text-rose-800 border-rose-200' 
-                              : 'bg-[#FAF8F5] text-stone-800 border-[#EADBCE]'
+                              ? 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]' 
+                              : 'bg-[#FAF8F5] text-stone-800 border-[#E5DFD5]'
                           }`}>
                             {d.accrued_interest}h
                           </span>
@@ -340,12 +340,12 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         {/* Break-Even Status */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
                           {d.break_even_status ? (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-rose-50 text-rose-800 border border-rose-200 animate-pulse">
-                              <Flame className="w-2.5 h-2.5 text-rose-600" />
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-[#FDF2F2] text-[#8E2825] border border-[#E8B4B2] animate-pulse">
+                              <Flame className="w-2.5 h-2.5 text-[#8E2825]" />
                               <span>EXCEEDED</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-[#EDF6F1] text-[#1E4E38] border border-[#BCD8C7]">
                               <span>Optimal</span>
                             </span>
                           )}
@@ -382,33 +382,33 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
         </div>
 
         {/* Mathematical Economic Inspection Drawer */}
-        <div className="lg:col-span-4 bg-white/95 rounded-md border border-[#EADBCE] p-5 shadow-xs sticky top-20 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F5EFEB]">
+        <div className="lg:col-span-4 bg-white/95 rounded-md border border-[#E5DFD5] p-5 shadow-xs sticky top-20 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#F4EFE6]">
             <div className="flex items-center space-x-1.5">
-              <Calculator className="w-4 h-4 text-blue-700" />
+              <Calculator className="w-4 h-4 text-[#0C1A2E]" />
               <h3 className="text-xs font-extrabold text-slate-950">Economic Formulation Breakdown</h3>
             </div>
-            <span className="text-[10px] font-mono text-blue-900 bg-[#F5EFEB] px-1.5 py-0.5 rounded-sm border border-[#EADBCE] font-bold">Section 7.3</span>
+            <span className="text-[10px] font-mono text-[#0C1A2E] bg-[#F0F4FA] px-1.5 py-0.5 rounded-sm border border-[#CBD8E8] font-bold">Section 7.3</span>
           </div>
 
           {selectedDebt ? (
             <div className="space-y-4 text-xs">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-blue-700 text-xs">{selectedDebt.debt_key}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700">
+                  <span className="font-mono font-bold text-[#0C1A2E] text-xs">{selectedDebt.debt_key}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-stone-100 text-stone-700">
                     {selectedDebt.category}
                   </span>
                 </div>
                 <h4 className="mt-1 font-bold text-slate-900 leading-snug">{selectedDebt.title}</h4>
-                <div className="text-[11px] text-slate-500 mt-1">Module: <strong className="text-slate-700">{selectedDebt.module_name}</strong></div>
+                <div className="text-[11px] text-stone-500 mt-1">Module: <strong className="text-slate-700">{selectedDebt.module_name}</strong></div>
               </div>
 
               {/* Interactive Debt Workflow State */}
-              <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-[#EADBCE] space-y-1.5">
+              <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-[#E5DFD5] space-y-1.5">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="font-semibold text-slate-700">Remediation Status</span>
-                  <span className="text-[10px] text-slate-400">Click to transition</span>
+                  <span className="text-[10px] text-stone-400">Click to transition</span>
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {(['IDENTIFIED', 'PRIORITIZED', 'IN_PROGRESS', 'REMEDIATED'] as DebtStatus[]).map((st) => {
@@ -417,16 +417,16 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                       <button
                         key={st}
                         onClick={() => handleStatusChange(selectedDebt.id, st)}
-                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-between transition-all cursor-pointer ${
+                        className={`px-2 py-1.5 rounded-md text-[10px] font-bold flex items-center justify-between transition-all cursor-pointer ${
                           isCurrent
                             ? st === 'REMEDIATED'
-                              ? 'bg-emerald-600 text-white shadow-xs'
+                              ? 'bg-[#1E4E38] text-white shadow-xs'
                               : st === 'IN_PROGRESS'
-                              ? 'bg-amber-500 text-white shadow-xs'
+                              ? 'bg-[#8A6112] text-white shadow-xs'
                               : st === 'PRIORITIZED'
-                              ? 'bg-indigo-600 text-white shadow-xs'
-                              : 'bg-slate-700 text-white shadow-xs'
-                            : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                              ? 'bg-[#0C1A2E] text-white shadow-xs'
+                              : 'bg-stone-700 text-white shadow-xs'
+                            : 'bg-white text-stone-600 border border-[#E5DFD5] hover:bg-[#F4EFE6]'
                         }`}
                       >
                         <span>{st.replace('_', ' ')}</span>
