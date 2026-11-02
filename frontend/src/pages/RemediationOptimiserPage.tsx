@@ -195,47 +195,47 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
           </div>
         )}
 
-        {/* Optimization Metrics Row */}
+        {/* Optimization Metrics Row with Semantic Theme Palette */}
         {plan && (
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-3 border-t border-slate-100 text-center">
-            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200 border-t-2 border-t-slate-500 shadow-2xs">
               <div className="text-[10px] font-semibold text-slate-500 uppercase">Effort Allocated</div>
               <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">
                 {plan.total_effort_allocated} / {plan.sprint_budget}h
               </div>
-              <div className="text-[10px] text-slate-400">{plan.budget_utilization_pct}% capacity</div>
+              <div className="text-[10px] text-slate-500 mt-0.5">{plan.budget_utilization_pct}% capacity</div>
             </div>
 
-            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="text-[10px] font-semibold text-slate-500 uppercase">Items Selected</div>
-              <div className="text-sm font-bold text-indigo-600 font-mono mt-0.5">
+            <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-200/80 border-t-2 border-t-indigo-500 shadow-2xs">
+              <div className="text-[10px] font-semibold text-indigo-600 uppercase">Items Selected</div>
+              <div className="text-sm font-bold text-indigo-700 font-mono mt-0.5">
                 {plan.selected_items.length} of {plan.selected_items.length + plan.deferred_items.length}
               </div>
-              <div className="text-[10px] text-slate-400">{plan.deferred_items.length} deferred</div>
+              <div className="text-[10px] text-indigo-500 mt-0.5">{plan.deferred_items.length} deferred</div>
             </div>
 
-            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="text-[10px] font-semibold text-slate-500 uppercase">Risk Reduction Score</div>
-              <div className="text-sm font-bold text-emerald-600 font-mono mt-0.5">
+            <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-200/80 border-t-2 border-t-emerald-500 shadow-2xs">
+              <div className="text-[10px] font-semibold text-emerald-600 uppercase">Risk Reduction Score</div>
+              <div className="text-sm font-bold text-emerald-700 font-mono mt-0.5">
                 {plan.total_risk_reduced} pts
               </div>
-              <div className="text-[10px] text-slate-400">Maximized via 0/1 DP</div>
+              <div className="text-[10px] text-emerald-600 mt-0.5">Maximized via 0/1 DP</div>
             </div>
 
-            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="text-[10px] font-semibold text-slate-500 uppercase">Interest Cost Saved</div>
-              <div className="text-sm font-bold text-rose-600 font-mono mt-0.5">
+            <div className="p-3 bg-rose-50/50 rounded-xl border border-rose-200/80 border-t-2 border-t-rose-500 shadow-2xs">
+              <div className="text-[10px] font-semibold text-rose-600 uppercase">Interest Cost Saved</div>
+              <div className="text-sm font-bold text-rose-700 font-mono mt-0.5">
                 {plan.accumulated_interest_saved} hrs
               </div>
-              <div className="text-[10px] text-slate-400">Prevented drag</div>
+              <div className="text-[10px] text-rose-500 mt-0.5">Prevented drag</div>
             </div>
 
-            <div className="p-2.5 bg-indigo-50/70 rounded-xl border border-indigo-100">
-              <div className="text-[10px] font-bold text-indigo-600 uppercase">Payoff Return (ROI)</div>
-              <div className="text-sm font-bold text-indigo-700 font-mono mt-0.5">
+            <div className="p-3 bg-teal-50/50 rounded-xl border border-teal-200/80 border-t-2 border-t-teal-500 shadow-2xs">
+              <div className="text-[10px] font-bold text-teal-600 uppercase">Payoff Return (ROI)</div>
+              <div className="text-sm font-bold text-teal-700 font-mono mt-0.5">
                 {roiRatio}x
               </div>
-              <div className="text-[10px] text-indigo-500">Interest / Effort</div>
+              <div className="text-[10px] text-teal-600 mt-0.5">Interest / Effort</div>
             </div>
           </div>
         )}

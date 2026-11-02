@@ -252,45 +252,50 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {clusters.map((c) => (
-                <div 
-                  key={c.cluster_id}
-                  className={`p-4 rounded-xl border transition-all ${
-                    c.is_noise 
-                      ? 'border-slate-200 bg-slate-50/60' 
-                      : 'border-indigo-200 bg-indigo-50/30 hover:border-indigo-300'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        c.is_noise 
-                          ? 'bg-slate-200 text-slate-700' 
-                          : 'bg-indigo-100 text-indigo-800'
-                      }`}>
-                        {c.is_noise ? 'Outliers / Noise' : `Cluster #${c.cluster_id + 1}`}
+              {clusters.map((c, cIdx) => {
+                const clusterThemes = [
+                  { border: 'border-indigo-200 hover:border-indigo-300', bg: 'bg-indigo-50/40', badge: 'bg-indigo-100 text-indigo-800 border-indigo-200', dot: 'text-indigo-600', text: 'text-indigo-700' },
+                  { border: 'border-purple-200 hover:border-purple-300', bg: 'bg-purple-50/40', badge: 'bg-purple-100 text-purple-800 border-purple-200', dot: 'text-purple-600', text: 'text-purple-700' },
+                  { border: 'border-teal-200 hover:border-teal-300', bg: 'bg-teal-50/40', badge: 'bg-teal-100 text-teal-800 border-teal-200', dot: 'text-teal-600', text: 'text-teal-700' },
+                  { border: 'border-amber-200 hover:border-amber-300', bg: 'bg-amber-50/40', badge: 'bg-amber-100 text-amber-800 border-amber-200', dot: 'text-amber-600', text: 'text-amber-700' },
+                  { border: 'border-emerald-200 hover:border-emerald-300', bg: 'bg-emerald-50/40', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200', dot: 'text-emerald-600', text: 'text-emerald-700' }
+                ];
+                const theme = c.is_noise 
+                  ? { border: 'border-slate-200', bg: 'bg-slate-50/60', badge: 'bg-slate-200 text-slate-700 border-slate-300', dot: 'text-slate-400', text: 'text-slate-600' }
+                  : clusterThemes[cIdx % clusterThemes.length];
+
+                return (
+                  <div 
+                    key={c.cluster_id}
+                    className={`p-4 rounded-xl border transition-all ${theme.border} ${theme.bg}`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border ${theme.badge}`}>
+                          {c.is_noise ? 'Outliers / Noise' : `Cluster #${c.cluster_id + 1}`}
+                        </span>
+                        <h4 className="mt-1.5 text-xs font-bold text-slate-900 leading-snug">
+                          {c.theme_title}
+                        </h4>
+                      </div>
+
+                      <span className={`text-xs font-bold font-mono ${theme.text}`}>
+                        {c.cause_count} causes
                       </span>
-                      <h4 className="mt-1 text-xs font-bold text-slate-900 leading-snug">
-                        {c.theme_title}
-                      </h4>
                     </div>
 
-                    <span className="text-xs font-bold text-indigo-600 font-mono">
-                      {c.cause_count} causes
-                    </span>
+                    <div className="mt-3 space-y-1.5 pt-2 border-t border-slate-200/60">
+                      {c.causes.map((cause, idx) => (
+                        <div key={idx} className="text-[11px] text-slate-600 flex items-start space-x-1.5">
+                          <span className={`${theme.dot} font-bold shrink-0`}>•</span>
+                          <span>{cause}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="mt-3 space-y-1.5 pt-2 border-t border-slate-100">
-                    {c.causes.map((cause, idx) => (
-                  <div key={idx} className="text-[11px] text-slate-600 flex items-start space-x-1.5">
-                    <span className="text-indigo-400 font-bold shrink-0">•</span>
-                    <span>{cause}</span>
-                  </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
       </div>
         </>
       ) : (

@@ -129,6 +129,33 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
     }
   };
 
+  const getCategoryBadge = (cat: string) => {
+    const c = (cat || '').toUpperCase();
+    if (c.includes('ARCHITECTURAL')) return 'bg-purple-50 text-purple-700 border-purple-200';
+    if (c.includes('CODE_SMELL')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (c.includes('INFRASTRUCTURE')) return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (c.includes('SECURITY')) return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (c.includes('TEST')) return 'bg-teal-50 text-teal-700 border-teal-200';
+    return 'bg-slate-100 text-slate-700 border-slate-200';
+  };
+
+  const getModuleBadge = (moduleName: string) => {
+    const m = (moduleName || '').toLowerCase().replace(/[\s-]/g, '_');
+    if (m.includes('payment')) return 'bg-purple-50 text-purple-700 border-purple-200';
+    if (m.includes('database')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (m.includes('settlement')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (m.includes('checkout')) return 'bg-sky-50 text-sky-700 border-sky-200';
+    if (m.includes('auth')) return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (m.includes('notification')) return 'bg-teal-50 text-teal-700 border-teal-200';
+    return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+  };
+
+  const getRiskBadge = (score: number) => {
+    if (score >= 50) return 'text-rose-700 bg-rose-50 border-rose-200';
+    if (score >= 25) return 'text-amber-700 bg-amber-50 border-amber-200';
+    return 'text-indigo-700 bg-indigo-50 border-indigo-200';
+  };
+
   return (
     <div className="space-y-6">
       
@@ -279,25 +306,33 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         {/* Key & Module */}
                         <td className="py-3 px-3 whitespace-nowrap">
                           <div className="font-mono font-bold text-slate-900">{d.debt_key}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">{d.module_name}</div>
+                          <span className={`inline-block mt-0.5 text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded-md border ${getModuleBadge(d.module_name)}`}>
+                            {d.module_name}
+                          </span>
                         </td>
 
                         {/* Title & Category */}
                         <td className="py-3 px-3 max-w-xs">
                           <div className="font-semibold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
-                          <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.2 rounded-sm bg-slate-100 text-slate-600">
+                          <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.2 rounded-sm border ${getCategoryBadge(d.category)}`}>
                             {d.category}
                           </span>
                         </td>
 
                         {/* Principal P(d) */}
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-800">
-                          {d.effort_principal}h
+                          <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded-md border border-indigo-100">
+                            {d.effort_principal}h
+                          </span>
                         </td>
 
                         {/* Interest I(d) */}
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold">
-                          <span className={d.break_even_status ? 'text-rose-600' : 'text-slate-800'}>
+                          <span className={`px-1.5 py-0.5 rounded-md border ${
+                            d.break_even_status 
+                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                              : 'bg-slate-50 text-slate-700 border-slate-200'
+                          }`}>
                             {d.accrued_interest}h
                           </span>
                         </td>
@@ -318,7 +353,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
                         {/* Risk Score */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
-                          <span className="font-mono font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-sm">
+                          <span className={`font-mono font-bold px-1.5 py-0.5 rounded-md border ${getRiskBadge(d.risk_score)}`}>
                             {d.risk_score}
                           </span>
                         </td>

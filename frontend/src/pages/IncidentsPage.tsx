@@ -140,6 +140,23 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
     }
   };
 
+  const getModuleBadge = (moduleName: string) => {
+    const m = (moduleName || '').toLowerCase().replace(/[\s-]/g, '_');
+    if (m.includes('payment')) return 'bg-purple-50 text-purple-700 border-purple-200';
+    if (m.includes('database')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (m.includes('settlement')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (m.includes('checkout')) return 'bg-sky-50 text-sky-700 border-sky-200';
+    if (m.includes('auth')) return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (m.includes('notification')) return 'bg-teal-50 text-teal-700 border-teal-200';
+    return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+  };
+
+  const getSimilarityBadge = (score: number) => {
+    if (score >= 0.7) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+    if (score >= 0.4) return 'text-indigo-700 bg-indigo-50 border-indigo-200';
+    return 'text-amber-700 bg-amber-50 border-amber-200';
+  };
+
   return (
     <div className="space-y-6">
       
@@ -274,7 +291,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                         <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-sm border ${severityBadge(inc.severity)}`}>
                           {inc.severity}
                         </span>
-                        <span className="text-xs font-mono text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-sm">
+                        <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md border ${getModuleBadge(inc.affected_module)}`}>
                           {inc.affected_module}
                         </span>
                       </div>
@@ -428,10 +445,10 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                         </div>
 
                         <div className="text-right shrink-0">
-                          <span className="font-mono font-bold text-indigo-600 text-[11px]">
+                          <span className={`font-mono font-bold text-[11px] px-1.5 py-0.5 rounded-md border ${getSimilarityBadge(s.similarity_score)}`}>
                             {Math.round(s.similarity_score * 100)}%
                           </span>
-                          <div className="text-[9px] text-slate-400">sim(i,j)</div>
+                          <div className="text-[9px] text-slate-400 mt-0.5">sim(i,j)</div>
                         </div>
                       </div>
                     ))}

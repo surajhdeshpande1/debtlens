@@ -33,6 +33,7 @@ export function sanitizeInput(input: string, maxLength: number = 500): string {
     .replace(/javascript:[^"']*/gi, '');
 
   // Strip null bytes and control chars (except standard whitespace)
+  // eslint-disable-next-line no-control-regex
   cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
 
   // Trim and enforce length limit

@@ -26,14 +26,14 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
     const elements: cytoscape.ElementDefinition[] = [
       ...graphData.nodes.map((n) => {
         let catColor = '#EEF2FF';
-        let borderColor = '#4F46E5';
+        let borderColor = '#6366F1';
         const cat = (n.data.category || '').toUpperCase();
-        if (cat === 'DATABASE') { catColor = '#EFF6FF'; borderColor = '#2563EB'; }
-        else if (cat === 'NETWORK') { catColor = '#F0F9FF'; borderColor = '#0284C7'; }
-        else if (cat === 'ARCHITECTURE') { catColor = '#FAF5FF'; borderColor = '#9333EA'; }
-        else if (cat === 'CONCURRENCY') { catColor = '#FFFBEB'; borderColor = '#D97706'; }
-        else if (cat === 'PERFORMANCE') { catColor = '#ECFDF5'; borderColor = '#059669'; }
-        else if (cat === 'MEMORY') { catColor = '#FFF1F2'; borderColor = '#E11D48'; }
+        if (cat.includes('DATABASE')) { catColor = '#EFF6FF'; borderColor = '#2563EB'; }
+        else if (cat.includes('NETWORK')) { catColor = '#F0FDFA'; borderColor = '#0D9488'; }
+        else if (cat.includes('ARCHITECTURE')) { catColor = '#FAF5FF'; borderColor = '#9333EA'; }
+        else if (cat.includes('CONCURRENCY')) { catColor = '#FFFBEB'; borderColor = '#D97706'; }
+        else if (cat.includes('PERFORMANCE')) { catColor = '#ECFDF5'; borderColor = '#059669'; }
+        else if (cat.includes('MEMORY')) { catColor = '#FFF1F2'; borderColor = '#E11D48'; }
 
         return {
           data: {
@@ -255,26 +255,41 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
         </div>
       </div>
 
-      {/* Graph Canvas */}
-      <div ref={containerRef} className="flex-1 w-full h-full bg-slate-50/20 cursor-grab active:cursor-grabbing" />
+      {/* Graph Canvas with Engineering Grid */}
+      <div 
+        ref={containerRef} 
+        className="flex-1 w-full h-full bg-slate-50/40 cursor-grab active:cursor-grabbing" 
+        style={{ 
+          backgroundImage: 'radial-gradient(#CBD5E1 1.2px, transparent 1.2px)', 
+          backgroundSize: '24px 24px' 
+        }}
+      />
 
       {/* Category Legend Pill */}
-      <div className="absolute top-14 left-4 z-10 flex flex-wrap gap-1.5 bg-white/90 backdrop-blur-xs p-1.5 rounded-lg border border-slate-200 shadow-xs text-[10px] text-slate-600">
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+      <div className="absolute top-14 left-4 z-10 flex flex-wrap gap-1.5 bg-white/95 backdrop-blur-xs p-1.5 rounded-xl border border-slate-200/90 shadow-xs text-[10px] text-slate-600">
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/80">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
           <span>Database</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-600" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
           <span>Network</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200/80">
           <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
           <span>Architecture</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/80">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
           <span>Concurrency</span>
+        </span>
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+          <span>Performance</span>
+        </span>
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+          <span>Memory</span>
         </span>
       </div>
 
@@ -283,7 +298,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
         <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:w-[420px] bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-indigo-200 shadow-xl z-20 animate-in fade-in slide-in-from-bottom-2 duration-150">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                 {selectedNode.category}
               </span>
               <h4 className="mt-1.5 text-xs font-bold text-slate-900 leading-snug">
@@ -299,15 +314,15 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
           </div>
 
           <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
-            <div className="p-2 bg-slate-50 rounded-xl">
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Betweenness</div>
-              <div className="text-xs font-mono font-bold text-indigo-600">{selectedNode.betweenness}</div>
+              <div className="text-xs font-mono font-bold text-purple-600">{selectedNode.betweenness}</div>
             </div>
-            <div className="p-2 bg-slate-50 rounded-xl">
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Degree Centrality</div>
               <div className="text-xs font-mono font-bold text-indigo-600">{selectedNode.degree}</div>
             </div>
-            <div className="p-2 bg-slate-50 rounded-xl">
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Linked Incidents</div>
               <div className="text-xs font-bold text-slate-800">{selectedNode.incidentCount}</div>
             </div>
