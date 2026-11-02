@@ -163,13 +163,13 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Incident Intake & Lifecycle</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] font-bold font-mono">
               Module M2
             </span>
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-stone-500 font-medium">
             Structured incident logging with severity mapping, resolution metrics, and automated root cause convergence
           </p>
         </div>
@@ -177,16 +177,16 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#EADBCE] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
             title="Export incidents dataset as CSV"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-stone-500" />
             <span>Export CSV</span>
           </button>
 
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:opacity-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Report New Incident</span>
@@ -195,15 +195,15 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-wrap items-center gap-3">
+      <div className="bg-white/95 rounded-xl border border-[#EADBCE] p-3 shadow-xs flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder="Search by title, number, or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-purple-500 bg-[#FAF8F5] text-slate-900"
           />
         </div>
 
@@ -211,7 +211,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
           <select
             value={filterSeverity}
             onChange={(e) => setFilterSeverity(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -223,7 +223,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="OPEN">Open</option>
@@ -234,7 +234,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
           <select
             value={filterModule}
             onChange={(e) => setFilterModule(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
           >
             <option value="ALL">All Modules</option>
             <option value="payments">payments</option>
@@ -249,10 +249,10 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg bg-[#F5EFEB] hover:bg-[#EADBCE] text-stone-700 transition-colors cursor-pointer font-semibold"
               title="Reset all active filters"
             >
-              <RotateCcw className="w-3 h-3 text-slate-500" />
+              <RotateCcw className="w-3 h-3 text-stone-500" />
               <span>Reset</span>
             </button>
           )}
@@ -263,15 +263,15 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Incident List Table */}
-        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <span className="text-xs font-bold text-slate-900">{incidents.length} Registered Incidents</span>
-            <span className="text-[11px] text-slate-500">Click row to inspect causal telemetry</span>
+        <div className="lg:col-span-7 bg-white/95 rounded-xl border border-[#EADBCE] shadow-xs overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#F5EFEB] flex items-center justify-between bg-[#FAF8F5]">
+            <span className="text-xs font-bold text-slate-950">{incidents.length} Registered Incidents</span>
+            <span className="text-[11px] text-stone-500 font-medium">Click row to inspect causal telemetry</span>
           </div>
 
-          <div className="divide-y divide-slate-100 max-h-[640px] overflow-y-auto">
+          <div className="divide-y divide-[#F5EFEB] max-h-[640px] overflow-y-auto">
             {incidents.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-400">
+              <div className="p-8 text-center text-xs text-stone-400 font-medium">
                 No incidents found matching current filters.
               </div>
             ) : (
@@ -281,13 +281,13 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                   <div
                     key={inc.id}
                     onClick={() => handleSelectIncident(inc)}
-                    className={`p-3.5 hover:bg-slate-50 transition-colors cursor-pointer flex flex-col space-y-2 ${
-                      isSelected ? 'bg-indigo-50/60 border-l-4 border-indigo-600' : ''
+                    className={`p-3.5 hover:bg-[#FAF8F5] transition-colors cursor-pointer flex flex-col space-y-2 ${
+                      isSelected ? 'bg-[#F5EFEB]/70 border-l-4 border-purple-700' : ''
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="font-mono text-xs font-bold text-slate-900">{inc.incident_number}</span>
+                        <span className="font-mono text-xs font-bold text-slate-950">{inc.incident_number}</span>
                         <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-sm border ${severityBadge(inc.severity)}`}>
                           {inc.severity}
                         </span>
@@ -301,12 +301,12 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                       </span>
                     </div>
 
-                    <h4 className="text-xs font-semibold text-slate-900 leading-snug line-clamp-1">
+                    <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1">
                       {inc.title}
                     </h4>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-400">
-                      <span>Effort: {inc.resolution_effort_hours}h</span>
+                    <div className="flex items-center justify-between text-[11px] text-stone-500 font-medium">
+                      <span>Effort: <strong className="text-slate-900">{inc.resolution_effort_hours}h</strong></span>
                       <span>{new Date(inc.reported_at).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -317,20 +317,20 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         </div>
 
         {/* Selected Incident Detail Inspector */}
-        <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-xs sticky top-20 space-y-5">
+        <div className="lg:col-span-5 bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs sticky top-20 space-y-5">
           {selectedIncident ? (
             <>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">
+                  <span className="font-mono text-xs font-bold text-purple-900 bg-[#F5EFEB] border border-[#EADBCE] px-2.5 py-0.5 rounded-md">
                     {selectedIncident.incident_number}
                   </span>
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-xs text-slate-500 font-medium">Status:</span>
+                    <span className="text-xs text-stone-500 font-medium">Status:</span>
                     <select
                       value={selectedIncident.status}
                       onChange={(e) => handleUpdateStatus(selectedIncident.id, e.target.value as IncidentStatus)}
-                      className="text-xs font-bold px-2 py-1 rounded-md border border-slate-200 bg-white cursor-pointer"
+                      className="text-xs font-bold px-2 py-1 rounded-md border border-[#EADBCE] bg-[#FAF8F5] text-slate-900 cursor-pointer"
                     >
                       <option value="OPEN">OPEN</option>
                       <option value="INVESTIGATING">INVESTIGATING</option>
@@ -340,10 +340,10 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                 </div>
 
                 {/* Interactive Lifecycle Workflow Stepper */}
-                <div className="my-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80">
+                <div className="my-3 bg-[#FAF8F5] p-2.5 rounded-xl border border-[#EADBCE]">
                   <div className="flex items-center justify-between text-[11px] mb-1.5">
-                    <span className="font-semibold text-slate-700">Lifecycle State</span>
-                    <span className="text-[10px] text-slate-400">Click to transition</span>
+                    <span className="font-bold text-slate-950">Lifecycle State</span>
+                    <span className="text-[10px] text-stone-500">Click to transition</span>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5">
                     {(['OPEN', 'INVESTIGATING', 'RESOLVED'] as IncidentStatus[]).map((st, idx) => {
@@ -354,16 +354,16 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                         <button
                           key={st}
                           onClick={() => handleUpdateStatus(selectedIncident.id, st)}
-                          className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all cursor-pointer ${
+                          className={`px-2 py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center space-x-1 transition-all cursor-pointer ${
                             isCurrent
                               ? st === 'RESOLVED' 
                                 ? 'bg-emerald-600 text-white shadow-xs'
                                 : st === 'INVESTIGATING'
-                                ? 'bg-amber-500 text-white shadow-xs'
+                                ? 'bg-amber-600 text-white shadow-xs'
                                 : 'bg-rose-600 text-white shadow-xs'
                               : isPast
-                              ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                              : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100'
+                              ? 'bg-[#EADBCE] text-stone-800 hover:bg-[#D8CEBE]'
+                              : 'bg-white text-stone-600 border border-[#EADBCE] hover:bg-[#FAF8F5]'
                           }`}
                         >
                           <span>{idx + 1}. {st.charAt(0) + st.slice(1).toLowerCase()}</span>
@@ -374,30 +374,30 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                   </div>
                 </div>
 
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">{selectedIncident.title}</h3>
-                <p className="mt-2 text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <h3 className="text-sm font-extrabold text-slate-950 leading-snug">{selectedIncident.title}</h3>
+                <p className="mt-2 text-xs text-stone-700 leading-relaxed bg-[#FAF8F5] p-3 rounded-lg border border-[#EADBCE] font-medium">
                   {selectedIncident.description}
                 </p>
               </div>
 
               {/* Metadata Badges */}
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-                  <div className="text-[10px] text-slate-400 font-medium uppercase">Affected Module</div>
-                  <div className="font-semibold text-slate-800">{selectedIncident.affected_module}</div>
+                <div className="p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EADBCE]">
+                  <div className="text-[10px] text-stone-500 font-bold uppercase">Affected Module</div>
+                  <div className="font-bold text-slate-900 mt-0.5">{selectedIncident.affected_module}</div>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-                  <div className="text-[10px] text-slate-400 font-medium uppercase">Resolution Effort</div>
-                  <div className="font-semibold text-slate-800">{selectedIncident.resolution_effort_hours} Hours</div>
+                <div className="p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EADBCE]">
+                  <div className="text-[10px] text-stone-500 font-bold uppercase">Resolution Effort</div>
+                  <div className="font-bold text-slate-900 mt-0.5">{selectedIncident.resolution_effort_hours} Hours</div>
                 </div>
               </div>
 
               {/* Convert to Debt Item Action Button */}
               {onConvertIncidentToDebt && (
-                <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 flex items-center justify-between">
+                <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-emerald-900">Quantify Underlying Debt</div>
-                    <div className="text-[10px] text-emerald-700">Convert incident finding into a scheduled debt item</div>
+                    <div className="text-xs font-bold text-emerald-950">Quantify Underlying Debt</div>
+                    <div className="text-[10px] text-emerald-800 font-medium">Convert incident finding into a scheduled debt item</div>
                   </div>
                   <button
                     onClick={() => onConvertIncidentToDebt({
@@ -407,7 +407,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                       effort_principal: Math.max(8.0, selectedIncident.resolution_effort_hours * 1.5),
                       linked_incident_id: selectedIncident.id
                     })}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center space-x-1 cursor-pointer transition-colors"
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center space-x-1 cursor-pointer transition-colors"
                   >
                     <Coins className="w-3.5 h-3.5" />
                     <span>Convert to Debt</span>
@@ -416,17 +416,17 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
               )}
 
               {/* Similar Incidents (M6 Hybrid Similarity Engine) */}
-              <div className="pt-3 border-t border-slate-100">
+              <div className="pt-3 border-t border-[#F5EFEB]">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    <span className="text-xs font-bold text-slate-900">Hybrid Similar Incidents</span>
+                    <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+                    <span className="text-xs font-bold text-slate-950">Hybrid Similar Incidents</span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400">TF-IDF + Semantics</span>
+                  <span className="text-[10px] font-mono text-purple-900 bg-[#F5EFEB] px-1.5 py-0.5 rounded border border-[#EADBCE] font-bold">TF-IDF + Semantics</span>
                 </div>
 
                 {similarIncidents.length === 0 ? (
-                  <div className="p-3 text-center text-[11px] text-slate-400 bg-slate-50 rounded-lg">
+                  <div className="p-3 text-center text-[11px] text-stone-500 bg-[#FAF8F5] rounded-lg border border-[#EADBCE] font-medium">
                     No related incidents exceeding similarity threshold.
                   </div>
                 ) : (
@@ -434,21 +434,21 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                     {similarIncidents.map((s) => (
                       <div 
                         key={s.incident_id}
-                        className="p-2 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-slate-100 transition-colors flex items-center justify-between text-xs"
+                        className="p-2 rounded-lg border border-[#EADBCE] bg-[#FAF8F5] hover:bg-white transition-colors flex items-center justify-between text-xs"
                       >
                         <div className="min-w-0 pr-2">
                           <div className="flex items-center space-x-1.5">
-                            <span className="font-mono font-bold text-slate-800 text-[11px]">{s.incident_number}</span>
-                            <span className="text-slate-400 text-[10px]">• {s.affected_module}</span>
+                            <span className="font-mono font-bold text-slate-900 text-[11px]">{s.incident_number}</span>
+                            <span className="text-stone-500 text-[10px]">• {s.affected_module}</span>
                           </div>
-                          <div className="text-[11px] text-slate-600 truncate">{s.title}</div>
+                          <div className="text-[11px] text-stone-700 truncate font-medium">{s.title}</div>
                         </div>
 
                         <div className="text-right shrink-0">
                           <span className={`font-mono font-bold text-[11px] px-1.5 py-0.5 rounded-md border ${getSimilarityBadge(s.similarity_score)}`}>
                             {Math.round(s.similarity_score * 100)}%
                           </span>
-                          <div className="text-[9px] text-slate-400 mt-0.5">sim(i,j)</div>
+                          <div className="text-[9px] text-stone-500 mt-0.5 font-medium">sim(i,j)</div>
                         </div>
                       </div>
                     ))}
@@ -457,7 +457,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
               </div>
             </>
           ) : (
-            <div className="p-8 text-center text-xs text-slate-400">
+            <div className="p-8 text-center text-xs text-stone-400 font-medium">
               Select an incident from the left to view details and similar defect telemetry.
             </div>
           )}

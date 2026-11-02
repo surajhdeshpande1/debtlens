@@ -153,12 +153,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'The engineering team has spent 182.2h responding to payment checkout failures—over double the 90h needed to permanently refactor the database connection pool.'
     },
     moduleChartData: [
-      { name: 'payments', interest: 48.5, blastRadius: 6, color: '#8B5CF6' },
-      { name: 'database', interest: 36.0, blastRadius: 4, color: '#F59E0B' },
-      { name: 'settlement', interest: 28.0, blastRadius: 3, color: '#10B981' },
-      { name: 'checkout', interest: 22.5, blastRadius: 4, color: '#0EA5E9' },
-      { name: 'auth', interest: 19.0, blastRadius: 5, color: '#F43F5E' },
-      { name: 'notification', interest: 14.0, blastRadius: 2, color: '#14B8A6' }
+      { name: 'payments', interest: 48.5, blastRadius: 6, color: '#1D4ED8' },
+      { name: 'database', interest: 36.0, blastRadius: 4, color: '#D97706' },
+      { name: 'settlement', interest: 28.0, blastRadius: 3, color: '#7C3AED' },
+      { name: 'checkout', interest: 22.5, blastRadius: 4, color: '#C026D3' },
+      { name: 'auth', interest: 19.0, blastRadius: 5, color: '#DC2626' },
+      { name: 'notification', interest: 14.0, blastRadius: 2, color: '#0F172A' }
     ],
     incident: {
       code: 'INC-101',
@@ -230,12 +230,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'Hospital IT expended 214.5h fighting ICU vitals telemetry queue drops—nearly triple the 75h required to refactor the unindexed patient query schema.'
     },
     moduleChartData: [
-      { name: 'vitals_stream', interest: 62.0, blastRadius: 7, color: '#E11D48' },
-      { name: 'patient_fhir', interest: 44.5, blastRadius: 5, color: '#F59E0B' },
-      { name: 'icu_alerts', interest: 38.0, blastRadius: 4, color: '#8B5CF6' },
-      { name: 'emr_records', interest: 29.0, blastRadius: 3, color: '#0EA5E9' },
-      { name: 'hipaa_audit', interest: 24.0, blastRadius: 6, color: '#10B981' },
-      { name: 'lab_sync', interest: 17.0, blastRadius: 2, color: '#14B8A6' }
+      { name: 'vitals_stream', interest: 62.0, blastRadius: 7, color: '#DC2626' }, // Crimson Red
+      { name: 'patient_fhir', interest: 44.5, blastRadius: 5, color: '#D97706' },  // Dark Yellow
+      { name: 'icu_alerts', interest: 38.0, blastRadius: 4, color: '#7C3AED' },    // Purple
+      { name: 'emr_records', interest: 29.0, blastRadius: 3, color: '#1D4ED8' },   // Royal Blue
+      { name: 'hipaa_audit', interest: 24.0, blastRadius: 6, color: '#C026D3' },   // Magenta
+      { name: 'lab_sync', interest: 17.0, blastRadius: 2, color: '#0F172A' }       // Black
     ],
     incident: {
       code: 'INC-204',
@@ -307,12 +307,12 @@ const SCENARIOS: Record<ScenarioId, ScenarioData> = {
       description: 'Logistics engineering burned 168.0h in post-incident stock reconciliation—over 2.5x the 65h needed to replace distributed database deadlocks.'
     },
     moduleChartData: [
-      { name: 'inventory_core', interest: 54.0, blastRadius: 6, color: '#3B82F6' },
-      { name: 'dispatch_route', interest: 38.5, blastRadius: 4, color: '#10B981' },
-      { name: 'carrier_sync', interest: 31.0, blastRadius: 4, color: '#F59E0B' },
-      { name: 'warehouse_pick', interest: 22.0, blastRadius: 3, color: '#8B5CF6' },
-      { name: 'order_tracking', interest: 14.5, blastRadius: 2, color: '#0EA5E9' },
-      { name: 'customs_intl', interest: 8.0, blastRadius: 1, color: '#64748B' }
+      { name: 'inventory_core', interest: 54.0, blastRadius: 6, color: '#1D4ED8' }, // Royal Blue
+      { name: 'dispatch_route', interest: 38.5, blastRadius: 4, color: '#7C3AED' }, // Purple
+      { name: 'carrier_sync', interest: 31.0, blastRadius: 4, color: '#D97706' },  // Dark Yellow
+      { name: 'warehouse_pick', interest: 22.0, blastRadius: 3, color: '#C026D3' }, // Magenta
+      { name: 'order_tracking', interest: 14.5, blastRadius: 2, color: '#DC2626' }, // Crimson Red
+      { name: 'customs_intl', interest: 8.0, blastRadius: 1, color: '#0F172A' }    // Black
     ],
     incident: {
       code: 'INC-309',
@@ -530,35 +530,35 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
   const isFocus = (target: string) => currentConfig.targetFocus === target;
 
   return (
-    <div className="relative min-h-screen bg-slate-100 text-slate-900 select-none pb-32">
+    <div className="relative min-h-screen bg-[#FDFBF7] text-slate-900 select-none pb-36">
       
       {/* ========================================================================= */}
       {/* 1. BLACK TRANSLUCENT SPOTLIGHT BACKDROP OVERLAY                           */}
       {/* Dimmed curtain covering everything except the active spotlighted section */}
       {/* ========================================================================= */}
-      <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-[2px] transition-all duration-300 z-30 pointer-events-none" />
+      <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-[2px] transition-all duration-300 z-30 pointer-events-none" />
 
       {/* ========================================================================= */}
-      {/* TOP HEADER: Clean, Professional Enterprise Header with Scenario Switcher  */}
+      {/* TOP HEADER: Elegant Light Beige Enterprise Header with Scenario Switcher */}
       {/* ========================================================================= */}
-      <div className="sticky top-0 z-40 bg-slate-900 text-white px-4 sm:px-6 py-2 border-b border-slate-800 shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div className="sticky top-0 z-40 bg-[#FCFAF7]/95 backdrop-blur-md text-slate-900 px-4 sm:px-6 py-2.5 border-b border-[#EADBCE] shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2.5">
           
           {/* Brand & Guide Info */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
-              <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-700 via-indigo-600 to-purple-700 flex items-center justify-center text-white shadow-sm ring-1 ring-blue-500/20">
                 <Layers className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-sm tracking-tight">DebtLens Operational Walkthrough</span>
-                  <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800 text-[10px] font-mono font-bold">
+                  <span className="font-extrabold text-sm tracking-tight text-slate-950">DebtLens Operational Walkthrough</span>
+                  <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] text-[10px] font-mono font-bold">
                     {activeScenario.platformCode}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 hidden sm:block">
-                  BEC Bagalkote • Dept. of ISE • Guide: Prof. P. R. Muttannavar
+                <p className="text-[10px] text-stone-500 hidden sm:block font-medium">
+                  BEC Bagalkote • Dept. of Information Science & Engineering • Guide: Prof. P. R. Muttannavar
                 </p>
               </div>
             </div>
@@ -566,16 +566,16 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             {/* Mobile Exit */}
             <button
               onClick={onExitDemo}
-              className="md:hidden px-2 py-1 rounded bg-rose-600 text-[11px] font-bold text-white flex items-center space-x-1"
+              className="md:hidden px-2.5 py-1 rounded-lg bg-rose-600 text-[11px] font-bold text-white flex items-center space-x-1"
             >
               <X className="w-3 h-3" />
               <span>Exit</span>
             </button>
           </div>
 
-          {/* Center: Scenario Switcher (At Least 3 Examples to Choose) */}
-          <div className="flex items-center space-x-1.5 bg-slate-800/90 p-1 rounded-xl border border-slate-700/80 self-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 px-2 hidden lg:inline">
+          {/* Center: Scenario Switcher (At Least 3 Domain Examples: FinTech, HealthTech, Supply Chain) */}
+          <div className="flex items-center space-x-1.5 bg-[#FAF8F5] p-1 rounded-xl border border-[#EADBCE] self-center">
+            <span className="text-[10px] uppercase font-bold text-stone-500 px-2 hidden lg:inline">
               Select Domain:
             </span>
 
@@ -587,10 +587,10 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 <button
                   key={id}
                   onClick={() => handleSwitchScenario(id)}
-                  className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/70'
+                      ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white shadow-xs font-bold'
+                      : 'text-stone-700 hover:text-slate-950 hover:bg-[#F5EFEB]'
                   }`}
                   title={sc.tagline}
                 >
@@ -601,23 +601,23 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             })}
           </div>
 
-          {/* Right Actions: Concept Guide & Exit */}
+          {/* Right Actions: Concept Guide, Restart & Exit */}
           <div className="hidden md:flex items-center space-x-2">
             <button
               onClick={() => setIsConceptModalOpen(true)}
-              className="px-2.5 py-1.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 text-xs font-bold transition-colors flex items-center space-x-1 cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
               title="Explain what DebtLens is and why it applies to any software domain"
             >
-              <Info className="w-3.5 h-3.5 text-indigo-400" />
+              <Info className="w-3.5 h-3.5 text-purple-700" />
               <span>What is DebtLens?</span>
             </button>
 
             <button
               onClick={() => setCurrentStep(1)}
               title="Restart walkthrough from stage 1"
-              className="p-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer text-xs font-semibold flex items-center space-x-1"
+              className="p-1.5 px-2.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F5EFEB] text-stone-700 hover:text-slate-950 border border-[#EADBCE] transition-colors cursor-pointer text-xs font-semibold flex items-center space-x-1"
             >
-              <RotateCcw className="w-3 h-3" />
+              <RotateCcw className="w-3 h-3 text-stone-500" />
               <span>Restart</span>
             </button>
 
@@ -637,59 +637,69 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       {/* CONCEPT GUIDE MODAL: Explains project to faculty / "Sir"                  */}
       {/* ========================================================================= */}
       {isConceptModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center space-x-2">
-                <BookOpen className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-base font-bold text-slate-900">
-                  What is DebtLens? (Executive Project Concept for Evaluators)
-                </h3>
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#FCFAF7] rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-[#EADBCE] space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EADBCE] pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 border border-purple-200">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-950">
+                    What is DebtLens?
+                  </h3>
+                  <p className="text-[11px] text-stone-500 font-medium">
+                    Executive Project Concept for Faculty, Evaluators & Software Leaders
+                  </p>
+                </div>
               </div>
               <button 
                 onClick={() => setIsConceptModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-stone-400 hover:text-slate-950 hover:bg-[#F5EFEB] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
-              <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-100">
-                <h4 className="font-bold text-indigo-950 mb-1">
-                  1. Domain-Agnostic Software Quality Platform
+            <div className="space-y-3 text-xs sm:text-sm text-stone-700 leading-relaxed">
+              <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200">
+                <h4 className="font-bold text-blue-950 mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  <span>1. Universal Software Domain Agnostic</span>
                 </h4>
-                <p className="text-slate-600">
+                <p className="text-stone-700 text-xs leading-relaxed">
                   Technical debt is <strong>not bounded to financial software</strong>. Every modern software organization—whether <strong>FinTech (payment processing)</strong>, <strong>HealthTech (hospital EHR & ICU telemetry)</strong>, <strong>Supply Chain (logistics & inventory routing)</strong>, or SaaS—suffers from accumulated architectural shortcuts, unindexed queries, thread pool starvation, and tightly coupled microservices.
                 </p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <h4 className="font-bold text-slate-900 mb-1">
-                  2. Why Traditional Linters (SonarQube) Fail
+              <div className="p-3.5 bg-amber-50/80 rounded-xl border border-amber-200">
+                <h4 className="font-bold text-amber-950 mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-600" />
+                  <span>2. Why Traditional Linters (SonarQube) Fail</span>
                 </h4>
-                <p className="text-slate-600">
+                <p className="text-stone-700 text-xs leading-relaxed">
                   Traditional static code analyzers scan source code syntax and report 1,000+ style warnings. However, engineering managers ignore them because they cannot answer: <em>"Is this code smell actually causing outages in production?"</em> DebtLens solves this by directly linking real production incidents into the debt ledger.
                 </p>
               </div>
 
-              <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100">
-                <h4 className="font-bold text-emerald-950 mb-1">
-                  3. The 4 Mathematical Pillars of DebtLens
+              <div className="p-3.5 bg-purple-50/70 rounded-xl border border-purple-200">
+                <h4 className="font-bold text-purple-950 mb-1 flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-purple-600" />
+                  <span>3. The 4 Mathematical Pillars of DebtLens</span>
                 </h4>
-                <ul className="list-disc list-inside space-y-1 text-slate-700">
+                <ul className="list-disc list-inside space-y-1 text-xs text-stone-700">
                   <li><strong>Economic Balance Sheet</strong>: Quantifies debt in wasted engineering salary hours (Accrued Interest I(d) &gt; P(d)).</li>
                   <li><strong>5-Whys Causal Traceability</strong>: Traces runtime incidents down to root architectural weaknesses.</li>
-                  <li><strong>NetworkX Graph Centrality</strong>: Calculates Betweenness Centrality $C_B(v)$ to isolate the #1 systemic bottleneck.</li>
+                  <li><strong>NetworkX Graph Centrality</strong>: Calculates Betweenness Centrality C_B(v) to isolate the #1 systemic bottleneck.</li>
                   <li><strong>0/1 Knapsack Dynamic Programming</strong>: Schedules the optimal subset of refactoring tickets for a bounded 40h sprint.</li>
                 </ul>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex justify-end">
+            <div className="pt-2 border-t border-[#EADBCE] flex justify-end">
               <button
                 onClick={() => setIsConceptModalOpen(false)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+                className="px-4 py-2 bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
               >
                 Close & Return to Walkthrough
               </button>
@@ -701,8 +711,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       {/* ========================================================================= */}
       {/* VISUAL NAVIGATING TOOL: COMPACT HORIZONTAL PIPELINE STEPPER                */}
       {/* ========================================================================= */}
-      <div className="sticky top-[45px] z-40 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800 px-4 sm:px-6 py-1.5 shadow-sm overflow-x-auto">
-        <div className="max-w-7xl mx-auto flex items-center justify-between min-w-[680px] gap-1">
+      <div className="sticky top-[55px] z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EADBCE] px-4 sm:px-6 py-2 shadow-xs overflow-x-auto">
+        <div className="max-w-7xl mx-auto flex items-center justify-between min-w-[700px] gap-1.5">
           {steps.map((s, idx) => {
             const Icon = s.icon;
             const isActive = s.step === currentStep;
@@ -712,23 +722,23 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               <React.Fragment key={s.step}>
                 <button
                   onClick={() => setCurrentStep(s.step)}
-                  className={`flex items-center space-x-1.5 px-2 py-1 rounded-lg transition-all cursor-pointer text-left shrink-0 ${
+                  className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg transition-all cursor-pointer text-left shrink-0 ${
                     isActive
-                      ? 'bg-indigo-600 text-white font-bold ring-1 ring-indigo-400 shadow-sm'
+                      ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white font-bold ring-1 ring-purple-300 shadow-xs'
                       : isCompleted
-                      ? 'bg-slate-800/80 text-emerald-400 hover:bg-slate-800'
-                      : 'bg-slate-800/40 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
+                      ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 font-semibold'
+                      : 'bg-white text-stone-600 border border-[#EADBCE] hover:bg-[#F5EFEB] hover:text-slate-950 font-medium'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${
                     isActive 
-                      ? 'bg-white text-indigo-700' 
+                      ? 'bg-white/20 text-white' 
                       : isCompleted 
-                      ? 'bg-emerald-950 text-emerald-400' 
-                      : 'text-slate-400'
+                      ? 'bg-emerald-100 text-emerald-700' 
+                      : 'text-stone-400'
                   }`}>
                     {isCompleted ? (
-                      <CheckCircle2 className="w-3 h-3" />
+                      <CheckCircle2 className="w-3 h-3 text-emerald-700" />
                     ) : (
                       <Icon className="w-3 h-3" />
                     )}
@@ -739,8 +749,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                 </button>
 
                 {idx < steps.length - 1 && (
-                  <div className={`h-0.5 flex-1 min-w-[6px] rounded-full ${
-                    isCompleted ? 'bg-emerald-500/70' : 'bg-slate-800'
+                  <div className={`h-0.5 flex-1 min-w-[8px] rounded-full ${
+                    isCompleted ? 'bg-emerald-500' : 'bg-[#EADBCE]'
                   }`} />
                 )}
               </React.Fragment>
@@ -759,39 +769,39 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-header"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('header')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('header') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-indigo-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 1 Focus • Production Telemetry Stream ({activeScenario.name})</span>
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#EADBCE]">
             <div>
-              <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+              <div className="flex items-center space-x-2 text-xs text-stone-500 mb-1">
                 <span>Domain</span>
                 <span>/</span>
-                <span className="text-slate-900 font-bold">{activeScenario.portfolioName}</span>
-                <span className="text-slate-300">•</span>
-                <span className="inline-flex items-center space-x-1 text-xs text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-slate-950 font-bold">{activeScenario.portfolioName}</span>
+                <span className="text-stone-300">•</span>
+                <span className="inline-flex items-center space-x-1 text-xs text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Real-time Telemetry Live</span>
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-950">
                 Executive Debt Intelligence Dashboard
               </h1>
-              <p className="text-xs text-slate-600 mt-0.5 font-medium">
+              <p className="text-xs text-stone-600 mt-0.5 font-medium">
                 {activeScenario.tagline}
               </p>
             </div>
 
             <div className="flex items-center space-x-2 shrink-0">
-              <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-mono font-bold">
+              <span className="px-2.5 py-1 rounded-lg bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] text-xs font-mono font-bold">
                 {activeScenario.clusterLocation}
               </span>
             </div>
@@ -805,12 +815,12 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-kpis"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('kpis')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-purple-600 shadow-[0_0_40px_rgba(124,58,237,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('kpis') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-indigo-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-purple-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 2 Focus • Debt Balance Sheet: Principal P(d) vs Accrued Interest I(d)</span>
             </div>
@@ -855,27 +865,27 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-alert"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('alert')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-rose-600 shadow-[0_0_40px_rgba(220,38,38,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('alert') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-rose-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-rose-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 3 Focus • Mathematical Break-Even Violation Trigger</span>
             </div>
           )}
 
-          <div className="p-3.5 sm:p-4 rounded-xl border border-rose-200 bg-rose-50/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-xs">
+          <div className="p-3.5 sm:p-4 rounded-xl border-2 border-rose-300 bg-[#FFF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-xs">
             <div className="flex items-start sm:items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
               </div>
               <div>
-                <div className="text-sm sm:text-base font-bold text-slate-900">
+                <div className="text-sm sm:text-base font-bold text-slate-950">
                   {activeScenario.breakevenAlert.title}
                 </div>
-                <div className="text-xs text-slate-700 mt-0.5 font-medium leading-relaxed">
+                <div className="text-xs text-stone-600 mt-0.5 font-medium leading-relaxed">
                   {activeScenario.breakevenAlert.description}
                 </div>
               </div>
@@ -898,24 +908,24 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-dragchart"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('dragchart')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-amber-600 shadow-[0_0_40px_rgba(217,119,6,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('dragchart') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-indigo-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-amber-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 4 Focus • Partitioned Failure Drag & Blast Radius ({activeScenario.name})</span>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-100">
+          <div className="bg-white rounded-xl border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-[#F5EFEB]">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Module Economic Drag Exposure</h3>
-                <p className="text-[11px] text-slate-500">Partitioned failure interest across {activeScenario.name} microservices</p>
+                <h3 className="text-sm font-bold text-slate-950">Module Economic Drag Exposure</h3>
+                <p className="text-[11px] text-stone-500">Partitioned failure interest across {activeScenario.name} microservices</p>
               </div>
-              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#F5EFEB] text-stone-700 border border-[#EADBCE]">
                 λ₁ = 0.15 (churn), λ₂ = 1.8 (blast radius)
               </span>
             </div>
@@ -923,7 +933,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             <div className="h-52 w-full pt-1">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={activeScenario.moduleChartData} margin={{ top: 10, right: 10, left: -15, bottom: 15 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2EDE4" />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#334155', fontWeight: 600 }} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#64748B' }} tickLine={false} />
                   <Tooltip formatter={(val: any) => [`${val} hours`, 'Failure Interest']} />
@@ -945,31 +955,31 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-incidents"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('incidents')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-fuchsia-600 shadow-[0_0_40px_rgba(192,38,211,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('incidents') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-indigo-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-fuchsia-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 5 Focus • Automated 5-Whys Diagnostic Decomposition ({activeScenario.incident.code})</span>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 pb-2">
+          <div className="bg-white rounded-xl border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+                <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800">
                   <AlertTriangle className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-slate-950">
                     Incident Triage: {activeScenario.incident.title}
                   </h3>
-                  <p className="text-[11px] text-slate-500">Production outage converted into structured causal evidence</p>
+                  <p className="text-[11px] text-stone-500">Production outage converted into structured causal evidence</p>
                 </div>
               </div>
-              <span className="text-xs font-mono font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+              <span className="text-xs font-mono font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
                 {activeScenario.incident.effort}h Effort • Severity: {activeScenario.incident.multiplier}
               </span>
             </div>
@@ -977,13 +987,13 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             {/* 5-Whys Diagnostic Chain */}
             <div className="space-y-1.5">
               {activeScenario.incident.whys.map((w, idx) => (
-                <div key={idx} className="p-2 rounded-lg border border-slate-200 bg-slate-50 flex items-start space-x-2">
-                  <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-900 font-mono font-bold text-[10px] shrink-0">
+                <div key={idx} className="p-2 rounded-lg border border-[#EADBCE] bg-[#FAF8F5] flex items-start space-x-2">
+                  <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-950 font-mono font-bold text-[10px] shrink-0">
                     {w.level}
                   </span>
                   <div className="flex-1 text-xs">
-                    <span className="font-bold text-slate-900">{w.text}</span>
-                    <span className="text-slate-600 block mt-0.5 font-medium">↳ {w.answer}</span>
+                    <span className="font-bold text-slate-950">{w.text}</span>
+                    <span className="text-stone-600 block mt-0.5 font-medium">↳ {w.answer}</span>
                   </div>
                 </div>
               ))}
@@ -998,56 +1008,56 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-causal"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('causal')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-purple-600 shadow-[0_0_40px_rgba(124,58,237,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('causal') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-purple-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-purple-700 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 6 Focus • NetworkX Directed Causal Graph Centrality</span>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 pb-2">
+          <div className="bg-white rounded-xl border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700">
                   <GitFork className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-slate-950">
                     NetworkX Directed Causal Graph Analysis
                   </h3>
-                  <p className="text-[11px] text-slate-500">Topological shortest path centrality isolating highest-impact bottleneck</p>
+                  <p className="text-[11px] text-stone-500">Topological shortest path centrality isolating highest-impact bottleneck</p>
                 </div>
               </div>
-              <span className="text-xs font-mono text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+              <span className="text-xs font-mono text-purple-800 font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                 {activeScenario.causalGraph.edgeCount}
               </span>
             </div>
 
-            <div className="p-3.5 rounded-xl border border-purple-200 bg-purple-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-3.5 rounded-xl border border-[#EADBCE] bg-[#FAF8F5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-200 text-purple-900">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-purple-950">
                   RANK #1 SYSTEMIC BOTTLENECK
                 </span>
-                <h4 className="text-sm font-bold text-slate-900 mt-1">
+                <h4 className="text-sm font-bold text-slate-950 mt-1">
                   {activeScenario.causalGraph.nodeTitle}
                 </h4>
-                <p className="text-xs text-slate-700 mt-0.5 font-medium">
+                <p className="text-xs text-stone-700 mt-0.5 font-medium">
                   Category: <strong className="text-purple-900 font-bold">{activeScenario.causalGraph.category}</strong> • {activeScenario.causalGraph.affectedServices}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-center shrink-0">
-                <div className="p-2 bg-white rounded-lg border border-purple-200 shadow-2xs">
-                  <div className="text-[9px] text-slate-500 font-bold uppercase">Betweenness CB(v)</div>
-                  <div className="text-base font-bold font-mono text-purple-700 mt-0.5">{activeScenario.causalGraph.betweenness}</div>
+                <div className="p-2 bg-white rounded-lg border border-[#EADBCE] shadow-2xs">
+                  <div className="text-[9px] text-stone-500 font-bold uppercase">Betweenness CB(v)</div>
+                  <div className="text-base font-bold font-mono text-purple-800 mt-0.5">{activeScenario.causalGraph.betweenness}</div>
                 </div>
-                <div className="p-2 bg-white rounded-lg border border-purple-200 shadow-2xs">
-                  <div className="text-[9px] text-slate-500 font-bold uppercase">Degree Centrality</div>
-                  <div className="text-base font-bold font-mono text-indigo-700 mt-0.5">{activeScenario.causalGraph.degree}</div>
+                <div className="p-2 bg-white rounded-lg border border-[#EADBCE] shadow-2xs">
+                  <div className="text-[9px] text-stone-500 font-bold uppercase">Degree Centrality</div>
+                  <div className="text-base font-bold font-mono text-blue-700 mt-0.5">{activeScenario.causalGraph.degree}</div>
                 </div>
               </div>
             </div>
@@ -1061,42 +1071,42 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-knapsack"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('knapsack')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-blue-600 shadow-[0_0_40px_rgba(29,78,216,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('knapsack') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-emerald-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-blue-800 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 7 Focus • Bounded 0/1 Knapsack Dynamic Programming Optimizer</span>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 pb-2">
+          <div className="bg-white rounded-xl border border-[#EADBCE] p-4 shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#F5EFEB] pb-2">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+                <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center text-blue-800">
                   <Calculator className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-slate-950">
                     Bounded 0/1 Knapsack Dynamic Programming Optimizer
                   </h3>
-                  <p className="text-[11px] text-slate-500">Globally optimal refactoring selection under sprint capacity constraint B = {activeScenario.knapsack.capacity}h</p>
+                  <p className="text-[11px] text-stone-500">Globally optimal refactoring selection under sprint capacity constraint B = {activeScenario.knapsack.capacity}h</p>
                 </div>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span className="text-xs font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                 Capacity B = {activeScenario.knapsack.capacity}h • Utilization: 95.0%
               </span>
             </div>
 
             {/* Segmented Packing Bar */}
             <div className="space-y-1">
-              <div className="flex justify-between text-xs font-bold text-slate-800">
+              <div className="flex justify-between text-xs font-bold text-slate-900">
                 <span>Optimal Refactoring Allocation:</span>
-                <span className="font-mono text-slate-500">{activeScenario.knapsack.packedEffort}h allocated / {activeScenario.knapsack.capacity}h capacity ({activeScenario.knapsack.slackHours}h slack)</span>
+                <span className="font-mono text-stone-500">{activeScenario.knapsack.packedEffort}h allocated / {activeScenario.knapsack.capacity}h capacity ({activeScenario.knapsack.slackHours}h slack)</span>
               </div>
-              <div className="w-full h-7 bg-slate-100 rounded-lg border border-slate-200 p-0.5 flex overflow-hidden shadow-inner">
+              <div className="w-full h-7 bg-[#F5EFEB] rounded-lg border border-[#EADBCE] p-0.5 flex overflow-hidden shadow-inner">
                 {activeScenario.knapsack.items.map((item, idx) => (
                   <div 
                     key={idx}
@@ -1107,7 +1117,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                     {item.code} ({item.effort}h)
                   </div>
                 ))}
-                <div style={{ width: '4%' }} className="bg-slate-200 h-full flex items-center justify-center text-[9px] text-slate-400 font-mono italic">
+                <div style={{ width: '4%' }} className="bg-stone-200 h-full flex items-center justify-center text-[9px] text-stone-500 font-mono italic">
                   {activeScenario.knapsack.slackHours}h
                 </div>
               </div>
@@ -1115,17 +1125,17 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
             {/* Metrics Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-              <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-center">
-                <div className="text-[9px] text-slate-500 font-bold uppercase">Effort Packed</div>
-                <div className="text-sm font-bold font-mono text-slate-900 mt-0.5">{activeScenario.knapsack.packedEffort} / {activeScenario.knapsack.capacity}h</div>
+              <div className="p-2.5 bg-[#FAF8F5] rounded-lg border border-[#EADBCE] text-center">
+                <div className="text-[9px] text-stone-500 font-bold uppercase">Effort Packed</div>
+                <div className="text-sm font-bold font-mono text-slate-950 mt-0.5">{activeScenario.knapsack.packedEffort} / {activeScenario.knapsack.capacity}h</div>
               </div>
-              <div className="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-center">
-                <div className="text-[9px] text-emerald-700 font-bold uppercase">Risk Points Remediated</div>
-                <div className="text-sm font-bold font-mono text-emerald-800 mt-0.5">{activeScenario.knapsack.riskPointsReduced} pts</div>
+              <div className="p-2.5 bg-[#FAF8F5] rounded-lg border border-[#EADBCE] text-center">
+                <div className="text-[9px] text-purple-800 font-bold uppercase">Risk Points Remediated</div>
+                <div className="text-sm font-bold font-mono text-purple-900 mt-0.5">{activeScenario.knapsack.riskPointsReduced} pts</div>
               </div>
-              <div className="p-2.5 bg-indigo-50 rounded-lg border border-indigo-200 text-center">
-                <div className="text-[9px] text-indigo-700 font-bold uppercase">Payoff Return ROI</div>
-                <div className="text-sm font-bold font-mono text-indigo-800 mt-0.5">{activeScenario.knapsack.roiMultiplier} ROI</div>
+              <div className="p-2.5 bg-[#FAF8F5] rounded-lg border border-[#EADBCE] text-center">
+                <div className="text-[9px] text-blue-800 font-bold uppercase">Payoff Return ROI</div>
+                <div className="text-sm font-bold font-mono text-blue-900 mt-0.5">{activeScenario.knapsack.roiMultiplier} ROI</div>
               </div>
             </div>
           </div>
@@ -1138,27 +1148,27 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           id="spotlight-target-audit"
           className={`scroll-mt-32 transition-all duration-300 ${
             isFocus('audit')
-              ? 'relative z-40 bg-white ring-2 ring-indigo-500 shadow-2xl rounded-2xl p-4 sm:p-5'
+              ? 'relative z-40 bg-white/98 ring-2 ring-slate-900 shadow-[0_0_40px_rgba(15,23,42,0.22)] rounded-2xl p-4 sm:p-5 border border-[#EADBCE]'
               : 'opacity-20 pointer-events-none'
           }`}
         >
           {isFocus('audit') && (
-            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-emerald-600 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-1.5 mb-2.5 bg-slate-950 text-white px-2.5 py-0.5 rounded-md shadow-xs text-xs font-bold uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
               <span>Stage 8 Focus • Technical Debt Audit & Governance Export</span>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-xl border border-[#EADBCE] p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 border border-emerald-200">
+              <div className="w-9 h-9 rounded-xl bg-[#F5EFEB] flex items-center justify-center text-purple-800 shrink-0 border border-[#EADBCE]">
                 <FileDown className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-sm font-bold text-slate-900">
+                <div className="text-sm font-bold text-slate-950">
                   {activeScenario.audit.title}
                 </div>
-                <div className="text-xs text-slate-600 mt-0.5 font-medium leading-relaxed">
+                <div className="text-xs text-stone-600 mt-0.5 font-medium leading-relaxed">
                   {activeScenario.audit.description}
                 </div>
               </div>
@@ -1166,7 +1176,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
             <button
               onClick={handleDownloadPdf}
-              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
+              className="px-3.5 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
             >
               <FileDown className="w-3.5 h-3.5" />
               <span>Download Audit Report PDF</span>
@@ -1180,23 +1190,23 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       {/* 2. DOCKED BOTTOM PRESENTER BAR (SIT FLUSH & LOW, NEVER OVERLAPS)           */}
       {/* Pinned to the absolute bottom, slim height, with minimize/expand toggle   */}
       {/* ========================================================================= */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-md border-t border-slate-200 shadow-[0_-8px_25px_rgba(0,0,0,0.12)]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#FCFAF7]/98 backdrop-blur-md border-t border-[#EADBCE] shadow-[0_-8px_30px_rgba(15,23,42,0.12)]">
         
         {/* Sleek Toggle Header for Minimal View */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-slate-100/80 py-1 text-[11px] text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-[#F5EFEB] py-1 text-[11px] text-stone-500">
           <div className="flex items-center space-x-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-slate-700">Presenter Console</span>
-            <span className="text-slate-300">|</span>
-            <span className="font-mono text-indigo-700 font-semibold">{activeScenario.name}</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-bold text-slate-950 uppercase tracking-wider text-[10px]">Presenter Console</span>
+            <span className="text-[#EADBCE]">|</span>
+            <span className="font-mono text-purple-800 font-bold">{activeScenario.name}</span>
           </div>
 
           <button
             onClick={() => setIsBottomBarCollapsed(!isBottomBarCollapsed)}
-            className="flex items-center space-x-1 text-slate-500 hover:text-slate-900 cursor-pointer font-medium"
+            className="flex items-center space-x-1 text-stone-600 hover:text-slate-950 cursor-pointer font-semibold transition-colors"
           >
             <span>{isBottomBarCollapsed ? 'Expand Controller' : 'Minimize Controller'}</span>
-            {isBottomBarCollapsed ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {isBottomBarCollapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
 
@@ -1204,23 +1214,23 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
         {isBottomBarCollapsed ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 rounded bg-indigo-600 text-white font-mono font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded bg-purple-700 text-white font-mono font-bold text-[10px]">
                 {currentStep} / {totalSteps}
               </span>
-              <span className="text-xs font-bold text-slate-900">{currentConfig.stageName}</span>
+              <span className="text-xs font-bold text-slate-950">{currentConfig.stageName}</span>
             </div>
 
             <div className="flex items-center space-x-2">
               <button
                 disabled={currentStep === 1}
                 onClick={handlePrev}
-                className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                className="px-2.5 py-1 rounded-lg border border-[#EADBCE] text-xs font-semibold text-stone-700 hover:bg-[#F5EFEB] disabled:opacity-30 cursor-pointer"
               >
                 Prev
               </button>
               <button
                 onClick={handleNext}
-                className="px-4 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                className="px-4 py-1 rounded-lg bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:opacity-95 text-white text-xs font-bold shadow-xs cursor-pointer"
               >
                 {currentConfig.nextLabel}
               </button>
@@ -1228,39 +1238,39 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           </div>
         ) : (
           /* Expanded Sleek Bar: Full Question, Explanation, and 1-Click Controls */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-center justify-between gap-2.5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-center justify-between gap-3">
             
             {/* Left: Stage Title & Clear Q&A Explanation */}
             <div className="flex-1 w-full md:w-auto">
-              <div className="flex items-center space-x-2 mb-0.5 flex-wrap gap-1">
-                <span className="px-2 py-0.5 rounded bg-indigo-600 text-white font-mono font-bold text-[9px] tracking-wider uppercase">
+              <div className="flex items-center space-x-2 mb-1 flex-wrap gap-1">
+                <span className="px-2 py-0.5 rounded-md bg-purple-700 text-white font-mono font-bold text-[9px] tracking-wider uppercase">
                   {currentConfig.badge}
                 </span>
-                <span className="text-xs font-bold text-slate-900">
+                <span className="text-xs font-bold text-slate-950">
                   Stage {currentStep} of {totalSteps}: {currentConfig.stageName}
                 </span>
-                <span className="text-slate-300 hidden sm:inline">•</span>
-                <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 font-semibold truncate max-w-xs">
+                <span className="text-stone-300 hidden sm:inline">•</span>
+                <span className="text-[10px] font-mono text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-bold truncate max-w-sm">
                   {currentConfig.mathematicalProof}
                 </span>
               </div>
 
-              <div className="text-xs font-bold text-slate-900 flex items-baseline space-x-1">
-                <span className="text-indigo-600 font-extrabold shrink-0">Q:</span>
-                <span>{currentConfig.inquiry}</span>
+              <div className="text-xs font-bold text-slate-950 flex items-baseline space-x-1.5">
+                <span className="text-purple-700 font-extrabold shrink-0">Q:</span>
+                <span className="text-slate-950 font-semibold">{currentConfig.inquiry}</span>
               </div>
 
-              <p className="text-[11px] text-slate-600 font-normal leading-snug mt-0.5 line-clamp-2 md:line-clamp-none">
+              <p className="text-[11px] text-stone-600 font-medium leading-snug mt-0.5 line-clamp-2 md:line-clamp-none">
                 {currentConfig.explanation}
               </p>
             </div>
 
             {/* Right: Master 1-Click Advance Controls */}
-            <div className="flex items-center justify-end space-x-2 shrink-0 w-full md:w-auto pt-1.5 md:pt-0 border-t md:border-t-0 border-slate-100">
+            <div className="flex items-center justify-end space-x-2 shrink-0 w-full md:w-auto pt-1.5 md:pt-0 border-t md:border-t-0 border-[#F5EFEB]">
               <button
                 disabled={currentStep === 1}
                 onClick={handlePrev}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-30 cursor-pointer flex items-center space-x-1 transition-colors"
+                className="px-2.5 py-1.5 rounded-lg border border-[#EADBCE] text-xs font-semibold text-stone-700 hover:bg-[#F5EFEB] disabled:opacity-30 cursor-pointer flex items-center space-x-1 transition-colors"
               >
                 <ArrowLeft className="w-3 h-3" />
                 <span>Prev</span>
@@ -1269,7 +1279,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               {/* Master ONE-CLICK Step Advance Button */}
               <button
                 onClick={handleNext}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md hover:shadow-lg flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:from-blue-800 hover:to-purple-800 text-white text-xs font-bold shadow-md hover:shadow-lg flex items-center space-x-1.5 transition-all cursor-pointer active:scale-95"
               >
                 <span>{currentConfig.nextLabel}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

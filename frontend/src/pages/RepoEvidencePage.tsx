@@ -227,24 +227,24 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Repository Evidence & Static Code Hotspots</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] font-bold font-mono">
               Module M5
             </span>
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-stone-500 font-medium">
             Deriving code churn, McCabe cyclomatic complexity, transitive blast radius via DFS, and self-admitted debt markers (SATD)
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab toggle */}
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-[#FAF8F5] border border-[#EADBCE] rounded-lg p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('matrix')}
-              className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
-                activeTab === 'matrix' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
+                activeTab === 'matrix' ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               Repository Matrix
@@ -254,8 +254,8 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                 setActiveTab('playground');
                 if (!snippetResult) handleAnalyzeSnippet();
               }}
-              className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1 cursor-pointer ${
-                activeTab === 'playground' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
+                activeTab === 'playground' ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               <Code2 className="w-3.5 h-3.5" />
@@ -266,9 +266,9 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
           <button
             onClick={handleScanWorkspace}
             disabled={isScanning}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-indigo-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-purple-400' : ''}`} />
             <span>{isScanning ? 'Scanning...' : 'Scan Repo'}</span>
           </button>
         </div>
@@ -277,26 +277,26 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
       {activeTab === 'matrix' ? (
         <>
           {/* Churn vs Complexity Matrix Scatter Plot */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+          <div className="bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Code Churn vs. Cyclomatic Complexity Hotspots</h3>
-                <p className="text-xs text-slate-500">High Churn + High Complexity files indicate severe architectural risk hotspots</p>
+                <h3 className="text-sm font-extrabold text-slate-950">Code Churn vs. Cyclomatic Complexity Hotspots</h3>
+                <p className="text-xs text-stone-500 font-medium">High Churn + High Complexity files indicate severe architectural risk hotspots</p>
               </div>
-              <span className="text-xs font-mono text-slate-400">McCabe AST Visitor</span>
+              <span className="text-xs font-mono text-purple-900 bg-[#F5EFEB] px-2 py-0.5 rounded border border-[#EADBCE] font-bold">McCabe AST Visitor</span>
             </div>
 
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F2EDE4" />
                   <XAxis 
                     type="number" 
                     dataKey="churn" 
                     name="Code Churn (Edits)" 
                     unit=" edits"
                     tick={{ fontSize: 11, fill: '#64748B' }}
-                    axisLine={{ stroke: '#CBD5E1' }}
+                    axisLine={{ stroke: '#EADBCE' }}
                   />
                   <YAxis 
                     type="number" 
@@ -304,7 +304,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                     name="Cyclomatic Complexity" 
                     unit=" CC"
                     tick={{ fontSize: 11, fill: '#64748B' }}
-                    axisLine={{ stroke: '#CBD5E1' }}
+                    axisLine={{ stroke: '#EADBCE' }}
                   />
                   <ZAxis type="number" dataKey="risk" range={[60, 400]} name="Risk Score" />
                   <Tooltip 
@@ -313,11 +313,11 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                       if (payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-lg text-xs space-y-1">
-                            <div className="font-bold text-slate-900 font-mono">{data.name}</div>
-                            <div className="text-slate-500">Module: <span className="font-semibold text-slate-700">{data.module}</span></div>
-                            <div className="text-slate-500">Cyclomatic Complexity: <span className="font-semibold text-slate-700">{data.complexity}</span></div>
-                            <div className="text-slate-500">Churn Count: <span className="font-semibold text-slate-700">{data.churn}</span></div>
+                          <div className="bg-white p-3 rounded-lg border border-[#EADBCE] shadow-lg text-xs space-y-1">
+                            <div className="font-bold text-slate-950 font-mono">{data.name}</div>
+                            <div className="text-stone-500 font-medium">Module: <span className="font-bold text-slate-900">{data.module}</span></div>
+                            <div className="text-stone-500 font-medium">Cyclomatic Complexity: <span className="font-bold text-slate-900">{data.complexity}</span></div>
+                            <div className="text-stone-500 font-medium">Churn Count: <span className="font-bold text-slate-900">{data.churn}</span></div>
                             <div className="text-indigo-600 font-bold">Composite Risk: {data.risk}</div>
                           </div>
                         );

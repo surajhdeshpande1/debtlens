@@ -162,30 +162,30 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Technical Debt Registry & Financial Ledger</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] font-bold font-mono">
               Module M4
             </span>
           </h2>
-          <p className="text-xs text-slate-500">
-            Pricing technical debt as a ledger of principal <span className="font-mono text-slate-700 font-bold">P(d)</span> and accruing interest <span className="font-mono text-slate-700 font-bold">I(d)</span> driven by incident cost and churn
+          <p className="text-xs text-stone-500 font-medium">
+            Pricing technical debt as a ledger of principal <span className="font-mono text-purple-900 font-bold">P(d)</span> and accruing interest <span className="font-mono text-rose-700 font-bold">I(d)</span> driven by incident cost and churn
           </p>
         </div>
 
         <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#EADBCE] hover:bg-[#FAF8F5] text-stone-700 text-xs font-bold shadow-xs transition-colors cursor-pointer"
             title="Export debt items as CSV"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-stone-500" />
             <span>Export CSV</span>
           </button>
 
           <button
             onClick={onOpenDebtModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:opacity-95 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Register Debt Item</span>
@@ -194,23 +194,23 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white/95 rounded-xl border border-[#EADBCE] p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 flex-1">
           <div className="relative min-w-[180px] flex-1 sm:flex-none">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
             <input
               type="text"
               placeholder="Search debt key or title..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white w-full focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+              className="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] w-full focus:outline-hidden focus:ring-2 focus:ring-purple-500 text-slate-900"
             />
           </div>
 
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
           >
             <option value="ALL">All Categories</option>
             <option value="ARCHITECTURAL">Architectural</option>
@@ -223,7 +223,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="IDENTIFIED">Identified</option>
@@ -235,7 +235,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer font-medium"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 cursor-pointer font-semibold"
           >
             <option value="risk">Sort by Risk Score R(d)</option>
             <option value="interest">Sort by Accrued Interest I(d)</option>
@@ -245,10 +245,10 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg bg-[#F5EFEB] hover:bg-[#EADBCE] text-stone-700 transition-colors cursor-pointer font-bold"
               title="Reset all filters"
             >
-              <RotateCcw className="w-3 h-3 text-slate-500" />
+              <RotateCcw className="w-3 h-3 text-stone-500" />
               <span>Reset</span>
             </button>
           )}
@@ -256,13 +256,13 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
         <button
           onClick={() => setBreakEvenOnly(!breakEvenOnly)}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
             breakEvenOnly
               ? 'bg-rose-50 text-rose-700 border-rose-300 ring-2 ring-rose-200'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              : 'bg-[#FAF8F5] text-stone-700 border-[#EADBCE] hover:bg-[#F5EFEB]'
           }`}
         >
-          <Flame className={`w-3.5 h-3.5 ${breakEvenOnly ? 'text-rose-600' : 'text-slate-400'}`} />
+          <Flame className={`w-3.5 h-3.5 ${breakEvenOnly ? 'text-rose-600' : 'text-stone-400'}`} />
           <span>Break-Even Exceeded Only ({debts.filter(d => d.break_even_status).length})</span>
         </button>
       </div>
@@ -271,10 +271,10 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Table */}
-        <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="lg:col-span-8 bg-white/95 rounded-xl border border-[#EADBCE] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <thead className="bg-[#FAF8F5] text-stone-600 font-bold uppercase text-[10px] tracking-wider border-b border-[#EADBCE]">
                 <tr>
                   <th className="py-3 px-3">Key & Module</th>
                   <th className="py-3 px-3">Title & Category</th>
@@ -285,10 +285,10 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                   <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#F5EFEB]">
                 {filteredDebts.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-xs text-slate-400">
+                    <td colSpan={7} className="py-8 text-center text-xs text-stone-400 font-medium">
                       No debt items found for current selection.
                     </td>
                   </tr>
@@ -299,39 +299,39 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                       <tr 
                         key={d.id} 
                         onClick={() => setSelectedDebt(d)}
-                        className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-indigo-50/50 border-l-4 border-indigo-600' : ''
+                        className={`hover:bg-[#FAF8F5] transition-colors cursor-pointer ${
+                          isSelected ? 'bg-[#F5EFEB]/70 border-l-4 border-purple-700' : ''
                         }`}
                       >
                         {/* Key & Module */}
                         <td className="py-3 px-3 whitespace-nowrap">
-                          <div className="font-mono font-bold text-slate-900">{d.debt_key}</div>
-                          <span className={`inline-block mt-0.5 text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded-md border ${getModuleBadge(d.module_name)}`}>
+                          <div className="font-mono font-bold text-slate-950">{d.debt_key}</div>
+                          <span className={`inline-block mt-0.5 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-md border ${getModuleBadge(d.module_name)}`}>
                             {d.module_name}
                           </span>
                         </td>
 
                         {/* Title & Category */}
                         <td className="py-3 px-3 max-w-xs">
-                          <div className="font-semibold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
+                          <div className="font-bold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
                           <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.2 rounded-sm border ${getCategoryBadge(d.category)}`}>
                             {d.category}
                           </span>
                         </td>
 
                         {/* Principal P(d) */}
-                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-800">
-                          <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded-md border border-indigo-100">
+                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-900">
+                          <span className="bg-blue-50 text-blue-900 px-2 py-0.5 rounded-md border border-blue-200">
                             {d.effort_principal}h
                           </span>
                         </td>
 
                         {/* Interest I(d) */}
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold">
-                          <span className={`px-1.5 py-0.5 rounded-md border ${
+                          <span className={`px-2 py-0.5 rounded-md border ${
                             d.break_even_status 
-                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
-                              : 'bg-slate-50 text-slate-700 border-slate-200'
+                              ? 'bg-rose-50 text-rose-800 border-rose-200' 
+                              : 'bg-[#FAF8F5] text-stone-800 border-[#EADBCE]'
                           }`}>
                             {d.accrued_interest}h
                           </span>
@@ -340,12 +340,12 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         {/* Break-Even Status */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
                           {d.break_even_status ? (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-800 border border-rose-200 animate-pulse">
                               <Flame className="w-2.5 h-2.5 text-rose-600" />
                               <span>EXCEEDED</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                               <span>Optimal</span>
                             </span>
                           )}
@@ -353,7 +353,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
                         {/* Risk Score */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
-                          <span className={`font-mono font-bold px-1.5 py-0.5 rounded-md border ${getRiskBadge(d.risk_score)}`}>
+                          <span className={`font-mono font-bold px-2 py-0.5 rounded-md border ${getRiskBadge(d.risk_score)}`}>
                             {d.risk_score}
                           </span>
                         </td>
@@ -382,13 +382,13 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
         </div>
 
         {/* Mathematical Economic Inspection Drawer */}
-        <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200 p-5 shadow-xs sticky top-20 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="lg:col-span-4 bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs sticky top-20 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#F5EFEB]">
             <div className="flex items-center space-x-1.5">
-              <Calculator className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-xs font-bold text-slate-900">Economic Formulation Breakdown</h3>
+              <Calculator className="w-4 h-4 text-purple-700" />
+              <h3 className="text-xs font-extrabold text-slate-950">Economic Formulation Breakdown</h3>
             </div>
-            <span className="text-[10px] font-mono text-slate-400">Section 7.3</span>
+            <span className="text-[10px] font-mono text-purple-900 bg-[#F5EFEB] px-1.5 py-0.5 rounded border border-[#EADBCE] font-bold">Section 7.3</span>
           </div>
 
           {selectedDebt ? (

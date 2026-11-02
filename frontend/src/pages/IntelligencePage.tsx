@@ -79,32 +79,32 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Incident Intelligence & Defect Analytics</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] font-bold font-mono">
               Module M6
             </span>
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-stone-500 font-medium">
             DBSCAN root cause clustering over cosine distance, hybrid TF-IDF lexical + semantic scoring, and regression recurrence detection
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab switcher */}
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-[#FAF8F5] border border-[#EADBCE] rounded-lg p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('clusters')}
-              className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
-                activeTab === 'clusters' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
+                activeTab === 'clusters' ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               Clusters & Regressions
             </button>
             <button
               onClick={() => setActiveTab('comparator')}
-              className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1 cursor-pointer ${
-                activeTab === 'comparator' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
+                activeTab === 'comparator' ? 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white shadow-xs' : 'text-stone-700 hover:text-slate-950'
               }`}
             >
               <GitCompare className="w-3.5 h-3.5" />
@@ -117,21 +117,21 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
       {activeTab === 'clusters' ? (
         <>
           {/* Interactive Formulation Tuning Bar */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-900">
+          <div className="bg-white/95 rounded-xl border border-[#EADBCE] p-4 shadow-xs space-y-3">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-950">
               <div className="flex items-center space-x-1.5">
-                <Sliders className="w-4 h-4 text-indigo-600" />
+                <Sliders className="w-4 h-4 text-purple-700" />
                 <span>Interactive Algorithmic Hyperparameter Tuning</span>
               </div>
-              <span className="text-[11px] font-normal text-slate-500">Adjust thresholds to observe sensitivity</span>
+              <span className="text-[11px] font-medium text-stone-500">Adjust thresholds to observe sensitivity</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               {/* Tau Slider */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+              <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#EADBCE] space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="font-semibold text-slate-700">Regression Similarity Threshold (τ):</span>
-                  <strong className="font-mono text-indigo-600">{tau.toFixed(2)}</strong>
+                  <span className="font-bold text-slate-900">Regression Similarity Threshold (τ):</span>
+                  <strong className="font-mono text-purple-900 font-extrabold">{tau.toFixed(2)}</strong>
                 </div>
                 <input
                   type="range"
@@ -140,9 +140,9 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                   step="0.05"
                   value={tau}
                   onChange={(e) => setTau(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                  className="w-full accent-purple-700 h-1.5 bg-[#F5EFEB] rounded-lg cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                <div className="flex justify-between text-[10px] text-stone-400 font-mono font-medium">
                   <span>0.20 (Broad)</span>
                   <span>0.50 (Standard)</span>
                   <span>0.80 (Strict)</span>
@@ -150,10 +150,10 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
               </div>
 
               {/* DBSCAN Eps Slider */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+              <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#EADBCE] space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="font-semibold text-slate-700">DBSCAN Clustering Radius (ε):</span>
-                  <strong className="font-mono text-indigo-600">{eps.toFixed(2)}</strong>
+                  <span className="font-bold text-slate-900">DBSCAN Clustering Radius (ε):</span>
+                  <strong className="font-mono text-purple-900 font-extrabold">{eps.toFixed(2)}</strong>
                 </div>
                 <input
                   type="range"
@@ -162,9 +162,9 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                   step="0.05"
                   value={eps}
                   onChange={(e) => setEps(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                  className="w-full accent-purple-700 h-1.5 bg-[#F5EFEB] rounded-lg cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                <div className="flex justify-between text-[10px] text-stone-400 font-mono font-medium">
                   <span>0.30 (Tight Clusters)</span>
                   <span>0.55 (Standard)</span>
                   <span>0.85 (Broad Clusters)</span>
@@ -174,19 +174,19 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
           </div>
 
           {/* Regression Detection Callout */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Detected Recurrent Regressions</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className="text-sm font-extrabold text-slate-950">Detected Recurrent Regressions</h3>
+                  <p className="text-xs text-stone-500 font-medium">
                     New incidents matching resolved incidents on identical modules after recorded fix date
                   </p>
                 </div>
               </div>
 
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-mono">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-mono">
                 {regressions.length} Regressions Flagged
               </span>
             </div>
