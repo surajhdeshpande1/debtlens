@@ -86,48 +86,48 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <div className="space-y-6">
       
       {/* Executive Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-slate-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-200/80">
         <div>
-          <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-500 mb-1.5">
+          <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
             <span>Portfolio</span>
             <span>/</span>
             <span className="text-slate-800 font-bold">Payments Platform (PAY)</span>
             <span className="text-slate-300">•</span>
             <span className="inline-flex items-center space-x-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Real-time Telemetry Live</span>
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             Executive Debt Intelligence Dashboard
           </h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1 font-medium">
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
             Preserving root cause causality from production incident intake to knapsack-optimized sprint scheduling.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 self-start sm:self-auto flex-wrap gap-2">
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto flex-wrap gap-2">
           <button
             onClick={() => onNavigateTab('demo')}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-extrabold shadow-sm hover:shadow-md transition-all cursor-pointer ring-2 ring-indigo-500/20 active:scale-95"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer ring-1 ring-indigo-500/20 active:scale-95"
             title="Launch 1-Click Interactive Demo Pipeline"
           >
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
             <span>Live Demo (1-Click)</span>
           </button>
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-slate-500" />
+            <Plus className="w-3.5 h-3.5 text-slate-500" />
             <span>Intake Incident</span>
           </button>
           <button
             onClick={() => onNavigateTab('optimiser')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
           >
             <span>Run Optimiser</span>
-            <ArrowRight className="w-4 h-4 text-slate-400" />
+            <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
           </button>
         </div>
       </div>
@@ -169,23 +169,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Break-Even Critical Callout */}
       {summary.past_breakeven_count > 0 && (
-        <div className="p-5 rounded-2xl border-2 border-rose-300 bg-rose-50/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-900 shadow-sm">
-          <div className="flex items-start sm:items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
-              <ShieldAlert className="w-6 h-6 text-rose-600" />
+        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-2xs">
+          <div className="flex items-start sm:items-center space-x-3">
+            <div className="w-9 h-9 rounded-lg bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
+              <ShieldAlert className="w-5 h-5 text-rose-600" />
             </div>
             <div>
-              <div className="text-base sm:text-lg font-extrabold text-slate-900">
+              <div className="text-sm sm:text-base font-bold text-slate-900">
                 Break-Even Alert: {summary.past_breakeven_count} debt items have exceeded their remediation cost!
               </div>
-              <div className="text-sm text-slate-700 mt-1 font-medium leading-relaxed">
+              <div className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium leading-relaxed">
                 The team has expended more hours responding to failures caused by these items than it would take to permanently refactor them.
               </div>
             </div>
           </div>
           <button
             onClick={() => onNavigateTab('debt')}
-            className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-xs shrink-0 cursor-pointer transition-colors"
+            className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-2xs shrink-0 cursor-pointer transition-colors"
           >
             Review Ledger →
           </button>
