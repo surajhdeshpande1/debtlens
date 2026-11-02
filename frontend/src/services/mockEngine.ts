@@ -543,6 +543,10 @@ export const mockEngine = {
     return list;
   },
 
+  getDebtDetail: async (debtId: number): Promise<DebtItem | null> => {
+    return store.debts.find(d => d.id === debtId) || null;
+  },
+
   createDebtItem: async (data: any): Promise<DebtItem> => {
     const newId = store.debts.length + 1;
     const debt: DebtItem = {

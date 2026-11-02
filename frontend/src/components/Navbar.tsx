@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
+import { isFirebaseConfigured } from '../services/firebase';
 import { isSupabaseConfigured } from '../services/supabase';
 
 interface NavbarProps {
@@ -97,7 +98,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Database / Backend Status Indicator */}
-          {isSupabaseConfigured ? (
+          {isFirebaseConfigured ? (
+            <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-semibold text-amber-800">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span>Google Cloud Firestore</span>
+            </div>
+          ) : isSupabaseConfigured ? (
             <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Supabase Cloud (PostgreSQL)</span>

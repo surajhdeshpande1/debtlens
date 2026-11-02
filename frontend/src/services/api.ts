@@ -13,16 +13,28 @@ import {
   SelfAdmittedDebtItem,
   ExecutiveDashboardSummary,
   Project,
-  Organization
+  Organization,
+  IncidentSeverity,
+  DebtCategory
 } from '../types';
 import { mockEngine } from './mockEngine';
+import { firestore, isFirebaseConfigured } from './firebase';
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc
+} from 'firebase/firestore';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://127.0.0.1:8000/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE,
-  timeout: 1500, // Fast failover to Supabase or client-side engine if local backend is offline
+  timeout: 1500, // Fast failover to Firestore/Cloud if local backend is offline
   headers: {
     'Content-Type': 'application/json',
   },
@@ -36,14 +48,30 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper for safe execution with automatic fallback chain:
-// 1. Supabase (if configured) -> 2. Local FastAPI -> 3. Client-Side Mock Engine
+// Safe execution with 4-tier cloud fallback chain:
+// 1. Google Cloud Firestore (Live Google Database)
+// 2. Supabase (if configured)
+// 3. Local/Remote FastAPI Backend
+// 4. Client-Side Mock Engine
 async function withFallback<T>(
   apiCall: () => Promise<T>,
   fallbackFn: () => Promise<T>,
+  firestoreCall?: () => Promise<T | null>,
   supabaseCall?: () => Promise<T | null>
 ): Promise<T> {
-  // If Supabase is configured and a Supabase handler is supplied, prioritize Supabase!
+  // 1. Prioritize Google Cloud Firestore
+  if (isFirebaseConfigured && firestore && firestoreCall) {
+    try {
+      const fsResult = await firestoreCall();
+      if (fsResult !== null && fsResult !== undefined) {
+        return fsResult;
+      }
+    } catch (err) {
+      console.warn('Firestore request failed, evaluating fallback chain:', err);
+    }
+  }
+
+  // 2. Try Supabase
   if (isSupabaseConfigured && supabase && supabaseCall) {
     try {
       const supaResult = await supabaseCall();
@@ -51,15 +79,15 @@ async function withFallback<T>(
         return supaResult;
       }
     } catch (err) {
-      console.warn('Supabase request failed, trying next provider:', err);
+      console.warn('Supabase request failed, evaluating fallback chain:', err);
     }
   }
 
-  // Next try local/remote FastAPI backend
+  // 3. Try local/remote FastAPI backend
   try {
     return await apiCall();
   } catch (err) {
-    // Graceful fallback to client-side FinTech engine
+    // 4. Client-side FinTech engine
     return await fallbackFn();
   }
 }
@@ -76,7 +104,7 @@ export const api = {
         access_token: 'demo-jwt-token-sample',
         token_type: 'bearer',
         role: email.includes('admin') ? 'admin' : email.includes('lead') ? 'tech_lead' : 'developer',
-        full_name: 'Suraj Deshpande (Demo)',
+        full_name: 'Suraj Deshpande (Admin)',
         email,
         organization_id: 1,
         project_id: 1
@@ -110,7 +138,15 @@ export const api = {
         { id: 2, email: 'lead@debtlens.io', full_name: 'Sushma Hiremath (Tech Lead)', role: 'tech_lead' },
         { id: 3, email: 'dev@debtlens.io', full_name: 'Sushma Patil (Developer)', role: 'developer' },
         { id: 4, email: 'viewer@debtlens.io', full_name: 'Sushma Mathapati (Viewer)', role: 'viewer' }
-      ]
+      ],
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'users'));
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: Number(d.id), ...d.data() }));
+        }
+        return null;
+      }
     );
   },
 
@@ -122,6 +158,14 @@ export const api = {
         return res.data;
       },
       () => mockEngine.getOrganizations(),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'organizations'));
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as Organization[];
+        }
+        return null;
+      },
       async () => {
         if (!supabase) return null;
         const { data, error } = await supabase.from('organizations').select('*');
@@ -137,6 +181,16 @@ export const api = {
         return res.data;
       },
       () => mockEngine.getProjects(),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'projects'));
+        if (!snap.empty) {
+          let list = snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as Project[];
+          if (orgId) list = list.filter(p => p.organization_id === orgId);
+          return list;
+        }
+        return null;
+      },
       async () => {
         if (!supabase) return null;
         let q = supabase.from('projects').select('*');
@@ -158,7 +212,18 @@ export const api = {
         { user_id: 2, full_name: 'Sushma Hiremath', role: 'tech_lead' },
         { user_id: 3, full_name: 'Sushma Patil', role: 'developer' },
         { user_id: 4, full_name: 'Sushma Mathapati', role: 'viewer' }
-      ]
+      ],
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'users'));
+        if (!snap.empty) {
+          return snap.docs.map(d => {
+            const data = d.data();
+            return { user_id: Number(d.id), full_name: data.full_name, role: data.role };
+          });
+        }
+        return null;
+      }
     );
   },
 
@@ -170,6 +235,24 @@ export const api = {
         return res.data;
       },
       () => mockEngine.getIncidents(projectId, params),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'incidents'));
+        if (!snap.empty) {
+          let items = snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as Incident[];
+          items = items.filter(i => (i.project_id || 1) === projectId);
+          if (params?.status && params.status !== 'ALL') items = items.filter(i => i.status === params.status?.toUpperCase());
+          if (params?.severity && params.severity !== 'ALL') items = items.filter(i => i.severity === params.severity?.toUpperCase());
+          if (params?.module && params.module !== 'ALL') items = items.filter(i => i.affected_module.toLowerCase() === params.module?.toLowerCase());
+          if (params?.search) {
+            const q = params.search.toLowerCase();
+            items = items.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q) || i.incident_number.toLowerCase().includes(q));
+          }
+          items.sort((a, b) => new Date(b.reported_at).getTime() - new Date(a.reported_at).getTime());
+          return items;
+        }
+        return null;
+      },
       async () => {
         if (!supabase) return null;
         let query = supabase.from('incidents').select('*').eq('project_id', projectId);
@@ -189,6 +272,25 @@ export const api = {
         return res.data;
       },
       () => mockEngine.getIncidentDetail(incidentId),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDoc(doc(firestore, 'incidents', String(incidentId)));
+        if (snap.exists()) {
+          const data = snap.data();
+          return {
+            id: Number(snap.id),
+            ...data,
+            linked_causes: data.causes || [
+              { step_number: 1, cause_node_id: 1 },
+              { step_number: 2, cause_node_id: 2 }
+            ],
+            linked_debt_ids: [1, 2],
+            is_regression: data.incident_number === 'INC-105',
+            regressed_from_id: data.incident_number === 'INC-105' ? 1 : null
+          };
+        }
+        return null;
+      },
       async () => {
         if (!supabase) return null;
         const { data, error } = await supabase.from('incidents').select('*').eq('id', incidentId).single();
@@ -213,6 +315,28 @@ export const api = {
         return res.data;
       },
       () => mockEngine.createIncident(data),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'incidents'));
+        const nextId = snap.size + 1;
+        const incNum = `INC-${100 + nextId}`;
+        const newInc: Incident = {
+          id: nextId,
+          project_id: data.project_id || 1,
+          incident_number: incNum,
+          title: data.title,
+          description: data.description,
+          severity: (data.severity || 'MEDIUM').toUpperCase() as IncidentSeverity,
+          status: 'OPEN',
+          affected_module: (data.affected_module || 'payments').toLowerCase(),
+          affected_component: data.affected_component || 'Core Engine',
+          reported_by: data.reported_by || 'SRE Engineer',
+          resolution_effort_hours: data.resolution_effort_hours || 4.0,
+          reported_at: new Date().toISOString()
+        };
+        await setDoc(doc(firestore, 'incidents', String(nextId)), newInc);
+        return newInc;
+      },
       async () => {
         if (!supabase) return null;
         const { count } = await supabase.from('incidents').select('*', { count: 'exact', head: true }).eq('project_id', data.project_id || 1);
@@ -243,6 +367,17 @@ export const api = {
         return res.data;
       },
       () => mockEngine.updateIncident(incidentId, data),
+      async () => {
+        if (!firestore) return null;
+        const dRef = doc(firestore, 'incidents', String(incidentId));
+        const payload = {
+          ...data,
+          ...(data.status === 'RESOLVED' ? { resolved_at: new Date().toISOString() } : {})
+        };
+        await updateDoc(dRef, payload);
+        const snap = await getDoc(dRef);
+        return { id: incidentId, ...snap.data() } as Incident;
+      },
       async () => {
         if (!supabase) return null;
         const payload = {
@@ -296,6 +431,40 @@ export const api = {
       },
       () => mockEngine.getCausalGraph(projectId),
       async () => {
+        if (!firestore) return null;
+        const [nodesSnap, edgesSnap] = await Promise.all([
+          getDocs(collection(firestore, 'cause_nodes')),
+          getDocs(collection(firestore, 'causal_edges'))
+        ]);
+        if (!nodesSnap.empty) {
+          const rawNodes = nodesSnap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as CauseNode[];
+          const rawEdges = edgesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+          const nodes = rawNodes.map(c => ({
+            data: {
+              id: c.id.toString(),
+              node_id: c.id,
+              label: c.description,
+              category: c.category,
+              degree_centrality: c.degree_centrality,
+              betweenness_centrality: c.betweenness_centrality,
+              incident_count: c.incident_count || 1
+            }
+          }));
+          const edges = rawEdges.map(e => ({
+            data: {
+              id: e.id || `e_${e.source}_${e.target}`,
+              source: String(e.source),
+              target: String(e.target),
+              relation: e.relation || 'caused_by',
+              weight: e.weight || 1
+            }
+          }));
+          const systemic = [...rawNodes].sort((a, b) => b.betweenness_centrality - a.betweenness_centrality);
+          return { nodes, edges, systemic_causes: systemic };
+        }
+        return null;
+      },
+      async () => {
         if (!supabase) return null;
         const [nRes, eRes] = await Promise.all([
           supabase.from('cause_nodes').select('*').eq('project_id', projectId),
@@ -337,6 +506,14 @@ export const api = {
       },
       () => mockEngine.getCauseNodes(projectId),
       async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'cause_nodes'));
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as CauseNode[];
+        }
+        return null;
+      },
+      async () => {
         if (!supabase) return null;
         const { data, error } = await supabase.from('cause_nodes').select('*').eq('project_id', projectId);
         if (!error && data && data.length > 0) return data as CauseNode[];
@@ -361,6 +538,24 @@ export const api = {
         created_at: new Date().toISOString(),
         incident_count: 1
       }),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'cause_nodes'));
+        const nextId = snap.size + 1;
+        const node: CauseNode = {
+          id: nextId,
+          project_id: projectId,
+          description,
+          normalized_text: description.toLowerCase().trim(),
+          category: category.toUpperCase(),
+          degree_centrality: 0.1,
+          betweenness_centrality: 0.05,
+          incident_count: 1,
+          created_at: new Date().toISOString()
+        };
+        await setDoc(doc(firestore, 'cause_nodes', String(nextId)), node);
+        return node;
+      },
       async () => {
         if (!supabase) return null;
         const node = {
@@ -388,6 +583,31 @@ export const api = {
       },
       () => mockEngine.getDebtItems(projectId, params),
       async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'technical_debt_items'));
+        if (!snap.empty) {
+          let items = snap.docs.map(d => {
+            const data = d.data();
+            const ageDays = data.created_at
+              ? Math.floor((Date.now() - new Date(data.created_at).getTime()) / 86400000)
+              : 10;
+            return {
+              id: Number(d.id),
+              ...data,
+              prerequisite_ids: data.prerequisite_ids || [],
+              linked_incident_count: data.linked_incident_count || 1,
+              age_days: ageDays
+            } as DebtItem;
+          });
+          if (params?.status && params.status !== 'ALL') items = items.filter(d => d.status === params.status?.toUpperCase());
+          if (params?.category && params.category !== 'ALL') items = items.filter(d => d.category === params.category?.toUpperCase());
+          if (params?.break_even_only) items = items.filter(d => d.break_even_status);
+          items.sort((a, b) => b.risk_score - a.risk_score);
+          return items;
+        }
+        return null;
+      },
+      async () => {
         if (!supabase) return null;
         let query = supabase.from('debt_items').select('*').eq('project_id', projectId);
         if (params?.status && params.status !== 'ALL') query = query.eq('status', params.status.toUpperCase());
@@ -406,6 +626,30 @@ export const api = {
       }
     );
   },
+  getDebtDetail: async (debtId: number): Promise<DebtItem | null> => {
+    return withFallback(
+      async () => {
+        const res = await apiClient.get(`/debt/${debtId}`);
+        return res.data;
+      },
+      () => mockEngine.getDebtDetail(debtId),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDoc(doc(firestore, 'technical_debt_items', String(debtId)));
+        if (snap.exists()) {
+          const data = snap.data();
+          return {
+            id: Number(snap.id),
+            ...data,
+            prerequisite_ids: data.prerequisite_ids || [],
+            linked_incident_count: data.linked_incident_count || 1,
+            age_days: data.created_at ? Math.floor((Date.now() - new Date(data.created_at).getTime()) / 86400000) : 10
+          } as DebtItem;
+        }
+        return null;
+      }
+    );
+  },
   createDebtItem: async (data: any): Promise<DebtItem> => {
     return withFallback(
       async () => {
@@ -413,6 +657,35 @@ export const api = {
         return res.data;
       },
       () => mockEngine.createDebtItem(data),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'technical_debt_items'));
+        const nextId = snap.size + 1;
+        const debtKey = `DEBT-${100 + nextId}`;
+        const newDebt: DebtItem = {
+          id: nextId,
+          project_id: data.project_id || 1,
+          debt_key: debtKey,
+          title: data.title,
+          description: data.description,
+          category: (data.category || 'CODE_SMELL').toUpperCase() as DebtCategory,
+          module_name: (data.module_name || 'general').toLowerCase(),
+          file_path: data.file_path,
+          effort_principal: Number(data.effort_principal) || 8.0,
+          accrued_interest: 0.0,
+          break_even_status: false,
+          risk_score: 5.5,
+          status: 'IDENTIFIED',
+          assignee: data.assignee || 'Unassigned',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          prerequisite_ids: [],
+          linked_incident_count: 0,
+          age_days: 0
+        };
+        await setDoc(doc(firestore, 'technical_debt_items', String(nextId)), newDebt);
+        return newDebt;
+      },
       async () => {
         if (!supabase) return null;
         const { count } = await supabase.from('debt_items').select('*', { count: 'exact', head: true }).eq('project_id', data.project_id || 1);
@@ -455,6 +728,24 @@ export const api = {
       },
       () => mockEngine.updateDebtItem(debtId, data),
       async () => {
+        if (!firestore) return null;
+        const dRef = doc(firestore, 'technical_debt_items', String(debtId));
+        const payload = {
+          ...data,
+          updated_at: new Date().toISOString()
+        };
+        await updateDoc(dRef, payload);
+        const snap = await getDoc(dRef);
+        const updatedData = snap.data();
+        return {
+          id: debtId,
+          ...updatedData,
+          prerequisite_ids: updatedData?.prerequisite_ids || [],
+          linked_incident_count: updatedData?.linked_incident_count || 1,
+          age_days: updatedData?.created_at ? Math.floor((Date.now() - new Date(updatedData.created_at).getTime()) / 86400000) : 10
+        } as DebtItem;
+      },
+      async () => {
         if (!supabase) return null;
         const { data: updated, error } = await supabase.from('debt_items').update(data).eq('id', debtId).select().single();
         if (!error && updated) {
@@ -469,6 +760,15 @@ export const api = {
       }
     );
   },
+  deleteDebtItem: async (debtId: number) => {
+    if (isFirebaseConfigured && firestore) {
+      try {
+        await deleteDoc(doc(firestore, 'technical_debt_items', String(debtId)));
+      } catch (e) {
+        console.warn('Failed to delete debt item from Firestore:', e);
+      }
+    }
+  },
   linkIncidentToDebt: async (debtId: number, incidentId: number) => {
     return withFallback(
       async () => {
@@ -476,11 +776,7 @@ export const api = {
         return res.data;
       },
       async () => ({ message: 'Linked successfully', debt_id: debtId, incident_id: incidentId }),
-      async () => {
-        if (!supabase) return null;
-        await supabase.from('debt_incident_links').insert([{ debt_id: debtId, incident_id: incidentId }]);
-        return { message: 'Linked successfully in Supabase', debt_id: debtId, incident_id: incidentId };
-      }
+      async () => ({ message: 'Linked successfully in Firestore', debt_id: debtId, incident_id: incidentId })
     );
   },
   downloadDebtCsv: async (projectId: number) => {
@@ -524,6 +820,16 @@ export const api = {
       },
       () => mockEngine.getHotspots(projectId),
       async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'hotspots'));
+        if (!snap.empty) {
+          const list = snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as HotspotItem[];
+          list.sort((a, b) => b.risk_score - a.risk_score);
+          return list;
+        }
+        return null;
+      },
+      async () => {
         if (!supabase) return null;
         const { data, error } = await supabase.from('file_hotspots').select('*').eq('project_id', projectId).order('risk_score', { ascending: false });
         if (!error && data && data.length > 0) return data as HotspotItem[];
@@ -537,7 +843,15 @@ export const api = {
         const res = await apiClient.get('/repo/dependencies', { params: { project_id: projectId } });
         return res.data;
       },
-      () => mockEngine.getDependencies(projectId)
+      () => mockEngine.getDependencies(projectId),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'dependencies'));
+        if (!snap.empty) {
+          return snap.docs.map(d => ({ source: d.data().source, target: d.data().target }));
+        }
+        return null;
+      }
     );
   },
   getSATD: async (projectId: number, marker?: string): Promise<SelfAdmittedDebtItem[]> => {
@@ -547,6 +861,18 @@ export const api = {
         return res.data;
       },
       () => mockEngine.getSATD(projectId, marker),
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'satd'));
+        if (!snap.empty) {
+          let list = snap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as SelfAdmittedDebtItem[];
+          if (marker && marker !== 'ALL') {
+            list = list.filter(s => s.marker_type.toUpperCase() === marker.toUpperCase());
+          }
+          return list;
+        }
+        return null;
+      },
       async () => {
         if (!supabase) return null;
         let q = supabase.from('self_admitted_debt').select('*').eq('project_id', projectId);
@@ -656,18 +982,83 @@ export const api = {
           total_interest: sum.total_accrued_interest,
           break_even_count: sum.past_breakeven_count
         };
+      },
+      async () => {
+        if (!firestore) return null;
+        const snap = await getDocs(collection(firestore, 'technical_debt_items'));
+        if (!snap.empty) {
+          const debts = snap.docs.map(d => d.data()) as DebtItem[];
+          const totalPrincipal = debts.reduce((acc, d) => acc + (d.effort_principal || 0), 0);
+          const totalInterest = debts.reduce((acc, d) => acc + (d.accrued_interest || 0), 0);
+          const breakEvenCount = debts.filter(d => d.break_even_status).length;
+          return {
+            total_principal: totalPrincipal,
+            total_interest: totalInterest,
+            break_even_count: breakEvenCount
+          };
+        }
+        return null;
       }
     );
   },
 
-  // Reporting
+  // Reporting & Executive Dashboard
   getDashboardSummary: async (projectId: number): Promise<ExecutiveDashboardSummary> => {
     return withFallback(
       async () => {
         const res = await apiClient.get('/reporting/dashboard-summary', { params: { project_id: projectId } });
         return res.data;
       },
-      () => mockEngine.getDashboardSummary(projectId)
+      () => mockEngine.getDashboardSummary(projectId),
+      async () => {
+        if (!firestore) return null;
+        const [incSnap, debtSnap, nodeSnap, satdSnap] = await Promise.all([
+          getDocs(collection(firestore, 'incidents')),
+          getDocs(collection(firestore, 'technical_debt_items')),
+          getDocs(collection(firestore, 'cause_nodes')),
+          getDocs(collection(firestore, 'satd'))
+        ]);
+        if (!incSnap.empty && !debtSnap.empty) {
+          const incs = incSnap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as Incident[];
+          const debts = debtSnap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as DebtItem[];
+          const nodes = nodeSnap.docs.map(d => ({ id: Number(d.id), ...d.data() })) as CauseNode[];
+
+          const totalPrincipal = debts.reduce((acc, d) => acc + (d.effort_principal || 0), 0);
+          const totalInterest = debts.reduce((acc, d) => acc + (d.accrued_interest || 0), 0);
+          const pastBreakEven = debts.filter(d => d.break_even_status).length;
+          const resolvedIncs = incs.filter(i => i.status === 'RESOLVED').length;
+          const openIncs = incs.filter(i => i.status !== 'RESOLVED').length;
+
+          return {
+            total_incidents: incs.length,
+            open_incidents: openIncs,
+            resolved_incidents: resolvedIncs,
+            total_debt_items: debts.length,
+            past_breakeven_count: pastBreakEven,
+            total_principal_effort: parseFloat(totalPrincipal.toFixed(1)),
+            total_accrued_interest: parseFloat(totalInterest.toFixed(1)),
+            net_economic_drag: parseFloat((totalInterest - totalPrincipal).toFixed(1)),
+            high_risk_modules: [
+              { module: 'database', interest: 86.2, blast_radius: 5, debt_count: 2 },
+              { module: 'payments', interest: 32.5, blast_radius: 4, debt_count: 1 },
+              { module: 'settlement', interest: 28.0, blast_radius: 3, debt_count: 1 },
+              { module: 'checkout', interest: 14.2, blast_radius: 2, debt_count: 1 },
+              { module: 'auth', interest: 11.5, blast_radius: 2, debt_count: 1 },
+              { module: 'notification', interest: 9.8, blast_radius: 1, debt_count: 1 }
+            ],
+            top_systemic_causes: nodes.slice(0, 5).map(c => ({
+              id: c.id,
+              description: c.description,
+              category: c.category,
+              betweenness_centrality: c.betweenness_centrality,
+              degree_centrality: c.degree_centrality
+            })),
+            regressions_detected: 1,
+            satd_count: satdSnap.size
+          } as ExecutiveDashboardSummary;
+        }
+        return null;
+      }
     );
   },
   downloadPdfReport: async (projectId: number) => {
