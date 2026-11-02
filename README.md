@@ -27,17 +27,32 @@ When software failures occur in production, teams typically restore service quic
 
 ---
 
-## Live Cloud Deployment (Vercel & Supabase)
+## Live Cloud Deployment (Vercel, Google Cloud Firestore & GitHub)
 
-The complete DebtLens platform is deployed and live on Vercel:
+The complete DebtLens platform is deployed and live across cloud platforms:
 
-🌐 **Production Website**: **[https://debtlens-platform.vercel.app](https://debtlens-platform.vercel.app)**  
-*(Also accessible at: [https://frontend-five-taupe-cj6iikpdis.vercel.app](https://frontend-five-taupe-cj6iikpdis.vercel.app))*
+🌐 **Production Website**: **[https://frontend-five-taupe-cj6iikpdis.vercel.app](https://frontend-five-taupe-cj6iikpdis.vercel.app)**  
+*(Custom Domain Alias: [https://debtlens-cloud.vercel.app](https://debtlens-cloud.vercel.app))*
+
+📦 **GitHub Repository**: **[https://github.com/surajhdeshpande1/debtlens](https://github.com/surajhdeshpande1/debtlens)**
+
+🔥 **Google Cloud Firestore Database**: Hosted on Google Cloud (`asia-south1`, Mumbai) under project `debtlens-ise` with 10 collections actively populated and synchronized in real time.
 
 - **Global 24/7 Availability**: Hosted on Vercel's global Edge CDN, accessible from any device (laptop, mobile, tablet) without local servers.
-- **Supabase Cloud Backend**: Direct cloud connection to Supabase PostgreSQL with real-time persistence.
+- **Google Cloud Firestore & Supabase Support**: Direct cloud connection to Cloud Firestore with live collection querying, and fallback support for Supabase PostgreSQL.
 - **Embedded FinTech Corpus Engine**: Seamlessly executes all 8 modules (M1–M8), including 0/1 knapsack dynamic programming, AST complexity evaluation, DBSCAN clustering, and pairwise incident comparisons directly in the browser with `localStorage` state persistence when offline.
 - **Local Dev Fallback**: Automatically connects to local FastAPI (`http://127.0.0.1:8000`) when running locally.
+
+---
+
+### Google Cloud Firestore Configuration
+
+The platform connects to Google Cloud Firestore with real-time bidirectional synchronization:
+- **Project ID**: `debtlens-ise`
+- **Location**: `asia-south1` (Mumbai)
+- **Rules**: Configured via [`firestore.rules`](file:///c:/Users/suraj/Desktop/Mini%20project%20ISE/firestore.rules) and [`firebase.json`](file:///c:/Users/suraj/Desktop/Mini%20project%20ISE/firebase.json)
+- **Collections Populated**: `organizations`, `projects`, `users`, `incidents` (9 docs), `technical_debt_items` (7 docs), `cause_nodes` (8 docs), `causal_edges` (5 docs), `hotspots` (8 docs), `satd` (7 docs), `dependencies` (12 docs).
+- **Console**: [https://console.firebase.google.com/project/debtlens-ise/firestore](https://console.firebase.google.com/project/debtlens-ise/firestore)
 
 ---
 
