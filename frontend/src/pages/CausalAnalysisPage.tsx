@@ -72,7 +72,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 tracking-tight flex items-center space-x-2">
             <span>Causal Graph & Guided 5-Whys</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFEB] text-purple-900 border border-[#EADBCE] font-bold font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-[#F5EFEB] text-blue-900 border border-[#EADBCE] font-bold font-mono">
               Module M3
             </span>
           </h2>
@@ -82,8 +82,8 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-stone-700 bg-white border border-[#EADBCE] px-3 py-1.5 rounded-lg shadow-xs font-medium">
-            NetworkX Centrality Engine: <strong className="text-purple-900 font-bold">Active</strong>
+          <span className="text-xs text-stone-700 bg-white border border-[#EADBCE] px-3 py-1.5 rounded-md shadow-xs font-medium">
+            NetworkX Centrality Engine: <strong className="text-blue-900 font-bold">Active</strong>
           </span>
         </div>
       </div>
@@ -95,7 +95,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
           onConvertCauseToDebt={onConvertCauseToDebt}
         />
       ) : (
-        <div className="h-[500px] bg-white rounded-xl border border-[#EADBCE] flex items-center justify-center text-stone-400 text-xs font-medium">
+        <div className="h-[500px] bg-white rounded-md border border-[#EADBCE] flex items-center justify-center text-stone-400 text-xs font-medium">
           Loading Causal Network...
         </div>
       )}
@@ -104,7 +104,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Systemic Causes Table */}
-        <div className="lg:col-span-8 bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs">
+        <div className="lg:col-span-8 bg-white/95 rounded-md border border-[#EADBCE] p-5 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Award className="w-4 h-4 text-amber-600" />
@@ -129,14 +129,14 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
                 {graphData?.systemic_causes.map((c, idx) => (
                   <tr key={c.id} className="hover:bg-[#FAF8F5] transition-colors">
                     <td className="py-3 px-3 whitespace-nowrap">
-                      <span className="font-bold text-purple-900 bg-[#F5EFEB] border border-[#EADBCE] px-2 py-0.5 rounded-sm text-[10px]">
+                      <span className="font-bold text-blue-900 bg-[#F5EFEB] border border-[#EADBCE] px-2 py-0.5 rounded-sm text-[10px]">
                         #{idx + 1} {c.category}
                       </span>
                     </td>
                     <td className="py-3 px-3 font-semibold text-slate-900">
                       {c.description}
                     </td>
-                    <td className="py-3 px-3 text-center font-mono font-bold text-purple-900">
+                    <td className="py-3 px-3 text-center font-mono font-bold text-blue-800">
                       {c.betweenness_centrality.toFixed(4)}
                     </td>
                     <td className="py-3 px-3 text-center font-mono font-bold text-blue-900">
@@ -167,9 +167,9 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
         </div>
 
         {/* Cause Node Registration Box */}
-        <div className="lg:col-span-4 bg-white/95 rounded-xl border border-[#EADBCE] p-5 shadow-xs space-y-4">
+        <div className="lg:col-span-4 bg-white/95 rounded-md border border-[#EADBCE] p-5 shadow-xs space-y-4">
           <div className="flex items-center space-x-2">
-            <Plus className="w-4 h-4 text-purple-700" />
+            <Plus className="w-4 h-4 text-blue-700" />
             <h3 className="text-sm font-extrabold text-slate-950">Add Reusable Cause Node</h3>
           </div>
           <p className="text-xs text-stone-500 font-medium leading-relaxed">
@@ -187,7 +187,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
                 value={newCauseDesc}
                 onChange={(e) => setNewCauseDesc(e.target.value)}
                 placeholder="e.g. Unbounded thread pool timeout during high concurrency"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-purple-500 bg-[#FAF8F5] text-slate-900 font-medium"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-[#FAF8F5] text-slate-900 font-medium"
               />
             </div>
 
@@ -198,7 +198,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
               <select
                 value={newCauseCategory}
                 onChange={(e) => setNewCauseCategory(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
+                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#EADBCE] bg-[#FAF8F5] text-stone-700 font-medium cursor-pointer"
               >
                 <option value="ARCHITECTURE">ARCHITECTURE</option>
                 <option value="DATABASE">DATABASE</option>
@@ -212,7 +212,7 @@ export const CausalAnalysisPage: React.FC<CausalAnalysisPageProps> = ({
             <button
               type="submit"
               disabled={isAdding}
-              className="w-full py-2 bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:opacity-95 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+              className="w-full py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
             >
               {isAdding ? 'Adding Node...' : '+ Insert into Causal Graph'}
             </button>

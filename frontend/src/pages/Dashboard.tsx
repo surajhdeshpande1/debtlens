@@ -37,17 +37,17 @@ interface DashboardProps {
 const MODULE_COLORS: Record<string, string> = {
   payments: '#1D4ED8',      // Royal Blue
   database: '#D97706',      // Dark Yellow / Warm Amber
-  settlement: '#7C3AED',    // Purple
+  settlement: '#0284C7',    // Sky / Steel Blue
   checkout: '#C026D3',      // Magenta
   auth: '#DC2626',          // Crimson Red
   notification: '#0F172A',  // Black / Deep Slate
-  core_ledger: '#6D28D9'    // Royal Violet
+  core_ledger: '#0369A1'    // Deep Sky Blue
 };
 
 const getModuleColor = (name: string, index: number) => {
   const clean = name.toLowerCase().replace(/[\s-]/g, '_');
   if (MODULE_COLORS[clean]) return MODULE_COLORS[clean];
-  const palette = ['#1D4ED8', '#7C3AED', '#D97706', '#C026D3', '#DC2626', '#0F172A'];
+  const palette = ['#1D4ED8', '#0284C7', '#D97706', '#C026D3', '#DC2626', '#0F172A'];
   return palette[index % palette.length];
 };
 
@@ -109,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="flex items-center space-x-2.5 self-start sm:self-auto flex-wrap gap-2">
           <button
             onClick={() => onNavigateTab('demo')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:from-blue-800 hover:to-purple-800 text-white text-xs sm:text-sm font-extrabold shadow-xs hover:shadow-md transition-all cursor-pointer ring-1 ring-blue-500/20 active:scale-95"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer ring-1 ring-blue-600 active:scale-95"
             title="Launch 1-Click Interactive Demo Pipeline"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
@@ -117,14 +117,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-[#F5EFEB] text-stone-800 text-xs sm:text-sm font-bold border border-[#EADBCE] shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white hover:bg-[#F5EFEB] text-stone-800 text-xs sm:text-sm font-bold border border-[#EADBCE] shadow-2xs transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-stone-500" />
             <span>Intake Incident</span>
           </button>
           <button
             onClick={() => onNavigateTab('optimiser')}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-[#F5EFEB] text-blue-700 text-xs sm:text-sm font-bold border border-[#EADBCE] shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white hover:bg-[#F5EFEB] text-blue-700 text-xs sm:text-sm font-bold border border-[#EADBCE] shadow-2xs transition-colors cursor-pointer"
           >
             <span>Run Optimiser</span>
             <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
@@ -169,9 +169,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Break-Even Critical Callout */}
       {summary.past_breakeven_count > 0 && (
-        <div className="p-4 rounded-xl border-2 border-rose-300 bg-[#FFF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-2xs">
+        <div className="p-4 rounded-md border-2 border-rose-300 bg-[#FFF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-900 shadow-2xs">
           <div className="flex items-start sm:items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
+            <div className="w-9 h-9 rounded-md bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
               <ShieldAlert className="w-5 h-5 text-rose-600" />
             </div>
             <div>
@@ -185,7 +185,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <button
             onClick={() => onNavigateTab('debt')}
-            className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-2xs shrink-0 cursor-pointer transition-colors"
+            className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-md shadow-2xs shrink-0 cursor-pointer transition-colors"
           >
             Review Ledger →
           </button>
@@ -263,11 +263,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Systemic Root Causes (Centrality Ranking) */}
-        <div className="lg:col-span-5 bg-white/95 rounded-2xl border border-[#EADBCE] p-6 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white/95 rounded-md border border-[#EADBCE] p-6 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
-                <GitFork className="w-5 h-5 text-purple-700" />
+                <GitFork className="w-5 h-5 text-blue-700" />
                 <h3 className="text-base sm:text-lg font-bold text-slate-950">Systemic Root Causes</h3>
               </div>
               <span className="text-xs uppercase font-bold text-stone-400">Betweenness</span>
@@ -280,13 +280,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {summary.top_systemic_causes.slice(0, 4).map((c, idx) => (
                 <div 
                   key={c.id} 
-                  className="p-3 rounded-xl border border-[#EADBCE] bg-[#FAF8F5] hover:bg-white hover:border-[#D1BFA8] transition-all"
+                  className="p-3 rounded-md border border-[#EADBCE] bg-[#FAF8F5] hover:bg-white hover:border-[#D1BFA8] transition-all"
                 >
                   <div className="flex items-start justify-between">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-900 border border-purple-200">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-sm bg-blue-50 text-blue-900 border border-blue-200">
                       #{idx + 1} {c.category}
                     </span>
-                    <span className="text-sm font-mono font-black text-purple-800">
+                    <span className="text-sm font-mono font-black text-blue-800">
                       {c.betweenness_centrality.toFixed(4)}
                     </span>
                   </div>
@@ -300,17 +300,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           <button
             onClick={() => onNavigateTab('causal')}
-            className="mt-5 w-full py-2.5 bg-[#F5EFEB] hover:bg-[#EFE7DE] text-purple-950 border border-[#EADBCE] rounded-xl text-xs sm:text-sm font-bold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+            className="mt-5 w-full py-2 bg-white hover:bg-[#F5EFEB] text-slate-900 border border-[#EADBCE] rounded-md text-xs sm:text-sm font-bold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs"
           >
             <span>Explore Full Causal Graph</span>
-            <ArrowRight className="w-4 h-4 text-purple-600" />
+            <ArrowRight className="w-4 h-4 text-blue-600" />
           </button>
         </div>
 
       </div>
 
       {/* Trajectory: Break-Even Crossing Curve */}
-      <div className="bg-white/95 rounded-2xl border border-[#EADBCE] p-6 shadow-xs space-y-4">
+      <div className="bg-white/95 rounded-md border border-[#EADBCE] p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h3 className="text-base sm:text-lg font-bold text-slate-950">Cumulative Drag Trajectory vs. Remediation Principal</h3>

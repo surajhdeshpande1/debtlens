@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Causal Graph (5 Whys)',
       icon: GitFork,
       moduleCode: 'M3',
-      iconColor: 'text-purple-600'
+      iconColor: 'text-blue-700'
     },
     {
       id: 'debt',
@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Knowledge & Audit',
       icon: BookOpen,
       moduleCode: 'M8',
-      iconColor: 'text-purple-700'
+      iconColor: 'text-slate-700'
     }
   ];
 
@@ -127,20 +127,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-64 bg-[#FCFAF7] border-r border-[#EADBCE] shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
       <div className="space-y-1">
         
-        {/* Prominent Live Demo Mode Button */}
+        {/* Prominent Live Demo Mode Button - Regular Shaped with Corners */}
         <button
           onClick={() => setCurrentTab('demo')}
-          className={`w-full mb-3.5 p-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-between transition-all cursor-pointer ${
+          className={`w-full mb-3.5 px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer ${
             currentTab === 'demo'
               ? 'bg-slate-950 text-white shadow-md'
-              : 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 hover:from-blue-800 hover:to-purple-800 text-white shadow-xs hover:shadow-md'
+              : 'bg-blue-700 hover:bg-blue-800 text-white shadow-xs'
           }`}
         >
           <div className="flex items-center space-x-2">
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
             <span>Live Demo Walkthrough</span>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-white/20 text-white">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono bg-white/20 text-white">
             1-CLICK
           </span>
         </button>
@@ -157,7 +157,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => setCurrentTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer group ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
                 isActive
                   ? 'bg-white text-slate-950 font-bold border border-[#EADBCE] shadow-xs'
                   : 'text-stone-700 hover:bg-[#F5EFEB] hover:text-slate-950 font-medium'
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="flex items-center space-x-1.5 shrink-0">
                 <span className="text-xs text-stone-400 font-mono font-medium">{item.moduleCode}</span>
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`px-2 py-0.5 text-[11px] font-mono font-bold rounded-md border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
+                  <span className={`px-2 py-0.5 text-[11px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
                     {item.badge}
                   </span>
                 )}
@@ -185,13 +185,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* College & Department Endorsement Footer */}
       <div className="pt-3 border-t border-[#EADBCE]">
-        <div className="p-3 bg-[#F5EFEB]/90 rounded-xl border border-[#EADBCE] text-stone-700">
+        <div className="p-3 bg-[#F5EFEB]/90 rounded-md border border-[#EADBCE] text-stone-700">
           <div className="flex items-center space-x-1.5 mb-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-700" />
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-700" />
             <span className="text-[11px] font-bold text-slate-950">BEC Bagalkote — ISE</span>
           </div>
           <div className="text-[10px] text-stone-500">Mini Project BISA531P</div>
-          <div className="text-[10px] text-purple-900 font-semibold mt-0.5">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-[10px] text-slate-800 font-semibold mt-0.5">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

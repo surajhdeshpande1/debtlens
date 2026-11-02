@@ -133,7 +133,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-slate-900 flex flex-col font-sans selection:bg-purple-100 selection:text-purple-900">
+    <div className="min-h-screen bg-[#FDFBF7] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
 
       {/* Top Navigation */}
       <Navbar

@@ -275,8 +275,8 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
           <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
           <span>Network</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200/80">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
           <span>Architecture</span>
         </span>
         <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/80">
@@ -295,10 +295,10 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
 
       {/* Selected Node Inspector Drawer */}
       {selectedNode && (
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:w-[420px] bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-indigo-200 shadow-xl z-20 animate-in fade-in slide-in-from-bottom-2 duration-150">
+        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:w-[420px] bg-white/95 backdrop-blur-md rounded-md p-4 border border-[#EADBCE] shadow-xl z-20 animate-in fade-in slide-in-from-bottom-2 duration-150">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-blue-50 text-blue-800 border border-blue-200">
                 {selectedNode.category}
               </span>
               <h4 className="mt-1.5 text-xs font-bold text-slate-900 leading-snug">
@@ -314,15 +314,15 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
           </div>
 
           <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
-            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-2 bg-slate-50 rounded-sm border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Betweenness</div>
-              <div className="text-xs font-mono font-bold text-purple-600">{selectedNode.betweenness}</div>
+              <div className="text-xs font-mono font-bold text-blue-700">{selectedNode.betweenness}</div>
             </div>
-            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-2 bg-slate-50 rounded-sm border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Degree Centrality</div>
-              <div className="text-xs font-mono font-bold text-indigo-600">{selectedNode.degree}</div>
+              <div className="text-xs font-mono font-bold text-blue-700">{selectedNode.degree}</div>
             </div>
-            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="p-2 bg-slate-50 rounded-sm border border-slate-100">
               <div className="text-[10px] text-slate-500 font-medium">Linked Incidents</div>
               <div className="text-xs font-bold text-slate-800">{selectedNode.incidentCount}</div>
             </div>
@@ -335,7 +335,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
                 description: selectedNode.fullLabel,
                 category: selectedNode.category
               })}
-              className="mt-3 w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+              className="mt-3 w-full py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-semibold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Create Remediation Debt Item for this Root Cause</span>

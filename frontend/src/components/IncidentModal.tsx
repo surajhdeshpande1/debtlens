@@ -103,17 +103,17 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#FAF8F5] rounded-md border border-[#EADBCE] shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="px-6 py-4 border-b border-[#EADBCE] flex items-center justify-between bg-white">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200">
+            <div className="p-2 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Report Production Incident</h3>
-              <p className="text-xs text-slate-500">Capture symptoms, affected module, and guided 5-Whys root cause</p>
+              <h3 className="text-base font-bold text-slate-950">Report Production Incident</h3>
+              <p className="text-xs text-stone-500">Capture symptoms, affected module, and guided 5-Whys root cause</p>
             </div>
           </div>
           
@@ -121,7 +121,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             <button
               type="button"
               onClick={handleLoadSample}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 transition-colors cursor-pointer"
               title="Populate with realistic sample incident and 5-Whys"
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -129,7 +129,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              className="text-stone-400 hover:text-slate-950 p-1.5 rounded-md hover:bg-[#F5EFEB] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -148,7 +148,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Stripe Webhook Gateway Timeout during Cyber Monday Spike"
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-white"
             />
           </div>
 
@@ -160,7 +160,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               <select
                 value={severity}
                 onChange={(e) => setSeverity(e.target.value as IncidentSeverity)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white cursor-pointer"
               >
                 <option value="CRITICAL">CRITICAL (3.5x Multiplier)</option>
                 <option value="HIGH">HIGH (2.5x Multiplier)</option>
@@ -176,7 +176,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               <select
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white cursor-pointer"
               >
                 <option value="payments">payments</option>
                 <option value="database">database</option>
@@ -199,7 +199,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
                 min="0.5"
                 value={effort}
                 onChange={(e) => setEffort(parseFloat(e.target.value) || 1)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
               />
             </div>
           </div>
@@ -214,39 +214,39 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detail the failure symptoms, stack trace, error logs, and impact..."
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-[#EADBCE] focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
             />
           </div>
 
           {/* Guided 5-Whys Toggle */}
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-[#EADBCE]">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-bold text-slate-900">Guided 5-Whys Root Cause Chain</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-indigo-50 text-indigo-700 font-semibold font-mono">Stage 2 Causality</span>
+                <span className="text-xs font-bold text-slate-950">Guided 5-Whys Root Cause Chain</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-blue-50 text-blue-800 font-semibold font-mono">Stage 2 Causality</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowFiveWhys(!showFiveWhys)}
-                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium cursor-pointer"
+                className="text-xs text-blue-700 hover:text-blue-800 font-semibold cursor-pointer"
               >
                 {showFiveWhys ? 'Collapse 5-Whys' : '+ Expand Guided 5-Whys'}
               </button>
             </div>
 
             {showFiveWhys && (
-              <div className="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200 animate-in fade-in duration-150">
+              <div className="space-y-2.5 p-3.5 bg-slate-50 rounded-md border border-[#EADBCE] animate-in fade-in duration-150">
                 {fiveWhys.map((w, idx) => (
                   <div key={w.step} className="space-y-1">
-                    <label className="block text-[11px] font-medium text-slate-600">
-                      <span className="font-bold text-indigo-600">Why #{w.step}:</span> {w.question}
+                    <label className="block text-[11px] font-medium text-slate-700">
+                      <span className="font-bold text-blue-700">Why #{w.step}:</span> {w.question}
                     </label>
                     <input
                       type="text"
                       value={w.cause}
                       onChange={(e) => handleWhyChange(idx, e.target.value)}
                       placeholder={`State cause for why level ${w.step}...`}
-                      className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                      className="w-full px-3 py-1.5 text-xs rounded-md border border-[#EADBCE] bg-white focus:outline-hidden focus:ring-1 focus:ring-blue-600"
                     />
                   </div>
                 ))}
@@ -255,18 +255,18 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
+          <div className="pt-4 border-t border-[#EADBCE] flex items-center justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-medium text-stone-700 hover:bg-[#F5EFEB] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? 'Recording...' : 'Register Incident & Causal Chain'}
             </button>
