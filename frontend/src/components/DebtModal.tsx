@@ -3,6 +3,7 @@ import { X, Coins, Link2, Sparkles } from 'lucide-react';
 import { DebtCategory, CauseNode, Incident } from '../types';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
+import { sanitizeInput, safeNumeric } from '../utils/security';
 
 interface DebtModalProps {
   isOpen: boolean;
@@ -80,13 +81,13 @@ export const DebtModal: React.FC<DebtModalProps> = ({
       setIsSubmitting(true);
       const payload: any = {
         project_id: projectId,
-        title,
-        description,
+        title: sanitizeInput(title, 200),
+        description: sanitizeInput(description, 1000),
         category,
-        module_name: module,
-        file_path: filePath,
-        effort_principal: principal,
-        assignee,
+        module_name: sanitizeInput(module, 50).toLowerCase(),
+        file_path: sanitizeInput(filePath, 250),
+        effort_principal: safeNumeric(principal, 8.0, 0.5, 500),
+        assignee: sanitizeInput(assignee, 100) || 'Unassigned',
         root_cause_id: selectedCauseId || null,
         linked_incident_ids: selectedIncidentId ? [selectedIncidentId] : []
       };

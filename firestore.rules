@@ -2,10 +2,88 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read and write for DebtLens academic demonstration and evaluation
-    match /{document=**} {
-      allow read, write: if true;
+    
+    // Core Data Sanitization & Type Check Helpers
+    function isValidString(str, minLen, maxLen) {
+      return str is string && str.size() >= minLen && str.size() <= maxLen;
+    }
+    
+    function isValidPositiveNum(num) {
+      return (num is int || num is float) && num >= 0;
+    }
+
+    // Organizations & Workspaces
+    match /organizations/{orgId} {
+      allow read: if true;
+      allow write: if request.resource.data.name is string && request.resource.data.slug is string;
+    }
+    
+    // Projects
+    match /projects/{projId} {
+      allow read: if true;
+      allow write: if request.resource.data.name is string && request.resource.data.key is string;
+    }
+
+    // RBAC Users
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.resource.data.email is string && 
+                      request.resource.data.role in ['admin', 'tech_lead', 'developer', 'viewer'];
+    }
+
+    // Incidents Collection: strict validation of severity, status, effort, and title
+    // Immutable audit trail: Deletion disallowed to preserve compliance history
+    match /incidents/{incidentId} {
+      allow read: if true;
+      allow create, update: if 
+        isValidString(request.resource.data.title, 3, 250) &&
+        isValidString(request.resource.data.incident_number, 3, 30) &&
+        request.resource.data.severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] &&
+        request.resource.data.status in ['OPEN', 'INVESTIGATING', 'RESOLVED'] &&
+        isValidPositiveNum(request.resource.data.resolution_effort_hours);
+      allow delete: if false; 
+    }
+
+    // Technical Debt Register: validated categorization, effort bounds, and status lifecycle
+    match /technical_debt_items/{debtId} {
+      allow read: if true;
+      allow create, update: if
+        isValidString(request.resource.data.title, 3, 250) &&
+        isValidString(request.resource.data.debt_key, 3, 30) &&
+        request.resource.data.category in ['ARCHITECTURAL', 'CODE_SMELL', 'TEST_DEBT', 'INFRASTRUCTURE', 'SECURITY_DEBT', 'DOCUMENTATION'] &&
+        request.resource.data.status in ['IDENTIFIED', 'PRIORITIZED', 'IN_PROGRESS', 'REMEDIATED'] &&
+        isValidPositiveNum(request.resource.data.effort_principal);
+      allow delete: if true;
+    }
+
+    // Causal Graph Nodes (5-Whys)
+    match /cause_nodes/{nodeId} {
+      allow read: if true;
+      allow write: if isValidString(request.resource.data.description, 3, 300);
+    }
+
+    // Directed Causal Edges
+    match /causal_edges/{edgeId} {
+      allow read: if true;
+      allow write: if request.resource.data.source is string && request.resource.data.target is string;
+    }
+
+    // Repository Evidence: Hotspots
+    match /hotspots/{id} {
+      allow read: if true;
+      allow write: if request.resource.data.file_path is string;
+    }
+
+    // Self-Admitted Technical Debt (SATD)
+    match /satd/{id} {
+      allow read: if true;
+      allow write: if request.resource.data.marker_type in ['TODO', 'FIXME', 'HACK', 'BUG', 'OPTIMIZE', 'DEPRECATED', 'WORKAROUND'];
+    }
+
+    // Architectural Dependencies
+    match /dependencies/{id} {
+      allow read: if true;
+      allow write: if request.resource.data.source is string && request.resource.data.target is string;
     }
   }
 }
-

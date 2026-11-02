@@ -7,8 +7,7 @@ import {
   GitBranch, 
   Sparkles, 
   Calculator, 
-  BookOpen,
-  ShieldAlert
+  BookOpen
 } from 'lucide-react';
 
 export type NavTab = 

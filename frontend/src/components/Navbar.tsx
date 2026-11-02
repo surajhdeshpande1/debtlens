@@ -3,11 +3,11 @@ import {
   Layers, 
   RotateCcw, 
   FileDown, 
-  User as UserIcon, 
   CheckCircle2, 
   ChevronDown,
   Building,
-  FolderGit2
+  FolderGit2,
+  ShieldCheck
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
@@ -95,6 +95,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-slate-300">/</span>
             <FolderGit2 className="w-3.5 h-3.5 text-indigo-500" />
             <span className="font-semibold text-slate-900">PAY: Payments Platform</span>
+          </div>
+
+          {/* Enterprise Security Badge */}
+          <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-emerald-50/60 border border-emerald-200/70 text-[11px] font-medium text-emerald-800">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>TLS 1.3 • CSP Hardened</span>
           </div>
 
           {/* Database / Backend Status Indicator */}

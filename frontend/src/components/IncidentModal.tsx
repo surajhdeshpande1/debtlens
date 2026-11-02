@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, AlertCircle, Sparkles, HelpCircle } from 'lucide-react';
 import { FiveWhysStep, IncidentSeverity } from '../types';
 import { useToast } from '../context/ToastContext';
+import { sanitizeInput, safeNumeric } from '../utils/security';
 
 interface IncidentModalProps {
   isOpen: boolean;
@@ -72,16 +73,21 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
       setIsSubmitting(true);
       const payload: any = {
         project_id: projectId,
-        title,
-        description,
+        title: sanitizeInput(title, 200),
+        description: sanitizeInput(description, 1000),
         severity,
-        affected_module: module,
-        affected_component: component,
-        resolution_effort_hours: effort,
+        affected_module: sanitizeInput(module, 50).toLowerCase(),
+        affected_component: sanitizeInput(component, 100) || 'Core Component',
+        resolution_effort_hours: safeNumeric(effort, 4.0, 0.5, 200),
       };
 
       if (showFiveWhys) {
-        payload.five_whys = fiveWhys.filter(w => w.cause.trim() !== '');
+        payload.five_whys = fiveWhys
+          .filter(w => w.cause.trim() !== '')
+          .map(w => ({
+            ...w,
+            cause: sanitizeInput(w.cause, 300)
+          }));
       }
 
       await onSubmit(payload);
