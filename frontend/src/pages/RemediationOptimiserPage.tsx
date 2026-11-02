@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Calculator, 
   CheckCircle2, 
-  Clock, 
-  TrendingUp, 
   Sliders, 
   ArrowRight, 
-  ShieldAlert, 
-  Flame,
   GitBranch,
   Sparkles,
-  Zap,
-  Layers,
   Lock,
-  Unlock,
-  Info
+  Unlock
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -344,7 +337,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
             })}
 
             {/* Deferred Items */}
-            {plan?.deferred_items.length! > 0 && (
+            {Boolean(plan?.deferred_items && plan.deferred_items.length > 0) && (
               <div className="pt-4 border-t border-slate-100">
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Deferred Items (Exceeds {budget}h Sprint Capacity)

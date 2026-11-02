@@ -7,7 +7,8 @@ import {
   ChevronDown,
   Building,
   FolderGit2,
-  ShieldCheck
+  ShieldCheck,
+  Search
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
@@ -19,13 +20,15 @@ interface NavbarProps {
   setCurrentRole: (role: UserRole) => void;
   activeProjectId: number;
   onRefreshData: () => void;
+  onOpenCommandPalette: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentRole,
   setCurrentRole,
   activeProjectId,
-  onRefreshData
+  onRefreshData,
+  onOpenCommandPalette
 }) => {
   const [isReloading, setIsReloading] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
@@ -88,6 +91,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Project Context & Global Actions */}
         <div className="flex items-center space-x-3">
           
+          {/* Quick Command Palette Button */}
+          <button
+            onClick={onOpenCommandPalette}
+            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            title="Search & Jump anywhere (Ctrl+K or ⌘K)"
+          >
+            <Search className="w-3.5 h-3.5 text-slate-400" />
+            <span className="hidden md:inline font-normal">Search or jump...</span>
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.2 text-[10px] font-mono font-medium text-slate-400 bg-white border border-slate-200 rounded-sm shadow-2xs">
+              ⌘K
+            </kbd>
+          </button>
+
           {/* Active Workspace Pill */}
           <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
             <Building className="w-3.5 h-3.5 text-slate-400" />

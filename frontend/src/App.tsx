@@ -11,6 +11,7 @@ import { RemediationOptimiserPage } from './pages/RemediationOptimiserPage';
 import { KnowledgeReportsPage } from './pages/KnowledgeReportsPage';
 import { IncidentModal } from './components/IncidentModal';
 import { DebtModal } from './components/DebtModal';
+import { CommandPalette } from './components/CommandPalette';
 import { ExecutiveDashboardSummary, UserRole, DebtCategory } from './types';
 import { api } from './services/api';
 import { ToastProvider, useToast } from './context/ToastContext';
@@ -23,6 +24,7 @@ const MainAppContent: React.FC = () => {
   const [summary, setSummary] = useState<ExecutiveDashboardSummary | null>(null);
   const [isIncidentModalOpen, setIsIncidentModalOpen] = useState(false);
   const [isDebtModalOpen, setIsDebtModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [debtModalInitialData, setDebtModalInitialData] = useState<{
     title?: string;
     description?: string;
@@ -45,6 +47,17 @@ const MainAppContent: React.FC = () => {
   useEffect(() => {
     fetchSummary();
   }, [activeProjectId]);
+
+  useEffect(() => {
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKey);
+    return () => window.removeEventListener('keydown', handleGlobalKey);
+  }, []);
 
   const handleCreateIncident = async (payload: any) => {
     await api.createIncident(payload);
@@ -96,6 +109,7 @@ const MainAppContent: React.FC = () => {
           showToast('info', 'RBAC Role Switched', `Active permissions set to: ${role.toUpperCase()}`);
         }}
         activeProjectId={activeProjectId}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onRefreshData={() => {
           fetchSummary();
           showToast('success', 'Data Synchronized', 'Telemetry and economic models refreshed.');
@@ -193,6 +207,24 @@ const MainAppContent: React.FC = () => {
         onSubmit={handleCreateDebt}
         projectId={activeProjectId}
         initialData={debtModalInitialData}
+      />
+
+      {/* Global Command Palette (⌘K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onNavigateTab={setCurrentTab}
+        onOpenIncidentModal={() => setIsIncidentModalOpen(true)}
+        onOpenDebtModal={() => {
+          setDebtModalInitialData(null);
+          setIsDebtModalOpen(true);
+        }}
+        onDownloadPdf={() => api.downloadPdfReport(activeProjectId)}
+        onReloadSeed={async () => {
+          await api.reloadSeedData();
+          await fetchSummary();
+        }}
+        projectId={activeProjectId}
       />
 
     </div>
