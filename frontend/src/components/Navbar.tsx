@@ -8,7 +8,8 @@ import {
   Building,
   FolderGit2,
   Search,
-  Sparkles
+  Sparkles,
+  GraduationCap
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
@@ -19,6 +20,7 @@ interface NavbarProps {
   activeProjectId: number;
   onRefreshData: () => void;
   onOpenCommandPalette: () => void;
+  onLaunchDemo?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -26,7 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   setCurrentRole,
   activeProjectId,
   onRefreshData,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  onLaunchDemo
 }) => {
   const [isReloading, setIsReloading] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
@@ -145,6 +148,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             <FileDown className="w-3.5 h-3.5 text-slate-500" />
             <span className="hidden sm:inline">{isDownloadingPdf ? 'Exporting...' : 'Export PDF'}</span>
           </button>
+
+          {/* Judge Demo Spotlight Button */}
+          {onLaunchDemo && (
+            <button
+              onClick={onLaunchDemo}
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition-all cursor-pointer"
+              title="Launch Faculty Spotlight Demonstration Mode (#demo)"
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-white" />
+              <span>Judge Demo</span>
+            </button>
+          )}
 
           <div className="h-4 w-px bg-slate-200" />
 

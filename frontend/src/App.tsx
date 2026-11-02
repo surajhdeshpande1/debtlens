@@ -9,7 +9,7 @@ import { RepoEvidencePage } from './pages/RepoEvidencePage';
 import { IntelligencePage } from './pages/IntelligencePage';
 import { RemediationOptimiserPage } from './pages/RemediationOptimiserPage';
 import { KnowledgeReportsPage } from './pages/KnowledgeReportsPage';
-import { DemoGuidePage } from './pages/DemoGuidePage';
+import { JudgeSpotlightDemoPage } from './pages/JudgeSpotlightDemoPage';
 import { IncidentModal } from './components/IncidentModal';
 import { DebtModal } from './components/DebtModal';
 import { CommandPalette } from './components/CommandPalette';
@@ -48,6 +48,30 @@ const MainAppContent: React.FC = () => {
   useEffect(() => {
     fetchSummary();
   }, [activeProjectId]);
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#demo' || window.location.pathname === '/demo') {
+        setCurrentTab('demo');
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleLaunchDemo = () => {
+    setCurrentTab('demo');
+    window.location.hash = 'demo';
+    showToast('info', 'Spotlight Demo Mode', 'Press Space or click Next to step through for judges.');
+  };
+
+  const handleExitDemo = () => {
+    setCurrentTab('dashboard');
+    if (window.location.hash === '#demo') {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+  };
 
   useEffect(() => {
     const handleGlobalKey = (e: KeyboardEvent) => {
@@ -99,6 +123,20 @@ const MainAppContent: React.FC = () => {
     setIsDebtModalOpen(true);
   };
 
+  if (currentTab === 'demo') {
+    return (
+      <JudgeSpotlightDemoPage
+        onExitDemo={handleExitDemo}
+        onNavigateTab={(tab) => {
+          setCurrentTab(tab);
+          if (window.location.hash === '#demo') {
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
       
@@ -111,6 +149,7 @@ const MainAppContent: React.FC = () => {
         }}
         activeProjectId={activeProjectId}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onLaunchDemo={handleLaunchDemo}
         onRefreshData={() => {
           fetchSummary();
           showToast('success', 'Data Synchronized', 'Telemetry and economic models refreshed.');
@@ -184,17 +223,6 @@ const MainAppContent: React.FC = () => {
           {currentTab === 'knowledge' && (
             <KnowledgeReportsPage
               projectId={activeProjectId}
-            />
-          )}
-
-          {currentTab === 'demo' && (
-            <DemoGuidePage
-              onNavigateTab={setCurrentTab}
-              onOpenIncidentModal={() => setIsIncidentModalOpen(true)}
-              onOpenDebtModal={() => {
-                setDebtModalInitialData(null);
-                setIsDebtModalOpen(true);
-              }}
             />
           )}
         </main>
