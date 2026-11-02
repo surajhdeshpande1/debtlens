@@ -9,6 +9,7 @@ import { RepoEvidencePage } from './pages/RepoEvidencePage';
 import { IntelligencePage } from './pages/IntelligencePage';
 import { RemediationOptimiserPage } from './pages/RemediationOptimiserPage';
 import { KnowledgeReportsPage } from './pages/KnowledgeReportsPage';
+import { DemoGuidePage } from './pages/DemoGuidePage';
 import { IncidentModal } from './components/IncidentModal';
 import { DebtModal } from './components/DebtModal';
 import { CommandPalette } from './components/CommandPalette';
@@ -183,6 +184,17 @@ const MainAppContent: React.FC = () => {
           {currentTab === 'knowledge' && (
             <KnowledgeReportsPage
               projectId={activeProjectId}
+            />
+          )}
+
+          {currentTab === 'demo' && (
+            <DemoGuidePage
+              onNavigateTab={setCurrentTab}
+              onOpenIncidentModal={() => setIsIncidentModalOpen(true)}
+              onOpenDebtModal={() => {
+                setDebtModalInitialData(null);
+                setIsDebtModalOpen(true);
+              }}
             />
           )}
         </main>

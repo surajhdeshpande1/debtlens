@@ -7,7 +7,8 @@ import {
   GitBranch, 
   Sparkles, 
   Calculator, 
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 
 export type NavTab = 
@@ -18,7 +19,8 @@ export type NavTab =
   | 'repository' 
   | 'intelligence' 
   | 'optimiser' 
-  | 'knowledge';
+  | 'knowledge'
+  | 'demo';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -112,8 +114,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="w-60 bg-white border-r border-slate-200/80 shrink-0 min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between select-none">
-      <div className="space-y-0.5">
-        <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+      <div className="space-y-1">
+        
+        {/* Prominent Faculty Demo Mode Button */}
+        <button
+          onClick={() => setCurrentTab('demo')}
+          className={`w-full mb-3 p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+            currentTab === 'demo'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-indigo-50/80 hover:bg-indigo-100/80 text-indigo-950 border border-indigo-200/90 shadow-2xs'
+          }`}
+        >
+          <div className="flex items-center space-x-2">
+            <GraduationCap className={`w-4 h-4 ${currentTab === 'demo' ? 'text-indigo-400' : 'text-indigo-600'}`} />
+            <span>Faculty Demo & Viva Lab</span>
+          </div>
+          <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono ${
+            currentTab === 'demo' ? 'bg-slate-800 text-indigo-300' : 'bg-indigo-200/70 text-indigo-800'
+          }`}>
+            DEMO
+          </span>
+        </button>
+
+        <div className="px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
           <span>Platform Modules</span>
           <span className="font-mono text-[9px] text-slate-300">8 CORE</span>
         </div>
