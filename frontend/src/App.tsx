@@ -49,21 +49,16 @@ const MainAppContent: React.FC = () => {
     fetchSummary();
   }, [activeProjectId]);
 
+  // Ensure website always starts clean on home dashboard
   useEffect(() => {
-    const handleHash = () => {
-      if (window.location.hash === '#demo' || window.location.pathname === '/demo') {
-        setCurrentTab('demo');
-      }
-    };
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    if (window.location.hash === '#demo') {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
   }, []);
 
   const handleLaunchDemo = () => {
     setCurrentTab('demo');
-    window.location.hash = 'demo';
-    showToast('info', 'Spotlight Demo Mode', 'Press Space or click Next to step through for judges.');
+    showToast('info', 'Live Demo Mode Active', '1-Click step through the live enterprise pipeline.');
   };
 
   const handleExitDemo = () => {
@@ -139,7 +134,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      
+
       {/* Top Navigation */}
       <Navbar
         currentRole={currentRole}
@@ -157,7 +152,7 @@ const MainAppContent: React.FC = () => {
       />
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        
+
         {/* Left Sidebar */}
         <Sidebar
           currentTab={currentTab}

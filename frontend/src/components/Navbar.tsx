@@ -149,15 +149,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden sm:inline">{isDownloadingPdf ? 'Exporting...' : 'Export PDF'}</span>
           </button>
 
-          {/* Judge Demo Spotlight Button */}
+          {/* Live Demo 1-Click Launch Button */}
           {onLaunchDemo && (
             <button
               onClick={onLaunchDemo}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition-all cursor-pointer"
-              title="Launch Faculty Spotlight Demonstration Mode (#demo)"
+              className="inline-flex items-center space-x-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all cursor-pointer ring-2 ring-indigo-500/20 active:scale-95"
+              title="Launch Interactive 1-Click Operational Pipeline Walkthrough"
             >
-              <GraduationCap className="w-3.5 h-3.5 text-white" />
-              <span>Judge Demo</span>
+              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>Live Demo (1-Click)</span>
             </button>
           )}
 
