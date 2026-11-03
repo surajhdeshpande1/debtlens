@@ -106,33 +106,33 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
   const severityBadge = (sev: IncidentSeverity) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-black text-white border-black font-mono';
+        return 'bg-red-50 text-red-700 border-red-200 font-mono font-bold';
       case 'HIGH':
-        return 'bg-zinc-800 text-white border-zinc-700 font-mono';
+        return 'bg-amber-50 text-amber-700 border-amber-200 font-mono font-bold';
       case 'MEDIUM':
-        return 'bg-zinc-200 text-zinc-900 border-zinc-300 font-mono';
+        return 'bg-blue-50 text-blue-700 border-blue-200 font-mono font-bold';
       case 'LOW':
-        return 'bg-zinc-100 text-zinc-700 border-zinc-200 font-mono';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-mono font-bold';
     }
   };
 
   const statusBadge = (stat: IncidentStatus) => {
     switch (stat) {
       case 'OPEN':
-        return 'bg-black text-white border-black font-mono';
+        return 'bg-red-50 text-red-700 border-red-200 font-mono font-bold';
       case 'INVESTIGATING':
-        return 'bg-zinc-800 text-white border-zinc-700 font-mono';
+        return 'bg-amber-50 text-amber-700 border-amber-200 font-mono font-bold';
       case 'RESOLVED':
-        return 'bg-zinc-100 text-zinc-800 border-zinc-300 font-mono';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-mono font-bold';
     }
   };
 
   const getModuleBadge = (_moduleName: string) => {
-    return 'bg-zinc-100 text-black border-zinc-200 font-mono';
+    return 'bg-slate-100 text-slate-800 border-slate-200 font-mono font-semibold';
   };
 
   const getSimilarityBadge = (_score: number) => {
-    return 'text-black bg-zinc-100 border-zinc-300 font-mono';
+    return 'text-blue-700 bg-blue-50 border-blue-200 font-mono font-bold';
   };
 
   return (
@@ -164,7 +164,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
 
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-black hover:bg-zinc-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-black"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-blue-800"
           >
             <Plus className="w-4 h-4" />
             <span>Report New Incident</span>

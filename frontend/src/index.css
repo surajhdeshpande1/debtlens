@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-mono-950: #09090B;
-  --color-mono-900: #18181B;
-  --color-mono-800: #27272A;
-  --color-mono-700: #3F3F46;
-  --color-mono-600: #52525B;
-  --color-mono-500: #71717A;
-  --color-mono-400: #A1A1AA;
-  --color-mono-300: #D4D4D8;
-  --color-mono-200: #E4E4E7;
-  --color-mono-100: #F4F4F5;
-  --color-mono-50: #FAFAFA;
+  --color-fintech-canvas: #FBFBFA;
+  --color-fintech-card: #FFFFFF;
+  --color-navy-950: #080D1A;
+  --color-navy-900: #0F172A;
+  --color-navy-800: #1E293B;
+  --color-navy-700: #334155;
+  --color-royal-blue: #1D4ED8;
+  --color-royal-blue-hover: #1E40AF;
+  --color-crimson-drag: #991B1B;
+  --color-emerald-opt: #065F46;
+  --color-brass-ochre: #B45309;
 }
 
 @layer base {
@@ -20,8 +20,8 @@
     color-scheme: light;
   }
   body {
-    background-color: #FFFFFF;
-    color: #000000;
+    background-color: #FBFBFA;
+    color: #0F172A;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -34,18 +34,18 @@
   }
 }
 
-/* Minimalist monochrome scrollbars */
+/* Elegant FinTech scrollbars */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F4F5;
+  background: #F1F1EE;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D4D4D8;
-  border-radius: 2px;
+  background: #CBD5E1;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A1A1AA;
+  background: #94A3B8;
 }

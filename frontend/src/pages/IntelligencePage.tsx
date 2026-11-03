@@ -178,13 +178,13 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                 </div>
               </div>
 
-              <span className="text-xs font-bold px-2.5 py-1 rounded-sm bg-black text-white font-mono">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-sm bg-red-50 text-red-700 border border-red-200 font-mono">
                 {regressions.length} Regressions Flagged
               </span>
             </div>
 
             {regressions.length === 0 ? (
-              <div className="p-6 text-center text-xs text-zinc-500 bg-zinc-50 rounded-md border border-zinc-200">
+              <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 rounded-md border border-slate-200">
                 No regressions detected at threshold τ = {tau}. Resolved fixes are holding stable.
               </div>
             ) : (
@@ -192,34 +192,34 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                 {regressions.map((r) => (
                   <div 
                     key={`${r.new_incident_id}-${r.resolved_incident_id}`}
-                    className="p-4 rounded-md border border-zinc-300 bg-zinc-50 hover:bg-zinc-100 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="p-4 rounded-md border border-red-200 bg-red-50/40 hover:bg-red-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <span className="font-mono text-xs font-bold text-white bg-black px-1.5 py-0.5 rounded-sm">
+                        <span className="font-mono text-xs font-bold text-white bg-red-700 px-1.5 py-0.5 rounded-sm">
                           ACTIVE REGRESSION
                         </span>
-                        <span className="font-mono text-xs font-bold text-black">{r.new_incident_number}</span>
-                        <span className="text-xs text-zinc-400">regressed from</span>
-                        <span className="font-mono text-xs font-bold text-zinc-600">{r.resolved_incident_number}</span>
+                        <span className="font-mono text-xs font-bold text-slate-900">{r.new_incident_number}</span>
+                        <span className="text-xs text-slate-400">regressed from</span>
+                        <span className="font-mono text-xs font-bold text-slate-600">{r.resolved_incident_number}</span>
                       </div>
 
-                      <h4 className="text-xs font-semibold text-black leading-snug">
+                      <h4 className="text-xs font-semibold text-slate-900 leading-snug">
                         {r.new_incident_title}
                       </h4>
 
-                      <div className="flex items-center space-x-4 text-[11px] text-zinc-600">
-                        <span>Module: <strong className="text-black">{r.affected_module}</strong></span>
+                      <div className="flex items-center space-x-4 text-[11px] text-slate-600">
+                        <span>Module: <strong className="text-slate-900">{r.affected_module}</strong></span>
                         <span>•</span>
-                        <span>Recurred after: <strong className="text-black">{r.days_to_recurrence} days</strong></span>
+                        <span>Recurred after: <strong className="text-slate-900">{r.days_to_recurrence} days</strong></span>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-mono font-bold text-black text-sm">
+                      <div className="font-mono font-bold text-red-700 text-sm">
                         {Math.round(r.similarity * 100)}% Match
                       </div>
-                      <div className="text-[10px] text-zinc-500">sim(i, j) ≥ τ ({tau})</div>
+                      <div className="text-[10px] text-slate-500">sim(i, j) ≥ τ ({tau})</div>
                     </div>
                   </div>
                 ))}
@@ -367,12 +367,12 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                     <div className="text-[10px] text-zinc-500 font-mono">cos(emb_a, emb_b)</div>
                   </div>
 
-                  <div className="p-3 bg-black text-white rounded-md border border-black">
-                    <div className="text-[10px] font-bold text-zinc-300 uppercase">Hybrid Formulation Score</div>
+                  <div className="p-3 bg-blue-700 text-white rounded-md border border-blue-800 shadow-xs">
+                    <div className="text-[10px] font-bold text-blue-100 uppercase">Hybrid Formulation Score</div>
                     <div className="text-2xl font-bold font-mono text-white mt-0.5">
                       {(comparisonResult.hybrid_score * 100).toFixed(1)}%
                     </div>
-                    <div className="text-[10px] text-zinc-400 font-mono">α·lex + (1-α)·sem</div>
+                    <div className="text-[10px] text-blue-200 font-mono">α·lex + (1-α)·sem</div>
                   </div>
                 </div>
 

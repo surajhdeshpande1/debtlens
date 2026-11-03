@@ -144,7 +144,7 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloading}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-black hover:bg-zinc-800 text-white text-xs font-semibold border border-black shadow-xs transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold border border-blue-800 shadow-xs transition-all cursor-pointer disabled:opacity-50"
           >
             <FileDown className="w-3.5 h-3.5" />
             <span>{isDownloading ? 'Generating...' : 'Export PDF'}</span>
@@ -153,13 +153,13 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
       </div>
 
       {/* College Project Endorsement Banner */}
-      <div className="bg-white rounded-md border border-zinc-200 p-6 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-zinc-200">
+      <div className="bg-white rounded-md border border-slate-200/90 p-6 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
           <div className="space-y-1">
-            <span className="text-[11px] font-bold text-black uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider font-mono">
               Basaveshwar Engineering College Bagalkote
             </span>
-            <h3 className="text-lg font-bold text-black">
+            <h3 className="text-lg font-bold text-slate-900">
               Department of Information Science & Engineering
             </h3>
             <p className="text-xs text-zinc-500 font-medium">

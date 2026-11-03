@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Sidebar, NavTab } from './components/Sidebar';
+import { NavTab } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { CausalAnalysisPage } from './pages/CausalAnalysisPage';
@@ -133,10 +133,12 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-[#FBFBFA] text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
 
-      {/* Top Navigation */}
+      {/* Top Executive Cockpit Navigation */}
       <Navbar
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
         currentRole={currentRole}
         setCurrentRole={(role) => {
           setCurrentRole(role);
@@ -149,28 +151,20 @@ const MainAppContent: React.FC = () => {
           fetchSummary();
           showToast('success', 'Data Synchronized', 'Telemetry and economic models refreshed.');
         }}
+        openIncidentsCount={summary?.open_incidents}
+        breakevenDebtCount={summary?.past_breakeven_count}
+        regressionsCount={summary?.regressions_detected}
       />
 
-      <div className="flex-1 flex max-w-[1400px] w-full mx-auto">
-
-        {/* Left Sidebar */}
-        <Sidebar
-          currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
-          openIncidentsCount={summary?.open_incidents}
-          breakevenDebtCount={summary?.past_breakeven_count}
-          regressionsCount={summary?.regressions_detected}
-        />
-
-        {/* Main Content Pane */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto min-w-0">
-          {currentTab === 'dashboard' && (
-            <Dashboard
-              summary={summary}
-              onNavigateTab={setCurrentTab}
-              onOpenReportModal={() => setIsIncidentModalOpen(true)}
-            />
-          )}
+      {/* Main Expansive 100% Full-Width Canvas */}
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 min-w-0">
+        {currentTab === 'dashboard' && (
+          <Dashboard
+            summary={summary}
+            onNavigateTab={setCurrentTab}
+            onOpenReportModal={() => setIsIncidentModalOpen(true)}
+          />
+        )}
 
           {currentTab === 'incidents' && (
             <IncidentsPage
@@ -221,8 +215,6 @@ const MainAppContent: React.FC = () => {
             />
           )}
         </main>
-
-      </div>
 
       {/* Incident Intake Modal */}
       <IncidentModal

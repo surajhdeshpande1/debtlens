@@ -341,41 +341,41 @@ And with one click on the Export PDF button, our system produces an executive co
     <div className="space-y-6 max-w-[1400px] mx-auto pb-12 overflow-x-hidden select-none">
       
       {/* Top Banner & Control Deck */}
-      <div className="bg-black text-white rounded-md p-5 sm:p-6 shadow-md border border-black relative overflow-hidden">
+      <div className="bg-slate-900 text-white rounded-md p-5 sm:p-6 shadow-md border border-slate-800 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-zinc-900 text-zinc-300 border border-zinc-700 text-[10px] font-mono font-semibold">
-                <GraduationCap className="w-3.5 h-3.5 text-white" />
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono font-semibold">
+                <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
                 <span>BEC BAGALKOTE • BISA531P MINI PROJECT</span>
               </span>
-              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-zinc-800 text-white border border-zinc-600 text-[10px] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 text-[10px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>AUTONOMOUS PIPELINE READY</span>
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
               <span>One-Click Autonomous Demo Control Room</span>
             </h1>
-            <p className="mt-1 text-xs text-zinc-300 max-w-2xl leading-relaxed">
+            <p className="mt-1 text-xs text-slate-300 max-w-2xl leading-relaxed">
               Click <strong className="text-white">"Start 1-Click Auto-Run"</strong> to let the entire DebtLens platform autonomously execute, demonstrate, and verify every formula, chart, and algorithm while you explain each stage to your faculty.
             </p>
           </div>
 
           {/* Master 1-Click Playback Control Deck */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-zinc-900 p-2.5 rounded-md border border-zinc-800 shadow-inner">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-slate-950 p-2.5 rounded-md border border-slate-800 shadow-inner">
             {!isRunning ? (
               <button
                 onClick={handleStartAutoRun}
-                className="px-5 py-2 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-bold border border-white shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
+                className="px-5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border border-emerald-600 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
               >
-                <Play className="w-4 h-4 fill-black text-black group-hover:scale-110 transition-transform" />
+                <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
                 <span>Start 1-Click Auto-Run</span>
               </button>
             ) : (
               <button
                 onClick={handlePause}
-                className="px-5 py-2 rounded-md bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold border border-zinc-700 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="px-5 py-2 rounded-md bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold border border-amber-600 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
               >
                 <Pause className="w-4 h-4 fill-white text-white" />
                 <span>Pause Simulation</span>
@@ -384,18 +384,18 @@ And with one click on the Export PDF button, our system produces an executive co
 
             <button
               onClick={handleReset}
-              className="p-2 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition-colors cursor-pointer"
+              className="p-2 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
               title="Reset simulation to Stage 1"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
 
             {/* Speed Toggle */}
-            <div className="flex items-center bg-zinc-950 rounded-md p-0.5 border border-zinc-800 text-[11px] font-mono">
+            <div className="flex items-center bg-slate-900 rounded-md p-0.5 border border-slate-800 text-[11px] font-mono">
               <button
                 onClick={() => setSimSpeed(1)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 1 ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
+                  simSpeed === 1 ? 'bg-white/20 text-white font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 1x
@@ -403,7 +403,7 @@ And with one click on the Export PDF button, our system produces an executive co
               <button
                 onClick={() => setSimSpeed(2)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 2 ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
+                  simSpeed === 2 ? 'bg-white/20 text-white font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 2x Fast
@@ -413,19 +413,19 @@ And with one click on the Export PDF button, our system produces an executive co
         </div>
 
         {/* Dynamic Progress Bar */}
-        <div className="mt-4 pt-3 border-t border-zinc-800 flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
+        <div className="mt-4 pt-3 border-t border-slate-800 flex flex-col space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
             <span className="flex items-center space-x-1.5">
-              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-white animate-ping' : 'bg-zinc-600'}`} />
+              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-ping' : 'bg-slate-600'}`} />
               <strong className="text-white">Stage {currentStage.id} of {stages.length}:</strong>
               <span>{currentStage.name}</span>
             </span>
             <span>{Math.round(stageProgress)}% of stage completed</span>
           </div>
 
-          <div className="w-full h-1.5 bg-zinc-850 rounded-sm overflow-hidden border border-zinc-800">
+          <div className="w-full h-1.5 bg-slate-950 rounded-sm overflow-hidden border border-slate-800">
             <div 
-              className="h-full bg-white transition-all duration-100 ease-linear"
+              className="h-full bg-emerald-500 transition-all duration-100 ease-linear"
               style={{ width: `${stageProgress}%` }}
             />
           </div>
@@ -443,14 +443,14 @@ And with one click on the Export PDF button, our system produces an executive co
               onClick={() => handleJumpToStage(idx)}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
                 isCurrent 
-                  ? 'bg-black text-white border-black shadow-xs'
+                  ? 'bg-blue-700 text-white border-blue-700 shadow-xs font-bold'
                   : isDone
-                  ? 'bg-zinc-100 text-black border-zinc-300 hover:bg-zinc-200'
-                  : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 hover:text-black'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
               <div className={`w-4 h-4 rounded-sm flex items-center justify-center text-[10px] font-bold ${
-                isCurrent ? 'bg-zinc-800 text-white' : isDone ? 'bg-zinc-200 text-black' : 'bg-zinc-100 text-zinc-600'
+                isCurrent ? 'bg-white/25 text-white' : isDone ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-600'
               }`}>
                 {isDone ? <Check className="w-2.5 h-2.5" /> : st.id}
               </div>

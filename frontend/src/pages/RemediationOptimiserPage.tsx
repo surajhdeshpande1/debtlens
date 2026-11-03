@@ -165,7 +165,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
             <div className="w-full h-7 bg-zinc-100 rounded-md border border-zinc-200 p-0.5 flex overflow-hidden shadow-inner">
               {plan.selected_items.map((it, idx) => {
                 const widthPct = (it.effort_principal / budget) * 100;
-                const colors = ['bg-black', 'bg-zinc-800', 'bg-zinc-700', 'bg-zinc-600', 'bg-zinc-500'];
+                const colors = ['bg-slate-900', 'bg-blue-700', 'bg-emerald-700', 'bg-amber-600', 'bg-indigo-700'];
                 return (
                   <div
                     key={it.id}
@@ -208,28 +208,28 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
               <div className="text-[10px] text-zinc-500 mt-0.5 font-medium">{plan.deferred_items.length} deferred</div>
             </div>
 
-            <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 shadow-2xs">
-              <div className="text-[10px] font-bold text-black uppercase">Risk Reduction Score</div>
-              <div className="text-sm font-bold text-black font-mono mt-0.5">
+            <div className="p-3 bg-blue-50/60 rounded-md border border-blue-200 shadow-2xs">
+              <div className="text-[10px] font-bold text-blue-900 uppercase">Risk Reduction Score</div>
+              <div className="text-sm font-bold text-blue-900 font-mono mt-0.5">
                 {plan.total_risk_reduced} pts
               </div>
-              <div className="text-[10px] text-zinc-500 mt-0.5 font-medium">Maximized via 0/1 DP</div>
+              <div className="text-[10px] text-blue-700 mt-0.5 font-medium">Maximized via 0/1 DP</div>
             </div>
 
-            <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 shadow-2xs">
-              <div className="text-[10px] font-bold text-black uppercase">Interest Cost Saved</div>
-              <div className="text-sm font-bold text-black font-mono mt-0.5">
+            <div className="p-3 bg-emerald-50/60 rounded-md border border-emerald-200 shadow-2xs">
+              <div className="text-[10px] font-bold text-emerald-900 uppercase">Interest Cost Saved</div>
+              <div className="text-sm font-bold text-emerald-900 font-mono mt-0.5">
                 {plan.accumulated_interest_saved} hrs
               </div>
-              <div className="text-[10px] text-zinc-500 mt-0.5 font-medium">Prevented drag</div>
+              <div className="text-[10px] text-emerald-700 mt-0.5 font-medium">Prevented drag</div>
             </div>
 
-            <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 shadow-2xs">
-              <div className="text-[10px] font-bold text-black uppercase">Payoff Return (ROI)</div>
-              <div className="text-sm font-bold text-black font-mono mt-0.5">
+            <div className="p-3 bg-emerald-50 rounded-md border border-emerald-300 shadow-2xs">
+              <div className="text-[10px] font-bold text-emerald-950 uppercase font-mono">Payoff Return (ROI)</div>
+              <div className="text-base font-extrabold text-emerald-800 font-mono mt-0.5">
                 {roiRatio}x
               </div>
-              <div className="text-[10px] text-zinc-500 mt-0.5 font-medium">Interest / Effort</div>
+              <div className="text-[10px] text-emerald-700 mt-0.5 font-medium">Interest / Effort</div>
             </div>
           </div>
         )}
@@ -408,7 +408,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
                     type="monotone" 
                     dataKey="risk_reduction" 
                     name="Risk Reduction Score" 
-                    stroke="#000000" 
+                    stroke="#1D4ED8" 
                     strokeWidth={2.5} 
                     dot={{ r: 4 }} 
                   />
@@ -416,8 +416,8 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
                     type="monotone" 
                     dataKey="interest_saved" 
                     name="Interest Saved (hrs)" 
-                    stroke="#71717A" 
-                    strokeWidth={2} 
+                    stroke="#059669" 
+                    strokeWidth={2.5} 
                     strokeDasharray="4 4" 
                   />
                 </LineChart>

@@ -23,10 +23,31 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
   const initGraph = (layoutName: string) => {
     if (!containerRef.current) return;
 
+    const getCategoryColors = (category: string, betweenness: number) => {
+      if (betweenness > 0.08) {
+        return { bg: '#FEF3C7', border: '#B45309', text: '#78350F' }; // High centrality (Brass Ochre)
+      }
+      switch (category?.toUpperCase()) {
+        case 'ARCHITECTURE':
+        case 'ARCHITECTURAL':
+          return { bg: '#EFF6FF', border: '#1D4ED8', text: '#1E3A8A' }; // Royal Blue
+        case 'DATABASE':
+        case 'CONCURRENCY':
+          return { bg: '#F1F5F9', border: '#0F172A', text: '#0F172A' }; // Midnight Navy
+        case 'PERFORMANCE':
+        case 'CODE_LOGIC':
+          return { bg: '#FEF2F2', border: '#991B1B', text: '#7F1D1D' }; // Crimson
+        case 'NETWORK':
+        case 'INFRASTRUCTURE':
+          return { bg: '#ECFDF5', border: '#065F46', text: '#064E3B' }; // Emerald
+        default:
+          return { bg: '#FFFFFF', border: '#64748B', text: '#1E293B' };
+      }
+    };
+
     const elements: cytoscape.ElementDefinition[] = [
       ...graphData.nodes.map((n) => {
-        const catColor = '#FFFFFF';
-        const borderColor = '#000000';
+        const colors = getCategoryColors(n.data.category, n.data.betweenness_centrality);
 
         return {
           data: {
@@ -38,8 +59,9 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
             degree: n.data.degree_centrality,
             betweenness: n.data.betweenness_centrality,
             incidentCount: n.data.incident_count,
-            catColor,
-            borderColor
+            catColor: colors.bg,
+            borderColor: colors.border,
+            textColor: colors.text
           }
         };
       }),
@@ -71,7 +93,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
             'background-color': 'data(catColor)',
             'border-color': 'data(borderColor)',
             'border-width': 2,
-            'color': '#000000',
+            'color': 'data(textColor)',
             'font-size': '10px',
             'font-weight': 'bold',
             'text-valign': 'center',
@@ -328,7 +350,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
                 description: selectedNode.fullLabel,
                 category: selectedNode.category
               })}
-              className="mt-3 w-full py-2 bg-black hover:bg-zinc-800 text-white rounded-md text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-black"
+              className="mt-3 w-full py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-blue-800"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Create Remediation Debt Item for this Root Cause</span>

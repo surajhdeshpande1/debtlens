@@ -163,7 +163,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
           <button
             onClick={onOpenDebtModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-black hover:bg-zinc-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-black"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-blue-800"
           >
             <Plus className="w-4 h-4" />
             <span>Register Debt Item</span>
@@ -281,13 +281,13 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                       <tr 
                         key={d.id} 
                         onClick={() => setSelectedDebt(d)}
-                        className={`hover:bg-zinc-50 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-zinc-100 border-l-4 border-black' : ''
+                        className={`hover:bg-slate-50 transition-colors cursor-pointer ${
+                          isSelected ? 'bg-blue-50/40 border-l-4 border-blue-700' : ''
                         }`}
                       >
                         {/* Key & Module */}
                         <td className="py-3 px-3 whitespace-nowrap">
-                          <div className="font-mono font-bold text-black">{d.debt_key}</div>
+                          <div className="font-mono font-bold text-slate-900">{d.debt_key}</div>
                           <span className={`inline-block mt-0.5 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-sm border ${getModuleBadge(d.module_name)}`}>
                             {d.module_name}
                           </span>
@@ -295,15 +295,15 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
                         {/* Title & Category */}
                         <td className="py-3 px-3 max-w-xs">
-                          <div className="font-bold text-black leading-snug line-clamp-1">{d.title}</div>
+                          <div className="font-bold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
                           <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.2 rounded-sm border ${getCategoryBadge(d.category)}`}>
                             {d.category}
                           </span>
                         </td>
 
                         {/* Principal P(d) */}
-                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-black">
-                          <span className="bg-zinc-100 text-black px-2 py-0.5 rounded-sm border border-zinc-200">
+                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-900">
+                          <span className="bg-slate-100 text-slate-900 px-2 py-0.5 rounded-sm border border-slate-200">
                             {d.effort_principal}h
                           </span>
                         </td>
@@ -312,8 +312,8 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold">
                           <span className={`px-2 py-0.5 rounded-sm border ${
                             d.break_even_status 
-                              ? 'bg-black text-white border-black' 
-                              : 'bg-zinc-50 text-black border-zinc-200'
+                              ? 'bg-red-50 text-red-700 border-red-200' 
+                              : 'bg-slate-50 text-slate-700 border-slate-200'
                           }`}>
                             {d.accrued_interest}h
                           </span>
@@ -322,12 +322,12 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         {/* Break-Even Status */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
                           {d.break_even_status ? (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-black text-white font-mono">
-                              <Flame className="w-2.5 h-2.5 text-white" />
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-red-50 text-red-700 border border-red-200 font-mono">
+                              <Flame className="w-2.5 h-2.5 text-red-600" />
                               <span>EXCEEDED</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-zinc-100 text-black border border-zinc-200">
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
                               <span>Optimal</span>
                             </span>
                           )}

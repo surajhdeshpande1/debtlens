@@ -202,15 +202,15 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
     switch (marker.toUpperCase()) {
       case 'FIXME':
       case 'BUG':
-        return 'bg-black text-white border-black';
+        return 'bg-red-50 text-red-700 border-red-200 font-mono font-bold';
       case 'HACK':
       case 'WORKAROUND':
-        return 'bg-zinc-800 text-white border-zinc-800';
+        return 'bg-amber-50 text-amber-700 border-amber-200 font-mono font-bold';
       case 'TODO':
       case 'OPTIMIZE':
-        return 'bg-zinc-100 text-black border-zinc-300';
+        return 'bg-blue-50 text-blue-700 border-blue-200 font-mono font-bold';
       default:
-        return 'bg-zinc-50 text-zinc-700 border-zinc-300';
+        return 'bg-slate-100 text-slate-700 border-slate-200 font-mono font-semibold';
     }
   };
 
@@ -318,7 +318,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
                       return null;
                     }}
                   />
-                  <Scatter name="Files" data={scatterData} fill="#000000" />
+                  <Scatter name="Files" data={scatterData} fill="#1D4ED8" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
@@ -427,7 +427,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
               <button
                 onClick={() => handleAnalyzeSnippet()}
                 disabled={isAnalyzingSnippet}
-                className="px-3.5 py-1.5 bg-black hover:bg-zinc-800 text-white rounded-md text-xs font-semibold border border-black shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-bold border border-blue-800 shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>{isAnalyzingSnippet ? 'Analyzing AST...' : 'Analyze AST & SATD'}</span>
