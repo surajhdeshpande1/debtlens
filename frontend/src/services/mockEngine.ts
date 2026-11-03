@@ -1,5 +1,6 @@
 import {
   Incident,
+  IncidentSeverity,
   CauseNode,
   CausalGraphData,
   DebtItem,
@@ -468,21 +469,86 @@ export const mockEngine = {
 
   createIncident: async (data: any): Promise<Incident> => {
     const newId = store.incidents.length + 1;
+    const severity = (data.severity || 'MEDIUM').toUpperCase() as IncidentSeverity;
+    const resolutionHours = Number(data.resolution_effort_hours) || 6.0;
+    const affectedModule = (data.affected_module || 'payments').toLowerCase();
+
+    // Severity weights for authentic economic loss calculations
+    const severityWeights: Record<string, number> = {
+      CRITICAL: 3.0,
+      HIGH: 2.0,
+      MEDIUM: 1.0,
+      LOW: 0.5
+    };
+    const weight = severityWeights[severity] || 1.0;
+
+    // Module Blast Radii based on transitive dependency reach
+    const blastRadii: Record<string, number> = {
+      database: 5,
+      payments: 4,
+      settlement: 3,
+      orders: 3,
+      checkout: 3,
+      auth: 2,
+      notification: 1,
+      inventory: 1
+    };
+    const blastRadius = blastRadii[affectedModule] || 2;
+
+    // Compounding economic drag formula:
+    // I(d) = λ1 * (Downtime * SeverityWeight) + λ2 * BlastRadius
+    const lambda1 = 0.85;
+    const lambda2 = 1.5;
+    const incrementalInterest = parseFloat(((lambda1 * (resolutionHours * weight)) + (lambda2 * blastRadius)).toFixed(1));
+
     const inc: Incident = {
       id: newId,
       project_id: data.project_id || 1,
       incident_number: `INC-${100 + newId}`,
       title: data.title,
       description: data.description,
-      severity: data.severity || 'MEDIUM',
+      severity,
       status: 'OPEN',
-      affected_module: data.affected_module || 'payments',
+      affected_module: affectedModule,
       affected_component: data.affected_component || 'Core Engine',
-      reported_by: data.reported_by || 'SRE Engineer',
-      resolution_effort_hours: data.resolution_effort_hours || 6.0,
+      reported_by: data.reported_by || 'SRE Observability Bot',
+      resolution_effort_hours: resolutionHours,
       reported_at: new Date().toISOString()
     };
+
     store.incidents = [inc, ...store.incidents];
+
+    // Dynamically attribute compounding drag interest to matching debts in this module
+    store.debts = store.debts.map(d => {
+      if (d.module_name.toLowerCase() === affectedModule) {
+        const newInterest = parseFloat((d.accrued_interest + incrementalInterest).toFixed(1));
+        const newBreakEven = newInterest > d.effort_principal;
+        return {
+          ...d,
+          accrued_interest: newInterest,
+          break_even_status: newBreakEven,
+          linked_incident_count: (d.linked_incident_count || 0) + 1,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return d;
+    });
+
+    // If a root cause was linked, increment its frequency and graph centrality in the causal network
+    if (data.root_cause_id) {
+      store.causeNodes = store.causeNodes.map(c => {
+        if (c.id === Number(data.root_cause_id)) {
+          return {
+            ...c,
+            incident_count: (c.incident_count || 1) + 1,
+            degree_centrality: parseFloat(Math.min(1.0, c.degree_centrality + 0.05).toFixed(3)),
+            betweenness_centrality: parseFloat(Math.min(1.0, c.betweenness_centrality + 0.04).toFixed(3))
+          };
+        }
+        return c;
+      });
+    }
+
     saveStore(store);
     return inc;
   },
@@ -638,6 +704,38 @@ export const mockEngine = {
       cc += ifs + lps + exc + bls;
     });
 
+    // Cognitive Complexity calculation (nesting depth penalty)
+    let cognitiveComplexity = 0;
+    lines.forEach(l => {
+      const trimmed = l.trim();
+      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('//')) return;
+      const indent = l.search(/\S|$/);
+      const nesting = Math.max(0, Math.floor(indent / 4));
+      const matchesDecision = (l.match(/\b(if|elif|for|while|except|catch)\b/g) || []).length;
+      if (matchesDecision > 0) {
+        cognitiveComplexity += matchesDecision + nesting;
+      }
+    });
+
+    // Halstead Software Science Metrics
+    const operators = (code.match(/[\+\-\*\/\=\<\>\!\&\|\%\:\;\,]/g) || []).length + cc;
+    const tokens = code.match(/\b[A-Za-z_][A-Za-z0-9_]*\b/g) || [];
+    const operands = tokens.length;
+    const uniqueOperators = Math.max(4, new Set(code.match(/[\+\-\*\/\=\<\>\!\&\|\%]/g) || []).size + 3);
+    const uniqueOperands = Math.max(4, new Set(tokens).size);
+    
+    const vocab = uniqueOperators + uniqueOperands;
+    const length = operators + operands;
+    const halsteadVolume = length > 0 && vocab > 0 ? parseFloat((length * Math.log2(vocab)).toFixed(1)) : 10.0;
+    const halsteadDifficulty = parseFloat(((uniqueOperators / 2) * (operands / Math.max(1, uniqueOperands))).toFixed(1));
+    const halsteadEffort = parseFloat((halsteadDifficulty * halsteadVolume).toFixed(1));
+    const estimatedBugs = parseFloat((halsteadVolume / 3000).toFixed(3));
+
+    // Maintainability Index (MI) - Microsoft / SEI standard formula
+    const loc = Math.max(1, lines.filter(l => l.trim().length > 0).length);
+    const rawMI = 171 - (5.2 * Math.log(Math.max(1, halsteadVolume))) - (0.23 * cc) - (16.2 * Math.log(loc));
+    const maintainabilityIndex = Math.min(100, Math.max(0, parseFloat(((rawMI / 171) * 100).toFixed(1))));
+
     const satdMarkers: any[] = [];
     lines.forEach((line, idx) => {
       const match = line.match(/#(.*?)(TODO|FIXME|HACK|BUG|OPTIMIZE|DEPRECATED):?\s*(.*)/i);
@@ -661,6 +759,16 @@ export const mockEngine = {
 
     return {
       cyclomatic_complexity: cc,
+      cognitive_complexity: cognitiveComplexity,
+      maintainability_index: maintainabilityIndex,
+      halstead: {
+        volume: halsteadVolume,
+        difficulty: halsteadDifficulty,
+        effort: halsteadEffort,
+        estimated_bugs: estimatedBugs,
+        vocabulary: vocab,
+        length
+      },
       risk_level: risk,
       recommendation,
       branch_breakdown: {
@@ -826,6 +934,25 @@ export const mockEngine = {
     const interestSaved = selectedItems.reduce((acc, it) => acc + it.accrued_interest, 0);
     const util = sprintBudgetHours > 0 ? (totalEffort / sprintBudgetHours) * 100 : 0;
 
+    // Greedy heuristic comparison: sort candidates by Risk / Effort ratio descending
+    const greedySorted = [...candidates].sort((a, b) => (b.risk_score / b.effort_principal) - (a.risk_score / a.effort_principal));
+    let greedyRemaining = remainingBudget;
+    const greedyChosenIds = new Set<number>(forced);
+    for (const item of greedySorted) {
+      if (item.effort_principal <= greedyRemaining) {
+        greedyChosenIds.add(item.id);
+        greedyRemaining -= item.effort_principal;
+      }
+    }
+    const greedySelected = pool.filter(d => greedyChosenIds.has(d.id));
+    const greedyEffort = greedySelected.reduce((acc, it) => acc + it.effort_principal, 0);
+    const greedyRisk = greedySelected.reduce((acc, it) => acc + it.risk_score, 0);
+    const greedyInterest = greedySelected.reduce((acc, it) => acc + it.accrued_interest, 0);
+
+    const optimalityAdvantage = greedyRisk > 0 
+      ? Math.max(0, parseFloat((((totalRisk - greedyRisk) / greedyRisk) * 100).toFixed(1)))
+      : 0;
+
     return {
       sprint_budget: sprintBudgetHours,
       total_effort_allocated: parseFloat(totalEffort.toFixed(1)),
@@ -856,7 +983,18 @@ export const mockEngine = {
         break_even_status: d.break_even_status,
         prerequisite_keys: d.prerequisite_ids.map(pid => store.debts.find(item => item.id === pid)?.debt_key || '')
       })),
-      remediation_order: selectedItems.map(d => d.debt_key)
+      remediation_order: selectedItems.map(d => d.debt_key),
+      algorithm_comparison: {
+        dp_risk: parseFloat(totalRisk.toFixed(2)),
+        dp_effort: parseFloat(totalEffort.toFixed(1)),
+        dp_interest: parseFloat(interestSaved.toFixed(2)),
+        greedy_risk: parseFloat(greedyRisk.toFixed(2)),
+        greedy_effort: parseFloat(greedyEffort.toFixed(1)),
+        greedy_interest: parseFloat(greedyInterest.toFixed(2)),
+        greedy_selected_keys: greedySelected.map(d => d.debt_key),
+        optimality_advantage_pct: optimalityAdvantage,
+        dp_subproblem_evaluations: n * W
+      }
     };
   },
 
@@ -882,6 +1020,46 @@ export const mockEngine = {
     const totalPrincipal = store.debts.reduce((acc, d) => acc + d.effort_principal, 0);
     const totalInterest = store.debts.reduce((acc, d) => acc + d.accrued_interest, 0);
     const breakEvenCount = store.debts.filter(d => d.break_even_status).length;
+
+    // Dynamically aggregate module exposures directly from registered technical debt and active telemetry
+    const blastRadii: Record<string, number> = {
+      database: 5,
+      payments: 4,
+      settlement: 3,
+      orders: 3,
+      checkout: 3,
+      auth: 2,
+      notification: 1,
+      inventory: 1
+    };
+
+    const moduleMap = new Map<string, { interest: number; debtCount: number }>();
+    store.debts.forEach(d => {
+      const mod = d.module_name.toLowerCase();
+      const curr = moduleMap.get(mod) || { interest: 0, debtCount: 0 };
+      curr.interest += d.accrued_interest;
+      curr.debtCount += 1;
+      moduleMap.set(mod, curr);
+    });
+
+    const highRiskModules = Array.from(moduleMap.entries()).map(([mod, data]) => ({
+      module: mod,
+      interest: parseFloat(data.interest.toFixed(1)),
+      blast_radius: blastRadii[mod] || 2,
+      debt_count: data.debtCount
+    })).sort((a, b) => b.interest - a.interest);
+
+    const finalModules = highRiskModules.length > 0 ? highRiskModules : [
+      { module: 'database', interest: 64.2, blast_radius: 5, debt_count: 1 },
+      { module: 'payments', interest: 32.5, blast_radius: 4, debt_count: 1 }
+    ];
+
+    // Rank systemic causes by betweenness and degree product
+    const rankedCauses = [...store.causeNodes].sort((a, b) => 
+      (b.betweenness_centrality * (b.degree_centrality + 0.1)) - 
+      (a.betweenness_centrality * (a.degree_centrality + 0.1))
+    );
+
     return {
       total_incidents: store.incidents.length,
       open_incidents: store.incidents.filter(i => i.status === 'OPEN').length,
@@ -891,15 +1069,8 @@ export const mockEngine = {
       total_principal_effort: parseFloat(totalPrincipal.toFixed(1)),
       total_accrued_interest: parseFloat(totalInterest.toFixed(1)),
       net_economic_drag: parseFloat((totalInterest - totalPrincipal).toFixed(1)),
-      high_risk_modules: [
-        { module: 'database', interest: 86.2, blast_radius: 5, debt_count: 2 },
-        { module: 'payments', interest: 32.5, blast_radius: 4, debt_count: 1 },
-        { module: 'settlement', interest: 28.0, blast_radius: 3, debt_count: 1 },
-        { module: 'checkout', interest: 14.2, blast_radius: 2, debt_count: 1 },
-        { module: 'auth', interest: 11.5, blast_radius: 2, debt_count: 1 },
-        { module: 'notification', interest: 9.8, blast_radius: 1, debt_count: 1 }
-      ],
-      top_systemic_causes: store.causeNodes.slice(0, 5).map(c => ({
+      high_risk_modules: finalModules,
+      top_systemic_causes: rankedCauses.slice(0, 5).map(c => ({
         id: c.id,
         description: c.description,
         category: c.category,

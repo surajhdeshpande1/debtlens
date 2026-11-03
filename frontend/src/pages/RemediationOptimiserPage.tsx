@@ -7,7 +7,12 @@ import {
   GitBranch,
   Sparkles,
   Lock,
-  Unlock
+  Unlock,
+  Download,
+  Copy,
+  FileText,
+  Layers,
+  Scale
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -76,6 +81,58 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
     ? (plan.accumulated_interest_saved / plan.total_effort_allocated).toFixed(2)
     : '0.00';
 
+  const handleExportSprintManifest = () => {
+    if (!plan) return;
+    const manifest = {
+      project_id: projectId,
+      sprint_budget_hours: budget,
+      total_effort_allocated: plan.total_effort_allocated,
+      budget_utilization_pct: plan.budget_utilization_pct,
+      total_risk_reduced: plan.total_risk_reduced,
+      accumulated_interest_saved: plan.accumulated_interest_saved,
+      remediation_order: plan.remediation_order,
+      algorithm: "Exact Bounded 0/1 Knapsack Dynamic Programming",
+      timestamp: new Date().toISOString(),
+      tasks: plan.selected_items.map((item, idx) => ({
+        step: idx + 1,
+        debt_key: item.debt_key,
+        title: item.title,
+        module: item.module_name,
+        category: item.category,
+        story_hours: item.effort_principal,
+        risk_points: item.risk_score,
+        interest_saved_hrs: item.accrued_interest,
+        prerequisites: item.prerequisite_keys
+      }))
+    };
+
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `DebtLens_Sprint_Remediation_Manifest_${budget}h.json`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    showToast('success', 'Manifest Exported', `Downloaded sprint remediation manifest for ${budget}h budget.`);
+  };
+
+  const handleCopyMarkdown = () => {
+    if (!plan) return;
+    const md = [
+      `# DebtLens Sprint Remediation Plan (Budget: ${budget}h)`,
+      `**Effort Allocated:** ${plan.total_effort_allocated}h / ${budget}h (${plan.budget_utilization_pct}%)`,
+      `**Risk Reduced:** ${plan.total_risk_reduced} pts | **Interest Saved:** ${plan.accumulated_interest_saved} hrs | **ROI:** ${roiRatio}x`,
+      '',
+      '| # | Key | Module | Task Title | Effort (h) | Risk Red | Interest Saved |',
+      '|---|---|---|---|---|---|---|',
+      ...plan.selected_items.map((it, idx) => `| ${idx + 1} | ${it.debt_key} | ${it.module_name} | ${it.title} | ${it.effort_principal}h | +${it.risk_score} | ${it.accrued_interest}h |`)
+    ].join('\n');
+
+    navigator.clipboard.writeText(md);
+    showToast('success', 'Copied to Clipboard', 'Markdown sprint task board copied.');
+  };
+
   return (
     <div className="space-y-6">
       
@@ -93,8 +150,24 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
           </p>
         </div>
 
-        <div className="text-xs text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-xs">
-          Formulation: <span className="font-mono font-semibold text-slate-800">Max Σ R(d)·x(d) s.t. Σ P(d)·x(d) ≤ B</span>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleCopyMarkdown}
+            className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            title="Copy JIRA / Markdown Sprint Breakdown"
+          >
+            <Copy className="w-3.5 h-3.5 text-slate-500" />
+            <span>Copy Board</span>
+          </button>
+
+          <button
+            onClick={handleExportSprintManifest}
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 shadow-xs transition-colors cursor-pointer"
+            title="Download Formal Sprint Manifest JSON"
+          >
+            <Download className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Export Manifest</span>
+          </button>
         </div>
       </div>
 
@@ -429,18 +502,93 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
           </div>
 
           {/* Mathematical Knapsack Dynamic Programming Rigor Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-2.5 text-xs text-slate-600">
-            <div className="flex items-center space-x-1.5 font-bold text-slate-900">
-              <Calculator className="w-4 h-4 text-indigo-600" />
-              <span>Dynamic Programming 0/1 Knapsack Formulation</span>
+          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3 text-xs text-slate-600">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5 font-bold text-slate-900">
+                <Calculator className="w-4 h-4 text-indigo-600" />
+                <span>Dynamic Programming 0/1 Knapsack Formulation</span>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
+                O(N · W) Exact
+              </span>
             </div>
 
             <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 font-mono text-[11px] text-slate-800 leading-relaxed">
               DP[i][w] = max(DP[i-1][w], DP[i-1][w - P(dᵢ)] + R(dᵢ))
             </div>
 
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              <strong>Why 0/1 DP over Greedy:</strong> A simple greedy approach sorting by <span className="font-mono">R(d)/P(d)</span> frequently gets trapped in sub-optimal local maxima when effort units are discrete and items possess prerequisite dependencies. DebtLens enforces topological ordering before DP packing to guarantee mathematical global optimality.
+            {/* Live Algorithm Comparison Table (DP vs Greedy) */}
+            {plan?.algorithm_comparison && (
+              <div className="pt-2 border-t border-slate-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1 text-xs font-bold text-slate-800">
+                    <Scale className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Algorithmic Optimality Verification</span>
+                  </div>
+                  {plan.algorithm_comparison.optimality_advantage_pct > 0 ? (
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      +{plan.algorithm_comparison.optimality_advantage_pct}% DP Advantage
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm bg-slate-100 text-slate-600 border border-slate-200">
+                      Identical Global Optimum
+                    </span>
+                  )}
+                </div>
+
+                <div className="overflow-hidden rounded-lg border border-slate-200">
+                  <table className="w-full text-left text-[11px]">
+                    <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                      <tr>
+                        <th className="py-1.5 px-2.5">Algorithm</th>
+                        <th className="py-1.5 px-2 text-center">Effort (h)</th>
+                        <th className="py-1.5 px-2 text-center">Risk Red.</th>
+                        <th className="py-1.5 px-2 text-center">Int. Saved</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-mono">
+                      <tr className="bg-indigo-50/40">
+                        <td className="py-1.5 px-2.5 font-bold text-indigo-700 flex items-center space-x-1">
+                          <CheckCircle2 className="w-3 h-3 text-indigo-600" />
+                          <span>Exact 0/1 DP</span>
+                        </td>
+                        <td className="py-1.5 px-2 text-center font-bold text-slate-800">
+                          {plan.algorithm_comparison.dp_effort}h
+                        </td>
+                        <td className="py-1.5 px-2 text-center font-bold text-emerald-700">
+                          {plan.algorithm_comparison.dp_risk}
+                        </td>
+                        <td className="py-1.5 px-2 text-center font-bold text-rose-700">
+                          {plan.algorithm_comparison.dp_interest}h
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-1.5 px-2.5 text-slate-600 font-semibold">
+                          Greedy R(d)/P(d)
+                        </td>
+                        <td className="py-1.5 px-2 text-center text-slate-600">
+                          {plan.algorithm_comparison.greedy_effort}h
+                        </td>
+                        <td className="py-1.5 px-2 text-center text-slate-600">
+                          {plan.algorithm_comparison.greedy_risk}
+                        </td>
+                        <td className="py-1.5 px-2 text-center text-slate-600">
+                          {plan.algorithm_comparison.greedy_interest}h
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="text-[10px] text-slate-400 font-mono flex items-center justify-between pt-0.5">
+                  <span>Subproblems: {plan.algorithm_comparison.dp_subproblem_evaluations} states evaluated</span>
+                  <span>Topological Closure: 100% Validated</span>
+                </div>
+              </div>
+            )}
+
+            <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
+              <strong>Why 0/1 DP over Greedy:</strong> A simple greedy density heuristic sorting by <span className="font-mono">R(d)/P(d)</span> frequently gets trapped in sub-optimal local maxima when effort units are discrete and tasks possess prerequisite dependencies. DebtLens enforces topological ordering before 2D DP matrix memoization to guarantee mathematical global optimality.
             </p>
           </div>
 

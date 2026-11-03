@@ -134,6 +134,17 @@ export interface RemediationPlan {
   selected_items: RemediationPlanItem[];
   deferred_items: RemediationPlanItem[];
   remediation_order: string[];
+  algorithm_comparison?: {
+    dp_risk: number;
+    dp_effort: number;
+    dp_interest: number;
+    greedy_risk: number;
+    greedy_effort: number;
+    greedy_interest: number;
+    greedy_selected_keys: string[];
+    optimality_advantage_pct: number;
+    dp_subproblem_evaluations: number;
+  };
 }
 
 export interface WhatIfScenario {

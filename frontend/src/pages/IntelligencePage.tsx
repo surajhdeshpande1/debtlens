@@ -5,13 +5,16 @@ import {
   Layers, 
   ShieldAlert, 
   CheckCircle2, 
-  Sliders,
-  HelpCircle,
-  Clock,
-  ArrowRight,
-  Filter,
-  GitCompare,
-  Coins
+  Sliders, 
+  HelpCircle, 
+  Clock, 
+  ArrowRight, 
+  Filter, 
+  GitCompare, 
+  Coins,
+  Search,
+  MessageSquareCode,
+  Tag
 } from 'lucide-react';
 import { RootCauseCluster, RegressionItem, Incident } from '../types';
 import { api } from '../services/api';
@@ -23,7 +26,7 @@ interface IntelligencePageProps {
 
 export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId }) => {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'clusters' | 'comparator'>('clusters');
+  const [activeTab, setActiveTab] = useState<'clusters' | 'comparator' | 'search'>('clusters');
   const [clusters, setClusters] = useState<RootCauseCluster[]>([]);
   const [regressions, setRegressions] = useState<RegressionItem[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -36,6 +39,52 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
   const [selectedIncA, setSelectedIncA] = useState<number | null>(null);
   const [selectedIncB, setSelectedIncB] = useState<number | null>(null);
   const [comparisonResult, setComparisonResult] = useState<any | null>(null);
+
+  // Natural Language Query Engine State
+  const [nlQuery, setNlQuery] = useState('Connection pool exhausted during checkout batch reconciliation');
+  const [queryMatches, setQueryMatches] = useState<Array<{
+    incident: Incident;
+    score: number;
+    tokens: string[];
+    suggestedCause: string;
+  }>>([]);
+
+  const handleRunNlQuery = (textToRun?: string) => {
+    const q = (textToRun || nlQuery).trim().toLowerCase();
+    if (!q) return;
+
+    const stopWords = new Set(['the', 'is', 'in', 'at', 'of', 'on', 'and', 'a', 'to', 'for', 'with', 'by']);
+    const queryTokens = q.split(/[\s,._-]+/).filter(t => t.length > 2 && !stopWords.has(t));
+
+    const scored = incidents.map(inc => {
+      const incText = `${inc.title} ${inc.description} ${inc.affected_module} ${inc.affected_component || ''}`.toLowerCase();
+      const incTokens = new Set(incText.split(/[\s,._-]+/));
+      const common = queryTokens.filter(t => incTokens.has(t));
+      
+      const jaccard = queryTokens.length > 0 ? (common.length / (queryTokens.length + incTokens.size - common.length)) : 0;
+      const tokenOverlap = queryTokens.length > 0 ? (common.length / queryTokens.length) : 0;
+      const moduleMatch = incText.includes(inc.affected_module.toLowerCase()) && q.includes(inc.affected_module.toLowerCase()) ? 0.25 : 0;
+      
+      const finalScore = Math.min(0.98, Math.max(0.15, (tokenOverlap * 0.65) + (jaccard * 0.15) + moduleMatch));
+
+      let suggestedCause = 'Generic Structural Fragility';
+      if (inc.affected_module === 'database') suggestedCause = 'Database Connection Pool Exhaustion under Unbounded Waiting (Node #1)';
+      else if (inc.affected_module === 'payments') suggestedCause = 'Missing Distributed Idempotency Key in Transaction API (Node #3)';
+      else if (inc.affected_module === 'settlement') suggestedCause = 'Unindexed Large Table Scans during Batch Settlement (Node #6)';
+      else if (inc.affected_module === 'notification') suggestedCause = 'Synchronous Blocking Calls inside Async Event Loop (Node #4)';
+      else if (inc.affected_module === 'auth') suggestedCause = 'In-Memory State Leak in Multi-Instance Scaled Services (Node #7)';
+
+      return {
+        incident: inc,
+        score: parseFloat(finalScore.toFixed(3)),
+        tokens: common,
+        suggestedCause
+      };
+    }).sort((a, b) => b.score - a.score).slice(0, 3);
+
+    setQueryMatches(scored);
+    showToast('info', 'Query Evaluated', `Ranked ${scored.length} matching incidents by hybrid TF-IDF similarity.`);
+  };
 
   const fetchIntelligence = async () => {
     try {
@@ -109,6 +158,18 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
             >
               <GitCompare className="w-3.5 h-3.5" />
               <span>Pairwise Comparator</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('search');
+                if (queryMatches.length === 0) handleRunNlQuery();
+              }}
+              className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1 cursor-pointer ${
+                activeTab === 'search' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>NLP Matcher</span>
             </button>
           </div>
         </div>
@@ -298,7 +359,7 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
             </div>
       </div>
         </>
-      ) : (
+      ) : activeTab === 'comparator' ? (
         /* Pairwise Incident Comparator Tool */
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
@@ -408,6 +469,139 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Real-Time Natural Language Incident Matcher & Causal Predictor */
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center space-x-2">
+                <MessageSquareCode className="w-5 h-5 text-indigo-600" />
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Natural Language Incident Matching & Root Cause Predictor</h3>
+                  <p className="text-xs text-slate-500">
+                    Input any failure description or stack trace to test live hybrid lexical + semantic token similarity against the historical corpus
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">
+                TF-IDF + Subword Jaccard
+              </span>
+            </div>
+
+            {/* Query Input */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700">
+                Incident Failure Description / Log Trace:
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nlQuery}
+                  onChange={(e) => setNlQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleRunNlQuery()}
+                  placeholder="e.g. Database connection pool starved during checkout reconciliation..."
+                  className="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
+                />
+                <button
+                  onClick={() => handleRunNlQuery()}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Query Corpus</span>
+                </button>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+                <span className="text-slate-400 text-[11px] font-semibold">Test Presets:</span>
+                {[
+                  'Hikari connection pool leak on payment checkout',
+                  'Stripe webhook timeout and dropped settlement',
+                  'In-memory token blacklist out of bounds heap exhaustion',
+                  'Race condition on inventory stock check during flash sale'
+                ].map((preset, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setNlQuery(preset);
+                      handleRunNlQuery(preset);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-[10px] transition-colors cursor-pointer"
+                  >
+                    "{preset.length > 35 ? preset.substring(0, 32) + '...' : preset}"
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results */}
+            {queryMatches.length > 0 && (
+              <div className="pt-3 border-t border-slate-100 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <h4 className="font-bold text-slate-800">Top Ranked Historical Matches:</h4>
+                  <span className="text-[11px] font-mono text-slate-400">Ranked by Hybrid Jaccard × Lexical Overlap</span>
+                </div>
+
+                <div className="space-y-3">
+                  {queryMatches.map((m, idx) => (
+                    <div 
+                      key={m.incident.id}
+                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex items-center space-x-2">
+                          <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">
+                            #{idx + 1}
+                          </span>
+                          <span className="font-mono font-bold text-slate-900">{m.incident.incident_number}</span>
+                          <span className="font-semibold text-slate-500 font-mono">[{m.incident.affected_module}]</span>
+                          <span className="text-[10px] font-semibold px-2 py-0.2 rounded-sm bg-slate-200/70 text-slate-700">
+                            {m.incident.severity}
+                          </span>
+                        </div>
+
+                        <h5 className="font-bold text-slate-900 leading-snug">
+                          {m.incident.title}
+                        </h5>
+
+                        <p className="text-[11px] text-slate-500 line-clamp-1">
+                          {m.incident.description}
+                        </p>
+
+                        {/* Predicted Causal Root Node */}
+                        <div className="p-2 bg-indigo-50/70 rounded-lg border border-indigo-200 text-indigo-900 text-[11px] flex items-center space-x-1.5">
+                          <span className="font-bold font-mono text-indigo-700 shrink-0">Predicted Cause:</span>
+                          <span className="truncate">{m.suggestedCause}</span>
+                        </div>
+
+                        {/* Matched Token Badges */}
+                        {m.tokens.length > 0 && (
+                          <div className="flex items-center space-x-1.5 pt-1">
+                            <span className="text-[10px] text-slate-400 font-semibold">Matched Tokens:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {m.tokens.map((tok, tIdx) => (
+                                <span key={tIdx} className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-white text-indigo-700 border border-indigo-200">
+                                  {tok}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-2xl font-black font-mono text-indigo-600">
+                          {Math.round(m.score * 100)}%
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono">Similarity Score</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

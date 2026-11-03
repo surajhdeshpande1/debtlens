@@ -6,15 +6,16 @@ import {
   Plus, 
   CheckCircle, 
   Clock, 
-  ArrowRight,
-  ExternalLink,
-  GitFork,
-  Sparkles,
-  ShieldAlert,
-  Coins,
-  Download,
-  RotateCcw,
-  Check
+  ArrowRight, 
+  ExternalLink, 
+  GitFork, 
+  Sparkles, 
+  ShieldAlert, 
+  Coins, 
+  Download, 
+  RotateCcw, 
+  Check,
+  Activity
 } from 'lucide-react';
 import { Incident, IncidentSeverity, IncidentStatus, SimilarIncidentMatch, DebtCategory } from '../types';
 import { api } from '../services/api';
@@ -116,6 +117,48 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
     }
   };
 
+  const handleSimulateTelemetrySpike = async () => {
+    try {
+      const syntheticIncidents = [
+        {
+          title: 'Redis Cluster Split-Brain Partition Timeout during Card Verification',
+          description: 'Distributed Redlock heartbeat latency exceeded 2500ms under concurrent traffic, triggering payment authorization retries.',
+          severity: 'HIGH',
+          affected_module: 'payments',
+          affected_component: 'Distributed Lock Interceptor',
+          resolution_effort_hours: 8.5
+        },
+        {
+          title: 'Database Read Replica Replication Lag Exceeded SLA Threshold',
+          description: 'Long-running settlement report transaction saturated IOPS on replica pool, delaying order status queries by 42 minutes.',
+          severity: 'HIGH',
+          affected_module: 'database',
+          affected_component: 'Hikari Replica Pool',
+          resolution_effort_hours: 11.0
+        },
+        {
+          title: 'Async Notification Webhook Worker Out-Of-Memory Crash',
+          description: 'Unbounded in-memory queue consumer heap exhausted during marketing flash campaign dispatch.',
+          severity: 'MEDIUM',
+          affected_module: 'notification',
+          affected_component: 'Event Streamer',
+          resolution_effort_hours: 5.5
+        }
+      ];
+
+      const chosen = syntheticIncidents[Math.floor(Math.random() * syntheticIncidents.length)];
+      await api.createIncident({
+        ...chosen,
+        project_id: projectId
+      });
+      showToast('warning', 'Live Telemetry Ingested', `Ingested: ${chosen.title}. Economic drag I(d) updated.`);
+      await fetchIncidents();
+    } catch (e) {
+      console.error(e);
+      showToast('error', 'Simulation Failed', 'Could not ingest synthetic telemetry event.');
+    }
+  };
+
   const severityBadge = (sev: IncidentSeverity) => {
     switch (sev) {
       case 'CRITICAL':
@@ -175,6 +218,15 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         </div>
 
         <div className="flex items-center space-x-2 self-start sm:self-auto">
+          <button
+            onClick={handleSimulateTelemetrySpike}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            title="Simulate Real-Time Telemetry Incident Ingestion"
+          >
+            <Activity className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+            <span>Simulate Telemetry</span>
+          </button>
+
           <button
             onClick={handleExportCsv}
             className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"

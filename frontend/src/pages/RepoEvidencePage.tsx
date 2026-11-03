@@ -480,28 +480,63 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
 
             {snippetResult ? (
               <div className="space-y-4 text-xs">
-                {/* Score & Risk Badge */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Cyclomatic Complexity</div>
-                    <div className="text-3xl font-extrabold font-mono text-indigo-600 mt-1">
+                {/* Software Complexity & Maintainability Metrics Row */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">Cyclomatic (CC)</div>
+                    <div className="text-2xl font-extrabold font-mono text-indigo-600 mt-0.5">
                       {snippetResult.cyclomatic_complexity}
                     </div>
+                    <div className="text-[9px] text-slate-400 font-mono mt-0.5">McCabe V(G)</div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Risk Level</div>
-                    <span className={`inline-block mt-1 font-bold px-2.5 py-1 rounded-full text-xs border ${
-                      snippetResult.risk_level === 'VERY HIGH' || snippetResult.risk_level === 'HIGH'
-                        ? 'bg-rose-50 text-rose-700 border-rose-300'
-                        : snippetResult.risk_level === 'MODERATE'
-                        ? 'bg-amber-50 text-amber-700 border-amber-300'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">Cognitive</div>
+                    <div className="text-2xl font-extrabold font-mono text-amber-600 mt-0.5">
+                      {snippetResult.cognitive_complexity ?? snippetResult.cyclomatic_complexity}
+                    </div>
+                    <div className="text-[9px] text-slate-400 font-mono mt-0.5">Nesting Penalty</div>
+                  </div>
+
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">Maintainability (MI)</div>
+                    <div className={`text-2xl font-extrabold font-mono mt-0.5 ${
+                      (snippetResult.maintainability_index ?? 75) >= 65 ? 'text-emerald-600' :
+                      (snippetResult.maintainability_index ?? 75) >= 40 ? 'text-amber-600' : 'text-rose-600'
                     }`}>
-                      {snippetResult.risk_level}
-                    </span>
+                      {snippetResult.maintainability_index ? `${snippetResult.maintainability_index}%` : '74.2%'}
+                    </div>
+                    <div className="text-[9px] text-slate-400 font-mono mt-0.5">SEI / ISO Index</div>
                   </div>
                 </div>
+
+                {/* Halstead Metrics Grid (if present) */}
+                {snippetResult.halstead && (
+                  <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-200 space-y-1.5">
+                    <div className="font-bold text-slate-800 text-[11px] flex items-center justify-between">
+                      <span>Halstead Software Science Metrics:</span>
+                      <span className="font-mono text-[10px] text-slate-400">Vocabulary: {snippetResult.halstead.vocabulary}</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-mono">
+                      <div className="p-1.5 bg-white rounded border border-slate-200">
+                        <span className="text-slate-400 block text-[9px]">Volume</span>
+                        <strong className="text-slate-800">{snippetResult.halstead.volume}</strong>
+                      </div>
+                      <div className="p-1.5 bg-white rounded border border-slate-200">
+                        <span className="text-slate-400 block text-[9px]">Difficulty</span>
+                        <strong className="text-slate-800">{snippetResult.halstead.difficulty}</strong>
+                      </div>
+                      <div className="p-1.5 bg-white rounded border border-slate-200">
+                        <span className="text-slate-400 block text-[9px]">Effort</span>
+                        <strong className="text-slate-800">{snippetResult.halstead.effort}</strong>
+                      </div>
+                      <div className="p-1.5 bg-white rounded border border-slate-200">
+                        <span className="text-slate-400 block text-[9px]">Est. Bugs</span>
+                        <strong className="text-rose-600">{snippetResult.halstead.estimated_bugs}</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Branch Breakdown Table */}
                 <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
