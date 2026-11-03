@@ -100,23 +100,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
           <button
-            onClick={() => onNavigateTab('demo')}
-            className="h-9 px-4 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-[#064E3B] inline-flex items-center space-x-2 active:scale-[0.99] whitespace-nowrap"
-            title="Launch 1-Click Interactive Demo Pipeline"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-pulse shrink-0" />
-            <span>Interactive Demo</span>
-          </button>
-          <button
             onClick={onOpenReportModal}
-            className="h-9 px-3.5 rounded-md bg-white hover:bg-[#F9F8F5] text-[#0A2E23] text-xs font-semibold border border-[#D8D4C8] shadow-2xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap"
+            className="h-9 px-4 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold border border-[#064E3B] shadow-xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap active:scale-[0.99]"
           >
-            <Plus className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+            <Plus className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
             <span>Intake Incident</span>
           </button>
           <button
             onClick={() => onNavigateTab('optimiser')}
-            className="h-9 px-3.5 rounded-md bg-[#0A2E23] hover:bg-[#05231B] text-white text-xs font-semibold border border-[#0A2E23] shadow-2xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap"
+            className="h-9 px-4 rounded-md bg-[#0A2E23] hover:bg-[#05231B] text-white text-xs font-semibold border border-[#0A2E23] shadow-xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap"
           >
             <span>Run Optimiser</span>
             <ArrowRight className="w-3.5 h-3.5 text-emerald-200 shrink-0" />

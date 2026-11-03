@@ -178,18 +178,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E2DA] shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E2DA] shadow-[0_1px_4px_rgba(0,0,0,0.03)] select-none">
       
       {/* TIER 1: Executive Brand, Search, Telemetry, and Actions */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-15 flex items-center justify-between gap-3 border-b border-[#F0EDE5]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-15 flex items-center justify-between gap-2.5 sm:gap-4 border-b border-[#F0EDE5]">
         
-        {/* Brand & Workspace Scope */}
+        {/* Left: Brand & Academic Scope Context */}
         <div className="flex items-center space-x-3 shrink-0">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-md bg-[#064E3B] flex items-center justify-center text-white shadow-xs border border-[#053D2E]">
+          <div 
+            className="flex items-center space-x-2.5 cursor-pointer" 
+            onClick={() => setCurrentTab('dashboard')}
+            title="Return to Executive Overview"
+          >
+            <div className="w-8 h-8 rounded-md bg-[#064E3B] flex items-center justify-center text-white shadow-xs border border-[#053D2E] shrink-0">
               <Layers className="w-4 h-4 text-emerald-200" />
             </div>
-            <div className="flex items-baseline space-x-1.5">
+            <div className="flex items-baseline space-x-1.5 shrink-0">
               <span className="text-base font-extrabold tracking-tight text-[#0A2E23] font-sans">
                 DEBTLENS
               </span>
@@ -199,28 +203,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          <div className="hidden xl:flex items-center text-stone-300 font-light">|</div>
+          <div className="hidden xl:block text-stone-300 font-light">|</div>
 
           {/* Academic Endorsement & Scope Pill */}
-          <div className="hidden xl:flex items-center space-x-2 text-xs text-stone-700 px-3 py-1 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] h-8">
+          <div className="hidden xl:flex items-center space-x-2 text-xs text-stone-700 px-3 py-1 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] h-8.5 shrink-0 whitespace-nowrap">
             <Building className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
             <span className="font-semibold text-stone-600">BEC Bagalkote</span>
             <span className="text-stone-300">/</span>
-            <span className="font-bold text-[#0A2E23] whitespace-nowrap">Payments Core (PAY)</span>
+            <span className="font-bold text-[#0A2E23]">Payments Core (PAY)</span>
           </div>
         </div>
 
-        {/* Center: Command Palette Trigger */}
-        <div className="flex-1 max-w-sm mx-3 hidden lg:block">
+        {/* Center: Command Palette Trigger with Fixed Safe Width */}
+        <div className="hidden md:flex items-center shrink-0">
           <button
             onClick={onOpenCommandPalette}
-            className="w-full h-8.5 flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group"
+            className="w-48 lg:w-56 xl:w-64 h-8.5 flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden"
             title="Press ⌘K or Ctrl+K to search"
           >
-            <div className="flex items-center space-x-2 min-w-0 pr-2">
+            <div className="flex items-center space-x-2 min-w-0 pr-1.5 overflow-hidden">
               <Search className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#064E3B] transition-colors shrink-0" />
               <span className="text-stone-500 group-hover:text-[#0A2E23] font-medium truncate whitespace-nowrap">
-                Search commands, incidents, ledger...
+                Search commands, ledger...
               </span>
             </div>
             <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-stone-600 bg-white border border-[#E5E2DA] rounded-sm shrink-0">
@@ -232,10 +236,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Actions: Live Status, PDF, 1-Click Demo, RBAC */}
         <div className="flex items-center space-x-2 shrink-0">
           
+          {/* Mobile search button (< md) */}
+          <button
+            onClick={onOpenCommandPalette}
+            className="md:hidden h-8.5 w-8.5 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center shrink-0 cursor-pointer"
+            title="Search (⌘K)"
+          >
+            <Search className="w-3.5 h-3.5 text-stone-500" />
+          </button>
+
           {/* Live Telemetry Indicator */}
-          <div className="hidden sm:flex items-center space-x-1.5 px-2.5 h-8.5 rounded-md text-xs font-mono font-semibold text-[#065F46] bg-[#ECFDF5] border border-[#A7F3D0] whitespace-nowrap">
+          <div className="hidden lg:flex items-center space-x-1.5 px-2.5 h-8.5 rounded-md text-xs font-mono font-bold text-[#065F46] bg-[#ECFDF5] border border-[#A7F3D0] whitespace-nowrap shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
-            <span>asia-south1 • Live</span>
+            <span className="whitespace-nowrap">asia-south1 • Live</span>
           </div>
 
           {/* Quick Refresh Seed Data */}
@@ -243,7 +256,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={handleReloadSeed}
             disabled={isReloading}
             title="Reset test dataset to baseline"
-            className="h-8.5 w-8.5 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-8.5 w-8.5 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center transition-colors disabled:opacity-50 cursor-pointer shrink-0 shadow-2xs"
           >
             <RotateCcw className={`w-3.5 h-3.5 ${isReloading ? 'animate-spin text-[#064E3B]' : ''}`} />
           </button>
@@ -252,37 +265,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="h-8.5 px-3 rounded-md text-xs font-semibold text-[#0A2E23] bg-white hover:bg-[#F9F8F5] border border-[#D8D4C8] inline-flex items-center space-x-1.5 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap shadow-2xs"
+            className="h-8.5 px-3 rounded-md text-xs font-semibold text-[#0A2E23] bg-white hover:bg-[#F9F8F5] border border-[#D8D4C8] inline-flex items-center space-x-1.5 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap shadow-2xs shrink-0"
           >
             <FileDown className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
-            <span className="hidden sm:inline">{isDownloadingPdf ? 'Generating...' : 'Audit PDF'}</span>
+            <span className="hidden sm:inline whitespace-nowrap">{isDownloadingPdf ? 'Generating...' : 'Audit PDF'}</span>
           </button>
 
           {/* Standout 1-Click Interactive Demo Button */}
           {onLaunchDemo && (
             <button
               onClick={onLaunchDemo}
-              className="h-8.5 px-3.5 rounded-md text-xs font-bold text-white bg-[#065F46] hover:bg-[#044E38] border border-[#044E38] inline-flex items-center space-x-1.5 transition-all cursor-pointer shadow-xs active:scale-[0.99] whitespace-nowrap"
+              className="h-8.5 px-3.5 rounded-md text-xs font-bold text-white bg-[#065F46] hover:bg-[#044E38] border border-[#044E38] inline-flex items-center space-x-1.5 transition-all cursor-pointer shadow-xs active:scale-[0.99] whitespace-nowrap shrink-0"
               title="Launch Interactive 1-Click Operational Pipeline Walkthrough"
             >
               <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-pulse shrink-0" />
-              <span>Interactive Demo</span>
-              <span className="ml-1 text-[9px] font-mono px-1 py-0.2 rounded-xs bg-[#0A2E23] text-emerald-200 font-bold">1-CLICK</span>
+              <span className="whitespace-nowrap">Interactive Demo</span>
+              <span className="ml-1 text-[9px] font-mono px-1 py-0.2 rounded-xs bg-[#0A2E23] text-emerald-200 font-bold shrink-0">1-CLICK</span>
             </button>
           )}
 
-          <div className="h-5 w-px bg-[#E5E2DA]" />
+          <div className="h-5 w-px bg-[#E5E2DA] shrink-0 mx-0.5" />
 
           {/* Role Switcher */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-              className="h-8.5 px-2 rounded-md hover:bg-[#F4F2EB] border border-[#E5E2DA] bg-white flex items-center space-x-2 transition-colors cursor-pointer group"
+              className="h-8.5 px-2.5 rounded-md hover:bg-[#F4F2EB] border border-[#E5E2DA] bg-white flex items-center space-x-2 transition-colors cursor-pointer group shrink-0 shadow-2xs"
             >
               <div className="w-6 h-6 rounded-md bg-[#064E3B] text-white flex items-center justify-center font-bold text-[10px] shrink-0">
                 {currentRoleObj.initials}
               </div>
-              <div className="hidden sm:block text-left text-xs leading-none">
+              <div className="hidden sm:block text-left text-xs leading-none whitespace-nowrap">
                 <span className="font-bold text-[#0A2E23] block">{currentRoleObj.label}</span>
               </div>
               <ChevronDown className="w-3 h-3 text-stone-400 group-hover:text-[#0A2E23] transition-colors shrink-0" />
@@ -319,80 +332,82 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* TIER 2: Top-Bar Executive Cockpit Module Navigation */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center overflow-x-auto no-scrollbar">
-        <nav className="flex items-center space-x-1 sm:space-x-1.5 w-full">
-          
-          {/* Group 1: Core Intelligence */}
-          <div className="flex items-center space-x-1 shrink-0">
-            {coreNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentTab(item.id)}
-                  className={`h-9 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                    isActive
-                      ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs'
-                      : 'bg-transparent text-stone-700 hover:text-[#0A2E23] hover:bg-[#F2EFE8] border-transparent'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-400'}`} />
-                  <span>{item.label}</span>
-                  
-                  <span className={`text-[9px] font-mono px-1 py-0.2 rounded-xs border ${
-                    isActive ? 'bg-white/20 text-white border-white/30' : 'bg-[#F4F2EB] text-stone-600 border-[#E2DFD6]'
-                  }`}>
-                    {item.moduleCode}
-                  </span>
-
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-xs border ${getBadgeStyle(item.badgeType, isActive)}`}>
-                      {item.badge}
+      <div className="bg-[#FAF9F6] border-b border-[#E5E2DA]">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center overflow-x-auto no-scrollbar">
+          <nav className="flex items-center space-x-1 sm:space-x-1.5 w-full min-w-max py-1">
+            
+            {/* Group 1: Core Intelligence */}
+            <div className="flex items-center space-x-1 shrink-0">
+              {coreNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentTab(item.id)}
+                    className={`h-8.5 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+                      isActive
+                        ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
+                        : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
+                    <span className="whitespace-nowrap">{item.label}</span>
+                    
+                    <span className={`text-[9px] font-mono px-1 py-0.2 rounded-xs border shrink-0 ${
+                      isActive ? 'bg-white/20 text-white border-white/30' : 'bg-[#F4F2EB] text-stone-600 border-[#E2DFD6]'
+                    }`}>
+                      {item.moduleCode}
                     </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
 
-          <div className="h-5 w-px bg-[#E5E2DA] shrink-0 mx-1" />
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Group 2: Remediation & Architecture */}
-          <div className="flex items-center space-x-1 shrink-0">
-            {remediationNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentTab(item.id)}
-                  className={`h-9 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                    isActive
-                      ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs'
-                      : 'bg-transparent text-stone-700 hover:text-[#0A2E23] hover:bg-[#F2EFE8] border-transparent'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-400'}`} />
-                  <span>{item.label}</span>
+            <div className="h-5 w-px bg-[#D8D4C8] shrink-0 mx-1.5" />
 
-                  <span className={`text-[9px] font-mono px-1 py-0.2 rounded-xs border ${
-                    isActive ? 'bg-white/20 text-white border-white/30' : 'bg-[#F4F2EB] text-stone-600 border-[#E2DFD6]'
-                  }`}>
-                    {item.moduleCode}
-                  </span>
+            {/* Group 2: Remediation & Architecture */}
+            <div className="flex items-center space-x-1 shrink-0">
+              {remediationNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentTab(item.id)}
+                    className={`h-8.5 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+                      isActive
+                        ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
+                        : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
+                    <span className="whitespace-nowrap">{item.label}</span>
 
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-xs border ${getBadgeStyle(item.badgeType, isActive)}`}>
-                      {item.badge}
+                    <span className={`text-[9px] font-mono px-1 py-0.2 rounded-xs border shrink-0 ${
+                      isActive ? 'bg-white/20 text-white border-white/30' : 'bg-[#F4F2EB] text-stone-600 border-[#E2DFD6]'
+                    }`}>
+                      {item.moduleCode}
                     </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
 
-        </nav>
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+          </nav>
+        </div>
       </div>
 
     </header>
