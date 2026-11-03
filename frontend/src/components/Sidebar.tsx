@@ -4,10 +4,11 @@ import {
   AlertCircle, 
   GitFork, 
   Coins, 
-  Calculator, 
   GitBranch, 
   Sparkles, 
-  BookOpen
+  Calculator, 
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 
 export type NavTab = 
@@ -15,9 +16,9 @@ export type NavTab =
   | 'incidents' 
   | 'causal' 
   | 'debt' 
-  | 'optimiser' 
   | 'repository' 
   | 'intelligence' 
+  | 'optimiser' 
   | 'knowledge'
   | 'demo';
 
@@ -32,17 +33,16 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   setCurrentTab,
-  openIncidentsCount = 2,
-  breakevenDebtCount = 6,
-  regressionsCount = 1
+  openIncidentsCount = 0,
+  breakevenDebtCount = 0,
+  regressionsCount = 0
 }) => {
-
-  const coreNavItems: { 
+  const navItems: { 
     id: NavTab; 
     label: string; 
     icon: React.ComponentType<{ className?: string }>; 
     badge?: number; 
-    badgeVariant?: 'solid' | 'subtle' | 'neutral';
+    badgeVariant?: 'rose' | 'amber' | 'neutral';
     moduleCode: string;
   }[] = [
     {
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Incident Management',
       icon: AlertCircle,
       badge: openIncidentsCount,
-      badgeVariant: 'solid',
+      badgeVariant: 'amber',
       moduleCode: 'M2'
     },
     {
@@ -70,24 +70,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Technical Debt Ledger',
       icon: Coins,
       badge: breakevenDebtCount,
-      badgeVariant: 'solid',
+      badgeVariant: 'rose',
       moduleCode: 'M4'
-    }
-  ];
-
-  const remediationNavItems: {
-    id: NavTab;
-    label: string;
-    icon: React.ComponentType<{ className?: string }>; 
-    badge?: number; 
-    badgeVariant?: 'solid' | 'subtle' | 'neutral';
-    moduleCode: string;
-  }[] = [
-    {
-      id: 'optimiser',
-      label: 'Payoff Optimiser (0/1)',
-      icon: Calculator,
-      moduleCode: 'M7'
     },
     {
       id: 'repository',
@@ -100,8 +84,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Incident Intelligence',
       icon: Sparkles,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
-      badgeVariant: 'subtle',
+      badgeVariant: 'neutral',
       moduleCode: 'M6'
+    },
+    {
+      id: 'optimiser',
+      label: 'Payoff Optimiser (0/1)',
+      icon: Calculator,
+      moduleCode: 'M7'
     },
     {
       id: 'knowledge',
@@ -111,105 +101,88 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  const getBadgeClass = (variant?: 'solid' | 'subtle' | 'neutral') => {
+  const getBadgeClass = (variant?: 'rose' | 'amber' | 'neutral') => {
     switch (variant) {
-      case 'solid':
-        return 'bg-black text-white border-black';
-      case 'subtle':
-        return 'bg-zinc-800 text-white border-zinc-700';
+      case 'rose':
+        return 'bg-rose-50 text-rose-700 border-rose-200/80';
+      case 'amber':
+        return 'bg-amber-50 text-amber-700 border-amber-200/80';
       default:
-        return 'bg-zinc-100 text-zinc-800 border-zinc-300';
+        return 'bg-slate-100 text-slate-700 border-slate-200/80';
     }
   };
 
-  const renderNavGroup = (items: typeof coreNavItems) => (
-    <div className="space-y-1.5">
-      {items.map((item) => {
-        const Icon = item.icon;
-        const isActive = currentTab === item.id;
-        return (
-          <button
-            key={item.id}
-            onClick={() => setCurrentTab(item.id)}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
-              isActive
-                ? 'bg-zinc-100 text-black font-bold border border-zinc-300 border-l-4 border-l-black shadow-2xs'
-                : 'text-zinc-600 hover:bg-zinc-50 hover:text-black font-medium border border-transparent'
-            }`}
-          >
-            <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
-              <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                isActive ? 'text-black' : 'text-zinc-400 group-hover:text-black'
-              }`} />
-              <span className="truncate">{item.label}</span>
-            </div>
-
-            <div className="flex items-center space-x-1.5 shrink-0">
-              <span className="text-[10px] text-zinc-500 font-mono font-semibold px-1.5 py-0.5 rounded-sm bg-zinc-100 border border-zinc-200">
-                {item.moduleCode}
-              </span>
-              {item.badge !== undefined && item.badge > 0 && (
-                <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
-                  {item.badge}
-                </span>
-              )}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-
   return (
-    <aside className="w-72 bg-white border-r border-zinc-200 shrink-0 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between select-none">
-      <div className="space-y-5">
+    <aside className="w-64 bg-white border-r border-slate-200/80 shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
+      <div className="space-y-1">
         
-        {/* Prominent Live Demo Mode Button - Minimal Solid Black with Spacious Sizing */}
+        {/* Prominent Live Demo Mode Button */}
         <button
           onClick={() => setCurrentTab('demo')}
-          className={`w-full h-11 px-4 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer border ${
+          className={`w-full mb-3.5 p-3.5 rounded-2xl text-sm font-extrabold flex items-center justify-between transition-all cursor-pointer ${
             currentTab === 'demo'
-              ? 'bg-zinc-900 text-white border-black shadow-md ring-1 ring-zinc-700'
-              : 'bg-black hover:bg-zinc-800 text-white border-black shadow-xs'
+              ? 'bg-slate-900 text-white shadow-md'
+              : 'bg-indigo-50/90 hover:bg-indigo-100/90 text-indigo-950 border border-indigo-200 shadow-xs hover:shadow-md'
           }`}
         >
           <div className="flex items-center space-x-2.5">
-            <Sparkles className="w-4 h-4 text-white animate-pulse shrink-0" />
-            <span className="font-bold">Interactive Demo</span>
+            <Sparkles className={`w-5 h-5 ${currentTab === 'demo' ? 'text-amber-300' : 'text-indigo-600'}`} />
+            <span>Live Demo Walkthrough</span>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono bg-zinc-800 text-white border border-zinc-700 tracking-wider">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full font-mono ${
+            currentTab === 'demo' ? 'bg-slate-800 text-indigo-300' : 'bg-indigo-200 text-indigo-900'
+          }`}>
             1-CLICK
           </span>
         </button>
 
-        {/* Section 1: Core Intelligence */}
-        <div>
-          <div className="px-3.5 pb-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between font-mono">
-            <span>Core Intelligence</span>
-            <span className="text-[9px] text-zinc-400">LEDGER</span>
-          </div>
-          {renderNavGroup(coreNavItems)}
+        <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+          <span>Platform Modules</span>
+          <span className="font-mono text-[10px] text-slate-300">8 CORE</span>
         </div>
 
-        {/* Section 2: Remediation & Architecture */}
-        <div>
-          <div className="px-3.5 pb-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between font-mono">
-            <span>Remediation Engine</span>
-            <span className="text-[9px] text-zinc-400">SOLVER</span>
-          </div>
-          {renderNavGroup(remediationNavItems)}
-        </div>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = currentTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setCurrentTab(item.id)}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors cursor-pointer group ${
+                isActive
+                  ? 'bg-slate-100 text-slate-900 font-bold'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
+              }`}
+            >
+              <div className="flex items-center space-x-2.5 truncate">
+                <Icon className={`w-4.5 h-4.5 shrink-0 transition-colors ${
+                  isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'
+                }`} />
+                <span className="truncate">{item.label}</span>
+              </div>
+
+              <div className="flex items-center space-x-1.5 shrink-0">
+                <span className="text-xs text-slate-400 font-mono font-medium">{item.moduleCode}</span>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className={`px-2 py-0.5 text-xs font-mono font-bold rounded-md border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
+                    {item.badge}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Institutional Department Endorsement Footer */}
-      <div className="pt-4 border-t border-zinc-200">
-        <div className="p-3.5 bg-zinc-50 rounded-md border border-zinc-200 text-zinc-700 text-xs space-y-1">
-          <div className="flex items-center space-x-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-            <span className="text-[11px] font-bold text-black">BEC Bagalkote — Dept of ISE</span>
+      {/* College & Department Endorsement Footer */}
+      <div className="pt-3 border-t border-slate-100">
+        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/70 text-slate-600">
+          <div className="flex items-center space-x-1.5 mb-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+            <span className="text-[11px] font-bold text-slate-900">BEC Bagalkote — ISE</span>
           </div>
-          <div className="text-[10px] text-zinc-500 font-mono">5th Sem Mini Project • BISA531P</div>
-          <div className="text-[10px] text-black font-semibold pt-0.5">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-[10px] text-slate-500">Mini Project BISA531P</div>
+          <div className="text-[10px] text-indigo-700 font-medium mt-1">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

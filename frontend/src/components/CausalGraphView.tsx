@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
-import { ZoomIn, ZoomOut, Maximize2, GitFork, Search, PlusCircle } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, GitFork, Search, PlusCircle, Layers, Sliders } from 'lucide-react';
 import { CausalGraphData } from '../types';
 
 interface CausalGraphViewProps {
@@ -23,31 +23,17 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
   const initGraph = (layoutName: string) => {
     if (!containerRef.current) return;
 
-    const getCategoryColors = (category: string, betweenness: number) => {
-      if (betweenness > 0.08) {
-        return { bg: '#FEF3C7', border: '#B45309', text: '#78350F' }; // High centrality (Brass Ochre)
-      }
-      switch (category?.toUpperCase()) {
-        case 'ARCHITECTURE':
-        case 'ARCHITECTURAL':
-          return { bg: '#ECFDF5', border: '#064E3B', text: '#0A2E23' }; // Sage & Deep Forest
-        case 'DATABASE':
-        case 'CONCURRENCY':
-          return { bg: '#F1F5F3', border: '#0A2E23', text: '#0A2E23' }; // Forest Slate
-        case 'PERFORMANCE':
-        case 'CODE_LOGIC':
-          return { bg: '#FDF2F4', border: '#881337', text: '#881337' }; // Burgundy
-        case 'NETWORK':
-        case 'INFRASTRUCTURE':
-          return { bg: '#FEF9EE', border: '#B45309', text: '#78350F' }; // Warm Ochre
-        default:
-          return { bg: '#FFFFFF', border: '#A8A29E', text: '#0A2E23' };
-      }
-    };
-
     const elements: cytoscape.ElementDefinition[] = [
       ...graphData.nodes.map((n) => {
-        const colors = getCategoryColors(n.data.category, n.data.betweenness_centrality);
+        let catColor = '#EEF2FF';
+        let borderColor = '#6366F1';
+        const cat = (n.data.category || '').toUpperCase();
+        if (cat.includes('DATABASE')) { catColor = '#EFF6FF'; borderColor = '#2563EB'; }
+        else if (cat.includes('NETWORK')) { catColor = '#F0FDFA'; borderColor = '#0D9488'; }
+        else if (cat.includes('ARCHITECTURE')) { catColor = '#FAF5FF'; borderColor = '#9333EA'; }
+        else if (cat.includes('CONCURRENCY')) { catColor = '#FFFBEB'; borderColor = '#D97706'; }
+        else if (cat.includes('PERFORMANCE')) { catColor = '#ECFDF5'; borderColor = '#059669'; }
+        else if (cat.includes('MEMORY')) { catColor = '#FFF1F2'; borderColor = '#E11D48'; }
 
         return {
           data: {
@@ -59,9 +45,8 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
             degree: n.data.degree_centrality,
             betweenness: n.data.betweenness_centrality,
             incidentCount: n.data.incident_count,
-            catColor: colors.bg,
-            borderColor: colors.border,
-            textColor: colors.text
+            catColor,
+            borderColor
           }
         };
       }),
@@ -93,7 +78,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
             'background-color': 'data(catColor)',
             'border-color': 'data(borderColor)',
             'border-width': 2,
-            'color': 'data(textColor)',
+            'color': '#0F172A',
             'font-size': '10px',
             'font-weight': 'bold',
             'text-valign': 'center',
@@ -115,7 +100,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
         {
           selector: 'node:selected',
           style: {
-            'border-color': '#000000',
+            'border-color': '#0F172A',
             'border-width': 4,
           }
         },
@@ -123,8 +108,8 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
           selector: 'edge',
           style: {
             'width': 2,
-            'line-color': '#71717A',
-            'target-arrow-color': '#000000',
+            'line-color': '#94A3B8',
+            'target-arrow-color': '#64748B',
             'target-arrow-shape': 'triangle',
             'curve-style': 'bezier',
             'arrow-scale': 1.15,
@@ -189,54 +174,54 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
   const handleFit = () => cyRef.current?.fit(undefined, 40);
 
   return (
-    <div className="relative w-full h-[560px] bg-white rounded-md border border-zinc-200 shadow-xs overflow-hidden flex flex-col">
+    <div className="relative w-full h-[560px] bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
       {/* Top Toolbar */}
-      <div className="px-4 py-2.5 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2 z-10">
-        <div className="flex items-center space-x-2 text-xs text-zinc-700">
-          <GitFork className="w-4 h-4 text-black" />
-          <span className="font-bold text-black">Reusable Directed Causal Graph</span>
-          <span className="text-zinc-300">|</span>
-          <span className="text-zinc-500 font-medium">{graphData.nodes.length} Nodes</span>
-          <span className="text-zinc-300">•</span>
-          <span className="text-zinc-500 font-medium">{graphData.edges.length} Directed Links</span>
+      <div className="px-4 py-2.5 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 z-10">
+        <div className="flex items-center space-x-2 text-xs text-slate-700">
+          <GitFork className="w-4 h-4 text-indigo-600" />
+          <span className="font-bold text-slate-900">Reusable Directed Causal Graph</span>
+          <span className="text-slate-300">|</span>
+          <span className="text-slate-500 font-medium">{graphData.nodes.length} Nodes</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-slate-500 font-medium">{graphData.edges.length} Directed Links</span>
         </div>
 
         {/* Layout Switcher & Search */}
         <div className="flex items-center space-x-2">
           {/* Quick Search inside graph */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2 top-2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" />
             <input
               type="text"
               placeholder="Find cause node..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-7 pr-2.5 py-1 text-xs rounded-md border border-zinc-200 bg-white focus:outline-hidden focus:ring-1 focus:ring-black w-36 sm:w-44 text-black"
+              className="pl-7 pr-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden focus:ring-1 focus:ring-indigo-500 w-36 sm:w-44"
             />
           </div>
 
           {/* Layout Selector */}
-          <div className="flex items-center space-x-1 bg-white border border-zinc-200 rounded-md p-0.5 text-xs text-zinc-600">
+          <div className="flex items-center space-x-1 bg-white border border-slate-200 rounded-lg p-0.5 text-xs text-slate-600">
             <button
               onClick={() => setLayoutMode('cose')}
-              className={`px-2 py-0.5 rounded-sm font-semibold text-[11px] transition-colors cursor-pointer ${
-                layoutMode === 'cose' ? 'bg-black text-white font-bold' : 'hover:bg-zinc-100'
+              className={`px-2 py-0.5 rounded-md font-medium text-[11px] transition-colors cursor-pointer ${
+                layoutMode === 'cose' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'hover:bg-slate-100'
               }`}
             >
               Force
             </button>
             <button
               onClick={() => setLayoutMode('breadthfirst')}
-              className={`px-2 py-0.5 rounded-sm font-semibold text-[11px] transition-colors cursor-pointer ${
-                layoutMode === 'breadthfirst' ? 'bg-black text-white font-bold' : 'hover:bg-zinc-100'
+              className={`px-2 py-0.5 rounded-md font-medium text-[11px] transition-colors cursor-pointer ${
+                layoutMode === 'breadthfirst' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'hover:bg-slate-100'
               }`}
             >
               Tree
             </button>
             <button
               onClick={() => setLayoutMode('concentric')}
-              className={`px-2 py-0.5 rounded-sm font-semibold text-[11px] transition-colors cursor-pointer ${
-                layoutMode === 'concentric' ? 'bg-black text-white font-bold' : 'hover:bg-zinc-100'
+              className={`px-2 py-0.5 rounded-md font-medium text-[11px] transition-colors cursor-pointer ${
+                layoutMode === 'concentric' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'hover:bg-slate-100'
               }`}
             >
               Radial
@@ -244,24 +229,24 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex items-center space-x-0.5 border-l border-zinc-200 pl-1.5">
+          <div className="flex items-center space-x-0.5 border-l border-slate-200 pl-1.5">
             <button
               onClick={handleZoomIn}
-              className="p-1 rounded-sm text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="p-1 rounded-md text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleZoomOut}
-              className="p-1 rounded-sm text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="p-1 rounded-md text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleFit}
-              className="p-1 rounded-sm text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="p-1 rounded-md text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
               title="Fit to Screen"
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -273,73 +258,73 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
       {/* Graph Canvas with Engineering Grid */}
       <div 
         ref={containerRef} 
-        className="flex-1 w-full h-full bg-zinc-50/50 cursor-grab active:cursor-grabbing" 
+        className="flex-1 w-full h-full bg-slate-50/40 cursor-grab active:cursor-grabbing" 
         style={{ 
-          backgroundImage: 'radial-gradient(#D4D4D8 1.2px, transparent 1.2px)', 
+          backgroundImage: 'radial-gradient(#CBD5E1 1.2px, transparent 1.2px)', 
           backgroundSize: '24px 24px' 
         }}
       />
 
       {/* Category Legend Pill */}
-      <div className="absolute top-14 left-4 z-10 flex flex-wrap gap-1.5 bg-white/95 backdrop-blur-xs p-1.5 rounded-md border border-zinc-200 shadow-xs text-[10px] text-zinc-600">
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-black" />
+      <div className="absolute top-14 left-4 z-10 flex flex-wrap gap-1.5 bg-white/95 backdrop-blur-xs p-1.5 rounded-xl border border-slate-200/90 shadow-xs text-[10px] text-slate-600">
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
           <span>Database</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
           <span>Network</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
           <span>Architecture</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-zinc-800" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
           <span>Concurrency</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
           <span>Performance</span>
         </span>
-        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-black" />
+        <span className="flex items-center space-x-1 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
           <span>Memory</span>
         </span>
       </div>
 
       {/* Selected Node Inspector Drawer */}
       {selectedNode && (
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:w-[420px] bg-white/98 backdrop-blur-md rounded-md p-4 border border-zinc-300 shadow-xl z-20 animate-in fade-in slide-in-from-bottom-2 duration-150">
+        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:w-[420px] bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-indigo-200 shadow-xl z-20 animate-in fade-in slide-in-from-bottom-2 duration-150">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-black text-white font-mono">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                 {selectedNode.category}
               </span>
-              <h4 className="mt-1.5 text-xs font-bold text-black leading-snug">
+              <h4 className="mt-1.5 text-xs font-bold text-slate-900 leading-snug">
                 {selectedNode.fullLabel}
               </h4>
             </div>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-zinc-400 hover:text-black text-xs font-bold p-1 rounded-md hover:bg-zinc-100 cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold p-1 rounded-md hover:bg-slate-100 cursor-pointer"
             >
               ✕
             </button>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-zinc-100 text-center">
-            <div className="p-2 bg-zinc-50 rounded-sm border border-zinc-200">
-              <div className="text-[10px] text-zinc-500 font-medium">Betweenness</div>
-              <div className="text-xs font-mono font-bold text-black">{selectedNode.betweenness}</div>
+          <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="text-[10px] text-slate-500 font-medium">Betweenness</div>
+              <div className="text-xs font-mono font-bold text-purple-600">{selectedNode.betweenness}</div>
             </div>
-            <div className="p-2 bg-zinc-50 rounded-sm border border-zinc-200">
-              <div className="text-[10px] text-zinc-500 font-medium">Degree Centrality</div>
-              <div className="text-xs font-mono font-bold text-zinc-700">{selectedNode.degree}</div>
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="text-[10px] text-slate-500 font-medium">Degree Centrality</div>
+              <div className="text-xs font-mono font-bold text-indigo-600">{selectedNode.degree}</div>
             </div>
-            <div className="p-2 bg-zinc-50 rounded-sm border border-zinc-200">
-              <div className="text-[10px] text-zinc-500 font-medium">Linked Incidents</div>
-              <div className="text-xs font-bold text-black">{selectedNode.incidentCount}</div>
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="text-[10px] text-slate-500 font-medium">Linked Incidents</div>
+              <div className="text-xs font-bold text-slate-800">{selectedNode.incidentCount}</div>
             </div>
           </div>
 
@@ -350,7 +335,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
                 description: selectedNode.fullLabel,
                 category: selectedNode.category
               })}
-              className="mt-3 w-full py-2 bg-[#064E3B] hover:bg-[#043D2E] text-white rounded-md text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-[#064E3B]"
+              className="mt-3 w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Create Remediation Debt Item for this Root Cause</span>

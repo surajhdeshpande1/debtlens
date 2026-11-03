@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
+  Coins, 
   Plus, 
+  Filter, 
   Flame, 
+  Clock, 
+  ShieldAlert, 
+  CheckCircle2, 
+  Layers, 
+  ArrowRight, 
+  TrendingUp, 
   Search, 
   Calculator, 
+  HelpCircle, 
+  X,
   Download,
   RotateCcw,
   Check
 } from 'lucide-react';
-import { DebtItem, DebtStatus } from '../types';
+import { DebtItem, DebtStatus, DebtCategory } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
@@ -21,6 +31,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
   const { showToast } = useToast();
   const [debts, setDebts] = useState<DebtItem[]>([]);
   const [selectedDebt, setSelectedDebt] = useState<DebtItem | null>(null);
+  const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [breakEvenOnly, setBreakEvenOnly] = useState(false);
@@ -29,6 +40,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
   const fetchDebts = async () => {
     try {
+      setLoading(true);
       const data = await api.getDebtItems(projectId, {
         category: filterCategory,
         status: filterStatus,
@@ -41,6 +53,8 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
     } catch (err) {
       console.error(err);
       showToast('error', 'Error', 'Failed to retrieve debt ledger.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,54 +98,62 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
   // Filter & Sort
   const filteredDebts = debts
-    .filter((d) => {
-      if (searchTerm.trim() === '') return true;
-      const q = searchTerm.toLowerCase();
+    .filter(d => {
+      if (!searchTerm) return true;
+      const s = searchTerm.toLowerCase();
       return (
-        d.debt_key.toLowerCase().includes(q) ||
-        d.title.toLowerCase().includes(q) ||
-        d.description.toLowerCase().includes(q) ||
-        d.module_name.toLowerCase().includes(q)
+        d.title.toLowerCase().includes(s) ||
+        d.debt_key.toLowerCase().includes(s) ||
+        d.module_name.toLowerCase().includes(s) ||
+        d.description.toLowerCase().includes(s)
       );
     })
     .sort((a, b) => {
-      switch (sortBy) {
-        case 'risk':
-          return b.risk_score - a.risk_score;
-        case 'interest':
-          return b.accrued_interest - a.accrued_interest;
-        case 'principal':
-          return b.effort_principal - a.effort_principal;
-        case 'age':
-          return b.age_days - a.age_days;
-      }
+      if (sortBy === 'risk') return b.risk_score - a.risk_score;
+      if (sortBy === 'interest') return b.accrued_interest - a.accrued_interest;
+      if (sortBy === 'principal') return b.effort_principal - a.effort_principal;
+      if (sortBy === 'age') return b.age_days - a.age_days;
+      return 0;
     });
 
   const statusBadge = (s: DebtStatus) => {
     switch (s) {
       case 'IDENTIFIED':
-        return 'bg-zinc-100 text-zinc-700 border-zinc-200 font-mono';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
       case 'PRIORITIZED':
-        return 'bg-black text-white border-black font-mono';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'IN_PROGRESS':
-        return 'bg-zinc-800 text-white border-zinc-700 font-mono';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'REMEDIATED':
-        return 'bg-zinc-200 text-zinc-900 border-zinc-300 font-mono';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     }
   };
 
-  const getCategoryBadge = (_cat: string) => {
-    return 'bg-zinc-100 text-black border-zinc-200 font-mono';
+  const getCategoryBadge = (cat: string) => {
+    const c = (cat || '').toUpperCase();
+    if (c.includes('ARCHITECTURAL')) return 'bg-purple-50 text-purple-700 border-purple-200';
+    if (c.includes('CODE_SMELL')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (c.includes('INFRASTRUCTURE')) return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (c.includes('SECURITY')) return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (c.includes('TEST')) return 'bg-teal-50 text-teal-700 border-teal-200';
+    return 'bg-slate-100 text-slate-700 border-slate-200';
   };
 
-  const getModuleBadge = (_moduleName: string) => {
-    return 'bg-zinc-100 text-black border-zinc-200 font-mono';
+  const getModuleBadge = (moduleName: string) => {
+    const m = (moduleName || '').toLowerCase().replace(/[\s-]/g, '_');
+    if (m.includes('payment')) return 'bg-purple-50 text-purple-700 border-purple-200';
+    if (m.includes('database')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (m.includes('settlement')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (m.includes('checkout')) return 'bg-sky-50 text-sky-700 border-sky-200';
+    if (m.includes('auth')) return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (m.includes('notification')) return 'bg-teal-50 text-teal-700 border-teal-200';
+    return 'bg-indigo-50 text-indigo-700 border-indigo-200';
   };
 
   const getRiskBadge = (score: number) => {
-    if (score >= 50) return 'text-white bg-black border-black font-mono';
-    if (score >= 25) return 'text-white bg-zinc-800 border-zinc-700 font-mono';
-    return 'text-black bg-zinc-100 border-zinc-300 font-mono';
+    if (score >= 50) return 'text-rose-700 bg-rose-50 border-rose-200';
+    if (score >= 25) return 'text-amber-700 bg-amber-50 border-amber-200';
+    return 'text-indigo-700 bg-indigo-50 border-indigo-200';
   };
 
   return (
@@ -140,30 +162,30 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-black tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
             <span>Technical Debt Registry & Financial Ledger</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-200 font-bold font-mono">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
               Module M4
             </span>
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">
-            Pricing technical debt as a ledger of principal <span className="font-mono text-black font-bold">P(d)</span> and accruing interest <span className="font-mono text-black font-bold">I(d)</span> driven by incident cost and churn
+          <p className="text-xs text-slate-500">
+            Pricing technical debt as a ledger of principal <span className="font-mono text-slate-700 font-bold">P(d)</span> and accruing interest <span className="font-mono text-slate-700 font-bold">I(d)</span> driven by incident cost and churn
           </p>
         </div>
 
         <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white border border-zinc-300 hover:bg-zinc-100 text-black text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
             title="Export debt items as CSV"
           >
-            <Download className="w-3.5 h-3.5 text-zinc-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Export CSV</span>
           </button>
 
           <button
             onClick={onOpenDebtModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-[#064E3B]"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Register Debt Item</span>
@@ -172,36 +194,36 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white rounded-md border border-zinc-200 p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex wrap items-center gap-2 flex-1">
+      <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1">
           <div className="relative min-w-[180px] flex-1 sm:flex-none">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
             <input
               type="text"
-              placeholder="Search debt key, title..."
+              placeholder="Search debt key or title..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-md border border-zinc-200 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
+              className="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white w-full focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-md border border-zinc-200 bg-white text-black font-medium cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
           >
             <option value="ALL">All Categories</option>
             <option value="ARCHITECTURAL">Architectural</option>
             <option value="CODE_SMELL">Code Smell</option>
             <option value="INFRASTRUCTURE">Infrastructure</option>
-            <option value="SECURITY">Security</option>
-            <option value="TEST">Testing</option>
+            <option value="TEST_DEBT">Test Debt</option>
+            <option value="SECURITY_DEBT">Security Debt</option>
           </select>
 
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-md border border-zinc-200 bg-white text-black font-medium cursor-pointer"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="IDENTIFIED">Identified</option>
@@ -210,68 +232,64 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
             <option value="REMEDIATED">Remediated</option>
           </select>
 
-          <button
-            onClick={() => setBreakEvenOnly(!breakEvenOnly)}
-            className={`px-3 py-1.5 text-xs rounded-md border font-semibold flex items-center space-x-1 transition-colors cursor-pointer ${
-              breakEvenOnly
-                ? 'bg-black text-white border-black font-bold shadow-xs'
-                : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
-            }`}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 cursor-pointer font-medium"
           >
-            <Flame className="w-3.5 h-3.5" />
-            <span>Break-Even (I &gt; P) Only</span>
-          </button>
-
+            <option value="risk">Sort by Risk Score R(d)</option>
+            <option value="interest">Sort by Accrued Interest I(d)</option>
+            <option value="principal">Sort by Principal P(d)</option>
+            <option value="age">Sort by Age (Days)</option>
+          </select>
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="px-2.5 py-1.5 text-xs rounded-md bg-zinc-100 hover:bg-zinc-200 text-black font-medium flex items-center space-x-1 cursor-pointer"
+              className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              title="Reset all filters"
             >
-              <RotateCcw className="w-3 h-3 text-zinc-500" />
+              <RotateCcw className="w-3 h-3 text-slate-500" />
               <span>Reset</span>
             </button>
           )}
         </div>
 
-        {/* Sort Controls */}
-        <div className="flex items-center space-x-1.5 text-xs text-zinc-500">
-          <span className="font-medium">Sort By:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-2 py-1 text-xs rounded-md border border-zinc-200 bg-white font-bold text-black cursor-pointer"
-          >
-            <option value="risk">Risk Score</option>
-            <option value="interest">Accrued Interest I(d)</option>
-            <option value="principal">Remediation Principal P(d)</option>
-            <option value="age">Age (Days)</option>
-          </select>
-        </div>
+        <button
+          onClick={() => setBreakEvenOnly(!breakEvenOnly)}
+          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+            breakEvenOnly
+              ? 'bg-rose-50 text-rose-700 border-rose-300 ring-2 ring-rose-200'
+              : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+          }`}
+        >
+          <Flame className={`w-3.5 h-3.5 ${breakEvenOnly ? 'text-rose-600' : 'text-slate-400'}`} />
+          <span>Break-Even Exceeded Only ({debts.filter(d => d.break_even_status).length})</span>
+        </button>
       </div>
 
-      {/* Main Two-Column Layout */}
+      {/* Two Column Layout: Debt Table + Mathematical Breakdown Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Table View */}
-        <div className="lg:col-span-8 bg-white rounded-md border border-zinc-200 shadow-xs overflow-hidden">
+        {/* Table */}
+        <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-zinc-50 text-zinc-600 font-bold uppercase text-[10px] tracking-wider border-b border-zinc-200">
+              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="py-2.5 px-3">Item Key & Module</th>
-                  <th className="py-2.5 px-3">Description & Scope</th>
-                  <th className="py-2.5 px-2 text-center">Principal P(d)</th>
-                  <th className="py-2.5 px-2 text-center">Interest I(d)</th>
-                  <th className="py-2.5 px-2 text-center">Break-Even</th>
-                  <th className="py-2.5 px-2 text-center">Risk Score</th>
-                  <th className="py-2.5 px-3 text-center">Workflow</th>
+                  <th className="py-3 px-3">Key & Module</th>
+                  <th className="py-3 px-3">Title & Category</th>
+                  <th className="py-3 px-2 text-center">Principal</th>
+                  <th className="py-3 px-2 text-center">Interest</th>
+                  <th className="py-3 px-2 text-center">Break-Even</th>
+                  <th className="py-3 px-2 text-center">Risk Score</th>
+                  <th className="py-3 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-slate-100">
                 {filteredDebts.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-zinc-400">
-                      No technical debt items found matching your filters.
+                    <td colSpan={7} className="py-8 text-center text-xs text-slate-400">
+                      No debt items found for current selection.
                     </td>
                   </tr>
                 ) : (
@@ -281,38 +299,38 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                       <tr 
                         key={d.id} 
                         onClick={() => setSelectedDebt(d)}
-                        className={`hover:bg-slate-50 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-[#ECFDF5]/60 border-l-4 border-[#064E3B]' : ''
+                        className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${
+                          isSelected ? 'bg-indigo-50/50 border-l-4 border-indigo-600' : ''
                         }`}
                       >
                         {/* Key & Module */}
                         <td className="py-3 px-3 whitespace-nowrap">
                           <div className="font-mono font-bold text-slate-900">{d.debt_key}</div>
-                          <span className={`inline-block mt-0.5 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-sm border ${getModuleBadge(d.module_name)}`}>
+                          <span className={`inline-block mt-0.5 text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded-md border ${getModuleBadge(d.module_name)}`}>
                             {d.module_name}
                           </span>
                         </td>
 
                         {/* Title & Category */}
                         <td className="py-3 px-3 max-w-xs">
-                          <div className="font-bold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
+                          <div className="font-semibold text-slate-900 leading-snug line-clamp-1">{d.title}</div>
                           <span className={`inline-block mt-1 text-[9px] font-bold px-1.5 py-0.2 rounded-sm border ${getCategoryBadge(d.category)}`}>
                             {d.category}
                           </span>
                         </td>
 
                         {/* Principal P(d) */}
-                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-900">
-                          <span className="bg-slate-100 text-slate-900 px-2 py-0.5 rounded-sm border border-slate-200">
+                        <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold text-slate-800">
+                          <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded-md border border-indigo-100">
                             {d.effort_principal}h
                           </span>
                         </td>
 
                         {/* Interest I(d) */}
                         <td className="py-3 px-2 text-center whitespace-nowrap font-mono font-bold">
-                          <span className={`px-2 py-0.5 rounded-sm border ${
+                          <span className={`px-1.5 py-0.5 rounded-md border ${
                             d.break_even_status 
-                              ? 'bg-red-50 text-red-700 border-red-200' 
+                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
                               : 'bg-slate-50 text-slate-700 border-slate-200'
                           }`}>
                             {d.accrued_interest}h
@@ -322,12 +340,12 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         {/* Break-Even Status */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
                           {d.break_even_status ? (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-red-50 text-red-700 border border-red-200 font-mono">
-                              <Flame className="w-2.5 h-2.5 text-red-600" />
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
+                              <Flame className="w-2.5 h-2.5 text-rose-600" />
                               <span>EXCEEDED</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
+                            <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                               <span>Optimal</span>
                             </span>
                           )}
@@ -335,7 +353,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
                         {/* Risk Score */}
                         <td className="py-3 px-2 text-center whitespace-nowrap">
-                          <span className={`font-mono font-bold px-2 py-0.5 rounded-sm border ${getRiskBadge(d.risk_score)}`}>
+                          <span className={`font-mono font-bold px-1.5 py-0.5 rounded-md border ${getRiskBadge(d.risk_score)}`}>
                             {d.risk_score}
                           </span>
                         </td>
@@ -345,7 +363,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                           <select
                             value={d.status}
                             onChange={(e) => handleStatusChange(d.id, e.target.value as DebtStatus)}
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-sm border ${statusBadge(d.status)} bg-white cursor-pointer`}
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${statusBadge(d.status)} bg-white cursor-pointer`}
                           >
                             <option value="IDENTIFIED">IDENTIFIED</option>
                             <option value="PRIORITIZED">PRIORITIZED</option>
@@ -364,33 +382,33 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
         </div>
 
         {/* Mathematical Economic Inspection Drawer */}
-        <div className="lg:col-span-4 bg-white rounded-md border border-zinc-200 p-5 shadow-xs sticky top-20 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+        <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200 p-5 shadow-xs sticky top-20 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center space-x-1.5">
-              <Calculator className="w-4 h-4 text-black" />
-              <h3 className="text-xs font-extrabold text-black">Economic Formulation Breakdown</h3>
+              <Calculator className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-bold text-slate-900">Economic Formulation Breakdown</h3>
             </div>
-            <span className="text-[10px] font-mono text-black bg-zinc-100 px-1.5 py-0.5 rounded-sm border border-zinc-200 font-bold">Section 7.3</span>
+            <span className="text-[10px] font-mono text-slate-400">Section 7.3</span>
           </div>
 
           {selectedDebt ? (
             <div className="space-y-4 text-xs">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-black text-xs">{selectedDebt.debt_key}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-zinc-100 text-black">
+                  <span className="font-mono font-bold text-indigo-600 text-xs">{selectedDebt.debt_key}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                     {selectedDebt.category}
                   </span>
                 </div>
-                <h4 className="mt-1 font-bold text-black leading-snug">{selectedDebt.title}</h4>
-                <div className="text-[11px] text-zinc-500 mt-1">Module: <strong className="text-black">{selectedDebt.module_name}</strong></div>
+                <h4 className="mt-1 font-bold text-slate-900 leading-snug">{selectedDebt.title}</h4>
+                <div className="text-[11px] text-slate-500 mt-1">Module: <strong className="text-slate-700">{selectedDebt.module_name}</strong></div>
               </div>
 
               {/* Interactive Debt Workflow State */}
-              <div className="bg-zinc-50 p-2.5 rounded-md border border-zinc-200 space-y-1.5">
+              <div className="bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80 space-y-1.5">
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-zinc-700">Remediation Status</span>
-                  <span className="text-[10px] text-zinc-400">Click to transition</span>
+                  <span className="font-semibold text-slate-700">Remediation Status</span>
+                  <span className="text-[10px] text-slate-400">Click to transition</span>
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {(['IDENTIFIED', 'PRIORITIZED', 'IN_PROGRESS', 'REMEDIATED'] as DebtStatus[]).map((st) => {
@@ -399,10 +417,16 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                       <button
                         key={st}
                         onClick={() => handleStatusChange(selectedDebt.id, st)}
-                        className={`px-2 py-1.5 rounded-md text-[10px] font-bold flex items-center justify-between transition-all cursor-pointer ${
+                        className={`px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-between transition-all cursor-pointer ${
                           isCurrent
-                            ? 'bg-black text-white shadow-xs border border-black'
-                            : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-100'
+                            ? st === 'REMEDIATED'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : st === 'IN_PROGRESS'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : st === 'PRIORITIZED'
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'bg-slate-700 text-white shadow-xs'
+                            : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         <span>{st.replace('_', ' ')}</span>
@@ -414,55 +438,60 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
               </div>
 
               {/* Mathematical Equation Card */}
-              <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 space-y-2">
-                <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
                   Accrued Interest Equation I(d):
                 </div>
-                <div className="font-mono text-[11px] text-black bg-white p-2 rounded-md border border-zinc-200 overflow-x-auto">
+                <div className="font-mono text-[11px] text-slate-800 bg-white p-2 rounded-lg border border-slate-200 overflow-x-auto">
                   I(d) = Σ [sev(k) · effort(k)] + λ₁·churn + λ₂·blast
                 </div>
 
-                <div className="space-y-1.5 pt-1 text-[11px] text-zinc-600">
+                <div className="space-y-1.5 pt-1 text-[11px] text-slate-600">
                   <div className="flex justify-between">
-                    <span>Incident Resolution Effort:</span>
-                    <strong className="font-mono text-black">{((selectedDebt as any).incident_frequency_count ?? selectedDebt.linked_incident_count ?? 1) * 12}h</strong>
+                    <span>Principal Remediation Effort P(d):</span>
+                    <strong className="text-slate-900 font-mono">{selectedDebt.effort_principal} hrs</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Git Churn Penalty (λ₁=0.15):</span>
-                    <strong className="font-mono text-black">+{(((selectedDebt as any).churn_rate ?? 24) * 0.15).toFixed(1)}h</strong>
+                    <span>Accrued Failure Interest I(d):</span>
+                    <strong className={`font-mono ${selectedDebt.break_even_status ? 'text-rose-600' : 'text-slate-900'}`}>
+                      {selectedDebt.accrued_interest} hrs
+                    </strong>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Architectural Blast Radius (λ₂=1.8):</span>
-                    <strong className="font-mono text-black">+{(((selectedDebt as any).blast_radius ?? 4) * 1.8).toFixed(1)}h</strong>
-                  </div>
-                  <div className="flex justify-between pt-1 border-t border-zinc-200 font-bold text-black">
-                    <span>Total Accrued Interest I(d):</span>
-                    <span className="font-mono">{selectedDebt.accrued_interest}h</span>
+                  <div className="flex justify-between pt-1 border-t border-slate-200">
+                    <span>Net Economic Drag [I(d) - P(d)]:</span>
+                    <strong className={`font-mono ${selectedDebt.accrued_interest > selectedDebt.effort_principal ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      {(selectedDebt.accrued_interest - selectedDebt.effort_principal).toFixed(1)} hrs
+                    </strong>
                   </div>
                 </div>
               </div>
 
-              {/* Break-Even Comparison Pill */}
-              <div className="p-3 rounded-md border border-zinc-200 bg-zinc-50 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-black text-xs">Balance Sheet Verdict:</span>
-                  <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm ${
-                    selectedDebt.break_even_status ? 'bg-black text-white' : 'bg-zinc-200 text-black'
-                  }`}>
-                    {selectedDebt.break_even_status ? 'I(d) > P(d) [DEFICIT]' : 'I(d) ≤ P(d) [NOMINAL]'}
-                  </span>
+              {/* Break Even Status Callout */}
+              <div className={`p-3 rounded-xl border ${
+                selectedDebt.break_even_status 
+                  ? 'bg-rose-50 border-rose-200 text-rose-900' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              }`}>
+                <div className="flex items-center space-x-1.5 font-bold text-xs">
+                  {selectedDebt.break_even_status ? <Flame className="w-4 h-4 text-rose-600" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                  <span>{selectedDebt.break_even_status ? 'Break-Even Exceeded' : 'Within Break-Even Budget'}</span>
                 </div>
-                <p className="text-[11px] text-zinc-600 leading-relaxed font-medium">
+                <p className="mt-1 text-[11px] opacity-90 leading-relaxed">
                   {selectedDebt.break_even_status 
-                    ? `This debt item has cost ${selectedDebt.accrued_interest}h in ongoing failure drag, exceeding its permanent ${selectedDebt.effort_principal}h fix cost. Refactoring is economically mandated.`
-                    : `Remediation principal (${selectedDebt.effort_principal}h) exceeds current failure interest (${selectedDebt.accrued_interest}h). Monitor churn.`}
+                    ? 'The organization has already wasted more hours coping with defects generated by this debt item than it would cost to permanently repair it.'
+                    : 'Accrued cost remains below remediation threshold; can be scheduled in standard backlog maintenance.'}
                 </p>
               </div>
 
+              {/* Linked Incident Count & Prereqs */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span>Linked Incidents: <strong className="text-slate-800">{selectedDebt.linked_incident_count}</strong></span>
+                <span>Age: <strong className="text-slate-800">{selectedDebt.age_days} days</strong></span>
+              </div>
             </div>
           ) : (
-            <div className="p-8 text-center text-xs text-zinc-400 font-medium">
-              Select an item from the ledger to inspect economic parameters.
+            <div className="p-8 text-center text-xs text-slate-400">
+              Select any debt item from the table to inspect its mathematical pricing breakdown.
             </div>
           )}
         </div>

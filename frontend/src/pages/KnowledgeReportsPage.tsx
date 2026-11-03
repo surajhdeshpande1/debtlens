@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { 
+  BookOpen, 
   FileDown, 
+  Award, 
   Search, 
+  CheckCircle2, 
+  Building2, 
   Users, 
+  ShieldCheck,
+  FileText,
+  HelpCircle,
   GraduationCap,
+  BookmarkCheck,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -103,37 +111,37 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
   );
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto overflow-x-hidden">
+    <div className="space-y-6">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-black tracking-tight flex items-center space-x-2">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
             <span>Knowledge Base & Academic Evaluation Guide</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-sm bg-black text-white font-bold font-mono">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold font-mono">
               Module M8
             </span>
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">
+          <p className="text-xs text-slate-500">
             Searchable historical incident post-mortems, formal PDF audit reports, and viva defense evaluation guide
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab toggle */}
-          <div className="flex items-center bg-[#F9F8F5] border border-[#E5E2DA] rounded-md p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('articles')}
-              className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
-                activeTab === 'articles' ? 'bg-[#064E3B] text-white shadow-xs' : 'text-stone-600 hover:text-[#0A2E23]'
+              className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
+                activeTab === 'articles' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Post-Mortems
             </button>
             <button
               onClick={() => setActiveTab('viva')}
-              className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
-                activeTab === 'viva' ? 'bg-[#064E3B] text-white shadow-xs' : 'text-stone-600 hover:text-[#0A2E23]'
+              className={`px-3 py-1.5 rounded-md transition-colors flex items-center space-x-1 cursor-pointer ${
+                activeTab === 'viva' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5" />
@@ -144,7 +152,7 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloading}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold border border-[#064E3B] shadow-xs transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
           >
             <FileDown className="w-3.5 h-3.5" />
             <span>{isDownloading ? 'Generating...' : 'Export PDF'}</span>
@@ -153,31 +161,31 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
       </div>
 
       {/* College Project Endorsement Banner */}
-      <div className="bg-white rounded-md border border-slate-200/90 p-6 shadow-xs">
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
           <div className="space-y-1">
-            <span className="text-[11px] font-bold text-[#064E3B] uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">
               Basaveshwar Engineering College Bagalkote
             </span>
             <h3 className="text-lg font-bold text-slate-900">
               Department of Information Science & Engineering
             </h3>
-            <p className="text-xs text-zinc-500 font-medium">
+            <p className="text-xs text-slate-500">
               5th Semester Mini Project (BISA531P) • Academic Year 2026-27
             </p>
           </div>
 
-          <div className="p-3.5 bg-zinc-50 border border-zinc-200 rounded-md text-xs text-zinc-900">
-            <div className="text-[10px] font-bold uppercase text-zinc-500">Project Guide</div>
-            <div className="font-bold text-sm text-black">Prof. P. R. Muttannavar</div>
-            <div className="text-[11px] text-zinc-600 font-medium">Dept. of ISE, BEC Bagalkote</div>
+          <div className="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-900">
+            <div className="text-[10px] font-bold uppercase text-indigo-500">Project Guide</div>
+            <div className="font-bold text-sm">Prof. P. R. Muttannavar</div>
+            <div className="text-[11px] text-indigo-700">Dept. of ISE, BEC Bagalkote</div>
           </div>
         </div>
 
         {/* Project Associates */}
         <div className="pt-4">
-          <div className="text-xs font-bold text-black mb-3 flex items-center space-x-1.5">
-            <Users className="w-4 h-4 text-black" />
+          <div className="text-xs font-bold text-slate-900 mb-3 flex items-center space-x-1.5">
+            <Users className="w-4 h-4 text-indigo-600" />
             <span>Project Associates</span>
           </div>
 
@@ -188,10 +196,10 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
               { name: 'Sushma K Patil', usn: '2BA24IS173', role: 'Repository Evidence & Hotspots' },
               { name: 'Sushma Mathapati', usn: '2BA24IS174', role: 'Payoff 0/1 Knapsack & Reporting' },
             ].map((student) => (
-              <div key={student.usn} className="p-3 bg-zinc-50 rounded-md border border-zinc-200 text-xs">
-                <div className="font-bold text-black">{student.name}</div>
-                <div className="font-mono text-black text-[11px] font-bold">{student.usn}</div>
-                <div className="text-[10px] text-zinc-500 mt-1 font-medium">{student.role}</div>
+              <div key={student.usn} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                <div className="font-bold text-slate-900">{student.name}</div>
+                <div className="font-mono text-indigo-600 text-[11px] font-semibold">{student.usn}</div>
+                <div className="text-[10px] text-slate-400 mt-1">{student.role}</div>
               </div>
             ))}
           </div>
@@ -200,44 +208,44 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
 
       {activeTab === 'articles' ? (
         /* Searchable Knowledge Base */
-        <div className="bg-white rounded-md border border-zinc-200 p-5 shadow-xs space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-black">Post-Mortems & Architectural Lessons Learned</h3>
-              <p className="text-xs text-zinc-500 font-medium">Preserved technical reasoning connecting failure symptoms to verified repairs</p>
+              <h3 className="text-sm font-bold text-slate-900">Post-Mortems & Architectural Lessons Learned</h3>
+              <p className="text-xs text-slate-500">Preserved technical reasoning connecting failure symptoms to verified repairs</p>
             </div>
 
             <div className="relative min-w-[240px]">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
               <input
                 type="text"
                 placeholder="Search post-mortems..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 bg-white"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredArticles.map((art) => (
-              <div key={art.id} className="p-4 rounded-md border border-zinc-200 bg-zinc-50 hover:bg-white transition-colors space-y-2 text-xs">
+              <div key={art.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-black text-white">
+                  <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded-sm bg-indigo-50 text-indigo-700 border border-indigo-200">
                     {art.module}
                   </span>
-                  <span className="text-[10px] text-zinc-500 font-medium">By {art.author}</span>
+                  <span className="text-[10px] text-slate-400">By {art.author}</span>
                 </div>
 
-                <h4 className="font-bold text-black leading-snug">
+                <h4 className="font-bold text-slate-900 leading-snug">
                   {art.title}
                 </h4>
 
-                <div className="text-[11px] text-zinc-600 font-medium">
-                  Root Cause: <strong className="text-black">{art.rootCause}</strong>
+                <div className="text-[11px] text-slate-500">
+                  Root Cause: <strong className="text-slate-700">{art.rootCause}</strong>
                 </div>
 
-                <div className="p-2.5 bg-white rounded-md border border-zinc-200 text-zinc-700 leading-relaxed text-[11px] font-medium">
+                <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-slate-700 leading-relaxed text-[11px]">
                   {art.lesson}
                 </div>
               </div>
@@ -246,12 +254,12 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
         </div>
       ) : (
         /* Viva Voce Defense Guide */
-        <div className="bg-white rounded-md border border-zinc-200 p-6 shadow-xs space-y-4">
-          <div className="flex items-center space-x-2 pb-3 border-b border-zinc-200">
-            <GraduationCap className="w-5 h-5 text-black" />
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="flex items-center space-x-2 pb-3 border-b border-slate-100">
+            <GraduationCap className="w-5 h-5 text-indigo-600" />
             <div>
-              <h3 className="text-sm font-bold text-black">Viva-Voce Evaluation & Algorithm Defense Q&A</h3>
-              <p className="text-xs text-zinc-500 font-medium">Key theoretical, mathematical, and algorithmic questions for mini project defense</p>
+              <h3 className="text-sm font-bold text-slate-900">Viva-Voce Evaluation & Algorithm Defense Q&A</h3>
+              <p className="text-xs text-slate-500">Key theoretical, mathematical, and algorithmic questions for mini project defense</p>
             </div>
           </div>
 
@@ -261,21 +269,21 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
               return (
                 <div 
                   key={idx}
-                  className="rounded-md border border-zinc-200 overflow-hidden transition-all"
+                  className="rounded-xl border border-slate-200 overflow-hidden transition-all"
                 >
                   <button
                     onClick={() => setExpandedViva(isExpanded ? null : idx)}
-                    className="w-full p-4 text-left bg-zinc-50 hover:bg-zinc-100 flex items-center justify-between text-xs font-bold text-black transition-colors cursor-pointer"
+                    className="w-full p-4 text-left bg-slate-50/70 hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-900 transition-colors cursor-pointer"
                   >
                     <span className="flex items-center space-x-2">
-                      <span className="font-mono text-black font-extrabold">Q{idx + 1}:</span>
+                      <span className="font-mono text-indigo-600">Q{idx + 1}:</span>
                       <span>{item.q}</span>
                     </span>
-                    {isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-600" /> : <ChevronDown className="w-4 h-4 text-zinc-600" />}
+                    {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                   </button>
 
                   {isExpanded && (
-                    <div className="p-4 bg-white text-xs text-zinc-700 leading-relaxed border-t border-zinc-200 animate-in fade-in duration-150 font-medium">
+                    <div className="p-4 bg-white text-xs text-slate-700 leading-relaxed border-t border-slate-100 animate-in fade-in duration-150">
                       {item.a}
                     </div>
                   )}

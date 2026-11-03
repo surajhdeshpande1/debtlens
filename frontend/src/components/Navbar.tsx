@@ -1,50 +1,54 @@
 import React, { useState } from 'react';
 import { 
   Layers, 
+  RotateCcw, 
   FileDown, 
   CheckCircle2, 
   ChevronDown,
   Building,
+  FolderGit2,
   Search,
   Sparkles,
-  LayoutDashboard,
-  AlertCircle,
-  Coins,
-  GitBranch
+  GraduationCap
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
-import { NavTab } from './Sidebar';
 
 interface NavbarProps {
-  currentTab: NavTab;
-  setCurrentTab: (tab: NavTab) => void;
   currentRole: UserRole;
   setCurrentRole: (role: UserRole) => void;
   activeProjectId: number;
   onRefreshData: () => void;
   onOpenCommandPalette: () => void;
   onLaunchDemo?: () => void;
-  openIncidentsCount?: number;
-  breakevenDebtCount?: number;
-  regressionsCount?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  currentTab,
-  setCurrentTab,
   currentRole,
   setCurrentRole,
   activeProjectId,
-  onRefreshData: _onRefreshData,
+  onRefreshData,
   onOpenCommandPalette,
-  onLaunchDemo,
-  openIncidentsCount = 2,
-  breakevenDebtCount = 6,
-  regressionsCount = 1
+  onLaunchDemo
 }) => {
+  const [isReloading, setIsReloading] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+
+  const handleReloadSeed = async () => {
+    if (confirm("Reset and reload the realistic enterprise test corpus?")) {
+      try {
+        setIsReloading(true);
+        await api.reloadSeedData();
+        onRefreshData();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to reload seed data");
+      } finally {
+        setIsReloading(false);
+      }
+    }
+  };
 
   const handleDownloadPdf = async () => {
     try {
@@ -67,216 +71,116 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const currentRoleObj = roles.find(r => r.role === currentRole) || roles[0];
 
-  // 4 Consolidated Core Views
-  const primaryNavItems: {
-    id: NavTab;
-    matchingTabs: NavTab[];
-    label: string;
-    shortLabel: string;
-    icon: React.ComponentType<{ className?: string }>;
-    badge?: number;
-    badgeType?: 'danger' | 'warning' | 'info';
-  }[] = [
-    {
-      id: 'dashboard',
-      matchingTabs: ['dashboard'],
-      label: 'Executive Balance Sheet',
-      shortLabel: 'Overview',
-      icon: LayoutDashboard
-    },
-    {
-      id: 'incidents',
-      matchingTabs: ['incidents', 'causal'],
-      label: 'Incidents & Causal',
-      shortLabel: 'Incidents',
-      icon: AlertCircle,
-      badge: openIncidentsCount,
-      badgeType: 'warning'
-    },
-    {
-      id: 'debt',
-      matchingTabs: ['debt', 'optimiser'],
-      label: 'Debt & Payoff Solver',
-      shortLabel: 'Debt Solver',
-      icon: Coins,
-      badge: breakevenDebtCount,
-      badgeType: 'danger'
-    },
-    {
-      id: 'intelligence',
-      matchingTabs: ['intelligence', 'repository', 'knowledge'],
-      label: 'Code & Viva Defense',
-      shortLabel: 'Code & Viva',
-      icon: GitBranch,
-      badge: regressionsCount > 0 ? regressionsCount : undefined,
-      badgeType: 'info'
-    }
-  ];
-
-  const getBadgeStyle = (type?: 'danger' | 'warning' | 'info', isActive?: boolean) => {
-    if (isActive) {
-      return 'bg-white/20 text-white border-white/30 font-bold';
-    }
-    switch (type) {
-      case 'danger':
-        return 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB] font-bold';
-      case 'warning':
-        return 'bg-[#FEF9EE] text-[#B45309] border-[#FDE68A] font-bold';
-      case 'info':
-        return 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0] font-bold';
-      default:
-        return 'bg-[#F4F2EB] text-stone-700 border-[#E2DFD6]';
-    }
-  };
-
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E2DA] shadow-[0_1px_4px_rgba(0,0,0,0.03)] select-none">
-      
-      {/* Sleek Single-Bar Top Header - Optimized for 100% Zoom (max-w-[1640px]) */}
-      <div className="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         
-        {/* Left: Brand & Institutional Scope Context */}
-        <div className="flex items-center space-x-3 shrink-0">
-          <div 
-            className="flex items-center space-x-2.5 cursor-pointer group" 
-            onClick={() => setCurrentTab('dashboard')}
-            title="Return to Executive Balance Sheet"
-          >
-            <div className="w-9 h-9 rounded-md bg-[#064E3B] flex items-center justify-center text-white shadow-xs border border-[#053D2E] shrink-0 group-hover:bg-[#043D2E] transition-colors">
-              <Layers className="w-4.5 h-4.5 text-emerald-200" />
+        {/* Brand & Workspace Context */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-xs">
+              <Layers className="w-4 h-4 text-indigo-400" />
             </div>
-            <div className="flex items-baseline space-x-1.5 shrink-0">
-              <span className="text-lg font-extrabold tracking-tight text-[#0A2E23] font-sans">
-                DEBTLENS
+            <div className="flex items-baseline space-x-1.5">
+              <span className="text-base font-bold tracking-tight text-slate-900">
+                Debt<span className="text-indigo-600">Lens</span>
               </span>
-              <span className="text-[10px] font-mono font-bold text-[#065F46] bg-[#ECFDF5] px-1.5 py-0.5 rounded-sm border border-[#A7F3D0]">
+              <span className="text-[10px] font-mono font-medium text-slate-400">
                 v1.0
               </span>
             </div>
           </div>
 
-          <div className="hidden lg:block text-stone-300 font-light">|</div>
+          <div className="hidden md:flex items-center text-xs text-slate-300">/</div>
 
-          {/* Academic Scope Badge */}
-          <div className="hidden lg:flex items-center space-x-2 text-xs text-stone-700 px-3 h-9 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] shrink-0 whitespace-nowrap shadow-2xs">
-            <Building className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
-            <span className="font-semibold text-stone-600">BEC Bagalkote</span>
-            <span className="text-stone-300">•</span>
-            <span className="font-bold text-[#0A2E23]">Payments Core</span>
+          {/* Clean Workspace Selector */}
+          <div className="hidden md:flex items-center space-x-2 text-xs text-slate-600 hover:text-slate-900 transition-colors cursor-pointer px-2 py-1 rounded-md hover:bg-slate-100/70">
+            <Building className="w-3.5 h-3.5 text-slate-400" />
+            <span className="font-medium text-slate-600">FinTech Platform</span>
+            <span className="text-slate-300">/</span>
+            <span className="font-semibold text-slate-900">Payments (PAY)</span>
+            <ChevronDown className="w-3 h-3 text-slate-400" />
           </div>
         </div>
 
-        {/* Center: 4 Consolidated Spacious Navigation Tabs - Visible on md: and up */}
-        <nav className="hidden md:flex items-center space-x-1.5 shrink-0">
-          {primaryNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.matchingTabs.includes(currentTab);
-            return (
-              <button
-                key={item.id}
-                onClick={() => setCurrentTab(item.id)}
-                className={`h-9 px-3 lg:px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                  isActive
-                    ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
-                    : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
-                <span className="hidden xl:inline whitespace-nowrap">{item.label}</span>
-                <span className="inline xl:hidden whitespace-nowrap">{item.shortLabel}</span>
-
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Right Actions: Live Region, Search, Audit PDF, Standout Interactive Demo, RBAC Profile */}
-        <div className="flex items-center space-x-2 shrink-0">
-          
-          {/* Cloud Region Environment Indicator */}
-          <div className="hidden 2xl:flex items-center space-x-2 px-3 h-9 rounded-md bg-[#ECFDF5] border border-[#A7F3D0] text-xs font-mono text-[#065F46] shrink-0 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="font-semibold text-stone-600">asia-south1</span>
-            <span className="text-emerald-300">•</span>
-            <span className="font-bold text-[#065F46]">Live</span>
-          </div>
-
-          {/* Search Trigger Button - Fixed Single-Row Width with Guaranteed No-Wrap */}
+        {/* Center: Command Palette Trigger */}
+        <div className="flex-1 max-w-sm mx-4 hidden lg:block">
           <button
             onClick={onOpenCommandPalette}
-            className="w-36 lg:w-44 xl:w-52 h-9 hidden sm:flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden shrink-0"
-            title="Press ⌘K or Ctrl+K to search commands & ledger"
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/90 text-xs text-slate-500 hover:text-slate-800 transition-all cursor-pointer group shadow-2xs"
+            title="Press ⌘K or Ctrl+K to search"
           >
-            <div className="flex items-center space-x-2 min-w-0 pr-1 truncate">
-              <Search className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#064E3B] transition-colors shrink-0" />
-              <span className="text-stone-500 group-hover:text-[#0A2E23] font-medium truncate whitespace-nowrap">
-                Search...
-              </span>
+            <div className="flex items-center space-x-2">
+              <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+              <span className="text-slate-400 group-hover:text-slate-600">Search commands, incidents...</span>
             </div>
-            <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-stone-600 bg-white border border-[#E5E2DA] rounded-sm shrink-0">
+            <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">
               ⌘K
             </kbd>
           </button>
+        </div>
 
-          {/* Mobile search button (< sm) */}
+        {/* Right Actions */}
+        <div className="flex items-center space-x-2.5">
+          
+          {/* Subtle Live Status Indicator */}
+          <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/70">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>asia-south1</span>
+          </div>
+
+          {/* Quick Refresh Seed */}
           <button
-            onClick={onOpenCommandPalette}
-            className="sm:hidden h-9 w-9 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center shrink-0 cursor-pointer shadow-2xs"
-            title="Search (⌘K)"
+            onClick={handleReloadSeed}
+            disabled={isReloading}
+            title="Reset test dataset to baseline"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            <Search className="w-4 h-4 text-stone-500" />
+            <RotateCcw className={`w-4 h-4 ${isReloading ? 'animate-spin text-indigo-600' : ''}`} />
           </button>
 
-          {/* Audit PDF Export Button */}
+          {/* Audit PDF Export */}
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="h-9 px-3.5 rounded-md text-xs font-semibold text-[#0A2E23] bg-white hover:bg-[#F9F8F5] border border-[#D8D4C8] inline-flex items-center space-x-2 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap shadow-2xs shrink-0"
-            title="Generate & Download Full PDF Technical Debt Audit Report"
+            className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
           >
-            <FileDown className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
-            <span className="hidden sm:inline whitespace-nowrap font-medium">{isDownloadingPdf ? 'Generating...' : 'Audit PDF'}</span>
+            <FileDown className="w-3.5 h-3.5 text-slate-500" />
+            <span className="hidden sm:inline">{isDownloadingPdf ? 'Exporting...' : 'Export PDF'}</span>
           </button>
 
-          {/* Standout 1-Click Interactive Demo Button */}
+          {/* Live Demo 1-Click Launch Button */}
           {onLaunchDemo && (
             <button
               onClick={onLaunchDemo}
-              className="h-9 px-4 rounded-md text-xs font-bold text-white bg-[#064E3B] hover:bg-[#043D2E] border border-[#064E3B] inline-flex items-center space-x-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] whitespace-nowrap shrink-0"
+              className="inline-flex items-center space-x-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all cursor-pointer ring-2 ring-indigo-500/20 active:scale-95"
               title="Launch Interactive 1-Click Operational Pipeline Walkthrough"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-pulse shrink-0" />
-              <span className="whitespace-nowrap">Interactive Demo</span>
-              <span className="ml-1 text-[9px] font-mono px-1.5 py-0.2 rounded-xs bg-[#0A2E23] text-emerald-200 font-bold shrink-0">1-CLICK</span>
+              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>Live Demo (1-Click)</span>
             </button>
           )}
 
-          <div className="h-5 w-px bg-[#E5E2DA] shrink-0 mx-0.5" />
+          <div className="h-4 w-px bg-slate-200" />
 
           {/* Role Switcher */}
-          <div className="relative shrink-0">
+          <div className="relative">
             <button
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-              className="h-9 px-3 rounded-md hover:bg-[#F4F2EB] border border-[#E5E2DA] bg-white flex items-center space-x-2.5 transition-colors cursor-pointer group shrink-0 shadow-2xs"
-              title="Active Role & Permissions"
+              className="flex items-center space-x-2 p-1 pl-1.5 pr-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group"
             >
-              <div className="w-6 h-6 rounded-md bg-[#064E3B] text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+              <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px] shadow-2xs">
                 {currentRoleObj.initials}
               </div>
-              <div className="hidden sm:block text-left text-xs leading-none whitespace-nowrap">
-                <span className="font-bold text-[#0A2E23] block">{currentRoleObj.label}</span>
+              <div className="hidden sm:block text-left text-xs leading-none">
+                <span className="font-semibold text-slate-800 block">{currentRoleObj.label}</span>
               </div>
-              <ChevronDown className="w-3 h-3 text-stone-400 group-hover:text-[#0A2E23] transition-colors shrink-0" />
+              <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
             </button>
 
             {showRoleDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl border border-[#D8D4C8] py-1.5 z-50 animate-in fade-in duration-100">
-                <div className="px-3 py-1.5 border-b border-[#F0EDE5] text-[10px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50 animate-in fade-in duration-100">
+                <div className="px-3 py-1.5 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Switch Active Role (RBAC)
                 </div>
                 {roles.map((r) => (
@@ -286,54 +190,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setCurrentRole(r.role);
                       setShowRoleDropdown(false);
                     }}
-                    className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs hover:bg-[#F9F8F5] transition-colors cursor-pointer ${
-                      currentRole === r.role ? 'bg-[#ECFDF5] text-[#065F46] font-bold' : 'text-stone-700'
+                    className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors cursor-pointer ${
+                      currentRole === r.role ? 'bg-indigo-50/70 text-indigo-900 font-medium' : 'text-slate-700'
                     }`}
                   >
                     <div>
-                      <div className="font-bold">{r.label}</div>
-                      <div className="text-[10px] text-stone-400">{r.desc}</div>
+                      <div className="font-semibold">{r.label}</div>
+                      <div className="text-[10px] text-slate-400">{r.desc}</div>
                     </div>
-                    {currentRole === r.role && <CheckCircle2 className="w-3.5 h-3.5 text-[#065F46]" />}
+                    {currentRole === r.role && <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />}
                   </button>
                 ))}
               </div>
             )}
           </div>
+
         </div>
-
       </div>
-
-      {/* Responsive Horizontal Navigation for Mobile screens only (< md) */}
-      <div className="md:hidden bg-[#FAF9F6] border-t border-[#E5E2DA] px-4 py-2 overflow-x-auto no-scrollbar">
-        <nav className="flex items-center space-x-1.5 min-w-max">
-          {primaryNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.matchingTabs.includes(currentTab);
-            return (
-              <button
-                key={item.id}
-                onClick={() => setCurrentTab(item.id)}
-                className={`h-8.5 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                  isActive
-                    ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
-                    : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
-                <span className="whitespace-nowrap">{item.label}</span>
-
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
     </header>
   );
 };
