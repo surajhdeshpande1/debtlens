@@ -341,12 +341,12 @@ And with one click on the Export PDF button, our system produces an executive co
     <div className="space-y-6 max-w-[1400px] mx-auto pb-12 overflow-x-hidden select-none">
       
       {/* Top Banner & Control Deck */}
-      <div className="bg-slate-900 text-white rounded-md p-5 sm:p-6 shadow-md border border-slate-800 relative overflow-hidden">
+      <div className="bg-[#0A2E23] text-white rounded-md p-5 sm:p-6 shadow-md border border-[#064E3B] relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono font-semibold">
-                <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-[#064E3B] text-emerald-200 border border-[#053D2E] text-[10px] font-mono font-semibold">
+                <GraduationCap className="w-3.5 h-3.5 text-emerald-300" />
                 <span>BEC BAGALKOTE • BISA531P MINI PROJECT</span>
               </span>
               <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 text-[10px] font-mono">
@@ -443,10 +443,10 @@ And with one click on the Export PDF button, our system produces an executive co
               onClick={() => handleJumpToStage(idx)}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
                 isCurrent 
-                  ? 'bg-blue-700 text-white border-blue-700 shadow-xs font-bold'
+                  ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
                   : isDone
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-950'
+                  ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0] hover:bg-[#D1FAE5]'
+                  : 'bg-white text-stone-600 border-[#E5E2DA] hover:bg-[#F9F8F5] hover:text-[#0A2E23]'
               }`}
             >
               <div className={`w-4 h-4 rounded-sm flex items-center justify-center text-[10px] font-bold ${

@@ -163,7 +163,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
 
           <button
             onClick={onOpenDebtModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-blue-800"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-[#064E3B]"
           >
             <Plus className="w-4 h-4" />
             <span>Register Debt Item</span>
@@ -282,7 +282,7 @@ export const DebtRegistryPage: React.FC<DebtRegistryPageProps> = ({ projectId, o
                         key={d.id} 
                         onClick={() => setSelectedDebt(d)}
                         className={`hover:bg-slate-50 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-blue-50/40 border-l-4 border-blue-700' : ''
+                          isSelected ? 'bg-[#ECFDF5]/60 border-l-4 border-[#064E3B]' : ''
                         }`}
                       >
                         {/* Key & Module */}

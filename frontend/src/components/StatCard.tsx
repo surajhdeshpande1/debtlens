@@ -21,33 +21,33 @@ export const StatCard: React.FC<StatCardProps> = ({
   badge
 }) => {
   const badgeStyles = {
-    negative: 'bg-red-50 text-red-700 border-red-200',
-    warning: 'bg-amber-50 text-amber-700 border-amber-200',
-    positive: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    neutral: 'bg-slate-100 text-slate-700 border-slate-200'
+    negative: 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB]',
+    warning: 'bg-[#FEF9EE] text-[#B45309] border-[#FDE68A]',
+    positive: 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]',
+    neutral: 'bg-[#F4F2EB] text-[#0A2E23] border-[#E2DFD6]'
   };
 
   const topBorderStyles = {
-    crimson: 'border-t-2 border-t-red-600',
-    ochre: 'border-t-2 border-t-amber-600',
-    emerald: 'border-t-2 border-t-emerald-600',
-    navy: 'border-t-2 border-t-slate-800'
+    crimson: 'border-t-2 border-t-[#881337]',
+    ochre: 'border-t-2 border-t-[#D97706]',
+    emerald: 'border-t-2 border-t-[#059669]',
+    navy: 'border-t-2 border-t-[#064E3B]'
   };
 
   const iconStyles = {
-    crimson: 'bg-red-50 text-red-700 border-red-100',
-    ochre: 'bg-amber-50 text-amber-700 border-amber-100',
-    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    navy: 'bg-slate-100 text-slate-800 border-slate-200'
+    crimson: 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB]',
+    ochre: 'bg-[#FEF9EE] text-[#B45309] border-[#FDE68A]',
+    emerald: 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]',
+    navy: 'bg-[#F4F2EB] text-[#064E3B] border-[#E2DFD6]'
   };
 
   const resolvedAccent = accentColor || (badge?.variant === 'negative' ? 'crimson' : badge?.variant === 'warning' ? 'ochre' : badge?.variant === 'positive' ? 'emerald' : 'navy');
 
   return (
-    <div className={`bg-white rounded-md border border-slate-200/90 ${topBorderStyles[resolvedAccent]} p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-md transition-all duration-150 flex flex-col justify-between min-h-[148px]`}>
+    <div className={`bg-white rounded-md border border-[#E5E2DA] ${topBorderStyles[resolvedAccent]} p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-md transition-all duration-150 flex flex-col justify-between min-h-[148px]`}>
       <div>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">
+          <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
             {title}
           </span>
           {Icon && (
@@ -58,7 +58,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </div>
 
         <div className="mt-3 flex items-baseline justify-between gap-2 flex-wrap">
-          <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-mono">
+          <span className="text-2xl sm:text-3xl font-extrabold text-[#0A2E23] tracking-tight font-mono">
             {value}
           </span>
           {badge && (
@@ -70,7 +70,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-3 text-xs text-slate-600 font-medium leading-relaxed border-t border-slate-100 pt-2">
+        <p className="mt-3 text-xs text-stone-600 font-medium leading-relaxed border-t border-[#F0EDE5] pt-2">
           {subtitle}
         </p>
       )}

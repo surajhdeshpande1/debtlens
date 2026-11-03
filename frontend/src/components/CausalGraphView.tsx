@@ -30,18 +30,18 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
       switch (category?.toUpperCase()) {
         case 'ARCHITECTURE':
         case 'ARCHITECTURAL':
-          return { bg: '#EFF6FF', border: '#1D4ED8', text: '#1E3A8A' }; // Royal Blue
+          return { bg: '#ECFDF5', border: '#064E3B', text: '#0A2E23' }; // Sage & Deep Forest
         case 'DATABASE':
         case 'CONCURRENCY':
-          return { bg: '#F1F5F9', border: '#0F172A', text: '#0F172A' }; // Midnight Navy
+          return { bg: '#F1F5F3', border: '#0A2E23', text: '#0A2E23' }; // Forest Slate
         case 'PERFORMANCE':
         case 'CODE_LOGIC':
-          return { bg: '#FEF2F2', border: '#991B1B', text: '#7F1D1D' }; // Crimson
+          return { bg: '#FDF2F4', border: '#881337', text: '#881337' }; // Burgundy
         case 'NETWORK':
         case 'INFRASTRUCTURE':
-          return { bg: '#ECFDF5', border: '#065F46', text: '#064E3B' }; // Emerald
+          return { bg: '#FEF9EE', border: '#B45309', text: '#78350F' }; // Warm Ochre
         default:
-          return { bg: '#FFFFFF', border: '#64748B', text: '#1E293B' };
+          return { bg: '#FFFFFF', border: '#A8A29E', text: '#0A2E23' };
       }
     };
 
@@ -350,7 +350,7 @@ export const CausalGraphView: React.FC<CausalGraphViewProps> = ({
                 description: selectedNode.fullLabel,
                 category: selectedNode.category
               })}
-              className="mt-3 w-full py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-blue-800"
+              className="mt-3 w-full py-2 bg-[#064E3B] hover:bg-[#043D2E] text-white rounded-md text-xs font-bold shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-[#064E3B]"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Create Remediation Debt Item for this Root Cause</span>

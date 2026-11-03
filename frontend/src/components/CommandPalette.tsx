@@ -322,31 +322,31 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-md cursor-pointer transition-colors ${
                     isSelected 
-                      ? 'bg-zinc-100 text-black' 
-                      : 'hover:bg-zinc-50 text-zinc-700'
+                      ? 'bg-[#ECFDF5] text-[#0A2E23]' 
+                      : 'hover:bg-[#F9F8F5] text-stone-700'
                   }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
                     <div className={`p-2 rounded-md border ${
                       isSelected 
-                        ? 'bg-black text-white border-black' 
-                        : 'bg-white text-zinc-500 border-zinc-200'
+                        ? 'bg-[#064E3B] text-white border-[#064E3B]' 
+                        : 'bg-white text-stone-500 border-[#E5E2DA]'
                     }`}>
                       <Icon className="w-3.5 h-3.5" />
                     </div>
 
                     <div className="truncate">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-semibold text-black truncate">
+                        <span className="text-xs font-semibold text-[#0A2E23] truncate">
                           {item.title}
                         </span>
                         {item.badge && (
                           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-sm border uppercase ${
                             item.badge.includes('BREAK-EVEN')
-                              ? 'bg-black text-white border-black'
+                              ? 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB]'
                               : isSelected
-                              ? 'bg-black text-white border-black'
-                              : 'bg-zinc-100 text-zinc-700 border-zinc-200'
+                              ? 'bg-[#064E3B] text-white border-[#064E3B]'
+                              : 'bg-[#F4F2EB] text-stone-700 border-[#E2DFD6]'
                           }`}>
                             {item.badge}
                           </span>
@@ -354,7 +354,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       </div>
 
                       {item.subtitle && (
-                        <p className="text-[11px] text-zinc-500 truncate mt-0.5">
+                        <p className="text-[11px] text-stone-500 truncate mt-0.5">
                           {item.subtitle}
                         </p>
                       )}
@@ -362,10 +362,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   </div>
 
                   <div className="flex items-center space-x-2 pl-3 shrink-0">
-                    <span className="text-[10px] text-zinc-400 font-mono">
+                    <span className="text-[10px] text-stone-400 font-mono">
                       {item.category}
                     </span>
-                    <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-black' : 'text-zinc-300'}`} />
+                    <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-[#064E3B]' : 'text-stone-300'}`} />
                   </div>
                 </div>
               );

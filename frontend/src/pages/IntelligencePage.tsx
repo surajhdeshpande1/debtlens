@@ -367,12 +367,12 @@ export const IntelligencePage: React.FC<IntelligencePageProps> = ({ projectId })
                     <div className="text-[10px] text-zinc-500 font-mono">cos(emb_a, emb_b)</div>
                   </div>
 
-                  <div className="p-3 bg-blue-700 text-white rounded-md border border-blue-800 shadow-xs">
-                    <div className="text-[10px] font-bold text-blue-100 uppercase">Hybrid Formulation Score</div>
+                  <div className="p-3 bg-[#064E3B] text-white rounded-md border border-[#043D2E] shadow-xs">
+                    <div className="text-[10px] font-bold text-emerald-100 uppercase">Hybrid Formulation Score</div>
                     <div className="text-2xl font-bold font-mono text-white mt-0.5">
                       {(comparisonResult.hybrid_score * 100).toFixed(1)}%
                     </div>
-                    <div className="text-[10px] text-blue-200 font-mono">α·lex + (1-α)·sem</div>
+                    <div className="text-[10px] text-emerald-200 font-mono">α·lex + (1-α)·sem</div>
                   </div>
                 </div>
 

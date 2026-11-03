@@ -121,11 +121,11 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
 
         <div className="flex items-center space-x-2">
           {/* Sub-tab toggle */}
-          <div className="flex items-center bg-zinc-100 border border-zinc-200 rounded-md p-0.5 text-xs font-semibold">
+          <div className="flex items-center bg-[#F9F8F5] border border-[#E5E2DA] rounded-md p-0.5 text-xs font-semibold">
             <button
               onClick={() => setActiveTab('articles')}
               className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-bold ${
-                activeTab === 'articles' ? 'bg-black text-white shadow-xs' : 'text-zinc-600 hover:text-black'
+                activeTab === 'articles' ? 'bg-[#064E3B] text-white shadow-xs' : 'text-stone-600 hover:text-[#0A2E23]'
               }`}
             >
               Post-Mortems
@@ -133,7 +133,7 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
             <button
               onClick={() => setActiveTab('viva')}
               className={`px-3 py-1.5 rounded-md transition-all flex items-center space-x-1 cursor-pointer font-bold ${
-                activeTab === 'viva' ? 'bg-black text-white shadow-xs' : 'text-zinc-600 hover:text-black'
+                activeTab === 'viva' ? 'bg-[#064E3B] text-white shadow-xs' : 'text-stone-600 hover:text-[#0A2E23]'
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloading}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold border border-blue-800 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold border border-[#064E3B] shadow-xs transition-all cursor-pointer disabled:opacity-50"
           >
             <FileDown className="w-3.5 h-3.5" />
             <span>{isDownloading ? 'Generating...' : 'Export PDF'}</span>
@@ -156,7 +156,7 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
       <div className="bg-white rounded-md border border-slate-200/90 p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
           <div className="space-y-1">
-            <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-bold text-[#064E3B] uppercase tracking-wider font-mono">
               Basaveshwar Engineering College Bagalkote
             </span>
             <h3 className="text-lg font-bold text-slate-900">

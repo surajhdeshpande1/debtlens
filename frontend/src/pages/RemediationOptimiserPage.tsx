@@ -124,8 +124,8 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
               onClick={() => handleBudgetChange(preset.val)}
               className={`px-3 py-1 text-xs rounded-md border font-semibold transition-all cursor-pointer ${
                 budget === preset.val
-                  ? 'bg-black text-white border-black font-bold shadow-xs'
-                  : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100'
+                  ? 'bg-[#064E3B] text-white border-[#064E3B] font-bold shadow-xs'
+                  : 'bg-[#F9F8F5] text-stone-700 border-[#E5E2DA] hover:bg-[#F2EFE8]'
               }`}
             >
               {preset.label}
@@ -142,7 +142,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
             step="5"
             value={budget}
             onChange={(e) => handleBudgetChange(parseFloat(e.target.value))}
-            className="w-full accent-black h-2 bg-zinc-100 rounded-md cursor-pointer"
+            className="w-full accent-[#064E3B] h-2 bg-[#F0EDE5] rounded-md cursor-pointer"
           />
           <div className="flex justify-between text-[11px] font-mono text-zinc-500 font-medium">
             <span>10 hrs</span>
@@ -165,7 +165,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
             <div className="w-full h-7 bg-zinc-100 rounded-md border border-zinc-200 p-0.5 flex overflow-hidden shadow-inner">
               {plan.selected_items.map((it, idx) => {
                 const widthPct = (it.effort_principal / budget) * 100;
-                const colors = ['bg-slate-900', 'bg-blue-700', 'bg-emerald-700', 'bg-amber-600', 'bg-indigo-700'];
+                const colors = ['bg-[#064E3B]', 'bg-[#059669]', 'bg-[#D97706]', 'bg-[#881337]', 'bg-[#0A2E23]'];
                 return (
                   <div
                     key={it.id}
@@ -208,28 +208,28 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
               <div className="text-[10px] text-zinc-500 mt-0.5 font-medium">{plan.deferred_items.length} deferred</div>
             </div>
 
-            <div className="p-3 bg-blue-50/60 rounded-md border border-blue-200 shadow-2xs">
-              <div className="text-[10px] font-bold text-blue-900 uppercase">Risk Reduction Score</div>
-              <div className="text-sm font-bold text-blue-900 font-mono mt-0.5">
+            <div className="p-3 bg-[#ECFDF5] rounded-md border border-[#A7F3D0] shadow-2xs">
+              <div className="text-[10px] font-bold text-[#064E3B] uppercase">Risk Reduction Score</div>
+              <div className="text-sm font-bold text-[#064E3B] font-mono mt-0.5">
                 {plan.total_risk_reduced} pts
               </div>
-              <div className="text-[10px] text-blue-700 mt-0.5 font-medium">Maximized via 0/1 DP</div>
+              <div className="text-[10px] text-[#065F46] mt-0.5 font-medium">Maximized via 0/1 DP</div>
             </div>
 
-            <div className="p-3 bg-emerald-50/60 rounded-md border border-emerald-200 shadow-2xs">
-              <div className="text-[10px] font-bold text-emerald-900 uppercase">Interest Cost Saved</div>
-              <div className="text-sm font-bold text-emerald-900 font-mono mt-0.5">
+            <div className="p-3 bg-[#ECFDF5]/60 rounded-md border border-[#A7F3D0] shadow-2xs">
+              <div className="text-[10px] font-bold text-[#065F46] uppercase">Interest Cost Saved</div>
+              <div className="text-sm font-bold text-[#065F46] font-mono mt-0.5">
                 {plan.accumulated_interest_saved} hrs
               </div>
-              <div className="text-[10px] text-emerald-700 mt-0.5 font-medium">Prevented drag</div>
+              <div className="text-[10px] text-[#065F46] mt-0.5 font-medium">Prevented drag</div>
             </div>
 
-            <div className="p-3 bg-emerald-50 rounded-md border border-emerald-300 shadow-2xs">
-              <div className="text-[10px] font-bold text-emerald-950 uppercase font-mono">Payoff Return (ROI)</div>
-              <div className="text-base font-extrabold text-emerald-800 font-mono mt-0.5">
+            <div className="p-3 bg-[#FEF9EE] rounded-md border border-[#FDE68A] shadow-2xs">
+              <div className="text-[10px] font-bold text-[#B45309] uppercase font-mono">Payoff Return (ROI)</div>
+              <div className="text-base font-extrabold text-[#B45309] font-mono mt-0.5">
                 {roiRatio}x
               </div>
-              <div className="text-[10px] text-emerald-700 mt-0.5 font-medium">Interest / Effort</div>
+              <div className="text-[10px] text-[#B45309] mt-0.5 font-medium">Interest / Effort</div>
             </div>
           </div>
         )}
@@ -408,7 +408,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
                     type="monotone" 
                     dataKey="risk_reduction" 
                     name="Risk Reduction Score" 
-                    stroke="#1D4ED8" 
+                    stroke="#064E3B" 
                     strokeWidth={2.5} 
                     dot={{ r: 4 }} 
                   />

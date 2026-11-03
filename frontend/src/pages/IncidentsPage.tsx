@@ -106,33 +106,33 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
   const severityBadge = (sev: IncidentSeverity) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-red-50 text-red-700 border-red-200 font-mono font-bold';
+        return 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB] font-mono font-bold';
       case 'HIGH':
-        return 'bg-amber-50 text-amber-700 border-amber-200 font-mono font-bold';
+        return 'bg-[#FEF9EE] text-[#B45309] border-[#FDE68A] font-mono font-bold';
       case 'MEDIUM':
-        return 'bg-blue-50 text-blue-700 border-blue-200 font-mono font-bold';
+        return 'bg-[#F1F5F3] text-[#064E3B] border-[#A7F3D0] font-mono font-bold';
       case 'LOW':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-mono font-bold';
+        return 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0] font-mono font-bold';
     }
   };
 
   const statusBadge = (stat: IncidentStatus) => {
     switch (stat) {
       case 'OPEN':
-        return 'bg-red-50 text-red-700 border-red-200 font-mono font-bold';
+        return 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB] font-mono font-bold';
       case 'INVESTIGATING':
-        return 'bg-amber-50 text-amber-700 border-amber-200 font-mono font-bold';
+        return 'bg-[#FEF9EE] text-[#B45309] border-[#FDE68A] font-mono font-bold';
       case 'RESOLVED':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-mono font-bold';
+        return 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0] font-mono font-bold';
     }
   };
 
   const getModuleBadge = (_moduleName: string) => {
-    return 'bg-slate-100 text-slate-800 border-slate-200 font-mono font-semibold';
+    return 'bg-[#F9F8F5] text-stone-800 border-[#E5E2DA] font-mono font-semibold';
   };
 
   const getSimilarityBadge = (_score: number) => {
-    return 'text-blue-700 bg-blue-50 border-blue-200 font-mono font-bold';
+    return 'text-[#065F46] bg-[#ECFDF5] border-[#A7F3D0] font-mono font-bold';
   };
 
   return (
@@ -164,7 +164,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
 
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-blue-800"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-[#064E3B]"
           >
             <Plus className="w-4 h-4" />
             <span>Report New Incident</span>

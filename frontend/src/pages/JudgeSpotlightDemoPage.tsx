@@ -712,10 +712,10 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
                   onClick={() => setCurrentStep(s.step)}
                   className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md transition-all cursor-pointer text-left shrink-0 ${
                     isActive
-                      ? 'bg-blue-700 text-white font-bold ring-1 ring-blue-700 shadow-xs'
+                      ? 'bg-[#064E3B] text-white font-bold ring-1 ring-[#064E3B] shadow-xs'
                       : isCompleted
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 font-semibold'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 font-medium'
+                      ? 'bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] hover:bg-[#D1FAE5] font-semibold'
+                      : 'bg-white text-stone-600 border border-[#E5E2DA] hover:bg-[#F9F8F5] hover:text-[#0A2E23] font-medium'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded-sm flex items-center justify-center shrink-0 ${
@@ -1203,7 +1203,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               </button>
               <button
                 onClick={handleNext}
-                className="px-4 py-1.5 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs cursor-pointer border border-blue-800"
+                className="px-4 py-1.5 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs cursor-pointer border border-[#064E3B]"
               >
                 {currentConfig.nextLabel}
               </button>
@@ -1216,7 +1216,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
             {/* Left: Stage Title & Clear Q&A Explanation */}
             <div className="flex-1 w-full md:w-auto">
               <div className="flex items-center space-x-2 mb-1 flex-wrap gap-1">
-                <span className="px-2 py-0.5 rounded-sm bg-black text-white font-mono font-bold text-[9px] tracking-wider uppercase">
+                <span className="px-2 py-0.5 rounded-sm bg-[#064E3B] text-white font-mono font-bold text-[9px] tracking-wider uppercase">
                   {currentConfig.badge}
                 </span>
                 <span className="text-xs font-bold text-black">
@@ -1252,7 +1252,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
               {/* Master ONE-CLICK Step Advance Button */}
               <button
                 onClick={handleNext}
-                className="px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-xs hover:shadow-sm flex items-center space-x-1.5 transition-all cursor-pointer active:scale-[0.99] border border-blue-800"
+                className="px-4 py-2 rounded-md bg-[#064E3B] hover:bg-[#043D2E] text-white text-xs font-bold shadow-xs hover:shadow-sm flex items-center space-x-1.5 transition-all cursor-pointer active:scale-[0.99] border border-[#064E3B]"
               >
                 <span>{currentConfig.nextLabel}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

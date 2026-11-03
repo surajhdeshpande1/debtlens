@@ -109,7 +109,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-white">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+            <div className="p-2 rounded-md bg-[#ECFDF5] text-[#064E3B] border border-[#A7F3D0]">
               <Coins className="w-5 h-5" />
             </div>
             <div>
@@ -291,7 +291,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md text-xs font-bold bg-blue-700 hover:bg-blue-800 text-white border border-blue-800 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-bold bg-[#064E3B] hover:bg-[#043D2E] text-white border border-[#064E3B] shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? 'Registering...' : 'Register Debt Item'}
             </button>
