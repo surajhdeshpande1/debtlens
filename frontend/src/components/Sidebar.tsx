@@ -4,11 +4,10 @@ import {
   AlertCircle, 
   GitFork, 
   Coins, 
+  Calculator, 
   GitBranch, 
   Sparkles, 
-  Calculator, 
-  BookOpen,
-  GraduationCap
+  BookOpen
 } from 'lucide-react';
 
 export type NavTab = 
@@ -16,9 +15,9 @@ export type NavTab =
   | 'incidents' 
   | 'causal' 
   | 'debt' 
+  | 'optimiser' 
   | 'repository' 
   | 'intelligence' 
-  | 'optimiser' 
   | 'knowledge'
   | 'demo';
 
@@ -33,10 +32,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   setCurrentTab,
-  openIncidentsCount = 0,
-  breakevenDebtCount = 0,
-  regressionsCount = 0
+  openIncidentsCount = 2,
+  breakevenDebtCount = 6,
+  regressionsCount = 1
 }) => {
+
   const coreNavItems: { 
     id: NavTab; 
     label: string; 
@@ -78,8 +78,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const remediationNavItems: {
     id: NavTab;
     label: string;
-    icon: React.ComponentType<{ className?: string }>;
-    badge?: number;
+    icon: React.ComponentType<{ className?: string }>; 
+    badge?: number; 
     badgeVariant?: 'solid' | 'subtle' | 'neutral';
     moduleCode: string;
   }[] = [
@@ -123,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderNavGroup = (items: typeof coreNavItems) => (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = currentTab === item.id;
@@ -131,13 +131,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             key={item.id}
             onClick={() => setCurrentTab(item.id)}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
               isActive
                 ? 'bg-zinc-100 text-black font-bold border border-zinc-300 border-l-4 border-l-black shadow-2xs'
-                : 'text-zinc-600 hover:bg-zinc-50 hover:text-black font-medium'
+                : 'text-zinc-600 hover:bg-zinc-50 hover:text-black font-medium border border-transparent'
             }`}
           >
-            <div className="flex items-center space-x-2.5 truncate">
+            <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
               <Icon className={`w-4 h-4 shrink-0 transition-colors ${
                 isActive ? 'text-black' : 'text-zinc-400 group-hover:text-black'
               }`} />
@@ -145,9 +145,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className="flex items-center space-x-1.5 shrink-0">
-              <span className="text-[10px] text-zinc-400 font-mono font-medium">{item.moduleCode}</span>
+              <span className="text-[10px] text-zinc-500 font-mono font-semibold px-1.5 py-0.5 rounded-sm bg-zinc-100 border border-zinc-200">
+                {item.moduleCode}
+              </span>
               {item.badge !== undefined && item.badge > 0 && (
-                <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
+                <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
                   {item.badge}
                 </span>
               )}
@@ -159,55 +161,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 
   return (
-    <aside className="w-64 bg-white border-r border-zinc-200 shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
-      <div className="space-y-4">
+    <aside className="w-72 bg-white border-r border-zinc-200 shrink-0 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between select-none">
+      <div className="space-y-5">
         
-        {/* Prominent Live Demo Mode Button - Minimal Solid Black */}
+        {/* Prominent Live Demo Mode Button - Minimal Solid Black with Spacious Sizing */}
         <button
           onClick={() => setCurrentTab('demo')}
-          className={`w-full px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer border ${
+          className={`w-full h-11 px-4 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer border ${
             currentTab === 'demo'
               ? 'bg-zinc-900 text-white border-black shadow-md ring-1 ring-zinc-700'
               : 'bg-black hover:bg-zinc-800 text-white border-black shadow-xs'
           }`}
         >
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-white animate-pulse" />
-            <span>Interactive Demo</span>
+          <div className="flex items-center space-x-2.5">
+            <Sparkles className="w-4 h-4 text-white animate-pulse shrink-0" />
+            <span className="font-bold">Interactive Demo</span>
           </div>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm font-mono bg-white/20 text-white tracking-wider">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm font-mono bg-zinc-800 text-white border border-zinc-700 tracking-wider">
             1-CLICK
           </span>
         </button>
 
         {/* Section 1: Core Intelligence */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+          <div className="px-3.5 pb-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between font-mono">
             <span>Core Intelligence</span>
-            <span className="font-mono text-[9px] text-zinc-400">LEDGER</span>
+            <span className="text-[9px] text-zinc-400">LEDGER</span>
           </div>
           {renderNavGroup(coreNavItems)}
         </div>
 
         {/* Section 2: Remediation & Architecture */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+          <div className="px-3.5 pb-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between font-mono">
             <span>Remediation Engine</span>
-            <span className="font-mono text-[9px] text-zinc-400">SOLVER</span>
+            <span className="text-[9px] text-zinc-400">SOLVER</span>
           </div>
           {renderNavGroup(remediationNavItems)}
         </div>
       </div>
 
       {/* Institutional Department Endorsement Footer */}
-      <div className="pt-3 border-t border-zinc-200">
-        <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 text-zinc-700 text-xs">
-          <div className="flex items-center space-x-1.5 mb-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-black" />
+      <div className="pt-4 border-t border-zinc-200">
+        <div className="p-3.5 bg-zinc-50 rounded-md border border-zinc-200 text-zinc-700 text-xs space-y-1">
+          <div className="flex items-center space-x-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
             <span className="text-[11px] font-bold text-black">BEC Bagalkote — Dept of ISE</span>
           </div>
           <div className="text-[10px] text-zinc-500 font-mono">5th Sem Mini Project • BISA531P</div>
-          <div className="text-[10px] text-black font-medium mt-0.5">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-[10px] text-black font-semibold pt-0.5">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

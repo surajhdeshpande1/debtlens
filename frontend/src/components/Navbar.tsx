@@ -6,10 +6,8 @@ import {
   CheckCircle2, 
   ChevronDown,
   Building,
-  FolderGit2,
   Search,
-  Sparkles,
-  GraduationCap
+  Sparkles
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
@@ -72,59 +70,61 @@ export const Navbar: React.FC<NavbarProps> = ({
   const currentRoleObj = roles.find(r => r.role === currentRole) || roles[0];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/98 backdrop-blur-md border-b border-zinc-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-white border-b border-zinc-200">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         
         {/* Brand & Workspace Context */}
-        <div className="flex items-center space-x-3.5">
+        <div className="flex items-center space-x-3 shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white shadow-xs border border-black">
+            <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white border border-black shadow-xs">
               <Layers className="w-4 h-4 text-white" />
             </div>
             <div className="flex items-baseline space-x-1.5">
               <span className="text-base font-extrabold tracking-tight text-black font-sans">
                 DEBTLENS
               </span>
-              <span className="text-[10px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded-sm border border-zinc-200">
+              <span className="text-[10px] font-mono font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.5 rounded-sm border border-zinc-200">
                 v1.0
               </span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center text-zinc-300 font-light">|</div>
+          <div className="hidden xl:flex items-center text-zinc-300 font-light">|</div>
 
           {/* Academic & Platform Scope Indicator */}
-          <div className="hidden md:flex items-center space-x-2 text-xs text-zinc-700 px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200">
-            <Building className="w-3.5 h-3.5 text-black" />
+          <div className="hidden xl:flex items-center space-x-2 text-xs text-zinc-700 px-3 py-1.5 rounded-md bg-zinc-50 border border-zinc-200 h-9">
+            <Building className="w-3.5 h-3.5 text-black shrink-0" />
             <span className="font-semibold text-zinc-600">BEC Bagalkote</span>
             <span className="text-zinc-300">/</span>
-            <span className="font-bold text-black">Payments Engine (PAY)</span>
+            <span className="font-bold text-black whitespace-nowrap">Payments Engine (PAY)</span>
           </div>
         </div>
 
-        {/* Center: Command Palette Trigger */}
-        <div className="flex-1 max-w-sm mx-4 hidden lg:block">
+        {/* Center: Command Palette Trigger (Single line, strictly bounded, cannot wrap or pop out) */}
+        <div className="flex-1 max-w-xs mx-2 hidden lg:block">
           <button
             onClick={onOpenCommandPalette}
-            className="w-full flex items-center justify-between px-3 py-1.5 rounded-md bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-600 hover:text-black transition-all cursor-pointer group"
+            className="w-full h-9 flex items-center justify-between px-3 rounded-md bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs text-zinc-600 hover:text-black transition-all cursor-pointer group"
             title="Press ⌘K or Ctrl+K to search"
           >
-            <div className="flex items-center space-x-2">
-              <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black transition-colors" />
-              <span className="text-zinc-500 group-hover:text-black font-medium">Search commands, incidents, ledger...</span>
+            <div className="flex items-center space-x-2 min-w-0 pr-2">
+              <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black transition-colors shrink-0" />
+              <span className="text-zinc-500 group-hover:text-black font-medium truncate whitespace-nowrap">
+                Search commands, incidents...
+              </span>
             </div>
-            <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-600 bg-white border border-zinc-200 rounded-sm">
+            <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-600 bg-white border border-zinc-200 rounded-sm shrink-0">
               ⌘K
             </kbd>
           </button>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center space-x-2">
+        {/* Right Actions: All uniform height h-9, spacious padding, regular rectangular shape */}
+        <div className="flex items-center space-x-2 shrink-0">
           
           {/* Live Telemetry Indicator */}
-          <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-sm text-[11px] font-mono font-semibold text-black bg-zinc-100 border border-zinc-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+          <div className="hidden md:flex items-center space-x-1.5 px-3 h-9 rounded-md text-xs font-mono font-semibold text-black bg-zinc-100 border border-zinc-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse shrink-0" />
             <span>asia-south1 • Live</span>
           </div>
 
@@ -133,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={handleReloadSeed}
             disabled={isReloading}
             title="Reset test dataset to baseline"
-            className="p-1.5 rounded-md text-zinc-600 hover:text-black hover:bg-zinc-100 border border-zinc-200 bg-white transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-9 w-9 rounded-md text-zinc-700 hover:text-black hover:bg-zinc-100 border border-zinc-300 bg-white flex items-center justify-center transition-colors disabled:opacity-50 cursor-pointer"
           >
             <RotateCcw className={`w-3.5 h-3.5 ${isReloading ? 'animate-spin text-black' : ''}`} />
           </button>
@@ -142,9 +142,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-black bg-white hover:bg-zinc-100 border border-zinc-300 transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-9 px-3.5 rounded-md text-xs font-semibold text-black bg-white hover:bg-zinc-100 border border-zinc-300 inline-flex items-center space-x-1.5 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap"
           >
-            <FileDown className="w-3.5 h-3.5 text-black" />
+            <FileDown className="w-3.5 h-3.5 text-black shrink-0" />
             <span className="hidden sm:inline">{isDownloadingPdf ? 'Exporting...' : 'Audit PDF'}</span>
           </button>
 
@@ -152,34 +152,34 @@ export const Navbar: React.FC<NavbarProps> = ({
           {onLaunchDemo && (
             <button
               onClick={onLaunchDemo}
-              className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold text-white bg-black hover:bg-zinc-800 transition-all cursor-pointer border border-black active:scale-[0.99]"
+              className="h-9 px-4 rounded-md text-xs font-bold text-white bg-black hover:bg-zinc-800 border border-black inline-flex items-center space-x-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] whitespace-nowrap"
               title="Launch Interactive 1-Click Operational Pipeline Walkthrough"
             >
-              <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-white animate-pulse shrink-0" />
               <span>Demo Walkthrough</span>
             </button>
           )}
 
-          <div className="h-4 w-px bg-zinc-200" />
+          <div className="h-5 w-px bg-zinc-200" />
 
           {/* Role Switcher */}
           <div className="relative">
             <button
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-              className="flex items-center space-x-2 p-1 pl-1.5 pr-2 rounded-md hover:bg-zinc-100 border border-transparent hover:border-zinc-200 transition-colors cursor-pointer group"
+              className="h-9 px-2.5 rounded-md hover:bg-zinc-100 border border-zinc-200 bg-white flex items-center space-x-2 transition-colors cursor-pointer group"
             >
-              <div className="w-6 h-6 rounded-md bg-black text-white flex items-center justify-center font-bold text-[10px]">
+              <div className="w-6 h-6 rounded-md bg-black text-white flex items-center justify-center font-bold text-[10px] shrink-0">
                 {currentRoleObj.initials}
               </div>
               <div className="hidden sm:block text-left text-xs leading-none">
                 <span className="font-bold text-black block">{currentRoleObj.label}</span>
               </div>
-              <ChevronDown className="w-3 h-3 text-zinc-400 group-hover:text-black transition-colors" />
+              <ChevronDown className="w-3 h-3 text-zinc-400 group-hover:text-black transition-colors shrink-0" />
             </button>
 
             {showRoleDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-zinc-200 py-1.5 z-50 animate-in fade-in duration-100">
-                <div className="px-3 py-1.5 border-b border-zinc-100 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl border border-zinc-300 py-1.5 z-50 animate-in fade-in duration-100">
+                <div className="px-3 py-1.5 border-b border-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                   Switch Active Role (RBAC)
                 </div>
                 {roles.map((r) => (
@@ -194,8 +194,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     }`}
                   >
                     <div>
-                      <div className="font-bold">{r.label}</div>
-                      <div className="text-[10px] text-zinc-400">{r.desc}</div>
+                      <div className="font-bold text-black">{r.label}</div>
+                      <div className="text-[10px] text-zinc-500">{r.desc}</div>
                     </div>
                     {currentRole === r.role && <CheckCircle2 className="w-3.5 h-3.5 text-black" />}
                   </button>
@@ -204,6 +204,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
         </div>
+
       </div>
     </header>
   );

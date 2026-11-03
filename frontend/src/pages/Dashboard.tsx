@@ -73,8 +73,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <div className="space-y-6">
       
       {/* Executive Institutional Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-200">
-        <div>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-zinc-200">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center space-x-2 text-xs text-zinc-500 mb-1 font-mono">
             <span>Portfolio</span>
             <span>/</span>
@@ -93,28 +93,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-2">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             onClick={() => onNavigateTab('demo')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-black hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer border border-black active:scale-[0.99]"
+            className="h-9 px-4 rounded-md bg-black hover:bg-zinc-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer border border-black inline-flex items-center space-x-2 active:scale-[0.99] whitespace-nowrap"
             title="Launch 1-Click Interactive Demo Pipeline"
           >
-            <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
+            <Sparkles className="w-3.5 h-3.5 text-white animate-pulse shrink-0" />
             <span>Interactive Demo</span>
           </button>
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white hover:bg-zinc-100 text-black text-xs sm:text-sm font-bold border border-zinc-300 shadow-2xs transition-colors cursor-pointer"
+            className="h-9 px-3.5 rounded-md bg-white hover:bg-zinc-100 text-black text-xs font-semibold border border-zinc-300 shadow-2xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap"
           >
-            <Plus className="w-3.5 h-3.5 text-zinc-500" />
-            <span>+ Intake Incident</span>
+            <Plus className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+            <span>Intake Incident</span>
           </button>
           <button
             onClick={() => onNavigateTab('optimiser')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-md bg-white hover:bg-zinc-100 text-black text-xs sm:text-sm font-bold border border-zinc-300 shadow-2xs transition-colors cursor-pointer"
+            className="h-9 px-3.5 rounded-md bg-white hover:bg-zinc-100 text-black text-xs font-semibold border border-zinc-300 shadow-2xs transition-colors cursor-pointer inline-flex items-center space-x-1.5 whitespace-nowrap"
           >
             <span>Run Optimiser</span>
-            <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
+            <ArrowRight className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
           </button>
         </div>
       </div>

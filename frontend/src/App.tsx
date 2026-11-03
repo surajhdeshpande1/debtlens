@@ -151,7 +151,7 @@ const MainAppContent: React.FC = () => {
         }}
       />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex max-w-[1400px] w-full mx-auto">
 
         {/* Left Sidebar */}
         <Sidebar

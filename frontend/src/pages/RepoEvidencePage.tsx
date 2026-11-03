@@ -215,7 +215,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto overflow-x-hidden">
+    <div className="space-y-6 max-w-[1400px] mx-auto overflow-x-hidden">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

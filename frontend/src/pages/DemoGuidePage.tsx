@@ -338,7 +338,7 @@ And with one click on the Export PDF button, our system produces an executive co
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 overflow-x-hidden select-none">
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-12 overflow-x-hidden select-none">
       
       {/* Top Banner & Control Deck */}
       <div className="bg-black text-white rounded-md p-5 sm:p-6 shadow-md border border-black relative overflow-hidden">

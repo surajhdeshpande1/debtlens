@@ -533,8 +533,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       <div className="fixed inset-0 bg-black/65 backdrop-blur-[1px] transition-all duration-300 z-30 pointer-events-none" />
 
       {/* TOP HEADER: Clean Minimal Monochrome Header with Scenario Switcher */}
-      <div className="sticky top-0 z-40 bg-white/98 backdrop-blur-md text-black px-4 sm:px-6 py-2.5 border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2.5">
+      <div className="sticky top-0 z-40 bg-white border-b border-zinc-200">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5">
           
           {/* Brand & Guide Info */}
           <div className="flex items-center justify-between">
@@ -699,8 +699,8 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       )}
 
       {/* COMPACT HORIZONTAL PIPELINE STEPPER */}
-      <div className="sticky top-[55px] z-40 bg-white/98 backdrop-blur-md border-b border-zinc-200 px-4 sm:px-6 py-2 overflow-x-auto">
-        <div className="max-w-7xl mx-auto flex items-center justify-between min-w-[700px] gap-1.5">
+      <div className="sticky top-16 z-40 bg-white/98 backdrop-blur-md border-b border-zinc-200 px-4 sm:px-6 py-2 overflow-x-auto">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between min-w-[700px] gap-1.5">
           {steps.map((s, idx) => {
             const Icon = s.icon;
             const isActive = s.step === currentStep;
@@ -748,7 +748,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       </div>
 
       {/* Main Container Rendering the Live Application State with Spotlight */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5 relative">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5 relative">
         
         {/* TARGET 1: EXECUTIVE PAGE HEADER */}
         <div 
@@ -1166,7 +1166,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-md border-t border-zinc-300 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
         
         {/* Toggle Header */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-zinc-100 py-1 text-[11px] text-zinc-500">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex items-center justify-between border-b border-zinc-100 py-1 text-[11px] text-zinc-500">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
             <span className="font-bold text-black uppercase tracking-wider text-[10px] font-mono">Presenter Console</span>
@@ -1185,7 +1185,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
 
         {/* Collapsed State */}
         {isBottomBarCollapsed ? (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="px-2 py-0.5 rounded-sm bg-black text-white font-mono font-bold text-[10px]">
                 {currentStep} / {totalSteps}
@@ -1211,7 +1211,7 @@ export const JudgeSpotlightDemoPage: React.FC<JudgeSpotlightDemoPageProps> = ({
           </div>
         ) : (
           /* Expanded Bar */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2.5 flex flex-col md:flex-row items-center justify-between gap-3">
             
             {/* Left: Stage Title & Clear Q&A Explanation */}
             <div className="flex-1 w-full md:w-auto">
