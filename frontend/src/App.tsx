@@ -133,7 +133,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-slate-900 flex flex-col font-sans selection:bg-[#E5DFD5] selection:text-[#0C1A2E]">
+    <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white">
 
       {/* Top Navigation */}
       <Navbar
@@ -163,7 +163,7 @@ const MainAppContent: React.FC = () => {
         />
 
         {/* Main Content Pane */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto min-w-0">
           {currentTab === 'dashboard' && (
             <Dashboard
               summary={summary}

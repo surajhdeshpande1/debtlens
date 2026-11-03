@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle, Sparkles, HelpCircle } from 'lucide-react';
+import { X, AlertCircle, Sparkles } from 'lucide-react';
 import { FiveWhysStep, IncidentSeverity } from '../types';
 import { useToast } from '../context/ToastContext';
 import { sanitizeInput, safeNumeric } from '../utils/security';
@@ -56,8 +56,8 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
       { step: 1, question: 'Why did the service fail or degrade?', cause: 'Inbound message consumers exhausted memory pool and stalled.', category: 'PERFORMANCE' },
       { step: 2, question: 'Why did that condition occur?', cause: 'Worker threads were synchronously waiting on slow third-party webhook endpoints.', category: 'NETWORK' },
       { step: 3, question: 'Why was that behaviour not handled?', cause: 'Synchronous blocking HTTP calls executed directly inside async processing loop.', category: 'PERFORMANCE' },
-      { step: 4, question: 'Why did the architecture permit this flaw?', cause: 'Missing circuit breaker and asynchronous decoupled queue.', category: 'ARCHITECTURE' },
-      { step: 5, question: 'Why does the fundamental root cause persist?', cause: 'Database Connection Pool Exhaustion under Unbounded Waiting', category: 'DATABASE' }
+      { step: 4, cause: 'Missing circuit breaker and asynchronous decoupled queue.', question: 'Why did the architecture permit this flaw?', category: 'ARCHITECTURE' },
+      { step: 5, cause: 'Database Connection Pool Exhaustion under Unbounded Waiting', question: 'Why does the fundamental root cause persist?', category: 'DATABASE' }
     ]);
     showToast('info', 'Sample Incident Loaded', 'Click Register to submit and update causal network.');
   };
@@ -91,7 +91,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
       }
 
       await onSubmit(payload);
-      showToast('success', 'Incident Registered', `Recorded and linked to causal analysis engine.`);
+      showToast('success', 'Incident Registered', 'Recorded and linked to causal analysis engine.');
       onClose();
     } catch (err) {
       console.error(err);
@@ -102,18 +102,18 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] rounded-md border border-[#E5DFD5] shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+      <div className="bg-white rounded-md border border-zinc-300 shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[#E5DFD5] flex items-center justify-between bg-white">
+        <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-white">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-md bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
+            <div className="p-2 rounded-md bg-black text-white">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-950">Report Production Incident</h3>
-              <p className="text-xs text-stone-500">Capture symptoms, affected module, and guided 5-Whys root cause</p>
+              <h3 className="text-base font-bold text-black">Report Production Incident</h3>
+              <p className="text-xs text-zinc-500">Capture symptoms, affected module, and guided 5-Whys root cause</p>
             </div>
           </div>
           
@@ -121,7 +121,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             <button
               type="button"
               onClick={handleLoadSample}
-              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-[#F0F4FA] hover:bg-[#E4ECF6] text-[#0C1A2E] border border-[#CBD8E8] transition-colors cursor-pointer"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 transition-colors cursor-pointer"
               title="Populate with realistic sample incident and 5-Whys"
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -129,7 +129,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="text-stone-400 hover:text-slate-950 p-1.5 rounded-md hover:bg-[#F4EFE6] transition-colors cursor-pointer"
+              className="text-zinc-500 hover:text-black p-1.5 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -139,28 +139,28 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Incident Title <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-zinc-900 mb-1">
+              Incident Title <span className="text-black font-bold">*</span>
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Stripe Webhook Gateway Timeout during Cyber Monday Spike"
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+              placeholder="e.g. Stripe Webhook Gateway Timeout during Peak Transaction Spike"
+              className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
                 Severity Level
               </label>
               <select
                 value={severity}
                 onChange={(e) => setSeverity(e.target.value as IncidentSeverity)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black cursor-pointer"
               >
                 <option value="CRITICAL">CRITICAL (3.5x Multiplier)</option>
                 <option value="HIGH">HIGH (2.5x Multiplier)</option>
@@ -170,13 +170,13 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Affected Module <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
+                Affected Module <span className="text-black font-bold">*</span>
               </label>
               <select
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black cursor-pointer"
               >
                 <option value="payments">payments</option>
                 <option value="database">database</option>
@@ -190,7 +190,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
                 Resolution Effort (Hours)
               </label>
               <input
@@ -199,14 +199,14 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
                 min="0.5"
                 value={effort}
                 onChange={(e) => setEffort(parseFloat(e.target.value) || 1)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Incident Description & Evidence <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-zinc-900 mb-1">
+              Incident Description & Evidence <span className="text-black font-bold">*</span>
             </label>
             <textarea
               required
@@ -214,39 +214,39 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detail the failure symptoms, stack trace, error logs, and impact..."
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
             />
           </div>
 
           {/* Guided 5-Whys Toggle */}
-          <div className="pt-2 border-t border-[#E5DFD5]">
+          <div className="pt-2 border-t border-zinc-200">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-bold text-slate-950">Guided 5-Whys Root Cause Chain</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] font-semibold font-mono border border-[#CBD8E8]">Stage 2 Causality</span>
+                <span className="text-xs font-bold text-black">Guided 5-Whys Root Cause Chain</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black font-semibold font-mono border border-zinc-300">Stage 2 Causality</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowFiveWhys(!showFiveWhys)}
-                className="text-xs text-[#0C1A2E] hover:text-[#142B4B] font-semibold cursor-pointer"
+                className="text-xs text-black hover:text-zinc-700 font-semibold cursor-pointer underline"
               >
                 {showFiveWhys ? 'Collapse 5-Whys' : '+ Expand Guided 5-Whys'}
               </button>
             </div>
 
             {showFiveWhys && (
-              <div className="space-y-2.5 p-3.5 bg-[#FAF8F5] rounded-md border border-[#E5DFD5] animate-in fade-in duration-150">
+              <div className="space-y-2.5 p-3.5 bg-zinc-50 rounded-md border border-zinc-200 animate-in fade-in duration-150">
                 {fiveWhys.map((w, idx) => (
                   <div key={w.step} className="space-y-1">
-                    <label className="block text-[11px] font-medium text-slate-700">
-                      <span className="font-bold text-[#0C1A2E]">Why #{w.step}:</span> {w.question}
+                    <label className="block text-[11px] font-medium text-zinc-800">
+                      <span className="font-bold text-black">Why #{w.step}:</span> {w.question}
                     </label>
                     <input
                       type="text"
                       value={w.cause}
                       onChange={(e) => handleWhyChange(idx, e.target.value)}
                       placeholder={`State cause for why level ${w.step}...`}
-                      className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5DFD5] bg-white focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E]"
+                      className="w-full px-3 py-1.5 text-xs rounded-md border border-zinc-300 bg-white text-black focus:outline-hidden focus:ring-1 focus:ring-black"
                     />
                   </div>
                 ))}
@@ -255,18 +255,18 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-[#E5DFD5] flex items-center justify-end space-x-2">
+          <div className="pt-4 border-t border-zinc-200 flex items-center justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-md text-xs font-medium text-stone-700 hover:bg-[#F4EFE6] transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-medium text-zinc-700 hover:bg-zinc-100 border border-zinc-300 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md text-xs font-bold bg-[#0C1A2E] hover:bg-[#142B4B] text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-semibold bg-black hover:bg-zinc-800 text-white border border-black shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? 'Recording...' : 'Register Incident & Causal Chain'}
             </button>

@@ -3,25 +3,13 @@ import {
   Play, 
   Pause, 
   RotateCcw, 
-  CheckCircle2, 
   ArrowRight, 
   Terminal, 
   GraduationCap, 
-  Sparkles, 
-  AlertTriangle, 
-  GitFork, 
-  Coins, 
-  Calculator, 
-  Code2, 
   FileDown, 
   Copy, 
   Check, 
-  Flame, 
-  Clock, 
-  Layers, 
   Zap, 
-  ShieldCheck,
-  CheckCircle,
   SkipForward
 } from 'lucide-react';
 import { NavTab } from '../components/Sidebar';
@@ -56,14 +44,13 @@ export const DemoGuidePage: React.FC<DemoGuidePageProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [stageProgress, setStageProgress] = useState(0);
-  const [simSpeed, setSimSpeed] = useState<number>(1); // 1x or 2x
+  const [simSpeed, setSimSpeed] = useState<number>(1);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'simulation' | 'viva'>('simulation');
   const timerRef = useRef<any>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
 
-  const STAGE_DURATION_MS = 6000; // 6 seconds per stage in 1x speed
+  const STAGE_DURATION_MS = 6000;
 
   const stages: DemoStage[] = [
     {
@@ -246,27 +233,24 @@ And with one click on the Export PDF button, our system produces an executive co
 
   const currentStage = stages[currentStageIndex];
 
-  // Auto-scroll terminal log to bottom
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [terminalLogs]);
 
-  // Autonomous Run Timer Loop
   useEffect(() => {
     if (!isRunning) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
 
-    const intervalStep = 100; // update progress every 100ms
+    const intervalStep = 100;
     const totalDuration = STAGE_DURATION_MS / simSpeed;
 
     timerRef.current = setInterval(() => {
       setStageProgress((prev) => {
         if (prev >= 100) {
-          // Transition to next stage
           setCurrentStageIndex((current) => {
             if (current >= stages.length - 1) {
               setIsRunning(false);
@@ -274,7 +258,6 @@ And with one click on the Export PDF button, our system produces an executive co
               return current;
             }
             const nextIdx = current + 1;
-            // Append stage logs
             setTerminalLogs((oldLogs) => [...oldLogs, ...stages[nextIdx].logs]);
             showToast('info', `Stage ${nextIdx + 1}: ${stages[nextIdx].name}`, stages[nextIdx].heading);
             return nextIdx;
@@ -334,7 +317,6 @@ And with one click on the Export PDF button, our system produces an executive co
   const handleJumpToStage = (idx: number) => {
     setCurrentStageIndex(idx);
     setStageProgress(0);
-    // Include logs up to that stage
     const logsUpToStage = stages.slice(0, idx + 1).flatMap((s) => s.logs);
     setTerminalLogs(logsUpToStage);
   };
@@ -356,44 +338,44 @@ And with one click on the Export PDF button, our system produces an executive co
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-12 select-none">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 overflow-x-hidden select-none">
       
       {/* Top Banner & Control Deck */}
-      <div className="bg-[#0C1A2E] text-white rounded-md p-5 sm:p-6 shadow-md border border-[#142B4B] relative overflow-hidden">
+      <div className="bg-black text-white rounded-md p-5 sm:p-6 shadow-md border border-black relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-white/10 text-stone-200 border border-white/20 text-[10px] font-mono font-semibold">
-                <GraduationCap className="w-3.5 h-3.5 text-stone-300" />
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-sm bg-zinc-900 text-zinc-300 border border-zinc-700 text-[10px] font-mono font-semibold">
+                <GraduationCap className="w-3.5 h-3.5 text-white" />
                 <span>BEC BAGALKOTE • BISA531P MINI PROJECT</span>
               </span>
-              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-[#1E4E38]/50 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-sm bg-zinc-800 text-white border border-zinc-600 text-[10px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span>AUTONOMOUS PIPELINE READY</span>
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
               <span>One-Click Autonomous Demo Control Room</span>
             </h1>
-            <p className="mt-1 text-xs text-stone-300 max-w-2xl leading-relaxed">
+            <p className="mt-1 text-xs text-zinc-300 max-w-2xl leading-relaxed">
               Click <strong className="text-white">"Start 1-Click Auto-Run"</strong> to let the entire DebtLens platform autonomously execute, demonstrate, and verify every formula, chart, and algorithm while you explain each stage to your faculty.
             </p>
           </div>
 
           {/* Master 1-Click Playback Control Deck */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-[#081220] p-2.5 rounded-md border border-[#1E3048] shadow-inner">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 bg-zinc-900 p-2.5 rounded-md border border-zinc-800 shadow-inner">
             {!isRunning ? (
               <button
                 onClick={handleStartAutoRun}
-                className="px-5 py-2 rounded-md bg-[#1E4E38] hover:bg-[#163B2A] text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
+                className="px-5 py-2 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-bold border border-white shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer group"
               >
-                <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
+                <Play className="w-4 h-4 fill-black text-black group-hover:scale-110 transition-transform" />
                 <span>Start 1-Click Auto-Run</span>
               </button>
             ) : (
               <button
                 onClick={handlePause}
-                className="px-5 py-2 rounded-md bg-[#8A6112] hover:bg-[#724F0C] text-white text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="px-5 py-2 rounded-md bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold border border-zinc-700 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
               >
                 <Pause className="w-4 h-4 fill-white text-white" />
                 <span>Pause Simulation</span>
@@ -402,18 +384,18 @@ And with one click on the Export PDF button, our system produces an executive co
 
             <button
               onClick={handleReset}
-              className="p-2 rounded-md bg-[#142B4B] hover:bg-[#1A375F] text-stone-300 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition-colors cursor-pointer"
               title="Reset simulation to Stage 1"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
 
             {/* Speed Toggle */}
-            <div className="flex items-center bg-[#0C1A2E] rounded-md p-0.5 border border-[#1E3048] text-[11px] font-mono">
+            <div className="flex items-center bg-zinc-950 rounded-md p-0.5 border border-zinc-800 text-[11px] font-mono">
               <button
                 onClick={() => setSimSpeed(1)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 1 ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
+                  simSpeed === 1 ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 1x
@@ -421,7 +403,7 @@ And with one click on the Export PDF button, our system produces an executive co
               <button
                 onClick={() => setSimSpeed(2)}
                 className={`px-2 py-1 rounded-sm transition-colors cursor-pointer ${
-                  simSpeed === 2 ? 'bg-white/20 text-white font-bold' : 'text-stone-400 hover:text-white'
+                  simSpeed === 2 ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 2x Fast
@@ -431,19 +413,19 @@ And with one click on the Export PDF button, our system produces an executive co
         </div>
 
         {/* Dynamic Progress Bar */}
-        <div className="mt-4 pt-3 border-t border-[#1E3048] flex flex-col space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-mono text-stone-400">
+        <div className="mt-4 pt-3 border-t border-zinc-800 flex flex-col space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
             <span className="flex items-center space-x-1.5">
-              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-ping' : 'bg-stone-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-white animate-ping' : 'bg-zinc-600'}`} />
               <strong className="text-white">Stage {currentStage.id} of {stages.length}:</strong>
               <span>{currentStage.name}</span>
             </span>
             <span>{Math.round(stageProgress)}% of stage completed</span>
           </div>
 
-          <div className="w-full h-1.5 bg-[#081220] rounded-sm overflow-hidden border border-[#1E3048]">
+          <div className="w-full h-1.5 bg-zinc-850 rounded-sm overflow-hidden border border-zinc-800">
             <div 
-              className="h-full bg-[#1E4E38] transition-all duration-100 ease-linear"
+              className="h-full bg-white transition-all duration-100 ease-linear"
               style={{ width: `${stageProgress}%` }}
             />
           </div>
@@ -451,7 +433,7 @@ And with one click on the Export PDF button, our system produces an executive co
       </div>
 
       {/* Horizontal Stage Stepper Pills */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin">
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
         {stages.map((st, idx) => {
           const isDone = idx < currentStageIndex;
           const isCurrent = idx === currentStageIndex;
@@ -461,14 +443,14 @@ And with one click on the Export PDF button, our system produces an executive co
               onClick={() => handleJumpToStage(idx)}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
                 isCurrent 
-                  ? 'bg-[#0C1A2E] text-white border-[#0C1A2E] shadow-xs'
+                  ? 'bg-black text-white border-black shadow-xs'
                   : isDone
-                  ? 'bg-[#EDF6F1] text-[#1E4E38] border-[#BCD8C7] hover:bg-[#E0EFE7]'
-                  : 'bg-white text-stone-600 border-[#E5DFD5] hover:bg-[#F4EFE6] hover:text-[#0C1A2E]'
+                  ? 'bg-zinc-100 text-black border-zinc-300 hover:bg-zinc-200'
+                  : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 hover:text-black'
               }`}
             >
               <div className={`w-4 h-4 rounded-sm flex items-center justify-center text-[10px] font-bold ${
-                isCurrent ? 'bg-white/20 text-white' : isDone ? 'bg-[#E0EFE7] text-[#1E4E38]' : 'bg-[#F4EFE6] text-stone-500'
+                isCurrent ? 'bg-zinc-800 text-white' : isDone ? 'bg-zinc-200 text-black' : 'bg-zinc-100 text-zinc-600'
               }`}>
                 {isDone ? <Check className="w-2.5 h-2.5" /> : st.id}
               </div>
@@ -485,20 +467,20 @@ And with one click on the Export PDF button, our system produces an executive co
         <div className="lg:col-span-7 space-y-4">
           
           {/* Active Simulation Stage Canvas */}
-          <div className="bg-white rounded-md border border-[#E5DFD5] p-5 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[#F4EFE6]">
+          <div className="bg-white rounded-md border border-zinc-200 p-5 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-zinc-200">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#0C1A2E] uppercase tracking-wider px-2 py-0.5 rounded-sm bg-[#F0F4FA] border border-[#CBD8E8]">
+                <span className="text-[10px] font-mono font-bold text-white uppercase tracking-wider px-2 py-0.5 rounded-sm bg-black border border-black">
                   {currentStage.moduleBadge}
                 </span>
-                <h2 className="text-base font-extrabold text-[#0C1A2E] mt-1">
+                <h2 className="text-base font-bold text-black mt-1">
                   {currentStage.heading}
                 </h2>
               </div>
 
               <button
                 onClick={() => onNavigateTab(currentStage.tab)}
-                className="self-start sm:self-auto px-3 py-1.5 rounded-md bg-[#F0F4FA] hover:bg-[#E4ECF6] text-[#0C1A2E] text-xs font-bold border border-[#CBD8E8] flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
+                className="self-start sm:self-auto px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-black text-xs font-semibold border border-zinc-300 flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
                 title="Jump directly into full module view"
               >
                 <span>Jump to {currentStage.moduleBadge.split(' ')[0]}</span>
@@ -507,29 +489,29 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Narrative Explanation */}
-            <p className="text-xs text-stone-700 leading-relaxed bg-[#FAF8F5] p-3 rounded-md border border-[#E5DFD5]">
+            <p className="text-xs text-zinc-700 leading-relaxed bg-zinc-50 p-3 rounded-md border border-zinc-200">
               {currentStage.narrative}
             </p>
 
             {/* Simulated Live Visual Card */}
-            <div className="p-3.5 rounded-md border border-[#E5DFD5] bg-[#FAF8F5] space-y-3">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-900">
+            <div className="p-3.5 rounded-md border border-zinc-200 bg-zinc-50 space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold text-black">
                 <span className="flex items-center space-x-1.5">
-                  <Zap className="w-3.5 h-3.5 text-[#8A6112]" />
+                  <Zap className="w-3.5 h-3.5 text-black" />
                   <span>Real-Time Simulated Telemetry:</span>
                 </span>
-                <span className="font-mono text-[10px] text-[#1E4E38] bg-[#EDF6F1] px-2 py-0.5 rounded-sm border border-[#BCD8C7] font-bold">
+                <span className="font-mono text-[10px] text-white bg-black px-2 py-0.5 rounded-sm border border-black font-bold">
                   ● ACTIVE PIPELINE
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {currentStage.metrics.map((m, idx) => (
-                  <div key={idx} className="p-2.5 rounded-md bg-white border border-[#E5DFD5] shadow-2xs">
-                    <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">{m.label}</div>
-                    <div className="text-sm font-bold text-[#0C1A2E] font-mono mt-1">{m.value}</div>
+                  <div key={idx} className="p-2.5 rounded-md bg-white border border-zinc-200 shadow-2xs">
+                    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{m.label}</div>
+                    <div className="text-sm font-bold text-black font-mono mt-1">{m.value}</div>
                     {m.badge && (
-                      <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
+                      <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-sm bg-zinc-100 text-black border border-zinc-300 font-mono">
                         {m.badge}
                       </span>
                     )}
@@ -539,44 +521,44 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Word-for-Word Faculty Presentation Script */}
-            <div className="space-y-2 pt-2 border-t border-[#F4EFE6]">
+            <div className="space-y-2 pt-2 border-t border-zinc-200">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#0C1A2E] flex items-center space-x-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-[#0C1A2E]" />
+                <span className="text-xs font-bold text-black flex items-center space-x-1.5">
+                  <Terminal className="w-3.5 h-3.5 text-black" />
                   <span>What to Say to Faculty Right Now (Speaker Script):</span>
                 </span>
                 <button
                   onClick={handleCopyScript}
-                  className="inline-flex items-center space-x-1 text-[11px] font-semibold text-stone-500 hover:text-[#0C1A2E] cursor-pointer"
+                  className="inline-flex items-center space-x-1 text-[11px] font-semibold text-zinc-600 hover:text-black cursor-pointer"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-[#1E4E38]" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-black" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>
 
-              <div className="p-3.5 rounded-md bg-[#0C1A2E] text-stone-100 text-xs leading-relaxed font-sans whitespace-pre-line border border-[#142B4B] shadow-inner">
+              <div className="p-3.5 rounded-md bg-zinc-950 text-zinc-100 text-xs leading-relaxed font-sans whitespace-pre-line border border-zinc-800 shadow-inner">
                 {currentStage.speakingScript}
               </div>
             </div>
 
             {/* Stepper Navigation */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#F4EFE6]">
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
               <button
                 disabled={currentStageIndex === 0}
                 onClick={handlePrevStage}
-                className="px-3 py-1.5 rounded-md border border-[#E5DFD5] text-xs font-semibold text-stone-700 hover:bg-[#F4EFE6] disabled:opacity-30 cursor-pointer"
+                className="px-3 py-1.5 rounded-md border border-zinc-300 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 cursor-pointer"
               >
                 ← Prev Stage
               </button>
 
-              <div className="text-xs text-stone-500 font-mono font-semibold">
+              <div className="text-xs text-zinc-500 font-mono font-semibold">
                 Stage {currentStageIndex + 1} of {stages.length}
               </div>
 
               <button
                 disabled={currentStageIndex === stages.length - 1}
                 onClick={handleNextStage}
-                className="px-3.5 py-1.5 rounded-md bg-[#0C1A2E] hover:bg-[#142B4B] text-white text-xs font-bold disabled:opacity-30 cursor-pointer flex items-center space-x-1 shadow-xs"
+                className="px-3.5 py-1.5 rounded-md bg-black hover:bg-zinc-800 text-white text-xs font-semibold border border-black disabled:opacity-30 cursor-pointer flex items-center space-x-1 shadow-xs"
               >
                 <span>Next Stage</span>
                 <SkipForward className="w-3.5 h-3.5" />
@@ -585,18 +567,18 @@ And with one click on the Export PDF button, our system produces an executive co
           </div>
 
           {/* Quick PDF Trigger Bar */}
-          <div className="p-4 rounded-md bg-[#F0F4FA] border border-[#CBD8E8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="p-4 rounded-md bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center space-x-3">
-              <FileDown className="w-5 h-5 text-[#0C1A2E] shrink-0" />
+              <FileDown className="w-5 h-5 text-black shrink-0" />
               <div>
-                <div className="text-xs font-bold text-[#0C1A2E]">Executive Technical Debt Audit Report PDF</div>
-                <div className="text-[11px] text-stone-600">Download formatted compliance evidence generated during this run</div>
+                <div className="text-xs font-bold text-black">Executive Technical Debt Audit Report PDF</div>
+                <div className="text-[11px] text-zinc-600">Download formatted compliance evidence generated during this run</div>
               </div>
             </div>
 
             <button
               onClick={handleDownloadPdf}
-              className="px-3.5 py-2 bg-[#0C1A2E] hover:bg-[#142B4B] text-white rounded-md text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
+              className="px-3.5 py-2 bg-black hover:bg-zinc-800 text-white border border-black rounded-md text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               Export Report PDF
             </button>
@@ -607,30 +589,30 @@ And with one click on the Export PDF button, our system produces an executive co
         {/* Right Column: Live Terminal Telemetry Log (5 Cols) */}
         <div className="lg:col-span-5 space-y-4 sticky top-20">
           
-          <div className="bg-[#081220] rounded-md border border-[#1E3048] shadow-md overflow-hidden flex flex-col h-[520px]">
+          <div className="bg-black rounded-md border border-zinc-800 shadow-md overflow-hidden flex flex-col h-[520px]">
             {/* Terminal Window Header */}
-            <div className="px-4 py-2.5 bg-[#0C1A2E] border-b border-[#1E3048] flex items-center justify-between">
+            <div className="px-4 py-2.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#8E2825]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#8A6112]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1E4E38]" />
-                <span className="text-[11px] font-mono text-stone-300 pl-2">debtlens-telemetry-console</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-500" />
+                <span className="text-[11px] font-mono text-zinc-300 pl-2">debtlens-telemetry-console</span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 font-bold">● LIVE 200 OK</span>
+              <span className="text-[10px] font-mono text-white font-bold">● LIVE 200 OK</span>
             </div>
 
             {/* Terminal Body Stream */}
             <div 
               ref={logContainerRef}
-              className="flex-1 p-4 font-mono text-xs text-stone-300 space-y-1.5 overflow-y-auto scrollbar-thin select-text"
+              className="flex-1 p-4 font-mono text-xs text-zinc-300 space-y-1.5 overflow-y-auto select-text"
             >
-              <div className="text-stone-500 text-[11px] pb-1 border-b border-[#1E3048]">
+              <div className="text-zinc-500 text-[11px] pb-1 border-b border-zinc-800">
                 # DebtLens Core Autonomous Pipeline Engine (FastAPI + NetworkX + Scikit-Learn)
                 <br /># Cloud Firestore asia-south1 cluster connected
               </div>
 
               {terminalLogs.length === 0 ? (
-                <div className="text-stone-500 italic pt-4">
+                <div className="text-zinc-500 italic pt-4">
                   Waiting for simulation trigger... Click "Start 1-Click Auto-Run" above.
                 </div>
               ) : (
@@ -641,7 +623,7 @@ And with one click on the Export PDF button, our system produces an executive co
                     <div 
                       key={i} 
                       className={`leading-relaxed text-[11px] ${
-                        isError ? 'text-[#E8B4B2] font-semibold' : isHighlight ? 'text-[#EBD8A3] font-semibold' : 'text-stone-300'
+                        isError ? 'text-white font-bold' : isHighlight ? 'text-zinc-100 font-semibold' : 'text-zinc-300'
                       }`}
                     >
                       {log}
@@ -652,20 +634,20 @@ And with one click on the Export PDF button, our system produces an executive co
             </div>
 
             {/* Terminal Status Bar */}
-            <div className="px-4 py-2 bg-[#0C1A2E] border-t border-[#1E3048] flex items-center justify-between text-[10px] font-mono text-stone-400">
+            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
               <span>asia-south1 (Mumbai)</span>
               <span>NetworkX 3.2 • Scikit-Learn 1.5</span>
             </div>
           </div>
 
           {/* College Endorsement Card */}
-          <div className="p-4 bg-white rounded-md border border-[#E5DFD5] text-stone-700 shadow-2xs space-y-1">
-            <div className="flex items-center space-x-1.5 font-bold text-xs text-[#0C1A2E]">
-              <GraduationCap className="w-4 h-4 text-[#0C1A2E]" />
+          <div className="p-4 bg-white rounded-md border border-zinc-200 text-zinc-700 shadow-2xs space-y-1">
+            <div className="flex items-center space-x-1.5 font-bold text-xs text-black">
+              <GraduationCap className="w-4 h-4 text-black" />
               <span>Basaveshwar Engineering College, Bagalkote</span>
             </div>
-            <div className="text-xs text-stone-500">Department of Information Science & Engineering</div>
-            <div className="text-xs font-semibold text-[#0C1A2E] pt-1">
+            <div className="text-xs text-zinc-500">Department of Information Science & Engineering</div>
+            <div className="text-xs font-semibold text-black pt-1">
               Guide: Prof. P. R. Muttannavar • BISA531P (2026-27)
             </div>
           </div>

@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     label: string; 
     icon: React.ComponentType<{ className?: string }>; 
     badge?: number; 
-    badgeVariant?: 'oxblood' | 'ochre' | 'navy' | 'neutral';
+    badgeVariant?: 'solid' | 'subtle' | 'neutral';
     moduleCode: string;
   }[] = [
     {
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Incident Management',
       icon: AlertCircle,
       badge: openIncidentsCount,
-      badgeVariant: 'ochre',
+      badgeVariant: 'solid',
       moduleCode: 'M2'
     },
     {
@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Technical Debt Ledger',
       icon: Coins,
       badge: breakevenDebtCount,
-      badgeVariant: 'oxblood',
+      badgeVariant: 'solid',
       moduleCode: 'M4'
     }
   ];
@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     badge?: number;
-    badgeVariant?: 'oxblood' | 'ochre' | 'navy' | 'neutral';
+    badgeVariant?: 'solid' | 'subtle' | 'neutral';
     moduleCode: string;
   }[] = [
     {
@@ -100,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Incident Intelligence',
       icon: Sparkles,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
-      badgeVariant: 'navy',
+      badgeVariant: 'subtle',
       moduleCode: 'M6'
     },
     {
@@ -111,16 +111,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  const getBadgeClass = (variant?: 'oxblood' | 'ochre' | 'navy' | 'neutral') => {
+  const getBadgeClass = (variant?: 'solid' | 'subtle' | 'neutral') => {
     switch (variant) {
-      case 'oxblood':
-        return 'bg-[#FDF2F2] text-[#8E2825] border-[#E8B4B2]';
-      case 'ochre':
-        return 'bg-[#FEF9EE] text-[#8A6112] border-[#EBD8A3]';
-      case 'navy':
-        return 'bg-[#F0F4FA] text-[#0C1A2E] border-[#CBD8E8]';
+      case 'solid':
+        return 'bg-black text-white border-black';
+      case 'subtle':
+        return 'bg-zinc-800 text-white border-zinc-700';
       default:
-        return 'bg-[#F4EFE6] text-stone-700 border-[#E5DFD5]';
+        return 'bg-zinc-100 text-zinc-800 border-zinc-300';
     }
   };
 
@@ -135,19 +133,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => setCurrentTab(item.id)}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs sm:text-sm transition-all cursor-pointer group ${
               isActive
-                ? 'bg-white text-[#0C1A2E] font-bold border border-[#E5DFD5] border-l-4 border-l-[#0C1A2E] shadow-2xs'
-                : 'text-stone-700 hover:bg-[#F4EFE6] hover:text-[#0C1A2E] font-medium'
+                ? 'bg-zinc-100 text-black font-bold border border-zinc-300 border-l-4 border-l-black shadow-2xs'
+                : 'text-zinc-600 hover:bg-zinc-50 hover:text-black font-medium'
             }`}
           >
             <div className="flex items-center space-x-2.5 truncate">
               <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                isActive ? 'text-[#0C1A2E]' : 'text-stone-400 group-hover:text-[#0C1A2E]'
+                isActive ? 'text-black' : 'text-zinc-400 group-hover:text-black'
               }`} />
               <span className="truncate">{item.label}</span>
             </div>
 
             <div className="flex items-center space-x-1.5 shrink-0">
-              <span className="text-[10px] text-stone-400 font-mono font-medium">{item.moduleCode}</span>
+              <span className="text-[10px] text-zinc-400 font-mono font-medium">{item.moduleCode}</span>
               {item.badge !== undefined && item.badge > 0 && (
                 <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold rounded-sm border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
                   {item.badge}
@@ -161,55 +159,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
 
   return (
-    <aside className="w-64 bg-[#FAF8F5] border-r border-[#E5DFD5] shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
+    <aside className="w-64 bg-white border-r border-zinc-200 shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
       <div className="space-y-4">
         
-        {/* Prominent Live Demo Mode Button - Deep Navy with Crisp Corners */}
+        {/* Prominent Live Demo Mode Button - Minimal Solid Black */}
         <button
           onClick={() => setCurrentTab('demo')}
           className={`w-full px-3.5 py-2.5 rounded-md text-xs sm:text-sm font-bold flex items-center justify-between transition-all cursor-pointer border ${
             currentTab === 'demo'
-              ? 'bg-[#142B4B] text-white border-[#142B4B] shadow-md ring-1 ring-white/20'
-              : 'bg-[#0C1A2E] hover:bg-[#142B4B] text-white border-[#142B4B] shadow-xs'
+              ? 'bg-zinc-900 text-white border-black shadow-md ring-1 ring-zinc-700'
+              : 'bg-black hover:bg-zinc-800 text-white border-black shadow-xs'
           }`}
         >
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-[#E5B54F] animate-pulse" />
+            <Sparkles className="w-4 h-4 text-white animate-pulse" />
             <span>Interactive Demo</span>
           </div>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm font-mono bg-white/15 text-white tracking-wider">
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-sm font-mono bg-white/20 text-white tracking-wider">
             1-CLICK
           </span>
         </button>
 
         {/* Section 1: Core Intelligence */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+          <div className="px-3 pb-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span>Core Intelligence</span>
-            <span className="font-mono text-[9px] text-stone-400">LEDGER</span>
+            <span className="font-mono text-[9px] text-zinc-400">LEDGER</span>
           </div>
           {renderNavGroup(coreNavItems)}
         </div>
 
         {/* Section 2: Remediation & Architecture */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center justify-between">
+          <div className="px-3 pb-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span>Remediation Engine</span>
-            <span className="font-mono text-[9px] text-stone-400">SOLVER</span>
+            <span className="font-mono text-[9px] text-zinc-400">SOLVER</span>
           </div>
           {renderNavGroup(remediationNavItems)}
         </div>
       </div>
 
       {/* Institutional Department Endorsement Footer */}
-      <div className="pt-3 border-t border-[#E5DFD5]">
-        <div className="p-3 bg-[#F4EFE6] rounded-md border border-[#E5DFD5] text-stone-700 text-xs">
+      <div className="pt-3 border-t border-zinc-200">
+        <div className="p-3 bg-zinc-50 rounded-md border border-zinc-200 text-zinc-700 text-xs">
           <div className="flex items-center space-x-1.5 mb-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0C1A2E]" />
-            <span className="text-[11px] font-bold text-[#0C1A2E]">BEC Bagalkote — Dept of ISE</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-black" />
+            <span className="text-[11px] font-bold text-black">BEC Bagalkote — Dept of ISE</span>
           </div>
-          <div className="text-[10px] text-stone-500 font-mono">5th Sem Mini Project • BISA531P</div>
-          <div className="text-[10px] text-stone-800 font-medium mt-0.5">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-[10px] text-zinc-500 font-mono">5th Sem Mini Project • BISA531P</div>
+          <div className="text-[10px] text-black font-medium mt-0.5">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

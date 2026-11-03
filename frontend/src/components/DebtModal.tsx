@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Coins, Link2, Sparkles } from 'lucide-react';
+import { X, Coins, Link2 } from 'lucide-react';
 import { DebtCategory, CauseNode, Incident } from '../types';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
@@ -62,7 +62,6 @@ export const DebtModal: React.FC<DebtModalProps> = ({
         setSelectedIncidentId(undefined);
       }
 
-      // Fetch causes & incidents for dropdown linking
       api.getCauseNodes(projectId).then(setCauses).catch(console.error);
       api.getIncidents(projectId).then(setIncidents).catch(console.error);
     }
@@ -104,23 +103,23 @@ export const DebtModal: React.FC<DebtModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] rounded-md border border-[#EADBCE] shadow-2xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+      <div className="bg-white rounded-md border border-zinc-300 shadow-2xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[#E5DFD5] flex items-center justify-between bg-white">
+        <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-white">
           <div className="flex items-center space-x-2">
-            <div className="p-2 rounded-md bg-[#F0F4FA] text-[#0C1A2E] border border-[#CBD8E8]">
+            <div className="p-2 rounded-md bg-black text-white">
               <Coins className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-950">Register Technical Debt Item</h3>
-              <p className="text-xs text-stone-500">Record structural compromise, principal effort, and architectural module</p>
+              <h3 className="text-base font-bold text-black">Register Technical Debt Item</h3>
+              <p className="text-xs text-zinc-500">Record structural compromise, principal effort, and architectural module</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-slate-950 p-1 rounded-md hover:bg-[#F4EFE6] transition-colors cursor-pointer"
+            className="text-zinc-500 hover:text-black p-1 rounded-md hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -129,8 +128,8 @@ export const DebtModal: React.FC<DebtModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Debt Item Title <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-zinc-900 mb-1">
+              Debt Item Title <span className="text-black font-bold">*</span>
             </label>
             <input
               type="text"
@@ -138,19 +137,19 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Refactor Connection Pool to HikariCP with Dynamic Backpressure"
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
                 Debt Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as DebtCategory)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black cursor-pointer"
               >
                 <option value="ARCHITECTURAL">ARCHITECTURAL</option>
                 <option value="CODE_SMELL">CODE_SMELL</option>
@@ -162,13 +161,13 @@ export const DebtModal: React.FC<DebtModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Affected Module <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
+                Affected Module <span className="text-black font-bold">*</span>
               </label>
               <select
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white cursor-pointer"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black cursor-pointer"
               >
                 <option value="database">database</option>
                 <option value="payments">payments</option>
@@ -184,8 +183,8 @@ export const DebtModal: React.FC<DebtModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Effort Principal P(d) (Hours) <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
+                Effort Principal P(d) (Hours) <span className="text-black font-bold">*</span>
               </label>
               <input
                 type="number"
@@ -194,12 +193,12 @@ export const DebtModal: React.FC<DebtModalProps> = ({
                 required
                 value={principal}
                 onChange={(e) => setPrincipal(parseFloat(e.target.value) || 1)}
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black font-mono"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-zinc-900 mb-1">
                 Assignee Lead
               </label>
               <input
@@ -207,7 +206,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
                 value={assignee}
                 onChange={(e) => setAssignee(e.target.value)}
                 placeholder="Assignee developer..."
-                className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+                className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
               />
             </div>
           </div>
@@ -215,14 +214,14 @@ export const DebtModal: React.FC<DebtModalProps> = ({
           {/* Direct Causal & Incident Linkage Selectors */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center space-x-1">
-                <Link2 className="w-3 h-3 text-[#0C1A2E]" />
+              <label className="block text-xs font-semibold text-zinc-900 mb-1 flex items-center space-x-1">
+                <Link2 className="w-3 h-3 text-black" />
                 <span>Link Systemic Root Cause</span>
               </label>
               <select
                 value={selectedCauseId || ''}
                 onChange={(e) => setSelectedCauseId(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
+                className="w-full px-3 py-1.5 text-xs rounded-md border border-zinc-300 bg-white text-black cursor-pointer"
               >
                 <option value="">None (Unlinked)</option>
                 {causes.map((c) => (
@@ -234,14 +233,14 @@ export const DebtModal: React.FC<DebtModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center space-x-1">
-                <Link2 className="w-3 h-3 text-[#0C1A2E]" />
+              <label className="block text-xs font-semibold text-zinc-900 mb-1 flex items-center space-x-1">
+                <Link2 className="w-3 h-3 text-black" />
                 <span>Link Tracing Incident</span>
               </label>
               <select
                 value={selectedIncidentId || ''}
                 onChange={(e) => setSelectedIncidentId(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5DFD5] bg-white cursor-pointer"
+                className="w-full px-3 py-1.5 text-xs rounded-md border border-zinc-300 bg-white text-black cursor-pointer"
               >
                 <option value="">None (Independent)</option>
                 {incidents.map((i) => (
@@ -254,7 +253,7 @@ export const DebtModal: React.FC<DebtModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-zinc-900 mb-1">
               File Path (Optional)
             </label>
             <input
@@ -262,13 +261,13 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={filePath}
               onChange={(e) => setFilePath(e.target.value)}
               placeholder="e.g. database/connection_pool.py"
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Remediation Scope & Technical Details <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-zinc-900 mb-1">
+              Remediation Scope & Technical Details <span className="text-black font-bold">*</span>
             </label>
             <textarea
               required
@@ -276,23 +275,23 @@ export const DebtModal: React.FC<DebtModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the structural compromise, corrective architecture refactoring, and acceptance criteria..."
-              className="w-full px-3 py-2 text-xs rounded-md border border-[#E5DFD5] focus:outline-hidden focus:ring-1 focus:ring-[#0C1A2E] bg-white"
+              className="w-full px-3 py-2 text-xs rounded-md border border-zinc-300 focus:outline-hidden focus:ring-1 focus:ring-black bg-white text-black"
             />
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-[#E5DFD5] flex items-center justify-end space-x-2">
+          <div className="pt-4 border-t border-zinc-200 flex items-center justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-md text-xs font-medium text-stone-700 hover:bg-[#F4EFE6] transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-medium text-zinc-700 hover:bg-zinc-100 border border-zinc-300 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md text-xs font-bold bg-[#0C1A2E] hover:bg-[#142B4B] text-white shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs font-semibold bg-black hover:bg-zinc-800 text-white border border-black shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? 'Registering...' : 'Register Debt Item'}
             </button>
