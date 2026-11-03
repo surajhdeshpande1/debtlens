@@ -72,6 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     id: NavTab;
     matchingTabs: NavTab[];
     label: string;
+    shortLabel: string;
     icon: React.ComponentType<{ className?: string }>;
     badge?: number;
     badgeType?: 'danger' | 'warning' | 'info';
@@ -80,12 +81,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'dashboard',
       matchingTabs: ['dashboard'],
       label: 'Executive Balance Sheet',
+      shortLabel: 'Overview',
       icon: LayoutDashboard
     },
     {
       id: 'incidents',
       matchingTabs: ['incidents', 'causal'],
       label: 'Incidents & Causal',
+      shortLabel: 'Incidents',
       icon: AlertCircle,
       badge: openIncidentsCount,
       badgeType: 'warning'
@@ -94,6 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'debt',
       matchingTabs: ['debt', 'optimiser'],
       label: 'Debt & Payoff Solver',
+      shortLabel: 'Debt Solver',
       icon: Coins,
       badge: breakevenDebtCount,
       badgeType: 'danger'
@@ -102,6 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'intelligence',
       matchingTabs: ['intelligence', 'repository', 'knowledge'],
       label: 'Code & Viva Defense',
+      shortLabel: 'Code & Viva',
       icon: GitBranch,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
       badgeType: 'info'
@@ -127,10 +132,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E2DA] shadow-[0_1px_4px_rgba(0,0,0,0.03)] select-none">
       
-      {/* Sleek Single-Bar Top Header */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      {/* Sleek Single-Bar Top Header - Optimized for 100% Zoom (max-w-[1640px]) */}
+      <div className="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         
-        {/* Left: Brand & Academic Scope Context */}
+        {/* Left: Brand & Institutional Scope Context */}
         <div className="flex items-center space-x-3 shrink-0">
           <div 
             className="flex items-center space-x-2.5 cursor-pointer group" 
@@ -150,10 +155,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          <div className="hidden 2xl:block text-stone-300 font-light">|</div>
+          <div className="hidden lg:block text-stone-300 font-light">|</div>
 
           {/* Academic Scope Badge */}
-          <div className="hidden 2xl:flex items-center space-x-2 text-xs text-stone-700 px-3 h-8.5 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] shrink-0 whitespace-nowrap shadow-2xs">
+          <div className="hidden lg:flex items-center space-x-2 text-xs text-stone-700 px-3 h-9 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] shrink-0 whitespace-nowrap shadow-2xs">
             <Building className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
             <span className="font-semibold text-stone-600">BEC Bagalkote</span>
             <span className="text-stone-300">•</span>
@@ -161,8 +166,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: 4 Consolidated Spacious Navigation Tabs */}
-        <nav className="hidden xl:flex items-center space-x-1.5 shrink-0">
+        {/* Center: 4 Consolidated Spacious Navigation Tabs - Visible on md: and up */}
+        <nav className="hidden md:flex items-center space-x-1.5 shrink-0">
           {primaryNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.matchingTabs.includes(currentTab);
@@ -170,14 +175,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={item.id}
                 onClick={() => setCurrentTab(item.id)}
-                className={`h-9 px-3.5 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+                className={`h-9 px-3 lg:px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
                   isActive
                     ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
                     : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
-                <span className="whitespace-nowrap">{item.label}</span>
+                <span className="hidden xl:inline whitespace-nowrap">{item.label}</span>
+                <span className="inline xl:hidden whitespace-nowrap">{item.shortLabel}</span>
 
                 {item.badge !== undefined && item.badge > 0 && (
                   <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
@@ -189,13 +195,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right Actions: Search, Audit PDF, Standout Interactive Demo, RBAC Profile */}
-        <div className="flex items-center space-x-2.5 shrink-0">
+        {/* Right Actions: Live Region, Search, Audit PDF, Standout Interactive Demo, RBAC Profile */}
+        <div className="flex items-center space-x-2 shrink-0">
           
-          {/* Search Trigger Button */}
+          {/* Cloud Region Environment Indicator */}
+          <div className="hidden 2xl:flex items-center space-x-2 px-3 h-9 rounded-md bg-[#ECFDF5] border border-[#A7F3D0] text-xs font-mono text-[#065F46] shrink-0 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="font-semibold text-stone-600">asia-south1</span>
+            <span className="text-emerald-300">•</span>
+            <span className="font-bold text-[#065F46]">Live</span>
+          </div>
+
+          {/* Search Trigger Button - Fixed Single-Row Width with Guaranteed No-Wrap */}
           <button
             onClick={onOpenCommandPalette}
-            className="w-44 lg:w-52 h-9 hidden md:flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden shrink-0"
+            className="w-36 lg:w-44 xl:w-52 h-9 hidden sm:flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden shrink-0"
             title="Press ⌘K or Ctrl+K to search commands & ledger"
           >
             <div className="flex items-center space-x-2 min-w-0 pr-1 truncate">
@@ -209,10 +223,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </kbd>
           </button>
 
-          {/* Mobile search button (< md) */}
+          {/* Mobile search button (< sm) */}
           <button
             onClick={onOpenCommandPalette}
-            className="md:hidden h-9 w-9 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center shrink-0 cursor-pointer shadow-2xs"
+            className="sm:hidden h-9 w-9 rounded-md text-stone-700 hover:text-[#0A2E23] hover:bg-[#F4F2EB] border border-[#D8D4C8] bg-white flex items-center justify-center shrink-0 cursor-pointer shadow-2xs"
             title="Search (⌘K)"
           >
             <Search className="w-4 h-4 text-stone-500" />
@@ -290,8 +304,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
 
-      {/* Responsive Horizontal Navigation for Tablet/Mobile screens (< xl) */}
-      <div className="xl:hidden bg-[#FAF9F6] border-t border-[#E5E2DA] px-4 py-2 overflow-x-auto no-scrollbar">
+      {/* Responsive Horizontal Navigation for Mobile screens only (< md) */}
+      <div className="md:hidden bg-[#FAF9F6] border-t border-[#E5E2DA] px-4 py-2 overflow-x-auto no-scrollbar">
         <nav className="flex items-center space-x-1.5 min-w-max">
           {primaryNavItems.map((item) => {
             const Icon = item.icon;

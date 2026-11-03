@@ -169,8 +169,8 @@ const MainAppContent: React.FC = () => {
         regressionsCount={summary?.regressions_detected}
       />
 
-      {/* Main Expansive 100% Full-Width Canvas */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 min-w-0">
+      {/* Main Expansive Full-Width Canvas - Optimized for 100% Zoom */}
+      <main className="flex-1 max-w-[1640px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 min-w-0">
         
         {/* VIEW 1: Executive Balance Sheet */}
         {currentTab === 'dashboard' && (
