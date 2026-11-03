@@ -9,11 +9,8 @@ import {
   Sparkles,
   LayoutDashboard,
   AlertCircle,
-  GitFork,
   Coins,
-  Calculator,
-  GitBranch,
-  BookOpen
+  GitBranch
 } from 'lucide-react';
 import { api } from '../services/api';
 import { UserRole } from '../types';
@@ -70,73 +67,50 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const currentRoleObj = roles.find(r => r.role === currentRole) || roles[0];
 
-  const coreNavItems: { 
-    id: NavTab; 
-    label: string; 
-    icon: React.ComponentType<{ className?: string }>; 
-    badge?: number; 
+  // 4 Consolidated Core Views
+  const primaryNavItems: {
+    id: NavTab;
+    matchingTabs: NavTab[];
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: number;
     badgeType?: 'danger' | 'warning' | 'info';
   }[] = [
     {
       id: 'dashboard',
-      label: 'Executive Overview',
+      matchingTabs: ['dashboard'],
+      label: 'Executive Balance Sheet',
       icon: LayoutDashboard
     },
     {
       id: 'incidents',
-      label: 'Incident Management',
+      matchingTabs: ['incidents', 'causal'],
+      label: 'Incidents & Causal',
       icon: AlertCircle,
       badge: openIncidentsCount,
       badgeType: 'warning'
     },
     {
-      id: 'causal',
-      label: 'Causal Graph (5 Whys)',
-      icon: GitFork
-    },
-    {
       id: 'debt',
-      label: 'Technical Debt Ledger',
+      matchingTabs: ['debt', 'optimiser'],
+      label: 'Debt & Payoff Solver',
       icon: Coins,
       badge: breakevenDebtCount,
       badgeType: 'danger'
-    }
-  ];
-
-  const remediationNavItems: {
-    id: NavTab; 
-    label: string; 
-    icon: React.ComponentType<{ className?: string }>; 
-    badge?: number; 
-    badgeType?: 'danger' | 'warning' | 'info';
-  }[] = [
-    {
-      id: 'optimiser',
-      label: 'Payoff Optimiser (0/1)',
-      icon: Calculator
-    },
-    {
-      id: 'repository',
-      label: 'Repository Evidence',
-      icon: GitBranch
     },
     {
       id: 'intelligence',
-      label: 'Incident Intelligence',
-      icon: Sparkles,
+      matchingTabs: ['intelligence', 'repository', 'knowledge'],
+      label: 'Code & Viva Defense',
+      icon: GitBranch,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
       badgeType: 'info'
-    },
-    {
-      id: 'knowledge',
-      label: 'Knowledge & Defense',
-      icon: BookOpen
     }
   ];
 
   const getBadgeStyle = (type?: 'danger' | 'warning' | 'info', isActive?: boolean) => {
     if (isActive) {
-      return 'bg-white/25 text-white border-white/30 font-bold';
+      return 'bg-white/20 text-white border-white/30 font-bold';
     }
     switch (type) {
       case 'danger':
@@ -153,17 +127,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E2DA] shadow-[0_1px_4px_rgba(0,0,0,0.03)] select-none">
       
-      {/* TIER 1: Executive Brand, Search, and Primary Actions */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 border-b border-[#F0EDE5]">
+      {/* Sleek Single-Bar Top Header */}
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         
-        {/* Left: Brand & Institutional Scope */}
+        {/* Left: Brand & Academic Scope Context */}
         <div className="flex items-center space-x-3 shrink-0">
           <div 
-            className="flex items-center space-x-2.5 cursor-pointer" 
+            className="flex items-center space-x-2.5 cursor-pointer group" 
             onClick={() => setCurrentTab('dashboard')}
-            title="Return to Executive Overview"
+            title="Return to Executive Balance Sheet"
           >
-            <div className="w-9 h-9 rounded-md bg-[#064E3B] flex items-center justify-center text-white shadow-xs border border-[#053D2E] shrink-0">
+            <div className="w-9 h-9 rounded-md bg-[#064E3B] flex items-center justify-center text-white shadow-xs border border-[#053D2E] shrink-0 group-hover:bg-[#043D2E] transition-colors">
               <Layers className="w-4.5 h-4.5 text-emerald-200" />
             </div>
             <div className="flex items-baseline space-x-1.5 shrink-0">
@@ -176,10 +150,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          <div className="hidden lg:block text-stone-300 font-light">|</div>
+          <div className="hidden 2xl:block text-stone-300 font-light">|</div>
 
           {/* Academic Scope Badge */}
-          <div className="hidden lg:flex items-center space-x-2 text-xs text-stone-700 px-3.5 h-9 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] shrink-0 whitespace-nowrap shadow-2xs">
+          <div className="hidden 2xl:flex items-center space-x-2 text-xs text-stone-700 px-3 h-8.5 rounded-md bg-[#F9F8F5] border border-[#E5E2DA] shrink-0 whitespace-nowrap shadow-2xs">
             <Building className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
             <span className="font-semibold text-stone-600">BEC Bagalkote</span>
             <span className="text-stone-300">•</span>
@@ -187,28 +161,54 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: Command Palette Trigger with Clean Fixed Width */}
-        <div className="hidden md:flex items-center shrink-0">
+        {/* Center: 4 Consolidated Spacious Navigation Tabs */}
+        <nav className="hidden xl:flex items-center space-x-1.5 shrink-0">
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.matchingTabs.includes(currentTab);
+            return (
+              <button
+                key={item.id}
+                onClick={() => setCurrentTab(item.id)}
+                className={`h-9 px-3.5 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+                  isActive
+                    ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
+                    : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
+                <span className="whitespace-nowrap">{item.label}</span>
+
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Right Actions: Search, Audit PDF, Standout Interactive Demo, RBAC Profile */}
+        <div className="flex items-center space-x-2.5 shrink-0">
+          
+          {/* Search Trigger Button */}
           <button
             onClick={onOpenCommandPalette}
-            className="w-56 lg:w-64 h-9 flex items-center justify-between px-3.5 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden"
-            title="Press ⌘K or Ctrl+K to search"
+            className="w-44 lg:w-52 h-9 hidden md:flex items-center justify-between px-3 rounded-md bg-[#F9F8F5] hover:bg-[#F2EFE8] border border-[#E5E2DA] text-xs text-stone-600 hover:text-[#0A2E23] transition-all cursor-pointer group shadow-2xs overflow-hidden shrink-0"
+            title="Press ⌘K or Ctrl+K to search commands & ledger"
           >
-            <div className="flex items-center space-x-2 min-w-0 pr-1.5 overflow-hidden">
+            <div className="flex items-center space-x-2 min-w-0 pr-1 truncate">
               <Search className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#064E3B] transition-colors shrink-0" />
               <span className="text-stone-500 group-hover:text-[#0A2E23] font-medium truncate whitespace-nowrap">
-                Search commands, ledger...
+                Search...
               </span>
             </div>
             <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-stone-600 bg-white border border-[#E5E2DA] rounded-sm shrink-0">
               ⌘K
             </kbd>
           </button>
-        </div>
 
-        {/* Right Actions: Audit PDF, Standout Interactive Demo, RBAC Profile */}
-        <div className="flex items-center space-x-2.5 shrink-0">
-          
           {/* Mobile search button (< md) */}
           <button
             onClick={onOpenCommandPalette}
@@ -223,6 +223,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
             className="h-9 px-3.5 rounded-md text-xs font-semibold text-[#0A2E23] bg-white hover:bg-[#F9F8F5] border border-[#D8D4C8] inline-flex items-center space-x-2 transition-colors disabled:opacity-50 cursor-pointer whitespace-nowrap shadow-2xs shrink-0"
+            title="Generate & Download Full PDF Technical Debt Audit Report"
           >
             <FileDown className="w-3.5 h-3.5 text-[#064E3B] shrink-0" />
             <span className="hidden sm:inline whitespace-nowrap font-medium">{isDownloadingPdf ? 'Generating...' : 'Audit PDF'}</span>
@@ -248,6 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
               className="h-9 px-3 rounded-md hover:bg-[#F4F2EB] border border-[#E5E2DA] bg-white flex items-center space-x-2.5 transition-colors cursor-pointer group shrink-0 shadow-2xs"
+              title="Active Role & Permissions"
             >
               <div className="w-6 h-6 rounded-md bg-[#064E3B] text-white flex items-center justify-center font-bold text-[10px] shrink-0">
                 {currentRoleObj.initials}
@@ -288,71 +290,34 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
 
-      {/* TIER 2: Executive Cockpit Module Navigation - Spacious Regular Shaped Buttons */}
-      <div className="bg-[#FAF9F6] border-b border-[#E5E2DA]">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-13 flex items-center overflow-x-auto no-scrollbar">
-          <nav className="flex items-center space-x-2 w-full min-w-max py-1.5">
-            
-            {/* Core Intelligence Group */}
-            <div className="flex items-center space-x-2 shrink-0">
-              {coreNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setCurrentTab(item.id)}
-                    className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2.5 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                      isActive
-                        ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
-                        : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
-                    }`}
-                  >
-                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
-                    <span className="whitespace-nowrap">{item.label}</span>
+      {/* Responsive Horizontal Navigation for Tablet/Mobile screens (< xl) */}
+      <div className="xl:hidden bg-[#FAF9F6] border-t border-[#E5E2DA] px-4 py-2 overflow-x-auto no-scrollbar">
+        <nav className="flex items-center space-x-1.5 min-w-max">
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.matchingTabs.includes(currentTab);
+            return (
+              <button
+                key={item.id}
+                onClick={() => setCurrentTab(item.id)}
+                className={`h-8.5 px-3 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
+                  isActive
+                    ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
+                    : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
+                <span className="whitespace-nowrap">{item.label}</span>
 
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="h-5 w-px bg-[#D8D4C8] shrink-0 mx-1.5" />
-
-            {/* Remediation & Architecture Group */}
-            <div className="flex items-center space-x-2 shrink-0">
-              {remediationNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setCurrentTab(item.id)}
-                    className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2.5 transition-all cursor-pointer whitespace-nowrap border shrink-0 ${
-                      isActive
-                        ? 'bg-[#064E3B] text-white border-[#064E3B] shadow-xs font-bold'
-                        : 'bg-white hover:bg-[#F2EFE8] text-[#0A2E23] border-[#E5E2DA] shadow-2xs hover:border-[#D8D4C8]'
-                    }`}
-                  >
-                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-emerald-200' : 'text-stone-500'}`} />
-                    <span className="whitespace-nowrap">{item.label}</span>
-
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-          </nav>
-        </div>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border shrink-0 ${getBadgeStyle(item.badgeType, isActive)}`}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
     </header>

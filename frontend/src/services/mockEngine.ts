@@ -15,8 +15,8 @@ import {
   Organization
 } from '../types';
 
-// Storage keys
-const STORAGE_KEY = 'debtlens_v1_store';
+// Storage keys - bumped to v3 for realistic Enterprise FinTech dataset
+const STORAGE_KEY = 'debtlens_enterprise_fintech_v3';
 
 interface StoreData {
   incidents: Incident[];

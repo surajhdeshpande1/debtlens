@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  AlertCircle, 
+  GitFork, 
+  Coins, 
+  Calculator, 
+  GitBranch, 
+  Sparkles, 
+  BookOpen 
+} from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { NavTab } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
@@ -132,10 +141,14 @@ const MainAppContent: React.FC = () => {
     );
   }
 
+  const isIncidentsGroup = currentTab === 'incidents' || currentTab === 'causal';
+  const isDebtGroup = currentTab === 'debt' || currentTab === 'optimiser';
+  const isIntelligenceGroup = currentTab === 'intelligence' || currentTab === 'repository' || currentTab === 'knowledge';
+
   return (
     <div className="min-h-screen bg-[#F9F8F5] text-[#0A2E23] flex flex-col font-sans selection:bg-[#064E3B] selection:text-white">
 
-      {/* Top Executive Cockpit Navigation */}
+      {/* Top Executive Cockpit Navigation (Single Sleek Bar) */}
       <Navbar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -157,7 +170,9 @@ const MainAppContent: React.FC = () => {
       />
 
       {/* Main Expansive 100% Full-Width Canvas */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 min-w-0">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 min-w-0">
+        
+        {/* VIEW 1: Executive Balance Sheet */}
         {currentTab === 'dashboard' && (
           <Dashboard
             summary={summary}
@@ -166,55 +181,207 @@ const MainAppContent: React.FC = () => {
           />
         )}
 
-          {currentTab === 'incidents' && (
-            <IncidentsPage
-              projectId={activeProjectId}
-              onOpenReportModal={() => setIsIncidentModalOpen(true)}
-              onConvertIncidentToDebt={handleOpenIncidentToDebt}
-            />
-          )}
+        {/* VIEW 2: Incidents & 5-Whys Causal Workspace */}
+        {isIncidentsGroup && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E5E2DA]">
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-[#0A2E23]">
+                  Incidents & Causal Graph Workspace
+                </h1>
+                <p className="text-xs text-stone-600 mt-1 font-medium leading-relaxed">
+                  Correlate live production failures with systemic 5-Whys convergence and NetworkX root cause centrality.
+                </p>
+              </div>
 
-          {currentTab === 'causal' && (
-            <CausalAnalysisPage
-              projectId={activeProjectId}
-              onConvertCauseToDebt={handleOpenCauseToDebt}
-            />
-          )}
+              {/* Luxury Segmented Pill Switcher */}
+              <div className="flex items-center space-x-1.5 p-1 bg-white rounded-md border border-[#E5E2DA] shadow-2xs self-start sm:self-auto shrink-0">
+                <button
+                  onClick={() => setCurrentTab('incidents')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'incidents'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>Production Incidents</span>
+                  {summary?.open_incidents ? (
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border ${
+                      currentTab === 'incidents' ? 'bg-white/20 text-white border-white/30' : 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB]'
+                    }`}>
+                      {summary.open_incidents} Open
+                    </span>
+                  ) : null}
+                </button>
+                <button
+                  onClick={() => setCurrentTab('causal')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'causal'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <GitFork className="w-3.5 h-3.5" />
+                  <span>5-Whys Causal Graph</span>
+                </button>
+              </div>
+            </div>
 
-          {currentTab === 'debt' && (
-            <DebtRegistryPage
-              projectId={activeProjectId}
-              onOpenDebtModal={() => {
-                setDebtModalInitialData(null);
-                setIsDebtModalOpen(true);
-              }}
-            />
-          )}
+            {currentTab === 'incidents' && (
+              <IncidentsPage
+                projectId={activeProjectId}
+                onOpenReportModal={() => setIsIncidentModalOpen(true)}
+                onConvertIncidentToDebt={handleOpenIncidentToDebt}
+              />
+            )}
 
-          {currentTab === 'repository' && (
-            <RepoEvidencePage
-              projectId={activeProjectId}
-            />
-          )}
+            {currentTab === 'causal' && (
+              <CausalAnalysisPage
+                projectId={activeProjectId}
+                onConvertCauseToDebt={handleOpenCauseToDebt}
+              />
+            )}
+          </div>
+        )}
 
-          {currentTab === 'intelligence' && (
-            <IntelligencePage
-              projectId={activeProjectId}
-            />
-          )}
+        {/* VIEW 3: Technical Debt Ledger & 0/1 Knapsack Solver Workspace */}
+        {isDebtGroup && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E5E2DA]">
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-[#0A2E23]">
+                  Technical Debt & Payoff Solver Workspace
+                </h1>
+                <p className="text-xs text-stone-600 mt-1 font-medium leading-relaxed">
+                  Quantify compounding capital drag I(d) and compute mathematically optimal remediation packages via bounded 0/1 knapsack dynamic programming.
+                </p>
+              </div>
 
-          {currentTab === 'optimiser' && (
-            <RemediationOptimiserPage
-              projectId={activeProjectId}
-            />
-          )}
+              {/* Luxury Segmented Pill Switcher */}
+              <div className="flex items-center space-x-1.5 p-1 bg-white rounded-md border border-[#E5E2DA] shadow-2xs self-start sm:self-auto shrink-0">
+                <button
+                  onClick={() => setCurrentTab('debt')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'debt'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <Coins className="w-3.5 h-3.5" />
+                  <span>Technical Debt Ledger</span>
+                  {summary?.past_breakeven_count ? (
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs border ${
+                      currentTab === 'debt' ? 'bg-white/20 text-white border-white/30' : 'bg-[#FDF2F4] text-[#881337] border-[#F8D2DB]'
+                    }`}>
+                      {summary.past_breakeven_count} Drag
+                    </span>
+                  ) : null}
+                </button>
+                <button
+                  onClick={() => setCurrentTab('optimiser')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'optimiser'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <Calculator className="w-3.5 h-3.5" />
+                  <span>0/1 Knapsack Payoff Optimiser</span>
+                </button>
+              </div>
+            </div>
 
-          {currentTab === 'knowledge' && (
-            <KnowledgeReportsPage
-              projectId={activeProjectId}
-            />
-          )}
-        </main>
+            {currentTab === 'debt' && (
+              <DebtRegistryPage
+                projectId={activeProjectId}
+                onOpenDebtModal={() => {
+                  setDebtModalInitialData(null);
+                  setIsDebtModalOpen(true);
+                }}
+              />
+            )}
+
+            {currentTab === 'optimiser' && (
+              <RemediationOptimiserPage
+                projectId={activeProjectId}
+              />
+            )}
+          </div>
+        )}
+
+        {/* VIEW 4: Code Evidence & Academic Defense Workspace */}
+        {isIntelligenceGroup && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E5E2DA]">
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-[#0A2E23]">
+                  Code Evidence & Viva Defense Workspace
+                </h1>
+                <p className="text-xs text-stone-600 mt-1 font-medium leading-relaxed">
+                  AST syntactic complexity hotspots, self-admitted debt markers, hybrid NLP regression detection, and academic Viva Voce defense.
+                </p>
+              </div>
+
+              {/* Luxury Segmented Pill Switcher */}
+              <div className="flex items-center space-x-1.5 p-1 bg-white rounded-md border border-[#E5E2DA] shadow-2xs self-start sm:self-auto overflow-x-auto shrink-0 no-scrollbar">
+                <button
+                  onClick={() => setCurrentTab('repository')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'repository'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <GitBranch className="w-3.5 h-3.5" />
+                  <span>AST Hotspots & SATD</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('intelligence')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'intelligence'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Incident Intelligence NLP</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('knowledge')}
+                  className={`h-9 px-4 rounded-md text-xs font-semibold flex items-center space-x-2 transition-all cursor-pointer whitespace-nowrap ${
+                    currentTab === 'knowledge'
+                      ? 'bg-[#064E3B] text-white shadow-xs font-bold'
+                      : 'text-stone-600 hover:text-[#0A2E23] hover:bg-[#F9F8F5]'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Viva Voce Defense</span>
+                </button>
+              </div>
+            </div>
+
+            {currentTab === 'repository' && (
+              <RepoEvidencePage
+                projectId={activeProjectId}
+              />
+            )}
+
+            {currentTab === 'intelligence' && (
+              <IntelligencePage
+                projectId={activeProjectId}
+              />
+            )}
+
+            {currentTab === 'knowledge' && (
+              <KnowledgeReportsPage
+                projectId={activeProjectId}
+              />
+            )}
+          </div>
+        )}
+
+      </main>
 
       {/* Incident Intake Modal */}
       <IncidentModal
