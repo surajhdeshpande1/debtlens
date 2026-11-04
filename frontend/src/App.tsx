@@ -151,7 +151,7 @@ const MainAppContent: React.FC = () => {
         }}
       />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full">
 
         {/* Left Sidebar */}
         <Sidebar
@@ -163,7 +163,7 @@ const MainAppContent: React.FC = () => {
         />
 
         {/* Main Content Pane */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 min-w-0 p-6 lg:p-8 overflow-y-auto">
           {currentTab === 'dashboard' && (
             <Dashboard
               summary={summary}

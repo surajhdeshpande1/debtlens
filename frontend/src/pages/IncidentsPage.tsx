@@ -15,11 +15,14 @@ import {
   Download, 
   RotateCcw, 
   Check,
-  Activity
+  Activity,
+  FileText,
+  CheckCircle2
 } from 'lucide-react';
 import { Incident, IncidentSeverity, IncidentStatus, SimilarIncidentMatch, DebtCategory } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { IncidentReportModal } from '../components/IncidentReportModal';
 
 interface IncidentsPageProps {
   projectId: number;
@@ -47,6 +50,8 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterModule, setFilterModule] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isFullReportOpen, setIsFullReportOpen] = useState(false);
+  const [reportIncident, setReportIncident] = useState<Incident | null>(null);
 
   const fetchIncidents = async () => {
     try {
@@ -91,7 +96,11 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
       if (selectedIncident?.id === incId) {
         setSelectedIncident(updated);
       }
-      showToast('success', 'Status Updated', `${updated.incident_number} is now marked ${newStatus}`);
+      if (newStatus === 'RESOLVED') {
+        showToast('success', 'Incident Solved & Resolved', `${updated.incident_number} post-mortem report generated in correct order.`);
+      } else {
+        showToast('success', 'Status Updated', `${updated.incident_number} is now marked ${newStatus}`);
+      }
     } catch (err) {
       console.error(err);
       showToast('error', 'Update Failed', 'Could not update status');
@@ -358,8 +367,19 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                     </h4>
 
                     <div className="flex items-center justify-between text-[11px] text-slate-400">
-                      <span>Effort: {inc.resolution_effort_hours}h</span>
-                      <span>{new Date(inc.reported_at).toLocaleDateString()}</span>
+                      <span>Effort: {inc.resolution_effort_hours}h • {new Date(inc.reported_at).toLocaleDateString()}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReportIncident(inc);
+                          setIsFullReportOpen(true);
+                        }}
+                        className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center space-x-1 cursor-pointer"
+                        title="Display full incident report in correct order"
+                      >
+                        <FileText className="w-3 h-3 text-indigo-500" />
+                        <span>Full Report</span>
+                      </button>
                     </div>
                   </div>
                 );
@@ -426,6 +446,29 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                   </div>
                 </div>
 
+                {/* Solved Post-Mortem Action Callout */}
+                {selectedIncident.status === 'RESOLVED' && (
+                  <div className="my-2.5 p-3 rounded-xl border border-emerald-300 bg-emerald-50/90 flex items-center justify-between text-xs animate-in fade-in">
+                    <div className="space-y-0.5">
+                      <div className="font-bold text-emerald-950 flex items-center space-x-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Incident Fully Solved & Resolved</span>
+                      </div>
+                      <div className="text-[10px] text-emerald-700">8-Section chronological post-mortem ready</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setReportIncident(selectedIncident);
+                        setIsFullReportOpen(true);
+                      }}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs flex items-center space-x-1 cursor-pointer transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>View Full Report</span>
+                    </button>
+                  </div>
+                )}
+
                 <h3 className="text-sm font-bold text-slate-900 leading-snug">{selectedIncident.title}</h3>
                 <p className="mt-2 text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
                   {selectedIncident.description}
@@ -443,6 +486,18 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
                   <div className="font-semibold text-slate-800">{selectedIncident.resolution_effort_hours} Hours</div>
                 </div>
               </div>
+
+              {/* View Full Incident Report Primary Button */}
+              <button
+                onClick={() => {
+                  setReportIncident(selectedIncident);
+                  setIsFullReportOpen(true);
+                }}
+                className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center space-x-2 cursor-pointer transition-colors"
+              >
+                <FileText className="w-4 h-4 text-indigo-400" />
+                <span>Display Full Incident Report (Correct Order)</span>
+              </button>
 
               {/* Convert to Debt Item Action Button */}
               {onConvertIncidentToDebt && (
@@ -516,6 +571,13 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
         </div>
 
       </div>
+
+      {/* Comprehensive 8-Section Incident Report Modal (Exact Correct Order) */}
+      <IncidentReportModal
+        isOpen={isFullReportOpen}
+        onClose={() => setIsFullReportOpen(false)}
+        incident={reportIncident}
+      />
 
     </div>
   );

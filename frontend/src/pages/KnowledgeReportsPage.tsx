@@ -16,7 +16,9 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { api } from '../services/api';
+import { Incident } from '../types';
 import { useToast } from '../context/ToastContext';
+import { IncidentReportModal } from '../components/IncidentReportModal';
 
 interface KnowledgeReportsPageProps {
   projectId: number;
@@ -28,6 +30,8 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
   const [isDownloading, setIsDownloading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedViva, setExpandedViva] = useState<number | null>(0);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportIncident, setReportIncident] = useState<Incident | null>(null);
 
   const handleDownloadPdf = async () => {
     try {
@@ -248,6 +252,30 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
                 <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-slate-700 leading-relaxed text-[11px]">
                   {art.lesson}
                 </div>
+
+                <button
+                  onClick={() => {
+                    setReportIncident({
+                      id: art.id,
+                      project_id: projectId,
+                      incident_number: `INC-${100 + art.id}`,
+                      title: art.title,
+                      description: art.lesson,
+                      affected_module: art.module,
+                      affected_component: `${art.module}_core_service`,
+                      severity: 'HIGH',
+                      status: 'RESOLVED',
+                      resolution_effort_hours: 6.5,
+                      reported_at: '2026-10-24T14:30:00Z',
+                      resolved_at: '2026-10-24T21:00:00Z'
+                    });
+                    setIsReportModalOpen(true);
+                  }}
+                  className="w-full py-2 px-3 rounded-lg bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200/80 text-indigo-900 font-bold text-[11px] flex items-center justify-center space-x-1.5 transition-colors cursor-pointer mt-2"
+                >
+                  <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Display 8-Section Incident Post-Mortem</span>
+                </button>
               </div>
             ))}
           </div>
@@ -293,6 +321,13 @@ export const KnowledgeReportsPage: React.FC<KnowledgeReportsPageProps> = ({ proj
           </div>
         </div>
       )}
+
+      {/* Comprehensive 8-Section Incident Report Modal (Exact Correct Order) */}
+      <IncidentReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        incident={reportIncident}
+      />
 
     </div>
   );

@@ -106,25 +106,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5 self-start sm:self-auto flex-wrap gap-2">
+        <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-2">
           <button
             onClick={() => onNavigateTab('demo')}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer ring-1 ring-indigo-500/20 active:scale-95"
+            className="h-9 inline-flex items-center space-x-1.5 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-[0.98]"
             title="Launch 1-Click Interactive Demo Pipeline"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            <span>Live Demo (1-Click)</span>
+            <span>Interactive Demo</span>
           </button>
           <button
             onClick={onOpenReportModal}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            className="h-9 inline-flex items-center space-x-1.5 px-3.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-slate-500" />
             <span>Intake Incident</span>
           </button>
           <button
             onClick={() => onNavigateTab('optimiser')}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            className="h-9 inline-flex items-center space-x-1.5 px-3.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
           >
             <span>Run Optimiser</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
