@@ -19,30 +19,30 @@ export const StatCard: React.FC<StatCardProps> = ({
   badge
 }) => {
   const badgeColors = {
-    positive: 'bg-emerald-50 text-emerald-800 border-emerald-200 ring-1 ring-emerald-500/20',
-    negative: 'bg-rose-50 text-rose-800 border-rose-200 ring-1 ring-rose-500/20',
-    warning: 'bg-amber-50 text-amber-800 border-amber-200 ring-1 ring-amber-500/20',
-    neutral: 'bg-slate-100 text-slate-800 border-slate-200'
+    positive: 'bg-emerald-50 text-emerald-900 border-emerald-300 font-bold',
+    negative: 'bg-rose-50 text-rose-900 border-rose-300 font-bold',
+    warning: 'bg-amber-50 text-amber-900 border-amber-300 font-bold',
+    neutral: 'bg-[#F2ECE1] text-stone-800 border-[#DDD5C7] font-semibold'
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-xs hover:border-slate-300 hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+    <div className="bg-white rounded-md border border-[#E2DDD5] p-4 flex flex-col justify-between shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#064E3B]/40 transition-colors">
       <div>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#64748B]">
             {title}
           </span>
-          <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-200/80 shadow-2xs">
-            <Icon className="w-4 h-4 text-indigo-600" />
+          <div className="w-7 h-7 rounded-sm bg-[#F4EFE6] flex items-center justify-center text-[#064E3B] border border-[#E2DDD5]">
+            <Icon className="w-3.5 h-3.5" />
           </div>
         </div>
 
-        <div className="mt-3 flex items-baseline justify-between gap-2 flex-wrap">
-          <span className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-mono">
+        <div className="mt-2.5 flex items-baseline justify-between gap-2 flex-wrap">
+          <span className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight font-mono tabular-nums">
             {value}
           </span>
           {badge && (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border shadow-2xs ${badgeColors[badge.variant]}`}>
+            <span className={`text-[11px] font-mono px-2 py-0.5 rounded-xs border ${badgeColors[badge.variant]}`}>
               {badge.text}
             </span>
           )}
@@ -50,7 +50,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtitle && (
-        <p className="mt-2 text-xs text-slate-600 font-medium leading-relaxed border-t border-slate-100 pt-2">
+        <p className="mt-3 text-[11px] text-[#64748B] font-mono leading-relaxed border-t border-[#F0ECE1] pt-2">
           {subtitle}
         </p>
       )}

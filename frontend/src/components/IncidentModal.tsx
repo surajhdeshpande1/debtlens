@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle, Sparkles, HelpCircle } from 'lucide-react';
+import { X, AlertCircle, FileCode, HelpCircle } from 'lucide-react';
 import { FiveWhysStep, IncidentSeverity } from '../types';
 import { useToast } from '../context/ToastContext';
 import { sanitizeInput, safeNumeric } from '../utils/security';
@@ -124,7 +124,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
               className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer"
               title="Populate with realistic sample incident and 5-Whys"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <FileCode className="w-3.5 h-3.5" />
               <span>Fill Sample</span>
             </button>
             <button

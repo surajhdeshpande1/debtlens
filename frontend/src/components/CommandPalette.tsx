@@ -6,7 +6,7 @@ import {
   GitFork, 
   Coins, 
   GitBranch, 
-  Sparkles, 
+  Cpu, 
   Calculator, 
   BookOpen, 
   FileDown, 
@@ -129,7 +129,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       category: 'Navigation',
       title: 'Incident Intelligence',
       subtitle: 'Hybrid cosine similarity, TF-IDF, DBSCAN clustering & regressions',
-      icon: Sparkles,
+      icon: Cpu,
       badge: 'M6',
       action: () => { onNavigateTab('intelligence'); onClose(); }
     },

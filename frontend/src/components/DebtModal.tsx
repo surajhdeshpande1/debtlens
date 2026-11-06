@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Coins, Link2, Sparkles } from 'lucide-react';
+import { X, Coins, Link2 } from 'lucide-react';
 import { DebtCategory, CauseNode, Incident } from '../types';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';

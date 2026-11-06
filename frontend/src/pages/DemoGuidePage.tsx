@@ -7,7 +7,6 @@ import {
   ArrowRight, 
   Terminal, 
   GraduationCap, 
-  Sparkles, 
   AlertTriangle, 
   GitFork, 
   Coins, 

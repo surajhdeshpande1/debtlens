@@ -5,7 +5,7 @@ import {
   Sliders, 
   ArrowRight, 
   GitBranch,
-  Sparkles,
+  Activity,
   Lock,
   Unlock,
   Download,
@@ -455,7 +455,7 @@ export const RemediationOptimiserPage: React.FC<RemediationOptimiserPageProps> =
                 <h3 className="text-sm font-bold text-slate-900">What-If Sensitivity Curve</h3>
                 <p className="text-xs text-slate-500">Risk Reduction & Interest Saved vs. Sprint Budget Capacity</p>
               </div>
-              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <Activity className="w-4 h-4 text-[#064E3B]" />
             </div>
 
             <div className="h-56 w-full">

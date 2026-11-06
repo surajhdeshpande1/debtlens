@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Sidebar, NavTab } from './components/Sidebar';
+import { RightTelemetryInspector } from './components/RightTelemetryInspector';
 import { Dashboard } from './pages/Dashboard';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { CausalAnalysisPage } from './pages/CausalAnalysisPage';
@@ -26,6 +27,11 @@ const MainAppContent: React.FC = () => {
   const [isIncidentModalOpen, setIsIncidentModalOpen] = useState(false);
   const [isDebtModalOpen, setIsDebtModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  
+  // Split Workbench State
+  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
+  const [selectedInspectorItem, setSelectedInspectorItem] = useState<any>(null);
+
   const [debtModalInitialData, setDebtModalInitialData] = useState<{
     title?: string;
     description?: string;
@@ -58,7 +64,7 @@ const MainAppContent: React.FC = () => {
 
   const handleLaunchDemo = () => {
     setCurrentTab('demo');
-    showToast('info', 'Live Demo Mode Active', '1-Click step through the live enterprise pipeline.');
+    showToast('info', 'Live Demo Pipeline Active', 'Step through the 3-scenario operational pipeline.');
   };
 
   const handleExitDemo = () => {
@@ -133,9 +139,9 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FAF9F5] text-[#0F172A] flex flex-col font-sans selection:bg-[#064E3B]/20 selection:text-[#064E3B]">
 
-      {/* Top Navigation */}
+      {/* Top Engineering Command Header */}
       <Navbar
         currentRole={currentRole}
         setCurrentRole={(role) => {
@@ -149,11 +155,14 @@ const MainAppContent: React.FC = () => {
           fetchSummary();
           showToast('success', 'Data Synchronized', 'Telemetry and economic models refreshed.');
         }}
+        onToggleInspector={() => setIsInspectorOpen(prev => !prev)}
+        isInspectorOpen={isInspectorOpen}
       />
 
+      {/* Split Workbench Console (IDE Style: Left Explorer + Center Workspace + Right Telemetry Inspector) */}
       <div className="flex-1 flex w-full">
 
-        {/* Left Sidebar */}
+        {/* Left Tree Explorer Sidebar (M1–M8) */}
         <Sidebar
           currentTab={currentTab}
           setCurrentTab={setCurrentTab}
@@ -162,8 +171,8 @@ const MainAppContent: React.FC = () => {
           regressionsCount={summary?.regressions_detected}
         />
 
-        {/* Main Content Pane */}
-        <main className="flex-1 min-w-0 p-6 lg:p-8 overflow-y-auto">
+        {/* Center Dense Engineering Workspace */}
+        <main className="flex-1 min-w-0 p-4 sm:p-5 lg:p-6 overflow-y-auto">
           {currentTab === 'dashboard' && (
             <Dashboard
               summary={summary}
@@ -221,6 +230,16 @@ const MainAppContent: React.FC = () => {
             />
           )}
         </main>
+
+        {/* Right Live Telemetry & AST Inspector Panel (Dual Mode) */}
+        <RightTelemetryInspector
+          isOpen={isInspectorOpen}
+          onToggle={() => setIsInspectorOpen(prev => !prev)}
+          selectedItem={selectedInspectorItem}
+          summary={summary}
+          onNavigateTab={setCurrentTab}
+          onClearSelection={() => setSelectedInspectorItem(null)}
+        />
 
       </div>
 

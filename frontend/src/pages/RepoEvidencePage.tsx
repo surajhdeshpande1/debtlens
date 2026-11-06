@@ -11,7 +11,7 @@ import {
   ArrowRight,
   Code2,
   Play,
-  Sparkles,
+  Cpu,
   CheckCircle2,
   Info
 } from 'lucide-react';
@@ -472,7 +472,7 @@ export const RepoEvidencePage: React.FC<RepoEvidencePageProps> = ({ projectId })
           <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
+                <Cpu className="w-4 h-4 text-[#064E3B]" />
                 <h3 className="text-xs font-bold text-slate-900">AST Control-Flow Telemetry</h3>
               </div>
               <span className="text-[10px] font-mono text-slate-400">McCabe AST NodeVisitor</span>

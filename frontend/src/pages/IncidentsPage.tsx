@@ -9,7 +9,7 @@ import {
   ArrowRight, 
   ExternalLink, 
   GitFork, 
-  Sparkles, 
+  Cpu, 
   ShieldAlert, 
   Coins, 
   Download, 
@@ -526,7 +526,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({
               <div className="pt-3 border-t border-slate-100">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <Cpu className="w-3.5 h-3.5 text-emerald-800" />
                     <span className="text-xs font-bold text-slate-900">Hybrid Similar Incidents</span>
                   </div>
                   <span className="text-[10px] font-mono text-slate-400">TF-IDF + Semantics</span>

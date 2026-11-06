@@ -5,10 +5,10 @@ import {
   GitFork, 
   Coins, 
   GitBranch, 
-  Sparkles, 
   Calculator, 
   BookOpen,
-  GraduationCap
+  Terminal,
+  Cpu
 } from 'lucide-react';
 
 export type NavTab = 
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'dashboard',
       label: 'Executive Overview',
       icon: LayoutDashboard,
-      moduleCode: 'M8'
+      moduleCode: 'M1'
     },
     {
       id: 'incidents',
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'intelligence',
       label: 'Incident Intelligence',
-      icon: Sparkles,
+      icon: Cpu,
       badge: regressionsCount > 0 ? regressionsCount : undefined,
       badgeVariant: 'neutral',
       moduleCode: 'M6'
@@ -104,41 +104,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const getBadgeClass = (variant?: 'rose' | 'amber' | 'neutral') => {
     switch (variant) {
       case 'rose':
-        return 'bg-rose-50 text-rose-700 border-rose-200/80';
+        return 'bg-rose-50 text-rose-800 border-rose-300 font-bold';
       case 'amber':
-        return 'bg-amber-50 text-amber-700 border-amber-200/80';
+        return 'bg-amber-50 text-amber-800 border-amber-300 font-bold';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200/80';
+        return 'bg-[#EAE5D9] text-stone-800 border-[#D5CFC5] font-bold';
     }
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 shrink-0 min-h-[calc(100vh-3.5rem)] p-3.5 flex flex-col justify-between select-none">
+    <aside className="w-60 bg-white border-r border-[#E2DDD5] shrink-0 min-h-[calc(100vh-3rem)] p-3 flex flex-col justify-between select-none">
       <div className="space-y-1">
         
-        {/* Prominent Live Demo Mode Button */}
+        {/* Prominent Demo Pipeline Button (Solid Forest Emerald, Zero Sparkles) */}
         <button
           onClick={() => setCurrentTab('demo')}
-          className={`w-full mb-3.5 p-3.5 rounded-2xl text-sm font-extrabold flex items-center justify-between transition-all cursor-pointer ${
+          className={`w-full mb-3 p-2.5 rounded-sm text-xs font-mono font-bold flex items-center justify-between transition-all cursor-pointer ${
             currentTab === 'demo'
-              ? 'bg-slate-900 text-white shadow-md'
-              : 'bg-indigo-50/90 hover:bg-indigo-100/90 text-indigo-950 border border-indigo-200 shadow-xs hover:shadow-md'
+              ? 'bg-[#064E3B] text-white border border-[#042C21] shadow-xs'
+              : 'bg-[#F4EFE6] hover:bg-[#EAE5D9] text-[#064E3B] border border-[#E2DDD5]'
           }`}
         >
-          <div className="flex items-center space-x-2.5">
-            <Sparkles className={`w-5 h-5 ${currentTab === 'demo' ? 'text-amber-300' : 'text-indigo-600'}`} />
-            <span>Live Demo Walkthrough</span>
+          <div className="flex items-center space-x-2">
+            <Terminal className="w-4 h-4 text-emerald-700" />
+            <span className="tracking-wide">DEMO PIPELINE</span>
           </div>
-          <span className={`text-xs font-bold px-2 py-0.5 rounded-full font-mono ${
-            currentTab === 'demo' ? 'bg-slate-800 text-indigo-300' : 'bg-indigo-200 text-indigo-900'
-          }`}>
+          <span className="text-[10px] px-1.5 py-0.2 rounded-xs font-mono font-black bg-[#064E3B] text-white">
             1-CLICK
           </span>
         </button>
 
-        <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+        <div className="px-2 py-1 text-[10px] font-mono font-bold text-stone-400 uppercase tracking-widest flex items-center justify-between">
           <span>Platform Modules</span>
-          <span className="font-mono text-[10px] text-slate-300">8 CORE</span>
+          <span className="text-stone-400">8 CORE</span>
         </div>
 
         {navItems.map((item) => {
@@ -148,23 +146,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => setCurrentTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors cursor-pointer group ${
+              className={`w-full flex items-center justify-between px-2.5 py-2 rounded-sm text-xs transition-colors cursor-pointer group ${
                 isActive
-                  ? 'bg-slate-100 text-slate-900 font-bold'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
+                  ? 'bg-[#F4EFE6] text-[#064E3B] font-bold border-l-2 border-l-[#064E3B] border-y border-r border-transparent'
+                  : 'text-stone-700 hover:bg-[#FAF9F5] hover:text-[#0F172A] font-medium'
               }`}
             >
-              <div className="flex items-center space-x-2.5 truncate">
-                <Icon className={`w-4.5 h-4.5 shrink-0 transition-colors ${
-                  isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'
+              <div className="flex items-center space-x-2 truncate">
+                <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                  isActive ? 'text-[#064E3B]' : 'text-stone-400 group-hover:text-stone-700'
                 }`} />
                 <span className="truncate">{item.label}</span>
               </div>
 
-              <div className="flex items-center space-x-1.5 shrink-0">
-                <span className="text-xs text-slate-400 font-mono font-medium">{item.moduleCode}</span>
+              <div className="flex items-center space-x-1.5 shrink-0 font-mono">
+                <span className={`text-[10px] font-bold ${isActive ? 'text-[#064E3B]' : 'text-stone-400'}`}>
+                  {item.moduleCode}
+                </span>
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`px-2 py-0.5 text-xs font-mono font-bold rounded-md border shadow-2xs ${getBadgeClass(item.badgeVariant)}`}>
+                  <span className={`px-1.5 py-0.2 text-[10px] rounded-xs border ${getBadgeClass(item.badgeVariant)}`}>
                     {item.badge}
                   </span>
                 )}
@@ -175,14 +175,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* College & Department Endorsement Footer */}
-      <div className="pt-3 border-t border-slate-100">
-        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/70 text-slate-600">
+      <div className="pt-3 border-t border-[#E2DDD5]">
+        <div className="p-2.5 bg-[#FAF9F5] rounded-sm border border-[#E2DDD5] text-stone-600 font-mono text-[10px]">
           <div className="flex items-center space-x-1.5 mb-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
-            <span className="text-[11px] font-bold text-slate-900">BEC Bagalkote — ISE</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#064E3B]" />
+            <span className="font-bold text-[#0F172A]">BEC Bagalkote — ISE</span>
           </div>
-          <div className="text-[10px] text-slate-500">Mini Project BISA531P</div>
-          <div className="text-[10px] text-indigo-700 font-medium mt-1">Guide: Prof. P. R. Muttannavar</div>
+          <div className="text-stone-500">Mini Project BISA531P</div>
+          <div className="text-[#064E3B] font-bold mt-1">Guide: Prof. P. R. Muttannavar</div>
         </div>
       </div>
     </aside>

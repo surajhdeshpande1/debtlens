@@ -14,7 +14,7 @@ import {
   FileText, 
   ArrowRight, 
   Layers, 
-  Sparkles, 
+  Terminal, 
   Building, 
   Award,
   Check,
@@ -701,3 +701,4 @@ export const IncidentReportModal: React.FC<IncidentReportModalProps> = ({
     </div>
   );
 };
+
