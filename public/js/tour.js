@@ -56,7 +56,8 @@ export function stop() { save(null); if (panel) panel.remove(); panel = null; $$
 
 export function sync(view) {
   const st = load();
-  if (!st || !S.project || !S.project.tour) { if (panel) { panel.remove(); panel = null; } return; }
+  // A missing or stale saved state (e.g. from an older version of the tour) simply hides the panel.
+  if (!st || !Number.isInteger(st.step) || !S.project || !S.project.tour) { if (panel) { panel.remove(); panel = null; } return; }
   const all = steps();
   const i = Math.max(0, Math.min(st.step, all.length - 1));
   const step = all[i];

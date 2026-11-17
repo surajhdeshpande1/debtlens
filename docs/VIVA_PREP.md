@@ -36,9 +36,9 @@ Backup if there is no internet: `scripts\windows\start.bat` (see `docs/LOCAL_SET
 stays and causes the next incident. DebtLens links incident → root cause → technical debt, and gives each debt item
 a cost so it can be planned.
 
-**What changed since Demo 1?** The panel asked for three things: simulate multiple scenarios (the Simulation Lab:
-5 industries plus what-if, forecast and failure injection), work in the terminal (the `debtlens` CLI and a CI
-gate), and host on Vercel without Supabase (Flask on Vercel with TiDB, which is MySQL-compatible).
+**What changed since Demo 1?** The panel asked for two things: simulate multiple scenarios (the Simulation Lab:
+5 industries plus what-if, forecast and failure injection) and work in the terminal (the `debtlens` CLI and a CI
+gate). We also moved hosting to Vercel without Supabase (Flask on Vercel with TiDB, which is MySQL-compatible).
 
 **Why Flask and MySQL?** That is what we proposed at Demo 1. Flask runs as a single Vercel Python function. TiDB Cloud
 speaks the MySQL protocol, so the same code runs on TiDB online and on MySQL 8 on our laptops.
