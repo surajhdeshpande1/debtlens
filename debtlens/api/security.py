@@ -60,7 +60,7 @@ def secret_key() -> str:
         import hmac
 
         return hmac.new(material.encode(), b"debtlens-jwt-v2", hashlib.sha256).hexdigest()
-    return "debtlens-local-development-only"
+    return "debtlens-local-development-only-not-for-production"
 
 
 def hash_password(pw: str) -> str:
@@ -134,8 +134,8 @@ def _resolve_principal() -> Principal | None:
         except jwt.InvalidTokenError as e:
             raise ApiError(401, "invalid token") from e
         if claims.get("typ") == "sandbox":
-            return Principal("sandbox", claims["role"], f"Sandbox visitor ({ROLE_LABELS.get(claims['role'], '')})",
-                             project_id=int(claims["pid"]))
+            name = str(claims.get("name") or "")[:80] or f"Sandbox visitor ({ROLE_LABELS.get(claims['role'], '')})"
+            return Principal("sandbox", claims["role"], name, project_id=int(claims["pid"]))
         u = s.get(User, int(claims["sub"]))
         if not u or not u.is_active:
             raise ApiError(401, "user disabled")

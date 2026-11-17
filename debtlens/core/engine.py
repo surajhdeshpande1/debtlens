@@ -118,11 +118,13 @@ def causal_metrics(snap: dict) -> dict:
     edges = [(e["source"], e["target"]) for e in snap.get("cause_edges") or []]
     deg = graph.degree_centrality(nodes, edges) if nodes else {}
     btw = graph.betweenness_centrality(nodes, edges) if nodes else {}
+    raw = graph.betweenness_centrality(nodes, edges, normalized=False) if nodes else {}
     inc_count: dict = defaultdict(set)
     for rc in snap.get("root_causes") or []:
         inc_count[rc["cause_id"]].add(rc["incident_id"])
+    # incidents = how many incident chains converge on the node (in-reach); paths = raw betweenness
     return {n: {"degree": round(deg.get(n, 0.0), 4), "betweenness": round(btw.get(n, 0.0), 4),
-                "incidents": len(inc_count.get(n, ()))} for n in nodes}
+                "paths": round(raw.get(n, 0.0), 2), "incidents": len(inc_count.get(n, ()))} for n in nodes}
 
 
 def causal_graph(snap: dict) -> dict:
@@ -138,8 +140,10 @@ def causal_graph(snap: dict) -> dict:
         m = metrics.get(c["id"], {})
         nodes.append({"id": c["id"], "label": c["label"], "category": c.get("category") or "GENERAL",
                       "degree": m.get("degree", 0), "betweenness": m.get("betweenness", 0),
-                      "incidents": m.get("incidents", 0), "depth": depth.get(c["id"], 1)})
-    nodes.sort(key=lambda n: (-(n["betweenness"] * 1.5 + n["degree"]), -n["incidents"]))
+                      "paths": m.get("paths", 0), "incidents": m.get("incidents", 0), "depth": depth.get(c["id"], 1)})
+    # systemic ranking: incident chains converging on the cause, then shortest paths through it
+    # (raw betweenness), then degree; deeper causes win ties
+    nodes.sort(key=lambda n: (-n["incidents"], -n["paths"], -n["degree"], -n["depth"]))
     return {"nodes": nodes, "edges": [{"source": s, "target": t, "weight": w} for (s, t), w in weight.items()]}
 
 

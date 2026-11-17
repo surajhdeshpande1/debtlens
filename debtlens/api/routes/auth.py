@@ -206,6 +206,8 @@ def add_member():
 @require("project.manage")
 def update_member(uid: int):
     p = me()
+    if p.kind != "user":
+        raise ApiError(403, "sandbox teams are fixed personas")
     data = V.body(request)
     s = db()
     u = s.get(User, uid)

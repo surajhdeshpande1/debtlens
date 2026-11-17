@@ -11,7 +11,7 @@ from .. import validation as V
 from ..deps import db, me, note, ok, rate_limit
 from ..errors import ApiError
 from ..models import Project, utcnow
-from ..security import issue_jwt, require
+from ..security import Principal, issue_jwt, require
 from ..services import iso
 
 bp = Blueprint("sandbox", __name__)
@@ -19,14 +19,12 @@ bp = Blueprint("sandbox", __name__)
 
 def _payload(proj: Project, role: str) -> dict:
     hours = max(0.1, (proj.expires_at - utcnow()).total_seconds() / 3600) if proj.expires_at else 24
-    token = issue_jwt({"typ": "sandbox", "pid": proj.id, "role": role}, hours=hours)
-
-    class _P:  # minimal principal for persona lookup
-        pass
-
-    pr = _P()
-    pr.role = role
-    return {"token": token, "role": role, "project": serial.project(proj), "persona": serial.persona(proj, pr),
+    persona = serial.persona(proj, Principal("sandbox", role, "", project_id=proj.id))
+    claims = {"typ": "sandbox", "pid": proj.id, "role": role}
+    if persona:
+        claims["name"] = f"{persona['name']} (sandbox)"
+    token = issue_jwt(claims, hours=hours)
+    return {"token": token, "role": role, "project": serial.project(proj), "persona": persona,
             "expires_at": iso(proj.expires_at)}
 
 

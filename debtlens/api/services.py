@@ -558,3 +558,57 @@ def intel(s: Session, proj: Project):
     alpha, tau = project_alpha_tau(proj)
     fn = embed_fn_for(s) if use_model else None
     return snap, alpha, tau, fn
+
+
+# ----------------------------------------------------------------------------- cross-scenario comparison
+
+_COMPARE_CACHE: dict = {}
+
+
+def compare_scenarios(s: Session, budget: float = 40.0) -> dict:
+    """Run the same engine over every bundled industry scenario and line the results up.
+    (Simulation Lab → Scenarios.)  Cached per process for ten minutes."""
+    import time
+
+    from ..core.similarity import incident_text
+
+    key = round(float(budget), 1)
+    hit = _COMPARE_CACHE.get(key)
+    if hit and time.time() - hit[0] < 600:
+        return hit[1]
+    t0 = time.time()
+    rows = []
+    for sc in SC.list_scenarios():
+        snap = SC.materialize(sc["code"])
+        texts = [incident_text(i) for i in snap["incidents"]]
+        cached = _cached_vectors(s, texts + [c["label"] for c in snap["causes"]])
+        for i, t in zip(snap["incidents"], texts):
+            v = cached.get(_h(t))
+            i["embedding"] = EMB.unpack(v) if v else None
+        for c in snap["causes"]:
+            v = cached.get(_h(c["label"]))
+            c["embedding"] = EMB.unpack(v) if v else None
+        led = E.ledger(snap)
+        bundle = E.similarity_bundle(snap)
+        dash = E.dashboard(snap, bundle=bundle)
+        pl = E.plan(snap, budget, led=led)
+        fc = E.forecast(snap, {"runs": 60, "sprints": 8, "budget": budget, "policies": ["optimal", "none"]})
+        cmp_ = fc["comparisons"].get("optimal_vs_none", {})
+        g = E.causal_graph(snap)
+        top = g["nodes"][0] if g["nodes"] else None
+        inc = dash["incidents"]
+        rows.append({
+            "code": sc["code"], "name": sc["name"], "industry": sc["industry"], "tagline": sc["tagline"],
+            "incidents": inc["total"], "open_incidents": inc["open"] + inc["investigating"], "mttr_hours": inc["mttr_hours"],
+            "modules": len(snap["modules"]), "open_debts": led["summary"]["open_items"],
+            "principal": led["summary"]["total_principal"], "interest": led["summary"]["total_interest"],
+            "break_even_pct": led["summary"]["break_even_pct"], "regressions": dash["regression_count"],
+            "satd": dash["satd_count"], "systemic_cause": top["label"] if top else None,
+            "plan_items": len(pl["selected"]), "plan_hours": pl["total_weight"], "interest_retired": pl["interest_retired"],
+            "gain_vs_greedy_pct": pl["comparison"]["gain_vs_greedy_pct"], "gain_vs_naive_pct": pl["comparison"]["gain_vs_naive_pct"],
+            "hours_saved_8_sprints": cmp_.get("hours_saved_mean"), "pct_saved_8_sprints": cmp_.get("pct_saved"),
+            "ci95": cmp_.get("ci95"), "semantic_method": bundle.semantic_method,
+        })
+    out = {"budget": budget, "scenarios": rows, "seconds": round(time.time() - t0, 2)}
+    _COMPARE_CACHE[key] = (time.time(), out)
+    return out

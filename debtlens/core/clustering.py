@@ -48,6 +48,11 @@ def similarity_to_distance(sim: list[list[float]]) -> list[list[float]]:
     return [[min(2.0, max(0.0, 1.0 - s)) for s in row] for row in sim]
 
 
+# generic words that make poor cluster names (they stay in the similarity model)
+_THEME_SKIP = {"one", "two", "three", "four", "five", "every", "each", "all", "same", "new", "old", "still",
+               "never", "always", "no", "not", "was", "were", "is", "are", "had", "has", "have", "did", "does"}
+
+
 def cluster_texts(texts: list[str], sim: list[list[float]], eps: float = 0.45,
                   min_samples: int = 2, ids: list | None = None) -> list[dict]:
     """Cluster items and name each cluster by its strongest shared terms."""
@@ -65,7 +70,7 @@ def cluster_texts(texts: list[str], sim: list[list[float]], eps: float = 0.45,
         for m in members:
             for t, w in model.transform_one(texts[m]).items():
                 weight[t] += w
-        terms = [t for t, _ in sorted(weight.items(), key=lambda kv: (-kv[1], kv[0]))[:3]]
+        terms = [t for t, _ in sorted(weight.items(), key=lambda kv: (-kv[1], kv[0])) if t not in _THEME_SKIP][:3]
         cohesion = 0.0
         if len(members) > 1:
             pairs = [(a, b) for ai, a in enumerate(members) for b in members[ai + 1 :]]

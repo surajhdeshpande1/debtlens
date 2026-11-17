@@ -161,8 +161,8 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
         el.append(Paragraph(f"Exact optimiser is {comp['gain_vs_greedy_pct']}% better than greedy and "
                             f"{comp['gain_vs_naive_pct']}% better than the v1 planner on this backlog.", small))
     el.append(Paragraph("Systemic root causes (causal graph)", h2))
-    rows = [["Cause", "Incidents", "Betweenness", "Degree"]] + [[n["label"], n["incidents"], n["betweenness"], n["degree"]]
-                                                                for n in graph["nodes"][:6]]
+    rows = [["Cause", "Incidents", "Paths through", "Degree"]] + [[n["label"], n["incidents"], n["paths"], n["degree"]]
+                                                                  for n in graph["nodes"][:6]]
     el.append(table(rows, [110, 20, 25, 20]))
     if dash["regressions"]:
         el.append(Paragraph("Regressions (fixed incidents that came back)", h2))

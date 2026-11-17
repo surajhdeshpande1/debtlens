@@ -24,7 +24,7 @@ from .models import Base
 
 _engine: Engine | None = None
 _Session: sessionmaker | None = None
-_lock = threading.Lock()
+_lock = threading.RLock()  # re-entrant: init_db() -> engine() -> configure()
 _initialised = False
 
 

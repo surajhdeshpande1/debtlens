@@ -118,7 +118,7 @@ def _satd(s, proj, sid: int) -> SatdMarker:
 _CATEGORY_HINTS = (("SECURITY_DEBT", ("secur", "auth", "password", "token", "secret", "csrf", "xss", "inject", "encrypt")),
                    ("TEST_DEBT", ("test", "flaky", "coverage", "mock")),
                    ("DOCUMENTATION", ("doc", "comment", "readme")),
-                   ("INFRASTRUCTURE", ("deploy", "infra", "config", "ci", "docker", "env", "pool", "timeout", "retry")),
+                   ("INFRASTRUCTURE", ("deploy", "infra", "config", "docker", "pool", "timeout", "retry", "retries", "backoff", "queue")),
                    ("ARCHITECTURAL", ("refactor", "architecture", "coupl", "split", "extract", "layer", "module")))
 
 

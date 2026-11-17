@@ -100,7 +100,7 @@ def list_debts(pid: int):
         r = led.get(d.id, {})
         rows.append(serial.debt(d, mods, {k: r.get(k) for k in (
             "interest", "incident_interest", "churn_interest", "blast_interest", "risk", "break_even",
-            "break_even_ratio", "linked_incidents", "incident_ids", "prerequisite_ids", "age_days", "churn_source")}))
+            "break_even_ratio", "linked_incidents", "incident_ids", "prerequisite_ids", "blast_radius", "churn_source")}))
     rows.sort(key=lambda r: (r["status"] == "REMEDIATED", -(r["risk"] or 0)))
     return ok({"items": rows, "total": len(rows)})
 

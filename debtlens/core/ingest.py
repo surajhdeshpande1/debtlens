@@ -157,6 +157,7 @@ _JS_FRAME = re.compile(r"^\s+at (?:.*?\()?([^\s()]+?):(\d+):\d+\)?\s*$")
 _JAVA_FRAME = re.compile(r"^\s+at [\w$.<>]+\(([\w$]+\.\w+):(\d+)\)")
 _LEVEL = re.compile(r"\b(FATAL|CRITICAL|PANIC|SEVERE|ERROR|ERR|WARN|WARNING)\b[\]:\s-]*(.*)", re.IGNORECASE)
 _TS = re.compile(r"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})")
+_HINT = re.compile(r"^(?:\[([\w./-]+)\]|([a-z]\w*(?:\.\w+)+):(?=\s))\s*(.*)$")
 _MASKS = [
     (re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I), "<uuid>"),
     (re.compile(r"\b0x[0-9a-f]+\b", re.I), "<hex>"),
@@ -222,15 +223,34 @@ def _events(lines: list[str]):
                 if fm:
                     frames.append(fm.group(1))
                 j += 1
+            hint = None
             if em:
                 exc, msg = em.group(1), em.group(2) or ""
             else:
-                rest = lm.group(2)
+                rest = lm.group(2).strip()
+                hm = _HINT.match(rest)
+                if hm:  # "ERROR [payments] ..." or "ERROR payments.gateway: ..."
+                    hint, rest = (hm.group(1) or hm.group(2)).split(".")[0].split("/")[0], hm.group(3)
                 em2 = _EXC_LINE.match(rest.strip())
                 exc, msg = (em2.group(1), em2.group(2) or "") if em2 else ("", rest)
+            # a Python traceback printed right after the log line belongs to the same event
+            if j < n and _PY_TB.search(lines[j]):
+                k = j + 1
+                while k < n and (lines[k].startswith((" ", "\t")) or not lines[k].strip()):
+                    fm = _PY_FRAME.match(lines[k])
+                    if fm:
+                        frames.append(fm.group(1))
+                    k += 1
+                if k < n:
+                    tm = _EXC_LINE.match(lines[k].strip())
+                    if tm:
+                        if not exc:
+                            exc, msg = tm.group(1), tm.group(2) or msg
+                        k += 1
+                j = k
             level = lm.group(1).upper() if lm else "ERROR"
             yield {"level": "ERROR" if level == "ERR" else level, "exc": exc, "message": msg,
-                   "frames": frames, "ts": ts, "line": i + 1}
+                   "frames": frames, "ts": ts, "line": i + 1, "module_hint": hint}
             i = j
             continue
         i += 1

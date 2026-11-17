@@ -54,3 +54,13 @@ def meta():
 @bp.get("/scenarios")
 def scenarios():
     return ok({"scenarios": SC.list_scenarios()})
+
+
+@bp.get("/scenarios/compare")
+def compare():
+    """The same engine run over every industry scenario, side by side (no sign-in needed)."""
+    try:
+        budget = max(4.0, min(400.0, float(request.args.get("budget", 40))))
+    except ValueError:
+        budget = 40.0
+    return ok(S.compare_scenarios(db(), budget))
