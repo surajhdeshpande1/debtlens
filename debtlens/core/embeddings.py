@@ -119,7 +119,10 @@ class MiniLM:
         self.tokenizer.enable_truncation(max_length=MAX_TOKENS)
         self.directory = directory
 
-    def embed(self, texts: list[str], batch_size: int = 32) -> list[list[float]]:
+    def embed(self, texts: list[str], batch_size: int = 1) -> list[list[float]]:
+        """One text per forward pass by default: the quantised model scales activations per
+        batch (dynamic quantisation), so batching would make a text's vector depend on which
+        other texts share its batch.  One-at-a-time keeps every vector reproducible."""
         import numpy as np
 
         out: list[list[float]] = []

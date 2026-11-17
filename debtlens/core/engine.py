@@ -316,7 +316,7 @@ def evaluate(snap: dict, labels: dict, embed_fn: EmbedFn | None = None) -> dict:
         b = similarity.SimilarityBundle(texts, lex, sem, [[best["alpha"] * lex[i][j] + (1 - best["alpha"]) * sem[i][j]
                                                            for j in range(len(incs))] for i in range(len(incs))],
                                         best["alpha"], method)
-        for tau in (0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75):
+        for tau in (0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7):
             pred = {(r["incident_key"], r["regressed_from_key"]) for r in similarity.detect_regressions(incs, b, tau)}
             reg_rows.append({"tau": tau, **evaluation.regression_scores(pred, truth_pairs)})
     return {"semantic_method": method, "retrieval": rows, "best_alpha": best["alpha"] if best else None,

@@ -27,7 +27,7 @@ import time
 import tokenize
 import urllib.error
 import urllib.request
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -53,7 +53,7 @@ MAX_FILE_BYTES = 800_000
 
 # ----------------------------------------------------------------------------- modules
 
-def module_of(path: str, rules: list[tuple[str, str]] | None = None) -> str:
+def module_of(path: str, rules: list[tuple[str, str]] | None = None, extra_containers: frozenset = frozenset()) -> str:
     """Map a file path to a module: explicit prefix rules first, else the first
     meaningful directory (skipping container dirs like src/, app/, services/)."""
     p = path.replace("\\", "/").lstrip("./")
@@ -63,10 +63,27 @@ def module_of(path: str, rules: list[tuple[str, str]] | None = None) -> str:
     parts = [x for x in p.split("/") if x]
     if len(parts) <= 1:
         return "root"
-    i = 0
-    while i < len(parts) - 2 and parts[i].lower() in CONTAINERS:
-        i += 1
-    return parts[i].lower()
+    if parts[0].lower() in extra_containers and len(parts) > 2:
+        return parts[1].lower()           # mypkg/core/x.py -> core (a package's own sub-packages are real modules)
+    if parts[0].lower() in CONTAINERS and len(parts) > 2:
+        return parts[1].lower()           # src/payments/x.py -> payments (only a top-level container is skipped)
+    return parts[0].lower()
+
+
+def package_containers(paths: list[str], rules) -> frozenset:
+    """A repository whose code mostly lives in one package folder (``mypkg/core``, ``mypkg/api``)
+    is split one level deeper, so modules are ``core`` and ``api`` rather than ``mypkg``."""
+    if rules:
+        return frozenset()
+    nested = [p.replace("\\", "/").split("/") for p in paths]
+    nested = [x for x in nested if len(x) >= 3]
+    if not paths or not nested:
+        return frozenset()
+    top, n = Counter(x[0].lower() for x in nested).most_common(1)[0]
+    subdirs = {x[1].lower() for x in nested if x[0].lower() == top}
+    if n / len(paths) >= 0.6 and len(subdirs) >= 2 and top not in CONTAINERS:
+        return frozenset({top})
+    return frozenset()
 
 
 def load_rules(root: Path) -> list[tuple[str, str]]:
@@ -343,6 +360,7 @@ def analyze_tree(root: Path, history: dict | None = None, rules: list | None = N
                 if mod.startswith(c + "."):
                     py_index.setdefault(mod[len(c) + 1 :], rel)
     all_paths = {rel for _, rel, _ in sources}
+    extra = package_containers([rel for _, rel, _ in sources], rules)
     hist_files = (history or {}).get("files", {})
     files, satd = [], []
     dep_w: dict[tuple[str, str], int] = defaultdict(int)
@@ -352,7 +370,7 @@ def analyze_tree(root: Path, history: dict | None = None, rules: list | None = N
             src = full.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        mod = module_of(rel, rules)
+        mod = module_of(rel, rules, extra)
         cx = complexity(src, lang)
         h = hist_files.get(rel)
         files.append({
@@ -372,7 +390,7 @@ def analyze_tree(root: Path, history: dict | None = None, rules: list | None = N
             cand = [tgt, tgt + ".py", tgt + ".js", tgt + ".ts", tgt + ".tsx", tgt + ".jsx",
                     tgt + "/index.js", tgt + "/index.ts", tgt + "/__init__.py"]
             real = next((c for c in cand if c in all_paths), tgt)
-            tmod = module_of(real, rules)
+            tmod = module_of(real, rules, extra)
             if tmod != mod:
                 dep_w[(mod, tmod)] += 1
         for e in ext:

@@ -17,9 +17,17 @@ from debtlens.api.models import Project, utcnow  # noqa: E402
 from debtlens.core import mining  # noqa: E402
 
 
+TEST_DB = os.environ.get("DEBTLENS_TEST_DATABASE_URL", "sqlite://")  # e.g. mysql+pymysql://u:p@localhost/debtlens_test
+
+
 @pytest.fixture()
 def client():
-    app = create_app("sqlite://", testing=True)
+    app = create_app(TEST_DB, testing=True)
+    if not TEST_DB.startswith("sqlite"):
+        from debtlens.api.models import Base
+
+        Base.metadata.drop_all(DB.engine())  # a clean MySQL/TiDB schema for every test
+        DB._initialised = False
     with app.test_client() as c:
         yield c
 
@@ -52,7 +60,7 @@ def register(c, email="lead@example.com", org="BEC ISE"):
 
 def test_health_and_meta(client):
     r = api(client, "get", "/health")
-    assert r.status_code == 200 and r.json["database"]["dialect"] == "sqlite"
+    assert r.status_code == 200 and r.json["database"]["dialect"] == TEST_DB.split(":")[0].split("+")[0]
     m = api(client, "get", "/meta").json
     assert {s["code"] for s in m["scenarios"]} == {"fintech", "healthtech", "ecommerce", "college", "self"}
     assert m["permissions"]["project.manage"] == ["admin"]

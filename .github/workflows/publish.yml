@@ -1,0 +1,20 @@
+# Publish `debtlens` to PyPI when a version tag is pushed (git tag v2.0.0 && git push --tags).
+# One-time setup on pypi.org: add a "trusted publisher" for this repository and workflow (publish.yml),
+# environment "pypi".  No API token is stored in GitHub.
+name: publish
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install build && python scripts/build_package.py
+      - uses: pypa/gh-action-pypi-publish@release/v1

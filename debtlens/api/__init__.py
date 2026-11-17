@@ -15,7 +15,9 @@ from .. import __version__
 from . import db as DB
 from .errors import ApiError
 
-PUBLIC_DIR = Path(__file__).resolve().parents[2] / "public"
+_REPO_PUBLIC = Path(__file__).resolve().parents[2] / "public"   # running from the git checkout / Vercel
+_PKG_PUBLIC = Path(__file__).resolve().parents[1] / "web"        # installed from PyPI (`debtlens serve`)
+PUBLIC_DIR = _REPO_PUBLIC if (_REPO_PUBLIC / "index.html").is_file() else _PKG_PUBLIC
 log = logging.getLogger("debtlens")
 
 

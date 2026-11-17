@@ -109,11 +109,12 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
     h1 = ParagraphStyle("h1", parent=ss["Heading1"], fontSize=16, spaceAfter=4)
     h2 = ParagraphStyle("h2", parent=ss["Heading2"], fontSize=12, spaceBefore=10, spaceAfter=4)
     body = ParagraphStyle("b", parent=ss["BodyText"], fontSize=9, leading=12)
+    cell = ParagraphStyle("c", parent=body, fontSize=8.2, leading=10)
     small = ParagraphStyle("s", parent=body, fontSize=8, textColor=colors.HexColor("#555555"))
     accent = colors.HexColor("#2457c5")
 
     def table(rows, widths, header=True):
-        t = Table([[Paragraph(str(c), body) for c in r] for r in rows], colWidths=[w * mm for w in widths], repeatRows=1)
+        t = Table([[Paragraph(str(c), cell) for c in r] for r in rows], colWidths=[w * mm for w in widths], repeatRows=1)
         style = [("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cccccc")), ("VALIGN", (0, 0), (-1, -1), "TOP"),
                  ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]
         if header:
@@ -137,11 +138,11 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
                      ["Regressions detected", dash["regression_count"]],
                      ["Self-admitted debt markers (TODO/FIXME…)", dash["satd_count"]]], [95, 80]))
     el.append(Paragraph("Highest-risk debt", h2))
-    rows = [["Key", "Debt", "Module", "Principal h", "Interest h/mo", "Risk", "Break-even"]]
+    rows = [["Key", "Debt", "Module", "Principal h", "Interest h/mo", "Risk", "Past BE"]]
     for r in [r for r in led["rows"] if r["is_open"]][:12]:
         rows.append([r["key"], r["title"], r["module"], r["principal"], r["interest"], r["risk"],
                      "yes" if r["break_even"] else "no"])
-    el.append(table(rows, [18, 62, 24, 18, 20, 14, 18]))
+    el.append(table(rows, [21, 64, 25, 18, 20, 14, 16]))
     el.append(Paragraph(f"Recommended plan for a {budget:g}-hour sprint budget", h2))
     el.append(Paragraph(f"Method: {plan['method']} (exact, precedence-constrained 0/1 knapsack). "
                         f"Uses {plan['total_weight']:g} h ({plan['utilization']}%), retires "

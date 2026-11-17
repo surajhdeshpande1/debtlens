@@ -270,10 +270,12 @@ def parse_logs(text: str, rules: list | None = None) -> dict:
             if marker in top_rel:
                 top_rel = top_rel.split(marker, 1)[1]
                 break
-        sig = f"{ev['exc'] or ev['level']}|{mask(ev['message'])}|{top_rel.rsplit('/', 1)[-1]}"
+        module = (ev.get("module_hint") or (module_of(top_rel, rules) if top_rel else "unassigned")).lower()
+        # signature: exception + masked message + module (the same error logged with or without its
+        # traceback still groups together; the top frame only names the file)
+        sig = f"{ev['exc'] or ev['level']}|{mask(ev['message'])}|{module}"
         g = groups.get(sig)
         if not g:
-            module = (ev.get("module_hint") or (module_of(top_rel, rules) if top_rel else "unassigned")).lower()
             exc = ev["exc"] or ev["level"].title()
             template = mask(ev["message"]) or "(no message)"
             g = groups[sig] = {

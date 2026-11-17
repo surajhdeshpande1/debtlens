@@ -1,0 +1,42 @@
+# PyPI package for the `debtlens` command.  Built by scripts/build_package.py, which assembles a
+# clean copy of the source (and the website into debtlens/web) — the repository root has no
+# pyproject.toml on purpose, so Vercel installs the server from requirements.txt.
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "debtlens"
+version = "2.0.0"
+description = "Developer incident & technical debt management: link incidents to root causes and debt, price the debt, plan what to fix — from the terminal."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Suraj H Deshpande" }, { name = "Sushma Hiremath" }, { name = "Sushma K Patil" }, { name = "Sushma Mathapati" }]
+keywords = ["technical debt", "incident management", "root cause analysis", "5 whys", "software maintenance", "cli"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Quality Assurance",
+  "Operating System :: OS Independent",
+]
+dependencies = ["typer>=0.12", "rich>=13"]
+
+[project.optional-dependencies]
+ml = ["numpy>=1.26", "onnxruntime>=1.18", "tokenizers>=0.19"]
+server = ["Flask>=3.0", "SQLAlchemy>=2.0", "PyMySQL>=1.1", "cryptography>=42", "certifi", "PyJWT>=2.8",
+          "bcrypt>=4.1", "reportlab>=4.0", "waitress>=3.0"]
+all = ["debtlens[ml,server]"]
+
+[project.scripts]
+debtlens = "debtlens.cli.main:run"
+
+[project.urls]
+Homepage = "https://debtlens-cloud.vercel.app"
+Source = "https://github.com/surajhdeshpande1/debtlens"
+
+[tool.setuptools.packages.find]
+include = ["debtlens*"]
+
+[tool.setuptools.package-data]
+debtlens = ["scenarios/*.json", "web/*", "web/**/*"]

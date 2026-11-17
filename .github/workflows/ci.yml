@@ -1,0 +1,25 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt build
+      - name: Engine + API tests (TF-IDF/DBSCAN vs scikit-learn, centrality vs networkx, complexity vs radon)
+        run: python -m pytest tests -q
+        env: { DEBTLENS_DISABLE_ML: "1" }
+      - name: Build the PyPI package and smoke-test the CLI
+        run: |
+          python scripts/build_package.py
+          python -m venv /tmp/cli && /tmp/cli/bin/pip install dist/*.whl
+          /tmp/cli/bin/debtlens --version
+          /tmp/cli/bin/debtlens plan --scenario fintech --budget 40
+          /tmp/cli/bin/debtlens scan . --top 5
+      - name: DebtLens quality gate on its own repository (offline self-audit scenario)
+        run: python -m debtlens ci --scenario self --max-open-critical 5

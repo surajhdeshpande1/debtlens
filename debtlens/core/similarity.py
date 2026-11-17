@@ -19,9 +19,9 @@ from . import text as T
 from .tfidf import TfidfModel, cosine, cosine_matrix, dense_cosine, dense_cosine_matrix
 
 # Calibrated on the five labelled scenarios (see Intelligence → Evaluation):
-# α = 0.4 is never worse than either signal alone; τ = 0.35 gives the best regression F1.
+# α = 0.4: hybrid precision@1 0.92 vs TF-IDF 0.69 and MiniLM 0.88 (mean of five); τ = 0.30: best regression F1.
 DEFAULT_ALPHA = 0.4
-DEFAULT_TAU = 0.35
+DEFAULT_TAU = 0.30  # regression threshold: best mean F1 (0.88; P 0.90, R 0.87) over the five labelled scenarios
 SEMANTIC_MINILM = "minilm"
 SEMANTIC_CHAR = "char-ngram"
 
