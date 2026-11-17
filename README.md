@@ -80,7 +80,7 @@ debtlens/api/      Flask REST API (/api/v1), SQLAlchemy models, auth (bcrypt + J
 debtlens/core/     the analysis engine, pure Python, shared by the API and the CLI
 debtlens/cli/      the `debtlens` command (Typer + Rich)
 debtlens/scenarios five labelled industry scenarios (JSON)
-tests/             122 tests: engine checked against scikit-learn, networkx and radon; API, roles and sandboxes
+tests/             123 tests: engine checked against scikit-learn, networkx and radon; API, roles and sandboxes
 ```
 
 - **Database:** TiDB Cloud Starter (MySQL-compatible, TLS) on Vercel; MySQL 8 or SQLite locally. The tables keep
@@ -95,7 +95,7 @@ tests/             122 tests: engine checked against scikit-learn, networkx and 
 Each scenario's incidents carry hand-labelled duplicate groups and true regressions. Every incident in a group
 is used as a query, and a hit is another member of the same group.
 
-| Scenario | Queries | P@1 TF-IDF | P@1 MiniLM | P@1 hybrid (α 0.45) | MRR hybrid | Cluster purity | ARI | Regression P / R / F1 (τ 0.30) |
+| Scenario | Queries | P@1 TF-IDF | P@1 MiniLM | P@1 hybrid (α 0.4) | MRR hybrid | Cluster purity | ARI | Regression P / R / F1 (τ 0.30) |
 |---|---|---|---|---|---|---|---|---|
 | PayCore (FinTech) | 16 | 0.62 | 0.94 | 0.94 | 0.95 | 0.88 | 0.83 | 0.78 / 0.78 / 0.78 |
 | CareStream HIS (HealthTech) | 14 | 0.57 | 0.79 | 0.79 | 0.88 | 0.93 | 0.90 | 0.86 / 0.86 / 0.86 |
@@ -111,7 +111,7 @@ the same wording, so TF-IDF alone reaches 1.00. The defaults α = 0.4 and τ = 0
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                      # 122 tests
+python -m pytest tests -q                      # 123 tests
 DATABASE_URL=sqlite:///dev.db flask --app app run    # website on http://127.0.0.1:5000
 python scripts/build_package.py                # build the PyPI package into dist/
 ```

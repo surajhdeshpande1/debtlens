@@ -268,8 +268,18 @@ def converge_cause(label: str, causes: list[dict], embed_fn: EmbedFn | None = No
     return (best["id"], round(score, 4), "token-overlap") if score >= 0.8 else (None, round(score, 4), "token-overlap")
 
 
-def evaluate(snap: dict, labels: dict, embed_fn: EmbedFn | None = None) -> dict:
-    """Score retrieval, clustering and regression detection against labelled ground truth."""
+ALPHA_GRID = (0.2, 0.3, 0.4, 0.5, 0.6, 0.7)
+TAU_GRID = (0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7)
+
+
+def evaluate(snap: dict, labels: dict, embed_fn: EmbedFn | None = None,
+             alpha: float = similarity.DEFAULT_ALPHA, tau: float = similarity.DEFAULT_TAU) -> dict:
+    """Score retrieval, clustering and regression detection against labelled ground truth.
+
+    Hybrid retrieval is shown over a grid of α that always contains the configured α, and regression detection is
+    scored at the configured α, because that is the setting the application uses to raise regressions.
+    """
+    alpha, tau = round(float(alpha), 2), round(float(tau), 2)
     incs = snap.get("incidents") or []
     key_ix = {i.get("key"): n for n, i in enumerate(incs)}
     groups = [None] * len(incs)
@@ -285,10 +295,13 @@ def evaluate(snap: dict, labels: dict, embed_fn: EmbedFn | None = None) -> dict:
             {"method": "Char n-gram TF-IDF", **evaluation.retrieval_metrics(char, groups)}]
     if method == similarity.SEMANTIC_MINILM:
         rows.append({"method": "MiniLM embeddings", **evaluation.retrieval_metrics(sem, groups)})
+    def hybrid(a: float) -> list[list[float]]:
+        return [[a * lex[i][j] + (1 - a) * sem[i][j] for j in range(len(incs))] for i in range(len(incs))]
+
     best = None
-    for a in (0.3, 0.45, 0.55, 0.7):
-        hyb = [[a * lex[i][j] + (1 - a) * sem[i][j] for j in range(len(incs))] for i in range(len(incs))]
-        r = {"method": f"Hybrid α={a}", "alpha": a, **evaluation.retrieval_metrics(hyb, groups)}
+    for a in sorted({*ALPHA_GRID, alpha}):
+        r = {"method": f"Hybrid α={a:g}", "alpha": a, "configured": abs(a - alpha) < 1e-9,
+             **evaluation.retrieval_metrics(hybrid(a), groups)}
         rows.append(r)
         if best is None or (r["mrr"] or 0) > (best["mrr"] or 0):
             best = r
@@ -313,14 +326,14 @@ def evaluate(snap: dict, labels: dict, embed_fn: EmbedFn | None = None) -> dict:
     truth_pairs = {tuple(p) for p in labels.get("regressions") or []}
     reg_rows = []
     if truth_pairs:
-        b = similarity.SimilarityBundle(texts, lex, sem, [[best["alpha"] * lex[i][j] + (1 - best["alpha"]) * sem[i][j]
-                                                           for j in range(len(incs))] for i in range(len(incs))],
-                                        best["alpha"], method)
-        for tau in (0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7):
-            pred = {(r["incident_key"], r["regressed_from_key"]) for r in similarity.detect_regressions(incs, b, tau)}
-            reg_rows.append({"tau": tau, **evaluation.regression_scores(pred, truth_pairs)})
+        b = similarity.SimilarityBundle(texts, lex, sem, hybrid(alpha), alpha, method)
+        for t in sorted({*TAU_GRID, tau}):
+            pred = {(r["incident_key"], r["regressed_from_key"]) for r in similarity.detect_regressions(incs, b, t)}
+            reg_rows.append({"tau": t, "configured": abs(t - tau) < 1e-9,
+                             **evaluation.regression_scores(pred, truth_pairs)})
     return {"semantic_method": method, "retrieval": rows, "best_alpha": best["alpha"] if best else None,
-            "clustering": clustering_res, "regression": reg_rows,
+            "configured": {"alpha": alpha, "tau": tau}, "clustering": clustering_res, "regression": reg_rows,
+            "regression_alpha": alpha,
             "labelled": {"duplicate_queries": rows[0]["queries"], "regression_pairs": len(truth_pairs)}}
 
 

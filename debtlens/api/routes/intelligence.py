@@ -76,9 +76,7 @@ def evaluation(pid: int):
         raise ApiError(400, "evaluation needs labelled data — open an industry scenario")
     snap, alpha, tau, fn = S.intel(db(), proj)
     labels = SC.labels(proj.scenario_code)
-    res = E.evaluate(snap, labels, fn)
-    res["configured"] = {"alpha": alpha, "tau": tau}
-    return ok(res)
+    return ok(E.evaluate(snap, labels, fn, alpha, tau))
 
 
 @bp.get("/projects/<int:pid>/dashboard")

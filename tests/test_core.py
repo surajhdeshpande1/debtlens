@@ -265,6 +265,16 @@ def test_every_scenario_runs_end_to_end(code):
     assert engine.dashboard(snap)["incidents"]["total"] == len(snap["incidents"])
 
 
+def test_evaluation_scores_the_configured_alpha_and_tau():
+    snap = scenarios.materialize("ecommerce")
+    ev = engine.evaluate(snap, scenarios.labels("ecommerce"), None, alpha=0.35, tau=0.3)
+    hybrid = [r for r in ev["retrieval"] if "alpha" in r]
+    assert [r["alpha"] for r in hybrid if r["configured"]] == [0.35]
+    assert {0.2, 0.4, 0.7} <= {r["alpha"] for r in hybrid}
+    assert ev["configured"] == {"alpha": 0.35, "tau": 0.3} and ev["regression_alpha"] == 0.35
+    assert [r["tau"] for r in ev["regression"] if r["configured"]] == [0.3]
+
+
 def test_forecast_is_reproducible_and_ranks_policies():
     snap = scenarios.materialize("fintech")
     cfg = {"runs": 40, "sprints": 6, "budget": 40, "seed": 5}
