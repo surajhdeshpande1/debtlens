@@ -1,0 +1,1337 @@
+{
+ "code": "self",
+ "order": 5,
+ "key": "DLV1",
+ "name": "DebtLens v1 (self-audit)",
+ "industry": "This project",
+ "tagline": "DebtLens v2 analysing the first version of DebtLens",
+ "summary": "Repository evidence mined from the real v1 git history (29 commits) with the same scanner the CLI uses, plus the findings of the 17 Nov 2026 audit as incidents. The optimiser's plan for this scenario is the v2 rebuild itself.",
+ "repository_url": "https://github.com/surajhdeshpande1/debtlens (branch main)",
+ "tour": {
+  "incident": "INC-501",
+  "debt": "DEBT-501",
+  "module": "data-layer",
+  "budget": 40,
+  "cascade_module": "mock-engine",
+  "headline": "v1 never deployed its backend, so the live site faked results; deploying a real API unblocks four other fixes."
+ },
+ "people": {
+  "suraj": {
+   "name": "Suraj H Deshpande",
+   "role": "tech_lead",
+   "title": "Architecture, simulations, CLI"
+  },
+  "sushma_h": {
+   "name": "Sushma Hiremath",
+   "role": "developer",
+   "title": "Incidents, causal graph, intelligence"
+  },
+  "sushma_p": {
+   "name": "Sushma K Patil",
+   "role": "developer",
+   "title": "Repository evidence, imports"
+  },
+  "sushma_m": {
+   "name": "Sushma Mathapati",
+   "role": "developer",
+   "title": "Debt ledger, optimiser, reports"
+  },
+  "guide": {
+   "name": "Prof. P. R. Muttannavar",
+   "role": "viewer",
+   "title": "Project guide"
+  }
+ },
+ "modules": [
+  {
+   "name": "components",
+   "path": "frontend/src/components",
+   "description": "Shared React components",
+   "churn": 24,
+   "complexity": 269,
+   "loc": 2894,
+   "files": 9
+  },
+  {
+   "name": "app-shell",
+   "path": "frontend/src",
+   "description": "React entry, routing and styles",
+   "churn": 20,
+   "complexity": 97,
+   "loc": 727,
+   "files": 6
+  },
+  {
+   "name": "pages",
+   "path": "frontend/src/pages",
+   "description": "React pages for the 8 modules",
+   "churn": 19,
+   "complexity": 343,
+   "loc": 3856,
+   "files": 8
+  },
+  {
+   "name": "demo",
+   "path": "frontend/src/pages/JudgeSpotlightDemoPage.tsx",
+   "description": "Judge Spotlight demo and demo guide pages",
+   "churn": 15,
+   "complexity": 106,
+   "loc": 1968,
+   "files": 2
+  },
+  {
+   "name": "mock-engine",
+   "path": "frontend/src/services/mockEngine.ts",
+   "description": "45 KB in-browser imitation of the backend analytics",
+   "churn": 5,
+   "complexity": 200,
+   "loc": 1085,
+   "files": 1
+  },
+  {
+   "name": "data-layer",
+   "path": "frontend/src/services/firebase.ts",
+   "description": "frontend/src/services/api.ts — 4-tier fallback: Firestore, Supabase, FastAPI, mock engine",
+   "churn": 2,
+   "complexity": 403,
+   "loc": 1144,
+   "files": 3
+  },
+  {
+   "name": "api",
+   "path": "backend/app/routers",
+   "description": "FastAPI application and routers",
+   "churn": 2,
+   "complexity": 160,
+   "loc": 1491,
+   "files": 16
+  },
+  {
+   "name": "firestore",
+   "path": "seed_firestore.py",
+   "description": "Firestore seed script and security rules",
+   "churn": 1,
+   "complexity": 22,
+   "loc": 321,
+   "files": 1
+  },
+  {
+   "name": "repo-analyzer",
+   "path": "backend/app/services/repo_analyzer.py",
+   "description": "Complexity, SATD and import scanning",
+   "churn": 1,
+   "complexity": 54,
+   "loc": 279,
+   "files": 1
+  },
+  {
+   "name": "auth",
+   "path": "backend/app/services/auth_service.py",
+   "description": "JWT login and role checks",
+   "churn": 1,
+   "complexity": 25,
+   "loc": 143,
+   "files": 2
+  },
+  {
+   "name": "analytics",
+   "path": "backend/app/services",
+   "description": "Debt economics, causal graph, PDF report",
+   "churn": 1,
+   "complexity": 46,
+   "loc": 457,
+   "files": 3
+  },
+  {
+   "name": "optimiser",
+   "path": "backend/app/services/knapsack_optimiser.py",
+   "description": "0/1 knapsack remediation planner",
+   "churn": 1,
+   "complexity": 53,
+   "loc": 216,
+   "files": 1
+  },
+  {
+   "name": "similarity",
+   "path": "backend/app/services/similarity_engine.py",
+   "description": "TF-IDF + char n-gram similarity, DBSCAN",
+   "churn": 1,
+   "complexity": 36,
+   "loc": 187,
+   "files": 1
+  },
+  {
+   "name": "models",
+   "path": "backend/app/schemas",
+   "description": "SQLAlchemy models and Pydantic schemas",
+   "churn": 1,
+   "complexity": 11,
+   "loc": 642,
+   "files": 11
+  },
+  {
+   "name": "tests",
+   "path": "backend/tests",
+   "description": "pytest suite",
+   "churn": 1,
+   "complexity": 50,
+   "loc": 145,
+   "files": 1
+  },
+  {
+   "name": "docs",
+   "path": "docs",
+   "description": "Synopsis, slides and README",
+   "churn": 0,
+   "complexity": 0,
+   "loc": 0,
+   "files": 0
+  }
+ ],
+ "dependencies": [
+  [
+   "analytics",
+   "api"
+  ],
+  [
+   "analytics",
+   "models"
+  ],
+  [
+   "analytics",
+   "optimiser"
+  ],
+  [
+   "api",
+   "analytics"
+  ],
+  [
+   "api",
+   "auth"
+  ],
+  [
+   "api",
+   "models"
+  ],
+  [
+   "api",
+   "optimiser"
+  ],
+  [
+   "api",
+   "repo-analyzer"
+  ],
+  [
+   "api",
+   "similarity"
+  ],
+  [
+   "app-shell",
+   "components"
+  ],
+  [
+   "app-shell",
+   "data-layer"
+  ],
+  [
+   "app-shell",
+   "demo"
+  ],
+  [
+   "app-shell",
+   "pages"
+  ],
+  [
+   "auth",
+   "api"
+  ],
+  [
+   "auth",
+   "models"
+  ],
+  [
+   "components",
+   "app-shell"
+  ],
+  [
+   "components",
+   "data-layer"
+  ],
+  [
+   "data-layer",
+   "app-shell"
+  ],
+  [
+   "data-layer",
+   "mock-engine"
+  ],
+  [
+   "demo",
+   "app-shell"
+  ],
+  [
+   "demo",
+   "components"
+  ],
+  [
+   "demo",
+   "data-layer"
+  ],
+  [
+   "mock-engine",
+   "app-shell"
+  ],
+  [
+   "models",
+   "api"
+  ],
+  [
+   "optimiser",
+   "analytics"
+  ],
+  [
+   "optimiser",
+   "models"
+  ],
+  [
+   "pages",
+   "app-shell"
+  ],
+  [
+   "pages",
+   "components"
+  ],
+  [
+   "pages",
+   "data-layer"
+  ],
+  [
+   "repo-analyzer",
+   "api"
+  ],
+  [
+   "repo-analyzer",
+   "models"
+  ],
+  [
+   "similarity",
+   "api"
+  ],
+  [
+   "similarity",
+   "models"
+  ],
+  [
+   "tests",
+   "analytics"
+  ],
+  [
+   "tests",
+   "api"
+  ],
+  [
+   "tests",
+   "models"
+  ],
+  [
+   "tests",
+   "optimiser"
+  ],
+  [
+   "tests",
+   "repo-analyzer"
+  ],
+  [
+   "tests",
+   "similarity"
+  ]
+ ],
+ "files": [
+  [
+   "frontend/src/services/mockEngine.ts",
+   "mock-engine",
+   5,
+   200,
+   1085,
+   1120,
+   1
+  ],
+  [
+   "frontend/src/App.tsx",
+   "app-shell",
+   17,
+   50,
+   297,
+   998,
+   1
+  ],
+  [
+   "frontend/src/pages/IncidentsPage.tsx",
+   "pages",
+   12,
+   70,
+   585,
+   1316,
+   1
+  ],
+  [
+   "frontend/src/services/api.ts",
+   "data-layer",
+   2,
+   386,
+   1096,
+   1133,
+   1
+  ],
+  [
+   "frontend/src/pages/IntelligencePage.tsx",
+   "pages",
+   12,
+   64,
+   614,
+   1303,
+   1
+  ],
+  [
+   "frontend/src/pages/DebtRegistryPage.tsx",
+   "pages",
+   9,
+   72,
+   504,
+   1403,
+   1
+  ],
+  [
+   "frontend/src/pages/JudgeSpotlightDemoPage.tsx",
+   "demo",
+   12,
+   54,
+   1287,
+   4920,
+   1
+  ],
+  [
+   "frontend/src/pages/DemoGuidePage.tsx",
+   "demo",
+   10,
+   52,
+   681,
+   1818,
+   1
+  ],
+  [
+   "frontend/src/pages/RemediationOptimiserPage.tsx",
+   "pages",
+   12,
+   41,
+   602,
+   1461,
+   1
+  ],
+  [
+   "frontend/src/pages/RepoEvidencePage.tsx",
+   "pages",
+   11,
+   43,
+   610,
+   1345,
+   1
+  ],
+  [
+   "frontend/src/components/Navbar.tsx",
+   "components",
+   21,
+   21,
+   235,
+   2246,
+   1
+  ],
+  [
+   "frontend/src/components/CommandPalette.tsx",
+   "components",
+   6,
+   67,
+   400,
+   561,
+   1
+  ],
+  [
+   "frontend/src/components/DebtModal.tsx",
+   "components",
+   9,
+   41,
+   306,
+   543,
+   1
+  ],
+  [
+   "frontend/src/components/CausalGraphView.tsx",
+   "components",
+   8,
+   42,
+   349,
+   838,
+   1
+  ],
+  [
+   "frontend/src/pages/Dashboard.tsx",
+   "pages",
+   17,
+   17,
+   379,
+   3132,
+   1
+  ],
+  [
+   "frontend/src/components/IncidentModal.tsx",
+   "components",
+   9,
+   27,
+   280,
+   539,
+   1
+  ],
+  [
+   "frontend/src/pages/KnowledgeReportsPage.tsx",
+   "pages",
+   10,
+   21,
+   335,
+   732,
+   1
+  ],
+  [
+   "frontend/src/components/Sidebar.tsx",
+   "components",
+   13,
+   11,
+   191,
+   1076,
+   1
+  ],
+  [
+   "frontend/src/context/ToastContext.tsx",
+   "app-shell",
+   5,
+   25,
+   101,
+   204,
+   1
+  ],
+  [
+   "frontend/src/pages/CausalAnalysisPage.tsx",
+   "pages",
+   6,
+   15,
+   227,
+   480,
+   1
+  ],
+  [
+   "frontend/src/components/IncidentReportModal.tsx",
+   "components",
+   2,
+   29,
+   705,
+   706,
+   1
+  ],
+  [
+   "frontend/src/utils/security.ts",
+   "app-shell",
+   3,
+   19,
+   61,
+   60,
+   1
+  ],
+  [
+   "backend/app/services/repo_analyzer.py",
+   "repo-analyzer",
+   1,
+   54,
+   279,
+   278,
+   1
+  ],
+  [
+   "backend/app/services/knapsack_optimiser.py",
+   "optimiser",
+   1,
+   53,
+   216,
+   215,
+   1
+  ],
+  [
+   "backend/tests/test_analytics.py",
+   "tests",
+   1,
+   50,
+   145,
+   144,
+   1
+  ],
+  [
+   "frontend/src/components/StatCard.tsx",
+   "components",
+   14,
+   3,
+   60,
+   553,
+   1
+  ],
+  [
+   "backend/app/routers/incidents.py",
+   "api",
+   1,
+   38,
+   193,
+   192,
+   1
+  ],
+  [
+   "backend/app/services/similarity_engine.py",
+   "similarity",
+   1,
+   36,
+   187,
+   186,
+   1
+  ],
+  [
+   "backend/app/routers/debt.py",
+   "api",
+   1,
+   34,
+   218,
+   217,
+   1
+  ],
+  [
+   "frontend/src/components/RightTelemetryInspector.tsx",
+   "components",
+   1,
+   28,
+   368,
+   367,
+   1
+  ],
+  [
+   "backend/app/services/causal_graph.py",
+   "analytics",
+   1,
+   23,
+   159,
+   158,
+   1
+  ],
+  [
+   "seed_firestore.py",
+   "firestore",
+   1,
+   22,
+   321,
+   320,
+   1
+  ],
+  [
+   "backend/app/seed_data.py",
+   "api",
+   1,
+   18,
+   479,
+   478,
+   1
+  ],
+  [
+   "backend/app/services/auth_service.py",
+   "auth",
+   1,
+   15,
+   75,
+   74,
+   1
+  ],
+  [
+   "backend/app/services/debt_economics.py",
+   "analytics",
+   1,
+   15,
+   108,
+   107,
+   1
+  ],
+  [
+   "backend/app/routers/reporting.py",
+   "api",
+   1,
+   15,
+   85,
+   84,
+   1
+  ],
+  [
+   "backend/app/routers/repo_evidence.py",
+   "api",
+   1,
+   13,
+   101,
+   100,
+   1
+  ],
+  [
+   "backend/app/routers/intelligence.py",
+   "api",
+   1,
+   11,
+   90,
+   89,
+   1
+  ],
+  [
+   "frontend/src/services/firebase.ts",
+   "data-layer",
+   1,
+   10,
+   31,
+   30,
+   1
+  ],
+  [
+   "backend/app/routers/auth.py",
+   "auth",
+   1,
+   10,
+   68,
+   67,
+   1
+  ],
+  [
+   "backend/app/routers/ledger_optimiser.py",
+   "api",
+   1,
+   9,
+   61,
+   60,
+   1
+  ],
+  [
+   "backend/app/services/pdf_service.py",
+   "analytics",
+   1,
+   8,
+   190,
+   189,
+   1
+  ],
+  [
+   "backend/app/routers/workspace.py",
+   "api",
+   1,
+   8,
+   46,
+   45,
+   1
+  ],
+  [
+   "frontend/src/services/supabase.ts",
+   "data-layer",
+   1,
+   7,
+   17,
+   16,
+   1
+  ],
+  [
+   "backend/app/routers/causal.py",
+   "api",
+   1,
+   5,
+   43,
+   42,
+   1
+  ],
+  [
+   "backend/app/main.py",
+   "api",
+   1,
+   3,
+   74,
+   73,
+   1
+  ],
+  [
+   "frontend/src/types/index.ts",
+   "app-shell",
+   2,
+   1,
+   238,
+   237,
+   1
+  ],
+  [
+   "backend/run.py",
+   "api",
+   2,
+   1,
+   15,
+   14,
+   1
+  ],
+  [
+   "frontend/vite.config.ts",
+   "app-shell",
+   1,
+   1,
+   19,
+   18,
+   1
+  ],
+  [
+   "frontend/src/main.tsx",
+   "app-shell",
+   1,
+   1,
+   11,
+   10,
+   1
+  ],
+  [
+   "backend/app/config.py",
+   "api",
+   1,
+   1,
+   31,
+   30,
+   1
+  ],
+  [
+   "backend/app/__init__.py",
+   "api",
+   1,
+   1,
+   4,
+   3,
+   1
+  ],
+  [
+   "backend/app/database.py",
+   "api",
+   1,
+   1,
+   28,
+   27,
+   1
+  ],
+  [
+   "backend/app/utils.py",
+   "api",
+   1,
+   1,
+   7,
+   6,
+   1
+  ],
+  [
+   "backend/app/schemas/incident.py",
+   "models",
+   1,
+   1,
+   57,
+   56,
+   1
+  ],
+  [
+   "backend/app/schemas/auth.py",
+   "models",
+   1,
+   1,
+   68,
+   67,
+   1
+  ],
+  [
+   "backend/app/schemas/causal.py",
+   "models",
+   1,
+   1,
+   55,
+   54,
+   1
+  ],
+  [
+   "backend/app/schemas/analytics.py",
+   "models",
+   1,
+   1,
+   111,
+   110,
+   1
+  ],
+  [
+   "backend/app/schemas/debt.py",
+   "models",
+   1,
+   1,
+   58,
+   57,
+   1
+  ],
+  [
+   "backend/app/routers/seed.py",
+   "api",
+   1,
+   1,
+   16,
+   15,
+   1
+  ],
+  [
+   "backend/app/models/incident.py",
+   "models",
+   1,
+   1,
+   41,
+   40,
+   1
+  ],
+  [
+   "backend/app/models/repository.py",
+   "models",
+   1,
+   1,
+   54,
+   53,
+   1
+  ],
+  [
+   "backend/app/models/__init__.py",
+   "models",
+   1,
+   1,
+   7,
+   6,
+   1
+  ],
+  [
+   "backend/app/models/causal.py",
+   "models",
+   1,
+   1,
+   49,
+   48,
+   1
+  ],
+  [
+   "backend/app/models/debt.py",
+   "models",
+   1,
+   1,
+   74,
+   73,
+   1
+  ],
+  [
+   "backend/app/models/user.py",
+   "models",
+   1,
+   1,
+   68,
+   67,
+   1
+  ]
+ ],
+ "satd": [],
+ "incidents": [
+  {
+   "key": "INC-501",
+   "title": "Live site marks only INC-105 as a regression",
+   "desc": "On debtlens-cloud.vercel.app the regression badge appears only on INC-105 whatever incidents exist; new similar incidents are never flagged.",
+   "module": "data-layer",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 12,
+   "effort": 3,
+   "by": "suraj",
+   "group": "G-FAKE",
+   "whys": [
+    "The regression badge is wrong on the live site",
+    "The Firestore code path returns a hard-coded regression flag",
+    "Regression logic exists only in the FastAPI backend",
+    "The FastAPI backend was never deployed, so the browser fakes analytics"
+   ]
+  },
+  {
+   "key": "INC-502",
+   "title": "Every incident shows DEBT-101 and DEBT-102 as linked debt",
+   "desc": "Opening any incident on the live site lists the same two debt items, even for incidents that have no debt.",
+   "module": "data-layer",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 12,
+   "effort": 2,
+   "by": "sushma_h",
+   "group": "G-FAKE",
+   "whys": [
+    "Linked debts are wrong for every incident",
+    "The Firestore and Supabase paths return a fixed list of debt ids",
+    "The FastAPI backend was never deployed, so the browser fakes analytics"
+   ]
+  },
+  {
+   "key": "INC-503",
+   "title": "Anyone on the internet can edit or delete debt items",
+   "desc": "Firestore rules allow unauthenticated writes to every collection and deletes on technical_debt_items; the web config ships in the public bundle.",
+   "module": "firestore",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 11,
+   "effort": 2,
+   "by": "sushma_p",
+   "whys": [
+    "Unauthenticated users can change data",
+    "Firestore rules check field types but not who is writing",
+    "The deployed app has no authentication layer"
+   ]
+  },
+  {
+   "key": "INC-504",
+   "title": "Viewer role can approve remediation plans",
+   "desc": "Switching the role pill to Viewer still allows every action; no endpoint checks the caller's role.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 11,
+   "effort": 2,
+   "by": "sushma_m",
+   "whys": [
+    "A viewer could perform lead-only actions",
+    "Roles are only a dropdown in the UI",
+    "No API endpoint checks the caller's role",
+    "The deployed app has no authentication layer"
+   ]
+  },
+  {
+   "key": "INC-505",
+   "title": "Optimiser leaves 6 hours of a 40-hour budget unused",
+   "desc": "The sprint plan dropped DEBT-107 because its prerequisite was not chosen, and nothing replaced it.",
+   "module": "optimiser",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 20,
+   "fixed": 19,
+   "effort": 3,
+   "by": "sushma_m",
+   "group": "G-OPT",
+   "whys": [
+    "Sprint budget was left unused",
+    "Items whose prerequisites were not picked were dropped after the DP",
+    "The knapsack DP ignores prerequisites and repairs the result afterwards"
+   ],
+   "fix": "Added a transitive-closure check after the DP.",
+   "lesson": "Repairing after the DP is still not optimal."
+  },
+  {
+   "key": "INC-506",
+   "title": "Files of equal length always show identical churn",
+   "desc": "Two unrelated files with about 500 lines both show churn 90, although one was never changed.",
+   "module": "repo-analyzer",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 10,
+   "effort": 2,
+   "by": "sushma_p",
+   "whys": [
+    "Churn values look identical for similar-sized files",
+    "Churn is computed as 18% of the line count",
+    "Git history is never read"
+   ]
+  },
+  {
+   "key": "INC-507",
+   "title": "Paraphrased incidents not recognised as similar",
+   "desc": "'Webhook callbacks time out' and 'merchant endpoint never acknowledges notifications' scored 0.08 similarity.",
+   "module": "similarity",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 9,
+   "effort": 2,
+   "by": "sushma_h",
+   "whys": [
+    "Similar incidents were not matched",
+    "The 'semantic' score is character n-gram TF-IDF",
+    "The MiniLM model promised in the synopsis was never integrated"
+   ]
+  },
+  {
+   "key": "INC-508",
+   "title": "Demo scenario numbers never change",
+   "desc": "FinTech, HealthTech and Supply-chain demo numbers stay the same whatever the data or inputs.",
+   "module": "demo",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 8,
+   "effort": 2,
+   "by": "suraj",
+   "group": "G-FAKE",
+   "whys": [
+    "Scenario results do not respond to inputs",
+    "Scenario KPIs are hard-coded constants in the page",
+    "The FastAPI backend was never deployed, so the browser fakes analytics"
+   ]
+  },
+  {
+   "key": "INC-509",
+   "title": "Every page waits 1.5 seconds before falling back",
+   "desc": "Each request on the live site first tries 127.0.0.1:8000, times out after 1.5 seconds and then falls back to the browser engine.",
+   "module": "data-layer",
+   "sev": "LOW",
+   "status": "OPEN",
+   "ago": 14,
+   "effort": 1,
+   "by": "suraj",
+   "group": "G-FAKE",
+   "whys": [
+    "Pages load slowly on the live site",
+    "Each call tries localhost and times out after 1.5 seconds",
+    "The FastAPI backend was never deployed, so the browser fakes analytics"
+   ]
+  },
+  {
+   "key": "INC-510",
+   "title": "Colour theme rewritten 15 times in two weeks",
+   "desc": "18 of 29 commits changed colours or layout, leaving no time for the analytics.",
+   "module": "components",
+   "sev": "LOW",
+   "status": "RESOLVED",
+   "ago": 15,
+   "fixed": 14,
+   "effort": 6,
+   "by": "suraj",
+   "whys": [
+    "The UI kept changing",
+    "Every review led to a new palette",
+    "There is no agreed design system"
+   ],
+   "fix": "Reverted to the original layout.",
+   "lesson": "Freeze the look; spend time on the engine."
+  },
+  {
+   "key": "INC-511",
+   "title": "Plan drops prerequisite-dependent items again after a budget change",
+   "desc": "At a 60-hour budget the plan again skipped DEBT-107 and left 5 hours unused.",
+   "module": "optimiser",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 6,
+   "effort": 2,
+   "by": "sushma_m",
+   "group": "G-OPT",
+   "whys": [
+    "Sprint budget was left unused",
+    "Items whose prerequisites were not picked were dropped after the DP",
+    "The knapsack DP ignores prerequisites and repairs the result afterwards"
+   ]
+  },
+  {
+   "key": "INC-512",
+   "title": "Synopsis, code and slides describe three different stacks",
+   "desc": "The synopsis says React, FastAPI and PostgreSQL; the code uses SQLite and Firestore; the Demo-1 slides say HTML, Flask and MySQL.",
+   "module": "docs",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 10,
+   "effort": 2,
+   "by": "suraj",
+   "group": "G-DOCS",
+   "whys": [
+    "An examiner sees conflicting architectures",
+    "Synopsis, code and slides were written separately",
+    "There is no single source of truth for the architecture"
+   ]
+  },
+  {
+   "key": "INC-513",
+   "title": "Demo-1 slides carry speaker notes from another project",
+   "desc": "Notes mention intelligent tutoring, BART summaries and quiz generation; the title reads 'MANAGMENT'.",
+   "module": "docs",
+   "sev": "LOW",
+   "status": "OPEN",
+   "ago": 10,
+   "effort": 1,
+   "by": "sushma_h",
+   "group": "G-DOCS",
+   "whys": [
+    "Slides contain wrong speaker notes",
+    "The deck was built from an unrelated template",
+    "There is no single source of truth for the architecture"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-501",
+   "title": "Deploy a real backend: Flask API on Vercel with TiDB (MySQL)",
+   "desc": "Replace the four-tier fallback with one API that computes every result.",
+   "module": "api",
+   "cat": "ARCHITECTURAL",
+   "principal": 24,
+   "status": "IN_PROGRESS",
+   "priority": "CRITICAL",
+   "owner": "suraj",
+   "incidents": [
+    "INC-501",
+    "INC-502",
+    "INC-508",
+    "INC-509"
+   ],
+   "cause": "The FastAPI backend was never deployed, so the browser fakes analytics",
+   "ago": 12
+  },
+  {
+   "key": "DEBT-502",
+   "title": "Server-side authentication and role checks",
+   "desc": "JWT login and a permission check on every endpoint.",
+   "module": "auth",
+   "cat": "SECURITY_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "suraj",
+   "incidents": [
+    "INC-503",
+    "INC-504"
+   ],
+   "needs": [
+    "DEBT-501"
+   ],
+   "cause": "The deployed app has no authentication layer",
+   "ago": 11
+  },
+  {
+   "key": "DEBT-503",
+   "title": "Remove Firestore and its open rules",
+   "desc": "Delete the client-side database path entirely.",
+   "module": "firestore",
+   "cat": "SECURITY_DEBT",
+   "principal": 2,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sushma_p",
+   "incidents": [
+    "INC-503"
+   ],
+   "cause": "Firestore rules check field types but not who is writing",
+   "ago": 11
+  },
+  {
+   "key": "DEBT-504",
+   "title": "Exact precedence-constrained optimiser",
+   "desc": "Tree DP / branch and bound that respect prerequisites, verified against brute force.",
+   "module": "optimiser",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sushma_m",
+   "incidents": [
+    "INC-505",
+    "INC-511"
+   ],
+   "cause": "The knapsack DP ignores prerequisites and repairs the result afterwards",
+   "ago": 19
+  },
+  {
+   "key": "DEBT-505",
+   "title": "Mine churn from real git history",
+   "desc": "git log --numstat for the CLI, GitHub API for the website.",
+   "module": "repo-analyzer",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sushma_p",
+   "incidents": [
+    "INC-506"
+   ],
+   "cause": "Git history is never read",
+   "ago": 10
+  },
+  {
+   "key": "DEBT-506",
+   "title": "Integrate MiniLM embeddings with a measured evaluation",
+   "desc": "ONNX MiniLM on CPU and precision@k against TF-IDF.",
+   "module": "similarity",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sushma_h",
+   "incidents": [
+    "INC-507"
+   ],
+   "needs": [
+    "DEBT-501"
+   ],
+   "cause": "The MiniLM model promised in the synopsis was never integrated",
+   "ago": 9
+  },
+  {
+   "key": "DEBT-507",
+   "title": "Compute demo scenarios with the real engine",
+   "desc": "Scenario datasets run through the same analysis as real projects.",
+   "module": "demo",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "suraj",
+   "incidents": [
+    "INC-508"
+   ],
+   "needs": [
+    "DEBT-501"
+   ],
+   "cause": "Scenario KPIs are hard-coded constants in the page",
+   "ago": 8
+  },
+  {
+   "key": "DEBT-508",
+   "title": "Freeze one design system",
+   "desc": "One light theme, one accent colour, documented components.",
+   "module": "components",
+   "cat": "DOCUMENTATION",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "LOW",
+   "owner": "suraj",
+   "incidents": [
+    "INC-510"
+   ],
+   "cause": "There is no agreed design system",
+   "ago": 14
+  },
+  {
+   "key": "DEBT-509",
+   "title": "Single architecture document behind synopsis, code and slides",
+   "desc": "One source of truth that the revised synopsis, report and slides are generated from.",
+   "module": "docs",
+   "cat": "DOCUMENTATION",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "suraj",
+   "incidents": [
+    "INC-512",
+    "INC-513"
+   ],
+   "cause": "There is no single source of truth for the architecture",
+   "ago": 10
+  }
+ ],
+ "evidence_source": {
+  "commits": 29,
+  "files": 66
+ }
+}

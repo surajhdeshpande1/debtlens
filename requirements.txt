@@ -1,0 +1,13 @@
+# Server dependencies (Vercel Python runtime and the local `debtlens serve`)
+Flask==3.1.3
+SQLAlchemy==2.1.9
+PyMySQL==1.2.4
+cryptography==50.0.1
+certifi==2026.10.18
+PyJWT==2.15.0
+bcrypt==5.0.0
+reportlab==5.0.1
+# Semantic similarity: all-MiniLM-L6-v2 on ONNX Runtime (CPU)
+numpy==2.5.3
+onnxruntime==1.29.0
+tokenizers==0.23.3

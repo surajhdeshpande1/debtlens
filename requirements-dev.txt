@@ -1,0 +1,8 @@
+-r requirements.txt
+typer==0.29.1
+rich==15.0.0
+pytest==9.1.1
+# reference implementations the tests compare against
+scikit-learn==1.9.1
+networkx==3.7
+radon==6.0.1
