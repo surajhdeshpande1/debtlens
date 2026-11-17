@@ -6,17 +6,20 @@ import { card, head } from "./_parts.js";
 const SAMPLE = html`<div class="term"><span class="p">$</span> debtlens plan --scenario fintech --budget 40
 <span class="b">PayCore · FinTech</span> — 14 open debt items, 461.3 h/month interest, 85.7% past break-even
 
-  <span class="y">Fix this sprint</span> (39.0 of 40 h, exact tree DP, proven optimal)
-  DEBT-101  Separate connection pools for API traffic and batch jobs   24.0 h   98.6 h/mo
-  DEBT-108  Idempotency keys on refund and capture calls              8.0 h   44.1 h/mo
-  DEBT-112  Alert on webhook retry queue depth                         4.0 h   21.9 h/mo
-  DEBT-115  Document the settlement cut-over runbook                   3.0 h   12.6 h/mo
+<span class="y">Fix this sprint</span> — 39 of 40 h (tree dp, proven optimal)
+debt      title                                                     hours  interest/mo
+DEBT-101  Separate connection pools for API traffic and batch jobs     24         98.5
+DEBT-105  Apply configurable timeouts on the UPI code path              4         42.9
+DEBT-108  Invalidate the API-key cache on rotation and revocation       8         23.9
+DEBT-113  Extend the checkout session TTL during the OTP step           3         11.8
 
-  Retires 177.2 h/month of interest.
-  vs greedy  <span class="p">+7.1%</span>   vs v1 naive DP  <span class="p">+2.0%</span>
+Retires <span class="p">177.2 h/month</span> of interest.
+vs greedy <span class="p">+7.1%</span>   vs v1 naive DP <span class="p">+2.0%</span>
 
-<span class="p">$</span> debtlens ci --max-open-critical 0
-<span class="r">FAIL</span> open critical incidents: 1 (limit 0)        <span class="c"># exit code 1 → the build stops</span></div>`;
+<span class="p">$</span> debtlens ci --scenario fintech --max-open-critical 0
+<span class="r">FAIL</span> open critical incidents: 1 (limit 0)
+ok   regressions in the last 30 days: 3 (no limit)
+<span class="r">FAIL</span> — the build should stop here      <span class="c"># exit code 1</span></div>`;
 
 export async function render(root, ctx) {
   const url = location.origin;
