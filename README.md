@@ -103,9 +103,9 @@ is used as a query, and a hit is another member of the same group.
 | CampusOne ERP (College) | 14 | 0.64 | 0.93 | 0.93 | 0.96 | 1.00 | 1.00 | 1.00 / 0.86 / 0.92 |
 | DebtLens v1 (self-audit) | 8 | 0.62 | 0.88 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 / 1.00 / 1.00 |
 
-Mean precision@1 across the five scenarios: TF-IDF 0.69, MiniLM 0.87, hybrid 0.91. The hybrid is never worse
-than the better of its two signals on any scenario. The defaults α = 0.4 and τ = 0.30 were chosen from these
-results.
+Mean precision@1 across the five scenarios: TF-IDF 0.69, MiniLM 0.87, hybrid 0.91. The hybrid matches or beats
+MiniLM on every scenario and beats TF-IDF on four of five. The exception is ShopSwift, whose duplicate reports reuse
+the same wording, so TF-IDF alone reaches 1.00. The defaults α = 0.4 and τ = 0.30 were chosen from these results.
 
 ## Development
 
