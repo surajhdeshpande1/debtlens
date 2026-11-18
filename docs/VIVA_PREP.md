@@ -10,7 +10,7 @@ your own words. Every file path is in this repository.
 | Scenarios | 5: PayCore (FinTech), CareStream HIS (HealthTech), ShopSwift (E-commerce), CampusOne ERP (College), DebtLens v1 self-audit |
 | Tables | 24 (8 kept from Demo 1 + 16 new) |
 | Roles | 6: Admin, Tech Lead, Developer, QA, Manager, Viewer |
-| Tests | 131 automated (engine 83, API 33, CLI 15); the API tests also pass on MySQL 8 |
+| Tests | 144 automated (engine and packs 93, API 35, CLI 16); the API tests also pass on MySQL 8 |
 | Similarity | sim = α·TF-IDF + (1−α)·MiniLM, α = 0.4; regression threshold τ = 0.30 |
 | Accuracy | mean precision@1: TF-IDF 0.69, MiniLM 0.87, hybrid 0.91; regression F1 ≈ 0.88 |
 | Interest | I(d) = Σ w(sev)·effort + λ₁·churn + λ₂·blast; w = 3.5/2.5/1.5/1.0, λ₁ = 0.15, λ₂ = 1.8 |
@@ -58,13 +58,22 @@ speaks the MySQL protocol, so the same code runs on TiDB online and on MySQL 8 o
 patterns. The fifth scenario is mined from our real v1 repository. Anyone can also mine any public GitHub repository,
 or their own repository with the CLI. Nothing in the analysis is hard-coded: every number is computed.
 
+**What are scenario packs?** Seven more systems, each built around its busiest day: Tatkal at 10 AM, Budget day for
+a stock broker, IPL final night for food delivery, a World Cup final for streaming, New Year's Eve for ride-hailing,
+the ITR deadline night and a stadium ticket on-sale. Each pack is one JSON file with modules, dependencies, incidents,
+5 Whys, debt and a load-spike event. DebtLens computes everything from it, as it does for a real project. A pack can
+be opened with one click, downloaded, edited and uploaded again, or passed to the terminal with `--scenario file.json`.
+An uploaded pack is checked completely first and every problem is listed at once (`core/packs.py`). In all seven,
+the spike plan saves more on the day than the regular sprint plan. In the Tatkal pack it saves 85.7 h against 34.6 h,
+because the regular plan fixes the debt that cost the most in the past and not the debt that breaks at 10:00.
+
 **How are roles enforced?** On the server. Every endpoint that reads or changes project data is wrapped in `@require("permission")`
 (`debtlens/api/security.py`), and a disallowed call gets HTTP 403. The buttons in the website are only a convenience.
 
 **What is a sandbox?** A private 24-hour copy of a scenario for a visitor without an account. It is isolated: a
 sandbox token can only reach its own project, which is tested in `tests/test_api.py`.
 
-**How do you know it works?** There are 131 automated tests. Our algorithms are compared against reference
+**How do you know it works?** There are 144 automated tests. Our algorithms are compared against reference
 libraries: scikit-learn for TF-IDF and DBSCAN, networkx for centrality, radon for complexity, and brute force for the
 optimiser. The tests run on every push (`.github/workflows/ci.yml`).
 

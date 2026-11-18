@@ -40,12 +40,11 @@ def _detail(proj: Project) -> dict:
     out["people"] = st.get("people") or {}
     out["persona"] = serial.persona(proj, p) if p.kind == "sandbox" else None
     if proj.scenario_code:
-        try:
-            sc = SC.get(proj.scenario_code)
-            out["scenario_info"] = {"code": sc["code"], "name": sc["name"], "industry": sc["industry"],
-                                    "tagline": sc["tagline"], "summary": sc["summary"]}
-        except KeyError:
-            out["scenario_info"] = None
+        sc = S.scenario_of(proj)
+        out["scenario_info"] = ({"code": sc["code"], "name": sc["name"], "industry": sc["industry"],
+                                 "tagline": sc.get("tagline", ""), "summary": sc.get("summary", ""),
+                                 "pack": SC.is_pack(sc), "uploaded": proj.scenario_code == S.UPLOADED}
+                                if sc else None)
     return out
 
 
@@ -75,7 +74,7 @@ def create_project():
     org = s.get(Organization, p.org_id)
     code = (data.get("scenario") or "").strip().lower() or None
     if code:
-        if code not in {x["code"] for x in SC.list_scenarios()}:
+        if not SC.known(code):
             raise ApiError(400, f"unknown scenario '{code}'")
         proj = S.seed_scenario(s, org, code, name=V.text(data, "name", max_len=160) or None)
     else:

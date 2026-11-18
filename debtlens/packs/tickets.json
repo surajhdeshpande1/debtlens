@@ -1,0 +1,1035 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "tickets",
+ "order": 7,
+ "key": "SHOW",
+ "name": "ShowPass",
+ "industry": "Event ticketing",
+ "tagline": "Concert and match tickets, where a stadium sells out in the first five minutes",
+ "summary": "ShowPass sells tickets for concerts, comedy and cricket: storefront, virtual waiting room, login, event catalogue, seat maps, seat inventory and holds, checkout, payments, QR ticket issuance and notifications. When a stadium tour goes on sale at noon, thirty times a normal hour's fans arrive in the first minutes. A waiting room that lets everyone in at once, double-sold seats and 'paid, no ticket' keep coming back.",
+ "repository_url": "https://github.com/example/showpass (fictional)",
+ "tour": {
+  "incident": "INC-1120",
+  "debt": "DEBT-1101",
+  "module": "waitroom",
+  "budget": 40,
+  "cascade_module": "inventory",
+  "headline": "The waiting room keeps queue positions in memory, so one crash at the drop lets every fan in at once; a durable queue costs 14 hours."
+ },
+ "people": {
+  "dinesh": {
+   "name": "Dinesh Pai",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "rekha": {
+   "name": "Rekha Menon",
+   "role": "tech_lead",
+   "title": "Engineering lead, ticketing"
+  },
+  "sameer": {
+   "name": "Sameer Qureshi",
+   "role": "developer",
+   "title": "Developer, seats & checkout"
+  },
+  "divya": {
+   "name": "Divya Shetty",
+   "role": "developer",
+   "title": "Developer, storefront & payments"
+  },
+  "ajay": {
+   "name": "Ajay Thakur",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "naina": {
+   "name": "Naina Joshi",
+   "role": "manager",
+   "title": "Product manager, live events"
+  },
+  "guest": {
+   "name": "Event promoters",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "web",
+   "path": "apps/storefront",
+   "description": "Storefront and public API",
+   "churn": 34,
+   "complexity": 101,
+   "loc": 3200,
+   "files": 8,
+   "owner": "divya"
+  },
+  {
+   "name": "waitroom",
+   "path": "svc/waitroom",
+   "description": "Virtual waiting room for on-sales",
+   "churn": 26,
+   "complexity": 77,
+   "loc": 2100,
+   "files": 5,
+   "owner": "rekha"
+  },
+  {
+   "name": "auth",
+   "path": "svc/auth",
+   "description": "Login and OTP",
+   "churn": 18,
+   "complexity": 64,
+   "loc": 1800,
+   "files": 5,
+   "owner": "divya"
+  },
+  {
+   "name": "catalog",
+   "path": "svc/catalog",
+   "description": "Events, venues and prices",
+   "churn": 22,
+   "complexity": 71,
+   "loc": 2200,
+   "files": 5,
+   "owner": "divya"
+  },
+  {
+   "name": "seatmap",
+   "path": "svc/seatmap",
+   "description": "Seat maps and live availability",
+   "churn": 37,
+   "complexity": 128,
+   "loc": 3300,
+   "files": 7,
+   "owner": "sameer"
+  },
+  {
+   "name": "inventory",
+   "path": "svc/inventory",
+   "description": "Seat inventory, holds and sales",
+   "churn": 52,
+   "complexity": 176,
+   "loc": 4400,
+   "files": 9,
+   "owner": "sameer"
+  },
+  {
+   "name": "checkout",
+   "path": "svc/checkout",
+   "description": "Checkout and order creation",
+   "churn": 45,
+   "complexity": 151,
+   "loc": 4000,
+   "files": 9,
+   "owner": "sameer"
+  },
+  {
+   "name": "payments",
+   "path": "svc/payments",
+   "description": "UPI, cards and wallets",
+   "churn": 28,
+   "complexity": 103,
+   "loc": 2800,
+   "files": 6,
+   "owner": "divya"
+  },
+  {
+   "name": "tickets",
+   "path": "svc/tickets",
+   "description": "QR ticket issuance and transfers",
+   "churn": 24,
+   "complexity": 82,
+   "loc": 2300,
+   "files": 5,
+   "owner": "sameer"
+  },
+  {
+   "name": "notify",
+   "path": "svc/notify",
+   "description": "Ticket emails, SMS and push",
+   "churn": 12,
+   "complexity": 40,
+   "loc": 1100,
+   "files": 4,
+   "owner": "ajay"
+  }
+ ],
+ "dependencies": [
+  [
+   "web",
+   "waitroom"
+  ],
+  [
+   "web",
+   "catalog"
+  ],
+  [
+   "web",
+   "auth"
+  ],
+  [
+   "web",
+   "seatmap"
+  ],
+  [
+   "web",
+   "checkout"
+  ],
+  [
+   "seatmap",
+   "inventory"
+  ],
+  [
+   "seatmap",
+   "catalog"
+  ],
+  [
+   "checkout",
+   "inventory"
+  ],
+  [
+   "checkout",
+   "payments"
+  ],
+  [
+   "checkout",
+   "tickets"
+  ],
+  [
+   "checkout",
+   "auth"
+  ],
+  [
+   "tickets",
+   "notify"
+  ]
+ ],
+ "files": [
+  [
+   "svc/waitroom/queue.py",
+   "waitroom",
+   23,
+   21,
+   520,
+   900,
+   3
+  ],
+  [
+   "svc/seatmap/build.py",
+   "seatmap",
+   31,
+   34,
+   780,
+   1260,
+   3
+  ],
+  [
+   "svc/inventory/sell.py",
+   "inventory",
+   40,
+   39,
+   870,
+   1790,
+   4
+  ],
+  [
+   "svc/inventory/holds.py",
+   "inventory",
+   28,
+   26,
+   610,
+   1020,
+   3
+  ],
+  [
+   "svc/payments/confirm.py",
+   "payments",
+   20,
+   19,
+   480,
+   600,
+   2
+  ],
+  [
+   "apps/storefront/limits.py",
+   "web",
+   11,
+   10,
+   260,
+   240,
+   2
+  ],
+  [
+   "svc/tickets/issue.py",
+   "tickets",
+   19,
+   18,
+   430,
+   520,
+   2
+  ],
+  [
+   "svc/auth/db.py",
+   "auth",
+   8,
+   7,
+   170,
+   110,
+   1
+  ],
+  [
+   "svc/notify/email.py",
+   "notify",
+   10,
+   8,
+   230,
+   220,
+   2
+  ],
+  [
+   "svc/checkout/gateway.py",
+   "checkout",
+   17,
+   16,
+   400,
+   430,
+   2
+  ],
+  [
+   "svc/catalog/pages.py",
+   "catalog",
+   14,
+   12,
+   330,
+   300,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "svc/waitroom/queue.py",
+   31,
+   "FIXME",
+   "queue positions live in process memory"
+  ],
+  [
+   "svc/seatmap/build.py",
+   47,
+   "OPTIMIZE",
+   "rebuilds the map from every seat row per request"
+  ],
+  [
+   "svc/inventory/sell.py",
+   92,
+   "XXX",
+   "check-then-mark without a lock"
+  ],
+  [
+   "svc/inventory/holds.py",
+   15,
+   "TODO",
+   "release holds when checkout fails instead of a 10-minute cron"
+  ],
+  [
+   "svc/payments/confirm.py",
+   58,
+   "TODO",
+   "reconcile payments with issued tickets"
+  ],
+  [
+   "apps/storefront/limits.py",
+   9,
+   "TODO",
+   "per-account limits and bot rate limits"
+  ],
+  [
+   "svc/tickets/issue.py",
+   66,
+   "BUG",
+   "retry creates a second QR code"
+  ],
+  [
+   "svc/auth/db.py",
+   12,
+   "FIXME",
+   "new connection per login"
+  ],
+  [
+   "svc/notify/email.py",
+   20,
+   "TODO",
+   "send through a queue"
+  ],
+  [
+   "svc/checkout/gateway.py",
+   34,
+   "FIXME",
+   "no timeout on gateway calls"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1101",
+   "title": "Waiting room restart let 3 lakh fans in at once",
+   "desc": "Five minutes into a stadium tour on-sale the waiting room restarted, lost every queue position and let all fans into checkout together.",
+   "module": "waitroom",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 168,
+   "fixed": 167.95,
+   "effort": 14,
+   "by": "naina",
+   "group": "G-WAIT",
+   "whys": [
+    "Everyone was admitted together",
+    "Queue positions were lost when the waiting room restarted",
+    "The waiting room keeps queue positions in memory"
+   ],
+   "fix": "Closed the sale and reopened it an hour later.",
+   "lesson": "Fans who queued fairly lost their place."
+  },
+  {
+   "key": "INC-1102",
+   "title": "Stadium seat map took 40 seconds to load",
+   "desc": "The 60,000-seat stadium map took 40 seconds to load at the drop and many fans gave up.",
+   "module": "seatmap",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.9,
+   "effort": 7,
+   "by": "ajay",
+   "group": "G-SEATMAP",
+   "whys": [
+    "The seat map was very slow",
+    "Each request rebuilt the map from 60,000 seat rows",
+    "The seat map is built from every seat row on each request"
+   ],
+   "fix": "Showed a block picker before the seat map.",
+   "lesson": "The block picker still loaded the full map."
+  },
+  {
+   "key": "INC-1103",
+   "title": "Same seat sold to two fans",
+   "desc": "Seat C-14-22 was sold to two fans who checked out in the same second; one was turned away at the gate.",
+   "module": "inventory",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151,
+   "effort": 10,
+   "by": "ajay",
+   "group": "G-OVERSELL",
+   "whys": [
+    "Two fans hold tickets for one seat",
+    "Both checkouts saw the seat as free",
+    "Seat sales check and mark seats sold without a lock"
+   ],
+   "fix": "Upgraded one fan to a better seat.",
+   "lesson": "Upgrades are not always available."
+  },
+  {
+   "key": "INC-1104",
+   "title": "Seats shown sold out while 2,000 were free",
+   "desc": "Fans saw 'sold out' for 10 minutes while 2,000 seats sat in abandoned holds.",
+   "module": "inventory",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 144,
+   "fixed": 143,
+   "effort": 6,
+   "by": "naina",
+   "whys": [
+    "Fans saw 'sold out' with seats still free",
+    "Abandoned holds were released only every 10 minutes",
+    "Seat holds are released only by a cron job every 10 minutes"
+   ],
+   "fix": "Ran the release job by hand.",
+   "lesson": "Promoters saw it on social media first."
+  },
+  {
+   "key": "INC-1105",
+   "title": "Fans charged but no ticket issued",
+   "desc": "900 fans were charged but got no tickets because payment confirmations arrived after their holds expired.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 136,
+   "fixed": 135,
+   "effort": 8,
+   "by": "divya",
+   "group": "G-PAID",
+   "whys": [
+    "Fans paid without getting tickets",
+    "Payment confirmations arrived after the hold expired",
+    "Payments are never reconciled with issued tickets"
+   ],
+   "fix": "Refunded the fans from a manual report.",
+   "lesson": "They wanted tickets, not refunds."
+  },
+  {
+   "key": "INC-1106",
+   "title": "Bots bought 40% of front-row tickets in 2 minutes",
+   "desc": "Scripts placed hundreds of checkouts per second and took most front-row seats, which appeared on resale sites within an hour.",
+   "module": "web",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 128,
+   "fixed": 127.9,
+   "effort": 8,
+   "by": "naina",
+   "group": "G-BOT",
+   "whys": [
+    "Bots took the best seats",
+    "Scripts placed hundreds of checkouts per second",
+    "There is no per-account purchase limit or bot rate limit"
+   ],
+   "fix": "Cancelled orders from obviously scripted accounts.",
+   "lesson": "Cancelling after the sale angers real fans too."
+  },
+  {
+   "key": "INC-1107",
+   "title": "Fans received two different QR codes for one seat",
+   "desc": "Ticket issuance was retried after a slow response and created a second QR code; the gate rejected one of them.",
+   "module": "tickets",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 120,
+   "fixed": 119,
+   "effort": 5,
+   "by": "ajay",
+   "group": "G-QR",
+   "whys": [
+    "Two QR codes for one seat",
+    "Issuance was retried and created a second ticket",
+    "Ticket issuance is retried without an idempotency key"
+   ],
+   "fix": "Voided the second QR codes.",
+   "lesson": "Fans did not know which code was valid."
+  },
+  {
+   "key": "INC-1108",
+   "title": "Checkout failed and seats stayed held for 10 minutes",
+   "desc": "When payments failed, the seats stayed held for 10 minutes, so other fans could not buy them.",
+   "module": "checkout",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 112,
+   "fixed": 111.9,
+   "effort": 6,
+   "by": "ajay",
+   "whys": [
+    "Seats stayed held after failed payments",
+    "Failed checkouts did not release their holds",
+    "Seat holds are released only by a cron job every 10 minutes"
+   ],
+   "fix": "Ran the release job every 5 minutes.",
+   "lesson": "Five minutes is an eternity at a drop."
+  },
+  {
+   "key": "INC-1109",
+   "title": "Queue positions lost after a waiting-room deploy",
+   "desc": "A deploy during a comedy on-sale restarted the waiting room and every fan lost their position.",
+   "module": "waitroom",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103.95,
+   "effort": 10,
+   "by": "naina",
+   "group": "G-WAIT",
+   "whys": [
+    "Fans lost their queue positions",
+    "The waiting room restarted during the deploy",
+    "The waiting room keeps queue positions in memory"
+   ],
+   "fix": "Froze deploys during on-sales.",
+   "lesson": "A crash does not respect a freeze."
+  },
+  {
+   "key": "INC-1110",
+   "title": "Seat map timing out for the stadium show",
+   "desc": "The seat map timed out for 6 minutes at the second-date on-sale.",
+   "module": "seatmap",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95.9,
+   "effort": 6,
+   "by": "ajay",
+   "group": "G-SEATMAP",
+   "whys": [
+    "The seat map timed out",
+    "Every request rebuilt the full map",
+    "The seat map is built from every seat row on each request"
+   ],
+   "fix": "Added servers to the seat map service.",
+   "lesson": "The next stadium is bigger."
+  },
+  {
+   "key": "INC-1111",
+   "title": "Double-sold seats in block C",
+   "desc": "Fourteen seats in block C were sold twice during a cricket on-sale.",
+   "module": "inventory",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87,
+   "effort": 9,
+   "by": "ajay",
+   "group": "G-OVERSELL",
+   "whys": [
+    "Seats were sold twice",
+    "Concurrent checkouts each saw the seats as free",
+    "Seat sales check and mark seats sold without a lock"
+   ],
+   "fix": "Moved the second buyers to other blocks.",
+   "lesson": "The race is still there."
+  },
+  {
+   "key": "INC-1112",
+   "title": "Login failing with 'too many connections' at 11:59",
+   "desc": "A minute before the drop, logins failed because each login opened its own database connection.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79.9,
+   "effort": 6,
+   "by": "divya",
+   "whys": [
+    "Fans could not log in before the drop",
+    "Each login opened its own database connection",
+    "Login opens a new database connection for every request"
+   ],
+   "fix": "Raised the database connection limit.",
+   "lesson": "The database ran out of memory instead."
+  },
+  {
+   "key": "INC-1113",
+   "title": "Paid, no ticket for 700 fans",
+   "desc": "Another on-sale left 700 fans charged without tickets after late payment confirmations.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 72,
+   "fixed": 71,
+   "effort": 7,
+   "by": "divya",
+   "group": "G-PAID",
+   "whys": [
+    "Fans were charged without tickets",
+    "Late confirmations were ignored after holds expired",
+    "Payments are never reconciled with issued tickets"
+   ],
+   "fix": "Issued tickets by hand where seats remained.",
+   "lesson": "Manual work for a week."
+  },
+  {
+   "key": "INC-1114",
+   "title": "Bot traffic doubled checkout load at the drop",
+   "desc": "Scripted checkouts doubled the load on checkout and inventory in the first minute.",
+   "module": "web",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 64,
+   "fixed": 63.9,
+   "effort": 6,
+   "by": "naina",
+   "group": "G-BOT",
+   "whys": [
+    "Checkout slowed for everyone",
+    "Bots sent hundreds of requests per second",
+    "There is no per-account purchase limit or bot rate limit"
+   ],
+   "fix": "Blocked a list of IP addresses.",
+   "lesson": "The bots changed addresses within minutes."
+  },
+  {
+   "key": "INC-1115",
+   "title": "Seat map shows held seats as sold",
+   "desc": "Fans saw large grey blocks of 'sold' seats that were only held by abandoned carts.",
+   "module": "seatmap",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 54,
+   "fixed": 53,
+   "effort": 4,
+   "by": "ajay",
+   "whys": [
+    "The seat map showed seats as sold",
+    "Holds from abandoned carts were still active",
+    "Seat holds are released only by a cron job every 10 minutes"
+   ],
+   "fix": "Showed held seats in a different colour.",
+   "lesson": "A colour does not free the seat."
+  },
+  {
+   "key": "INC-1116",
+   "title": "Duplicate QR codes after an issuance retry",
+   "desc": "Issuance retries during a busy on-sale created second QR codes for 200 tickets.",
+   "module": "tickets",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 44,
+   "fixed": 43,
+   "effort": 4,
+   "by": "ajay",
+   "group": "G-QR",
+   "whys": [
+    "Fans got two QR codes",
+    "A retried issuance created a new ticket",
+    "Ticket issuance is retried without an idempotency key"
+   ],
+   "fix": "Voided the duplicates.",
+   "lesson": "Same bug, different show."
+  },
+  {
+   "key": "INC-1117",
+   "title": "Ticket emails delivered 2 hours late",
+   "desc": "Ticket confirmation emails arrived two hours after purchase; fans flooded support.",
+   "module": "notify",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 32,
+   "fixed": 31,
+   "effort": 3,
+   "by": "ajay",
+   "whys": [
+    "Fans did not get ticket emails",
+    "Emails were sent inline and dropped under load",
+    "Ticket emails are sent synchronously without a queue"
+   ],
+   "fix": "Re-sent the emails.",
+   "lesson": "Fans thought their payment had failed."
+  },
+  {
+   "key": "INC-1118",
+   "title": "Payments taken without tickets on Saturday's drop",
+   "desc": "Fans charged on Saturday have no tickets; nothing has matched the payments yet.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 18,
+   "effort": 7,
+   "by": "divya",
+   "group": "G-PAID",
+   "whys": [
+    "Fans were charged without tickets",
+    "Confirmations arrived after holds expired",
+    "Payments are never reconciled with issued tickets"
+   ]
+  },
+  {
+   "key": "INC-1119",
+   "title": "Bots took the front rows again",
+   "desc": "Most front-row seats for the second show went to scripted accounts within a minute.",
+   "module": "web",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 6,
+   "effort": 6,
+   "by": "naina",
+   "group": "G-BOT",
+   "whys": [
+    "Bots took the front rows",
+    "Scripts bought faster than fans",
+    "There is no per-account purchase limit or bot rate limit"
+   ]
+  },
+  {
+   "key": "INC-1120",
+   "title": "Waiting room admitted everyone after a crash",
+   "desc": "The waiting room crashed at 12:03 today and admitted every fan at once; checkout and inventory are overloaded.",
+   "module": "waitroom",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 1,
+   "effort": 12,
+   "by": "naina",
+   "group": "G-WAIT",
+   "whys": [
+    "Everyone was admitted at once",
+    "Queue positions were lost in the crash",
+    "The waiting room keeps queue positions in memory"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1101",
+   "title": "Keep waiting-room positions in a durable queue",
+   "desc": "Store queue positions in a durable store shared by all waiting-room servers so a crash or deploy never loses them.",
+   "module": "waitroom",
+   "cat": "ARCHITECTURAL",
+   "principal": 14,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "rekha",
+   "incidents": [
+    "INC-1101",
+    "INC-1109",
+    "INC-1120"
+   ],
+   "cause": "The waiting room keeps queue positions in memory",
+   "ago": 166,
+   "file": "svc/waitroom/queue.py"
+  },
+  {
+   "key": "DEBT-1102",
+   "title": "Precompute the seat map and serve it cached with live updates",
+   "desc": "Precompute each venue's seat map once and serve it cached, sending only availability changes to fans.",
+   "module": "seatmap",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1102",
+    "INC-1110"
+   ],
+   "cause": "The seat map is built from every seat row on each request",
+   "ago": 158,
+   "file": "svc/seatmap/build.py"
+  },
+  {
+   "key": "DEBT-1103",
+   "title": "Sell seats with a row-level lock",
+   "desc": "Check and mark a seat as sold under a row-level lock so two concurrent checkouts cannot both take it.",
+   "module": "inventory",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "PRIORITIZED",
+   "priority": "CRITICAL",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1103",
+    "INC-1111"
+   ],
+   "cause": "Seat sales check and mark seats sold without a lock",
+   "ago": 150,
+   "file": "svc/inventory/sell.py"
+  },
+  {
+   "key": "DEBT-1104",
+   "title": "Expiring seat holds, released the moment checkout fails",
+   "desc": "Each hold carries its own expiry and is released immediately when payment fails or the fan leaves, instead of waiting for a cron job.",
+   "module": "inventory",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1104",
+    "INC-1108",
+    "INC-1115"
+   ],
+   "cause": "Seat holds are released only by a cron job every 10 minutes",
+   "ago": 142,
+   "file": "svc/inventory/holds.py"
+  },
+  {
+   "key": "DEBT-1105",
+   "title": "Reconcile payments with issued tickets every 5 minutes",
+   "desc": "Match every captured payment with an issued ticket; issue it if seats remain or refund automatically.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "divya",
+   "incidents": [
+    "INC-1105",
+    "INC-1113",
+    "INC-1118"
+   ],
+   "cause": "Payments are never reconciled with issued tickets",
+   "ago": 134,
+   "file": "svc/payments/confirm.py"
+  },
+  {
+   "key": "DEBT-1106",
+   "title": "Per-account purchase limits and bot rate limits",
+   "desc": "Limit tickets per account and card, and rate limit checkouts per account and device so scripts cannot outrun fans.",
+   "module": "web",
+   "cat": "SECURITY_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "divya",
+   "incidents": [
+    "INC-1106",
+    "INC-1114",
+    "INC-1119"
+   ],
+   "cause": "There is no per-account purchase limit or bot rate limit",
+   "ago": 126,
+   "file": "apps/storefront/limits.py"
+  },
+  {
+   "key": "DEBT-1107",
+   "title": "Idempotency key for ticket issuance",
+   "desc": "Issue at most one ticket per order line: a retry returns the ticket already issued.",
+   "module": "tickets",
+   "cat": "CODE_SMELL",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1107",
+    "INC-1116"
+   ],
+   "cause": "Ticket issuance is retried without an idempotency key",
+   "ago": 118,
+   "file": "svc/tickets/issue.py"
+  },
+  {
+   "key": "DEBT-1108",
+   "title": "Use a shared connection pool for login",
+   "desc": "Login borrows from a shared, bounded connection pool instead of opening a new database connection per request.",
+   "module": "auth",
+   "cat": "INFRASTRUCTURE",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "divya",
+   "incidents": [
+    "INC-1112"
+   ],
+   "cause": "Login opens a new database connection for every request",
+   "ago": 78,
+   "file": "svc/auth/db.py"
+  },
+  {
+   "key": "DEBT-1109",
+   "title": "Send ticket emails through a durable queue",
+   "desc": "Checkout publishes ticket emails to a durable queue; workers send them with retries.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "ajay",
+   "incidents": [
+    "INC-1117"
+   ],
+   "cause": "Ticket emails are sent synchronously without a queue",
+   "ago": 30,
+   "file": "svc/notify/email.py"
+  },
+  {
+   "key": "DEBT-1110",
+   "title": "Timeouts on payment gateway calls in checkout",
+   "desc": "Give every gateway call a strict timeout so a slow gateway frees checkout threads.",
+   "module": "checkout",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sameer",
+   "incidents": [],
+   "ago": 40,
+   "file": "svc/checkout/gateway.py"
+  },
+  {
+   "key": "DEBT-1111",
+   "title": "Serve cached event pages from the edge",
+   "desc": "Event and venue pages are served cached at the edge for a minute instead of being rendered for every fan.",
+   "module": "catalog",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "divya",
+   "incidents": [],
+   "ago": 36,
+   "file": "svc/catalog/pages.py"
+  },
+  {
+   "key": "DEBT-1112",
+   "title": "Load test the drop at 30x before every stadium on-sale",
+   "desc": "Replay a stadium on-sale at 30 times a normal hour against staging, including bots and failed payments.",
+   "module": "checkout",
+   "cat": "TEST_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "ajay",
+   "incidents": [],
+   "needs": [
+    "DEBT-1101",
+    "DEBT-1104"
+   ],
+   "ago": 28
+  },
+  {
+   "key": "DEBT-1113",
+   "title": "Use IST for on-sale start times",
+   "desc": "On-sale times are stored and checked in IST.",
+   "module": "web",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "divya",
+   "incidents": [],
+   "ago": 150
+  }
+ ],
+ "spike": {
+  "key": "stadium-drop",
+  "name": "Stadium tour on-sale at noon",
+  "description": "Tickets for a stadium tour go on sale at 12:00: fans start arriving at 11:00, thirty times a normal hour's traffic arrives in the first hour, and the rush tails off through the afternoon.",
+  "profile": [
+   0.3,
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.3,
+   0.5,
+   0.8,
+   1.2,
+   1.6,
+   2.5,
+   6.0,
+   30.0,
+   10.0,
+   4.0,
+   2.5,
+   2.0,
+   1.8,
+   1.6,
+   1.6,
+   1.4,
+   1.2,
+   0.8,
+   0.5
+  ],
+  "entry": {
+   "web": 1.0,
+   "waitroom": 1.0,
+   "auth": 1.0,
+   "checkout": 1.0
+  },
+  "exposure": {
+   "notify": 0.6
+  },
+  "baseline": {
+   "auth": 0.0273,
+   "catalog": 0.0273,
+   "checkout": 0.0273,
+   "inventory": 0.0273,
+   "notify": 0.0446,
+   "payments": 0.0233,
+   "seatmap": 0.0273,
+   "tickets": 0.0273,
+   "waitroom": 0.0273,
+   "web": 0.0273
+  }
+ }
+}

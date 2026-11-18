@@ -73,8 +73,13 @@ def project(p: Project, counts: dict | None = None) -> dict:
 
 def persona(p: Project, principal: Principal) -> dict | None:
     """In a sandbox the visitor plays the scenario character who holds the chosen role."""
-    people = (p.settings or {}).get("people") or {}
-    for key, person in people.items():
+    st = p.settings or {}
+    people = st.get("people") or {}
+    # MySQL and TiDB store JSON objects with their keys re-ordered, so the scenario's own order is kept separately:
+    # the first person listed for a role plays it.
+    order = [k for k in (st.get("people_order") or []) if k in people] + sorted(set(people) - set(st.get("people_order") or []))
+    for key in order:
+        person = people[key]
         if person.get("role") == principal.role:
             return {"key": key, **person}
     return None

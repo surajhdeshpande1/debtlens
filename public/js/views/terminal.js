@@ -28,12 +28,20 @@ export async function render(root, ctx) {
     <div class="grid c2">
       <div class="stack">
         ${card("1 · Install", html`${codeBlock("pipx install debtlens        # or: pip install debtlens")}<p class="small muted" style="margin:0">Python 3.10+. Works on Windows, macOS and Linux. <code>debtlens model download</code> fetches the 23 MB MiniLM model once for semantic similarity (optional — TF-IDF works without it).</p>`)}
-        ${card("2 · Try it offline (no account)", codeBlock(`debtlens scenarios                       # the 5 bundled industry scenarios
+        ${card("2 · Try it offline (no account)", codeBlock(`debtlens scenarios                       # 5 industry scenarios + 7 scenario packs
 debtlens demo healthtech                 # dashboard of a scenario
 debtlens similar "lab results not showing" --scenario healthtech
 debtlens plan --scenario fintech --budget 40
 debtlens simulate forecast --scenario college --sprints 12
-debtlens simulate cascade db --scenario fintech`))}
+debtlens simulate cascade db --scenario fintech
+debtlens simulate spike --scenario tatkal  # Tatkal at 10 AM, hour by hour`))}
+        ${card("Scenario packs", html`${codeBlock(`debtlens pack list                       # the 7 bundled packs and their busiest day
+debtlens pack show broker                # what a pack contains
+debtlens pack export tickets -o my.json  # copy one to edit
+debtlens pack validate my.json           # every problem at once
+debtlens simulate spike -s my.json --budget 60
+debtlens plan -s my.json --budget 40`)}
+          <p class="small muted" style="margin:0">A pack is a whole system in one JSON file: modules, dependencies, files, TODO markers, incidents with 5 Whys, debt with prerequisites and its own load-spike event. Every command accepts a pack code or file with <code>--scenario</code>, and the website opens a pack file from its home page. Format: <code>docs/PACKS.md</code>.</p>`)}
         ${card("3 · Your own repository", codeBlock(`cd my-project
 debtlens scan .                          # churn, complexity, TODO/FIXME, import graph
 debtlens scan . --since 180 --json > scan.json
@@ -54,7 +62,8 @@ debtlens ci --max-open-critical 0 --max-regressions 3`)}
             ["incidents list | show | new", "Browse and report incidents, record 5 Whys"],
             ["debt / ledger", "Debt items with principal, interest, risk, break-even"],
             ["plan --budget H", "Exact precedence-constrained knapsack (--approve to save)"],
-            ["simulate whatif | forecast | cascade", "The Simulation Lab from the terminal"],
+            ["simulate whatif | forecast | cascade | spike", "The Simulation Lab from the terminal"],
+            ["pack list | show | validate | export", "Scenario packs: bundled systems or your own .json file"],
             ["ingest app.log", "Logs → grouped incident candidates (--push)"],
             ["import file.csv|json", "Bring in a Jira/ServiceNow backlog"],
             ["ci", "Quality gate: exit code 1 when a limit is crossed"],

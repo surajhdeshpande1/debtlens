@@ -300,6 +300,56 @@ def test_load_spike_simulation(client):
     assert [x["kind"] for x in runs].count("spike") == 2
 
 
+def test_scenario_packs_cards_download_and_validation(client):
+    meta = api(client, "get", "/meta").json
+    assert [p["code"] for p in meta["packs"]][:2] == ["tatkal", "broker"] and len(meta["packs"]) == 7
+    assert len(meta["scenarios"]) == 5  # packs never change the industry-scenario comparison
+    r = api(client, "get", "/packs/tatkal")
+    assert r.status_code == 200 and "attachment" in r.headers["Content-Disposition"]
+    pack = r.get_json()
+    assert pack["format"] == "debtlens-pack/1" and pack["spike"]["key"] == "tatkal-10am"
+    assert api(client, "get", "/packs/nope").status_code == 404
+    ok = api(client, "post", "/packs/validate", json={"pack": pack}).json
+    assert ok["valid"] and ok["info"]["counts"]["incidents"] == 20
+    pack["incidents"][0]["module"] = "nowhere"
+    bad = api(client, "post", "/packs/validate", json={"pack": pack}).json
+    assert not bad["valid"] and any("nowhere" in p for p in bad["problems"])
+
+
+def test_sandbox_from_a_pack_code_and_from_an_uploaded_pack(client):
+    tok, pid = sandbox(client, "broker", "developer")
+    d = api(client, "get", f"/projects/{pid}", tok).json["project"]
+    assert d["scenario_info"]["pack"] and not d["scenario_info"]["uploaded"] and d["persona"]["name"] == "Vikram Rathore"
+    ev = api(client, "get", f"/projects/{pid}/simulate/spike/events", tok).json["events"]
+    assert ev[0]["key"] == "budget-day" and ev[0]["peak"] == 12
+    assert api(client, "get", f"/projects/{pid}/evaluation", tok).status_code == 200
+
+    pack = api(client, "get", "/packs/tickets").get_json()
+    pack.update(code="my-show", name="My Show Co")
+    r = api(client, "post", "/sandbox", json={"pack": pack, "role": "tech_lead"})
+    assert r.status_code == 201, r.json
+    tok2, pid2 = r.json["token"], r.json["project"]["id"]
+    d = api(client, "get", f"/projects/{pid2}", tok2).json["project"]
+    assert d["name"] == "My Show Co" and d["scenario_info"]["uploaded"] and d["tour"]["incident"] == "INC-1120"
+    ev = api(client, "get", f"/projects/{pid2}/simulate/spike/events", tok2).json["events"]
+    assert ev[0]["key"] == "stadium-drop"
+    s = api(client, "post", f"/projects/{pid2}/simulate/spike", tok2, json={"budget": 40, "runs": 60}).json
+    assert s["event"]["key"] == "stadium-drop" and s["after"]["hours_lost"] < s["before"]["hours_lost"]
+    e = api(client, "get", f"/projects/{pid2}/evaluation", tok2).json
+    assert e["labelled"]["regression_pairs"] >= 5 and e["labelled"]["duplicate_queries"] >= 10
+    snap = api(client, "get", f"/projects/{pid2}/export", tok2).json
+    assert snap["project"]["spike"]["key"] == "stadium-drop"  # the terminal sees the pack's event too
+    r = api(client, "post", "/sandbox/reset", tok2, json={})  # an uploaded pack resets to itself
+    assert r.status_code == 201 and r.json["project"]["name"] == "My Show Co"
+    assert api(client, "get", f"/projects/{pid}", tok2).status_code in (403, 404)  # still isolated from other sandboxes
+
+    pack["debts"][0]["needs"] = ["DEBT-0"]
+    r = api(client, "post", "/sandbox", json={"pack": pack})
+    assert r.status_code == 400 and any("DEBT-0" in p for p in r.json["problems"])
+    assert api(client, "post", "/sandbox", json={"pack": "not a pack"}).status_code == 400
+    assert api(client, "post", "/sandbox", json={"scenario": "../fintech"}).status_code == 400
+
+
 def test_playbooks_choice_progress_and_project_edits(client):
     tok, pid = sandbox(client)
     lib = api(client, "get", f"/projects/{pid}/playbooks", tok).json

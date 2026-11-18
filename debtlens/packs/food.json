@@ -1,0 +1,1090 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "food",
+ "order": 3,
+ "key": "ZAIK",
+ "name": "ZaikaNow",
+ "industry": "Food delivery",
+ "tagline": "Food delivery in 30 cities, where match night is the busiest night of the year",
+ "summary": "ZaikaNow connects 80,000 restaurants and 1.5 lakh riders with hungry customers: search, menus, cart, payments, orders, the restaurant tablet app, rider dispatch, ETAs and notifications. On IPL final night orders peak at the innings break. Riders not assigned, restaurants not seeing orders and sold-out dishes that can still be ordered keep coming back.",
+ "repository_url": "https://github.com/example/zaikanow (fictional)",
+ "tour": {
+  "incident": "INC-719",
+  "debt": "DEBT-701",
+  "module": "dispatch",
+  "budget": 40,
+  "cascade_module": "notify",
+  "headline": "Riders are assigned in one city-wide batch every 60 seconds, so every big match night leaves thousands of orders waiting; fixing it costs 20 hours."
+ },
+ "people": {
+  "harish": {
+   "name": "Harish Gowda",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "shreya": {
+   "name": "Shreya Banerjee",
+   "role": "tech_lead",
+   "title": "Engineering lead, ordering"
+  },
+  "arjun": {
+   "name": "Arjun Mehta",
+   "role": "developer",
+   "title": "Developer, orders & dispatch"
+  },
+  "nisha": {
+   "name": "Nisha Pillai",
+   "role": "developer",
+   "title": "Developer, menus, search & cart"
+  },
+  "rohit": {
+   "name": "Rohit Saxena",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "ishita": {
+   "name": "Ishita Agarwal",
+   "role": "manager",
+   "title": "Product manager, delivery"
+  },
+  "guest": {
+   "name": "City operations",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "app",
+   "path": "services/app-api",
+   "description": "Customer app API and order tracking",
+   "churn": 39,
+   "complexity": 118,
+   "loc": 3400,
+   "files": 8,
+   "owner": "nisha"
+  },
+  {
+   "name": "search",
+   "path": "services/search",
+   "description": "Restaurant and dish search by area",
+   "churn": 31,
+   "complexity": 104,
+   "loc": 2900,
+   "files": 6,
+   "owner": "nisha"
+  },
+  {
+   "name": "menu",
+   "path": "services/menu",
+   "description": "Menus, prices and dish availability",
+   "churn": 36,
+   "complexity": 97,
+   "loc": 2700,
+   "files": 6,
+   "owner": "nisha"
+  },
+  {
+   "name": "cart",
+   "path": "services/cart",
+   "description": "Cart, coupons and checkout",
+   "churn": 42,
+   "complexity": 133,
+   "loc": 3600,
+   "files": 8,
+   "owner": "nisha"
+  },
+  {
+   "name": "payments",
+   "path": "services/payments",
+   "description": "UPI, cards, wallets and refunds",
+   "churn": 34,
+   "complexity": 121,
+   "loc": 3200,
+   "files": 7,
+   "owner": "arjun"
+  },
+  {
+   "name": "orders",
+   "path": "services/orders",
+   "description": "Order lifecycle and status",
+   "churn": 55,
+   "complexity": 187,
+   "loc": 4800,
+   "files": 10,
+   "owner": "arjun"
+  },
+  {
+   "name": "partner",
+   "path": "services/partner",
+   "description": "Restaurant tablet app: accept and prepare orders",
+   "churn": 27,
+   "complexity": 96,
+   "loc": 2600,
+   "files": 6,
+   "owner": "arjun"
+  },
+  {
+   "name": "dispatch",
+   "path": "services/dispatch",
+   "description": "Rider assignment and batching",
+   "churn": 49,
+   "complexity": 172,
+   "loc": 4300,
+   "files": 9,
+   "owner": "arjun"
+  },
+  {
+   "name": "maps",
+   "path": "services/maps",
+   "description": "Routing and delivery ETAs",
+   "churn": 23,
+   "complexity": 109,
+   "loc": 3000,
+   "files": 6,
+   "owner": "arjun"
+  },
+  {
+   "name": "notify",
+   "path": "services/notify",
+   "description": "Push notifications and SMS",
+   "churn": 14,
+   "complexity": 44,
+   "loc": 1300,
+   "files": 4,
+   "owner": "rohit"
+  }
+ ],
+ "dependencies": [
+  [
+   "app",
+   "search"
+  ],
+  [
+   "app",
+   "menu"
+  ],
+  [
+   "app",
+   "cart"
+  ],
+  [
+   "app",
+   "orders"
+  ],
+  [
+   "search",
+   "menu"
+  ],
+  [
+   "cart",
+   "menu"
+  ],
+  [
+   "cart",
+   "payments"
+  ],
+  [
+   "cart",
+   "orders"
+  ],
+  [
+   "orders",
+   "partner"
+  ],
+  [
+   "orders",
+   "dispatch"
+  ],
+  [
+   "orders",
+   "notify"
+  ],
+  [
+   "dispatch",
+   "maps"
+  ],
+  [
+   "dispatch",
+   "notify"
+  ],
+  [
+   "partner",
+   "notify"
+  ]
+ ],
+ "files": [
+  [
+   "services/dispatch/assign.py",
+   "dispatch",
+   43,
+   41,
+   980,
+   2050,
+   4
+  ],
+  [
+   "services/dispatch/zones.py",
+   "dispatch",
+   15,
+   17,
+   420,
+   380,
+   2
+  ],
+  [
+   "services/menu/cache.py",
+   "menu",
+   26,
+   19,
+   430,
+   720,
+   3
+  ],
+  [
+   "services/partner/tablet_sync.py",
+   "partner",
+   24,
+   26,
+   560,
+   810,
+   3
+  ],
+  [
+   "services/cart/coupons.py",
+   "cart",
+   28,
+   30,
+   640,
+   990,
+   3
+  ],
+  [
+   "services/payments/create.py",
+   "payments",
+   19,
+   18,
+   470,
+   520,
+   2
+  ],
+  [
+   "services/payments/refunds.py",
+   "payments",
+   13,
+   16,
+   390,
+   330,
+   2
+  ],
+  [
+   "services/app-api/tracking.py",
+   "app",
+   30,
+   22,
+   520,
+   870,
+   3
+  ],
+  [
+   "services/maps/eta.py",
+   "maps",
+   25,
+   33,
+   690,
+   840,
+   2
+  ],
+  [
+   "services/orders/db.py",
+   "orders",
+   12,
+   10,
+   260,
+   210,
+   2
+  ],
+  [
+   "services/orders/status.py",
+   "orders",
+   34,
+   35,
+   820,
+   1330,
+   4
+  ],
+  [
+   "services/search/area_lists.py",
+   "search",
+   17,
+   20,
+   460,
+   440,
+   2
+  ],
+  [
+   "services/menu/queries.sql",
+   "menu",
+   8,
+   3,
+   190,
+   120,
+   1
+  ],
+  [
+   "services/notify/push.py",
+   "notify",
+   10,
+   8,
+   240,
+   230,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "services/dispatch/assign.py",
+   143,
+   "FIXME",
+   "one city-wide assignment batch every 60 s"
+  ],
+  [
+   "services/menu/cache.py",
+   37,
+   "TODO",
+   "invalidate when a restaurant marks a dish sold out"
+  ],
+  [
+   "services/partner/tablet_sync.py",
+   52,
+   "XXX",
+   "long-poll never reconnects after a drop"
+  ],
+  [
+   "services/cart/coupons.py",
+   18,
+   "HACK",
+   "campaign rules copied into code for each season"
+  ],
+  [
+   "services/payments/create.py",
+   66,
+   "TODO",
+   "idempotency key per order"
+  ],
+  [
+   "services/app-api/tracking.py",
+   24,
+   "OPTIMIZE",
+   "apps poll every 2 s; push instead"
+  ],
+  [
+   "services/maps/eta.py",
+   91,
+   "TODO",
+   "use kitchen preparation times"
+  ],
+  [
+   "services/orders/db.py",
+   12,
+   "FIXME",
+   "hourly sales report uses the order pool"
+  ],
+  [
+   "services/payments/refunds.py",
+   40,
+   "TODO",
+   "reconcile failed refunds with the gateway"
+  ],
+  [
+   "services/notify/push.py",
+   15,
+   "TODO",
+   "send through a queue instead of inline"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-701",
+   "title": "Orders waited 30 minutes for riders on Saturday night",
+   "desc": "At 21:00 thousands of orders sat unassigned for up to 30 minutes while riders waited idle nearby.",
+   "module": "dispatch",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 166,
+   "fixed": 165.9,
+   "effort": 12,
+   "by": "ishita",
+   "group": "G-RIDER",
+   "whys": [
+    "Orders sat unassigned for up to 30 minutes",
+    "The city-wide assignment batch took longer than its 60-second interval",
+    "Rider assignment runs as one city-wide batch every 60 seconds"
+   ],
+   "fix": "Shortened the batch to 30 seconds.",
+   "lesson": "A shorter interval made the overlap worse."
+  },
+  {
+   "key": "INC-702",
+   "title": "Customers ordered dishes the restaurant had marked sold out",
+   "desc": "Biryani marked sold out at 20:10 could still be ordered until 21:05; 600 orders were cancelled by restaurants.",
+   "module": "menu",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 158,
+   "fixed": 157,
+   "effort": 6,
+   "by": "rohit",
+   "whys": [
+    "Sold-out dishes could still be ordered",
+    "The app showed availability from an hour-old cache",
+    "Menu availability is cached without invalidation when restaurants change it"
+   ],
+   "fix": "Cut the cache time to 15 minutes.",
+   "lesson": "Fifteen minutes is still a lot of cancelled biryani."
+  },
+  {
+   "key": "INC-703",
+   "title": "Restaurants stopped receiving new orders on their tablets",
+   "desc": "From 20:30 to 20:55 restaurant tablets in two cities showed no new orders; customers were charged and waited.",
+   "module": "partner",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 150,
+   "fixed": 149.9,
+   "effort": 10,
+   "by": "ishita",
+   "group": "G-PARTNER",
+   "whys": [
+    "Tablets showed no new orders for 25 minutes",
+    "The long-poll connection dropped and never reconnected",
+    "The partner tablet keeps one long-poll connection with no reconnect"
+   ],
+   "fix": "Asked restaurants to restart their tablets.",
+   "lesson": "Restaurants should not have to restart anything."
+  },
+  {
+   "key": "INC-704",
+   "title": "IPL50 coupon rejected for first-time users",
+   "desc": "The IPL50 coupon was rejected as 'not eligible' for new users for the first two hours of the campaign.",
+   "module": "cart",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 142,
+   "fixed": 141,
+   "effort": 4,
+   "by": "rohit",
+   "group": "G-COUPON",
+   "whys": [
+    "Eligible users could not apply the coupon",
+    "The eligibility rule was coded for the previous campaign",
+    "Coupon rules are hard-coded for each campaign"
+   ],
+   "fix": "Hot-fixed the eligibility check.",
+   "lesson": "Marketing changes campaigns every week."
+  },
+  {
+   "key": "INC-705",
+   "title": "Search listed restaurants that had closed for the night",
+   "desc": "Customers kept finding restaurants that had closed at 22:00 and their orders were rejected.",
+   "module": "search",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 134,
+   "fixed": 133.9,
+   "effort": 5,
+   "by": "rohit",
+   "whys": [
+    "Closed restaurants appeared in search",
+    "Search read restaurant status from the stale menu cache",
+    "Menu availability is cached without invalidation when restaurants change it"
+   ],
+   "fix": "Filtered by opening hours as well.",
+   "lesson": "Restaurants close early when they run out of food."
+  },
+  {
+   "key": "INC-706",
+   "title": "Customers charged twice after tapping Pay again",
+   "desc": "When payment confirmation was slow, customers tapped Pay again and 420 orders were charged twice.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 126,
+   "fixed": 125,
+   "effort": 6,
+   "by": "arjun",
+   "group": "G-PAYTWICE",
+   "whys": [
+    "Some customers were charged twice",
+    "A second tap created a second payment for the same order",
+    "Payments are created without an idempotency key per order"
+   ],
+   "fix": "Refunded the second payments.",
+   "lesson": "People tap again when nothing happens."
+  },
+  {
+   "key": "INC-707",
+   "title": "App order tracking down during the India-Pakistan match",
+   "desc": "Order tracking returned errors for 20 minutes at the innings break as every open app polled for status.",
+   "module": "app",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 118,
+   "fixed": 117.9,
+   "effort": 10,
+   "by": "shreya",
+   "group": "G-POLL",
+   "whys": [
+    "Order tracking returned errors for 20 minutes",
+    "Every open app polled order status every 2 seconds",
+    "Apps poll order status every 2 seconds with no backoff"
+   ],
+   "fix": "Added servers to the tracking API.",
+   "lesson": "Polling traffic grows with every open app, not every order."
+  },
+  {
+   "key": "INC-708",
+   "title": "ETA showed 15 minutes; orders took 50",
+   "desc": "On Friday night ETAs promised 15 minutes while orders took 45 to 55 minutes; support chats tripled.",
+   "module": "maps",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 110,
+   "fixed": 109,
+   "effort": 5,
+   "by": "ishita",
+   "group": "G-ETA",
+   "whys": [
+    "ETAs were far too optimistic",
+    "ETA used travel distance only and ignored kitchen preparation time",
+    "ETA ignores live kitchen preparation times"
+   ],
+   "fix": "Added a fixed 10 minutes to every ETA.",
+   "lesson": "A fixed buffer is wrong for every kitchen."
+  },
+  {
+   "key": "INC-709",
+   "title": "Rider assignment backlog of 4,000 orders at 21:30",
+   "desc": "During the semi-final innings break the assignment backlog reached 4,000 orders; average wait for a rider was 22 minutes.",
+   "module": "dispatch",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 102,
+   "fixed": 101.9,
+   "effort": 12,
+   "by": "ishita",
+   "group": "G-RIDER",
+   "whys": [
+    "Thousands of orders were waiting for riders",
+    "Each assignment batch ran past 60 seconds and the next one queued behind it",
+    "Rider assignment runs as one city-wide batch every 60 seconds"
+   ],
+   "fix": "Split Bengaluru into two batches by hand.",
+   "lesson": "Every city grows past one batch."
+  },
+  {
+   "key": "INC-710",
+   "title": "Restaurant tablets missed orders for 15 minutes after a network blip",
+   "desc": "After a mobile network blip, tablets in Hyderabad did not show new orders until restaurants restarted them.",
+   "module": "partner",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 94,
+   "fixed": 93,
+   "effort": 8,
+   "by": "rohit",
+   "group": "G-PARTNER",
+   "whys": [
+    "Restaurants did not see new orders",
+    "Tablets did not reconnect after the connection dropped",
+    "The partner tablet keeps one long-poll connection with no reconnect"
+   ],
+   "fix": "Called restaurants to restart tablets.",
+   "lesson": "The same restart, again."
+  },
+  {
+   "key": "INC-711",
+   "title": "Refunds for cancelled orders not received after 7 days",
+   "desc": "Refunds for 1,300 cancelled orders failed at the gateway and were never retried; customers complained on social media.",
+   "module": "payments",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 86,
+   "fixed": 85,
+   "effort": 6,
+   "by": "arjun",
+   "group": "G-REFUND",
+   "whys": [
+    "Customers did not get refunds",
+    "Refund requests that failed at the gateway were never retried or checked",
+    "Refunds are never reconciled with the payment gateway"
+   ],
+   "fix": "Re-sent the failed refunds from a report.",
+   "lesson": "Nobody looks at failed refunds until people complain."
+  },
+  {
+   "key": "INC-712",
+   "title": "Order placement failing with 'pool exhausted' at 20:45",
+   "desc": "New orders failed for 12 minutes at the start of the second innings while the hourly sales report ran.",
+   "module": "orders",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 78,
+   "fixed": 77.9,
+   "effort": 9,
+   "by": "shreya",
+   "whys": [
+    "New orders failed for 12 minutes",
+    "The hourly sales report job held most database connections",
+    "Analytics batch jobs share the order database connection pool"
+   ],
+   "fix": "Stopped the report job.",
+   "lesson": "Reports should never compete with orders."
+  },
+  {
+   "key": "INC-713",
+   "title": "Match-day coupon not applying for eligible users",
+   "desc": "The MATCHDAY coupon failed for eligible users because the code still had last season's dates.",
+   "module": "cart",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 70,
+   "fixed": 69,
+   "effort": 4,
+   "by": "rohit",
+   "group": "G-COUPON",
+   "whys": [
+    "The coupon was rejected for eligible users",
+    "The campaign rule was hard-coded with last season's dates",
+    "Coupon rules are hard-coded for each campaign"
+   ],
+   "fix": "Updated the dates in code.",
+   "lesson": "Every campaign needs a release."
+  },
+  {
+   "key": "INC-714",
+   "title": "Order tracking errors during the final over",
+   "desc": "In the final over of a league match, tracking failed for 10 minutes under polling traffic.",
+   "module": "app",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 62,
+   "fixed": 61.9,
+   "effort": 8,
+   "by": "shreya",
+   "group": "G-POLL",
+   "whys": [
+    "Tracking failed for 10 minutes",
+    "Polling traffic from open apps overloaded the tracking API",
+    "Apps poll order status every 2 seconds with no backoff"
+   ],
+   "fix": "Added more servers again.",
+   "lesson": "The final will be bigger."
+  },
+  {
+   "key": "INC-715",
+   "title": "Checkout showed old prices after restaurants updated menus",
+   "desc": "Customers saw a higher total at payment than in the cart after restaurants raised prices for the match.",
+   "module": "cart",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 52,
+   "fixed": 51,
+   "effort": 5,
+   "by": "nisha",
+   "whys": [
+    "Customers saw a different total at payment",
+    "Cart priced items from the stale menu cache",
+    "Menu availability is cached without invalidation when restaurants change it"
+   ],
+   "fix": "Re-priced carts at payment.",
+   "lesson": "The cache is wrong in three places now."
+  },
+  {
+   "key": "INC-716",
+   "title": "Double charge when the payment page was refreshed",
+   "desc": "Refreshing the payment page during a slow UPI response created a second payment for 150 orders.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 40,
+   "fixed": 39,
+   "effort": 5,
+   "by": "arjun",
+   "group": "G-PAYTWICE",
+   "whys": [
+    "Customers were charged twice",
+    "Refreshing created a second payment for the same order",
+    "Payments are created without an idempotency key per order"
+   ],
+   "fix": "Refunded the duplicates.",
+   "lesson": "Retries and refreshes both need a key."
+  },
+  {
+   "key": "INC-717",
+   "title": "Rainy-night ETAs off by 40 minutes",
+   "desc": "During heavy rain ETAs stayed at 20 minutes while deliveries took an hour.",
+   "module": "maps",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 28,
+   "fixed": 27,
+   "effort": 4,
+   "by": "ishita",
+   "group": "G-ETA",
+   "whys": [
+    "ETAs were wrong in the rain",
+    "ETA ignored kitchen load and slower rides",
+    "ETA ignores live kitchen preparation times"
+   ],
+   "fix": "Added a rain buffer by hand.",
+   "lesson": "Buffers do not know which kitchen is busy."
+  },
+  {
+   "key": "INC-718",
+   "title": "Refunds pending for cancelled IPL-night orders",
+   "desc": "Refunds for orders cancelled on match night are still pending; the gateway rejected a batch and nothing retried it.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 16,
+   "effort": 6,
+   "by": "arjun",
+   "group": "G-REFUND",
+   "whys": [
+    "Refunds are stuck",
+    "The gateway rejected a refund batch and nothing retried it",
+    "Refunds are never reconciled with the payment gateway"
+   ]
+  },
+  {
+   "key": "INC-719",
+   "title": "Riders not assigned for 25 minutes during the semi-final",
+   "desc": "At the innings break orders are waiting 25 minutes for a rider in Bengaluru and Pune.",
+   "module": "dispatch",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 6,
+   "effort": 12,
+   "by": "ishita",
+   "group": "G-RIDER",
+   "whys": [
+    "Orders are waiting 25 minutes for riders",
+    "Assignment batches are overlapping again",
+    "Rider assignment runs as one city-wide batch every 60 seconds"
+   ]
+  },
+  {
+   "key": "INC-720",
+   "title": "Order-delivered notifications sent 30 minutes late",
+   "desc": "Customers received 'Your order is on the way' after it had arrived.",
+   "module": "notify",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 2,
+   "effort": 3,
+   "by": "rohit",
+   "whys": [
+    "Notifications were late",
+    "Push notifications are sent inline and were dropped under load",
+    "Push notifications are sent synchronously without a queue"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-701",
+   "title": "Assign riders continuously from a per-zone queue of workers",
+   "desc": "Each zone has its own queue and worker that assigns riders as orders arrive, instead of one city-wide batch every minute.",
+   "module": "dispatch",
+   "cat": "ARCHITECTURAL",
+   "principal": 20,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "arjun",
+   "incidents": [
+    "INC-701",
+    "INC-709",
+    "INC-719"
+   ],
+   "cause": "Rider assignment runs as one city-wide batch every 60 seconds",
+   "ago": 164,
+   "file": "services/dispatch/assign.py"
+  },
+  {
+   "key": "DEBT-702",
+   "title": "Invalidate the menu cache when a restaurant changes availability or prices",
+   "desc": "Publish an event on every availability or price change and invalidate the cached menu for that restaurant at once.",
+   "module": "menu",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "nisha",
+   "incidents": [
+    "INC-702",
+    "INC-705",
+    "INC-715"
+   ],
+   "cause": "Menu availability is cached without invalidation when restaurants change it",
+   "ago": 156,
+   "file": "services/menu/cache.py"
+  },
+  {
+   "key": "DEBT-703",
+   "title": "Reconnect partner tablets with backoff and redeliver missed orders",
+   "desc": "Tablets reconnect with exponential backoff and jitter after any drop and fetch every order created while they were away.",
+   "module": "partner",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-703",
+    "INC-710"
+   ],
+   "cause": "The partner tablet keeps one long-poll connection with no reconnect",
+   "ago": 148,
+   "file": "services/partner/tablet_sync.py"
+  },
+  {
+   "key": "DEBT-704",
+   "title": "Move coupon rules into configuration",
+   "desc": "Campaign eligibility, dates and limits become configuration that marketing can change without a release.",
+   "module": "cart",
+   "cat": "CODE_SMELL",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "nisha",
+   "incidents": [
+    "INC-704",
+    "INC-713"
+   ],
+   "cause": "Coupon rules are hard-coded for each campaign",
+   "ago": 140,
+   "file": "services/cart/coupons.py"
+  },
+  {
+   "key": "DEBT-705",
+   "title": "Idempotency key per order for payments",
+   "desc": "Create at most one payment per order: a second tap or a refresh returns the payment already in progress.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-706",
+    "INC-716"
+   ],
+   "cause": "Payments are created without an idempotency key per order",
+   "ago": 124,
+   "file": "services/payments/create.py"
+  },
+  {
+   "key": "DEBT-706",
+   "title": "Backoff for order-status polling, with pushed updates",
+   "desc": "Apps poll with backoff from 5 to 30 seconds and receive pushed updates at each milestone, instead of polling every 2 seconds.",
+   "module": "app",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "nisha",
+   "incidents": [
+    "INC-707",
+    "INC-714"
+   ],
+   "cause": "Apps poll order status every 2 seconds with no backoff",
+   "ago": 116,
+   "file": "services/app-api/tracking.py"
+  },
+  {
+   "key": "DEBT-707",
+   "title": "Capture structured kitchen preparation times for ETA",
+   "desc": "Restaurants report structured preparation times per dish and current kitchen load; ETA uses them along with traffic and rain.",
+   "module": "maps",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "arjun",
+   "incidents": [
+    "INC-708",
+    "INC-717"
+   ],
+   "cause": "ETA ignores live kitchen preparation times",
+   "ago": 108,
+   "file": "services/maps/eta.py"
+  },
+  {
+   "key": "DEBT-708",
+   "title": "Reconcile refunds with the payment gateway every hour",
+   "desc": "An hourly job matches every refund with the gateway's report and retries any that failed.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-711",
+    "INC-718"
+   ],
+   "needs": [
+    "DEBT-705"
+   ],
+   "cause": "Refunds are never reconciled with the payment gateway",
+   "ago": 84,
+   "file": "services/payments/refunds.py"
+  },
+  {
+   "key": "DEBT-709",
+   "title": "Separate connection pools for order writes and analytics batch jobs",
+   "desc": "Reports and other batch jobs get their own small pool on a read replica so they can never starve order placement.",
+   "module": "orders",
+   "cat": "INFRASTRUCTURE",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "shreya",
+   "incidents": [
+    "INC-712"
+   ],
+   "cause": "Analytics batch jobs share the order database connection pool",
+   "ago": 76,
+   "file": "services/orders/db.py"
+  },
+  {
+   "key": "DEBT-710",
+   "title": "Serve area restaurant lists from a precomputed cache",
+   "desc": "Precompute the restaurant list for each delivery area every minute and serve it cached, instead of searching on every app open.",
+   "module": "search",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "nisha",
+   "incidents": [],
+   "needs": [
+    "DEBT-702"
+   ],
+   "ago": 60,
+   "file": "services/search/area_lists.py"
+  },
+  {
+   "key": "DEBT-711",
+   "title": "Send push notifications through a durable queue",
+   "desc": "Order milestones publish to a durable queue; workers send push and SMS without slowing the order path.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "rohit",
+   "incidents": [
+    "INC-720"
+   ],
+   "cause": "Push notifications are sent synchronously without a queue",
+   "ago": 3,
+   "file": "services/notify/push.py"
+  },
+  {
+   "key": "DEBT-712",
+   "title": "Index menu items by restaurant and availability",
+   "desc": "Add a composite index on (restaurant, available) so menu reads do not scan every dish.",
+   "module": "menu",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "IDENTIFIED",
+   "priority": "LOW",
+   "owner": "nisha",
+   "incidents": [],
+   "ago": 45,
+   "file": "services/menu/queries.sql"
+  },
+  {
+   "key": "DEBT-713",
+   "title": "Load test match-night dispatch at 10x",
+   "desc": "Replay an IPL innings break at 10 times normal orders against staging before the playoffs.",
+   "module": "dispatch",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "rohit",
+   "incidents": [],
+   "needs": [
+    "DEBT-701"
+   ],
+   "ago": 40
+  },
+  {
+   "key": "DEBT-714",
+   "title": "Use IST for coupon validity windows",
+   "desc": "Coupon start and end times are stored and checked in IST.",
+   "module": "cart",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "nisha",
+   "incidents": [],
+   "ago": 130
+  }
+ ],
+ "spike": {
+  "key": "ipl-final",
+  "name": "IPL final night",
+  "description": "Dinner orders build from 19:00 and peak at the innings break around 21:15 at nine times a normal busy hour, with a second rush after the match ends.",
+  "profile": [
+   0.6,
+   0.4,
+   0.2,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.4,
+   0.8,
+   1.0,
+   1.1,
+   1.4,
+   2.2,
+   2.0,
+   1.2,
+   1.0,
+   1.2,
+   1.6,
+   2.4,
+   4.5,
+   6.5,
+   9.0,
+   7.0,
+   3.0
+  ],
+  "entry": {
+   "app": 1.0,
+   "search": 0.9,
+   "cart": 0.9,
+   "dispatch": 1.0,
+   "payments": 0.8,
+   "partner": 0.8
+  },
+  "baseline": {
+   "app": 0.0911,
+   "cart": 0.0778,
+   "dispatch": 0.0911,
+   "maps": 0.0778,
+   "menu": 0.0911,
+   "notify": 0.0911,
+   "orders": 0.0911,
+   "partner": 0.0911,
+   "payments": 0.0911,
+   "search": 0.0911
+  }
+ }
+}

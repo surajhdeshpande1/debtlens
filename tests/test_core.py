@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from debtlens.core import clustering, economics, engine, graph, ingest, mining, optimiser, playbooks, scenarios, simulation
+from debtlens.core import packs as PK
 from debtlens.core import spike as SPIKE
 from debtlens.core import text as T
 from debtlens.core.tfidf import TfidfModel, cosine_matrix
@@ -388,3 +389,95 @@ def test_bigger_spikes_hurt_more_and_runs_are_reproducible():
     for code in ("healthtech", "ecommerce", "self"):  # every scenario has an event (self uses the custom default)
         r = engine.spike(scenarios.materialize(code), None, 40, runs=50, seed=1)
         assert r["plan"]["hours_used"] <= 40 and r["after"]["hours_lost"] <= r["before"]["hours_lost"]
+
+
+# ----------------------------------------------------------------------------- scenario packs
+
+
+def test_bundled_packs_are_valid_distinct_and_complete():
+    codes = PK.codes()
+    assert len(codes) == 7 and len(set(codes)) == 7
+    assert not set(codes) & {s["code"] for s in scenarios.list_scenarios()}
+    keys = set()
+    for code in codes:
+        pack = PK.get(code)
+        again, warnings = PK.validate(PK.dump(pack))  # a bundled pack survives its own download
+        assert again == pack and warnings == []
+        info = PK.info(pack)
+        assert info["event"] and info["event"]["peak"] > 1 and len(pack["spike"]["profile"]) == SPIKE.HOURS
+        assert pack["tour"]["incident"] in {i["key"] for i in pack["incidents"]}
+        roles = {p["role"] for p in pack["people"].values()}
+        assert roles >= {"admin", "tech_lead", "developer", "qa", "manager", "viewer"}
+        labels = scenarios.labels(pack)
+        assert len(labels["duplicate_groups"]) >= 5 and len(labels["regressions"]) >= 5
+        own = {i["key"] for i in pack["incidents"]} | {d["key"] for d in pack["debts"]}
+        assert not own & keys  # keys never repeat across packs, so switching packs on stage is not confusing
+        keys |= own
+
+
+@pytest.mark.parametrize("code", PK.codes())
+def test_every_pack_runs_every_page_and_simulation(code):
+    pack = PK.get(code)
+    snap = scenarios.materialize(pack)
+    assert snap["project"]["spike"]["key"] == pack["spike"]["key"]
+    _, asg = engine.playbook_assignment(snap)
+    assert all(a["key"] != playbooks.FALLBACK for a in asg.values()), "every debt matches a specific playbook"
+    dash = engine.dashboard(snap)
+    assert dash["top_causes"] and dash["top_causes"][0]["incidents"] >= 3
+    ev = engine.evaluate(snap, scenarios.labels(pack))
+    hybrid = next(r for r in ev["retrieval"] if r["method"] == "Hybrid α=0.4")
+    reg = next(r for r in ev["regression"] if r["configured"])
+    assert hybrid["p@1"] >= 0.75 and reg["precision"] >= 0.8 and reg["recall"] >= 0.3
+    pl = engine.plan(snap, 40)
+    assert 0 < pl["total_weight"] <= 40 and pl["optimal"]
+    fc = engine.forecast(snap, {"runs": 40, "sprints": 6, "budget": 40, "policies": ["optimal", "none"]})
+    assert fc["comparisons"]["optimal_vs_none"]["hours_saved_mean"] > 0
+    cas = engine.cascade(snap, pack["tour"]["cascade_module"], 0.35, 300)
+    assert cas["expected_affected"] > 0
+    sp = engine.spike(snap, None, 40, 80, 17)
+    assert sp["event"]["key"] == pack["spike"]["key"] and sp["event"]["preset"]
+    assert sp["after"]["hours_lost"] < 0.6 * sp["before"]["hours_lost"]
+    assert sp["plan"]["hours_used"] <= 40 and sp["saved_hours"]["mean"] >= sp["regular_plan"]["saved_hours"]["mean"] - 1
+
+
+def test_pack_validation_lists_every_problem():
+    pack = PK.get("tatkal")
+    bad = PK.parse(PK.dump(pack))
+    bad["modules"].append({"name": "Bad Module!"})
+    bad["incidents"][0]["module"] = "nowhere"
+    bad["incidents"][1]["fixed"] = 999
+    bad["incidents"][2]["sev"] = "SEVERE"
+    bad["debts"][0]["needs"] = ["DEBT-404"]
+    bad["debts"][1]["incidents"] = ["INC-000"]
+    bad["debts"][2]["playbook"] = "magic"
+    bad["dependencies"].append(["gateway", "gateway"])
+    bad["spike"]["entry"] = {"moon": 1}
+    with pytest.raises(PK.PackError) as e:
+        PK.validate(bad)
+    text = "\n".join(e.value.problems)
+    for needle in ("'name' must be", "INC-501: module 'nowhere'", "INC-502: 'fixed' (999 days ago) is before",
+                   "'sev' must be one of", "needs unknown debt DEBT-404", "unknown incident INC-000",
+                   "unknown playbook 'magic'", "cannot depend on itself", "unknown module 'moon'"):
+        assert needle in text, needle
+    assert len(e.value.problems) >= 9
+    for raw, msg in ((b"{nope", "not valid JSON"), (b"[1, 2]", "a pack is a JSON object"),
+                     (b"x" * (PK.MAX_BYTES + 1), "larger than"), ({"name": "x"}, "'name' must have at least 2")):
+        with pytest.raises(PK.PackError) as e:
+            PK.validate(raw)
+        assert msg in str(e.value.problems)
+
+
+def test_minimal_pack_gets_defaults_and_a_custom_spike_profile():
+    pack, warnings = PK.validate({
+        "name": "Tiny Shop", "modules": ["web", "db"], "dependencies": [["web", "db"]],
+        "incidents": [{"key": "inc-1", "title": "Checkout down", "module": "web", "ago": 10, "fixed": 9,
+                       "whys": ["Checkout failed", "The database was saturated"]}],
+        "debts": [{"key": "d-1", "title": "Index the orders table", "module": "db", "principal": 4,
+                   "incidents": ["INC-1"]}],
+        "spike": {"name": "Sale", "peak": 6, "start_hour": 20, "duration": 2, "entry": {"web": 1}},
+        "tour": {"incident": "INC-9"}})
+    assert pack["code"] == "tiny-shop" and pack["key"] == "TINY" and pack["incidents"][0]["key"] == "INC-1"
+    assert max(pack["spike"]["profile"]) == 6 and pack["spike"]["profile"][20] == 6
+    assert "tour" not in pack and any("tour" in w for w in warnings)
+    snap = scenarios.materialize(pack)
+    assert engine.spike(snap, None, 10, 40)["event"]["name"] == "Sale"

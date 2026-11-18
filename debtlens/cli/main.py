@@ -22,6 +22,7 @@ from ..core import embeddings as EMB
 from ..core import engine as E
 from ..core import ingest as ING
 from ..core import mining as MIN
+from ..core import packs as PK
 from ..core import scenarios as SC
 from ..core import similarity as SIM
 from .client import Api, CliError, config_dir, load_config, save_config
@@ -33,15 +34,18 @@ incidents_app = typer.Typer(help="Browse and report incidents (record 5 Whys).",
 simulate_app = typer.Typer(help="Simulation Lab: what-if, Monte Carlo forecast, failure injection, load spikes.",
                            no_args_is_help=True)
 model_app = typer.Typer(help="Manage the optional MiniLM model used for semantic similarity.", no_args_is_help=True)
+pack_app = typer.Typer(help="Scenario packs: a whole system on its busiest day, in one JSON file.", no_args_is_help=True)
 app.add_typer(incidents_app, name="incidents")
 app.add_typer(simulate_app, name="simulate")
 app.add_typer(model_app, name="model")
+app.add_typer(pack_app, name="pack")
 
 out = Console(highlight=False)
 err = Console(stderr=True, highlight=False)
 
 ProjectOpt = typer.Option(None, "--project", "-p", help="Website project id (needs `debtlens login`).")
-ScenarioOpt = typer.Option(None, "--scenario", "-s", help="Bundled scenario: fintech, healthtech, ecommerce, college, self.")
+ScenarioOpt = typer.Option(None, "--scenario", "-s", help="Bundled scenario (fintech, healthtech, ecommerce, college, "
+                           "self), a scenario pack code (`debtlens pack list`) or a pack .json file.")
 SnapshotOpt = typer.Option(None, "--snapshot", help="A JSON snapshot exported from the website.")
 JsonOpt = typer.Option(False, "--json", help="Print JSON instead of tables.")
 
@@ -104,11 +108,21 @@ class Source:
                 err.print("[dim]offline: using the bundled fintech scenario (pass --scenario, --project or --snapshot)[/]")
 
     def _load_scenario(self, code: str):
+        path = Path(code).expanduser()
+        if code.lower().endswith(".json") or path.is_file():
+            pack = read_pack(path)
+            self._snap = SC.materialize(pack)
+            self.kind, self.label, self.code = "scenario", f"pack {pack['name']} ({path.name})", pack["code"]
+            self.pack = pack
+            return
         code = code.lower()
-        if code not in {s["code"] for s in SC.list_scenarios()}:
-            raise CliError(f"unknown scenario '{code}' — try: {', '.join(s['code'] for s in SC.list_scenarios())}")
+        if not SC.known(code):
+            raise CliError(f"unknown scenario '{code}' — try: "
+                           f"{', '.join([s['code'] for s in SC.list_scenarios()] + PK.codes())}, or a pack .json file")
         self._snap = SC.materialize(code)
-        self.kind, self.label, self.code = "scenario", f"scenario {code}", code
+        kind = "pack" if code in PK.codes() else "scenario"
+        self.kind, self.label, self.code = "scenario", f"{kind} {code}", code
+
 
     @property
     def remote(self) -> bool:
@@ -133,6 +147,17 @@ class Source:
         p = self.snap().get("project") or {}
         return f"{p.get('name', 'Project')} · {p.get('industry') or self.label}"
 
+
+def read_pack(path: Path) -> dict:
+    """Load and check a pack file; every problem is reported at once."""
+    try:
+        pack, warnings = PK.load_file(path)
+    except PK.PackError as e:
+        raise CliError(f"{path} is not a usable pack:\n  " + "\n  ".join(e.problems[:40])
+                       + ("\n  …" if len(e.problems) > 40 else "")) from None
+    for w in warnings[:10]:
+        err.print(f"[yellow]note[/] {w}")
+    return pack
 
 def embedder():
     """MiniLM if it has been downloaded (`debtlens model download`), else None (char n-gram fallback)."""
@@ -181,16 +206,116 @@ def table(*cols, title: str | None = None) -> Table:
 
 @app.command()
 def scenarios(as_json: bool = JsonOpt):
-    """List the bundled industry scenarios."""
+    """List the bundled industry scenarios and scenario packs."""
     rows = SC.list_scenarios()
+    packs = PK.list_packs()
     if as_json:
-        return emit_json(rows)
+        return emit_json(rows + packs)
     t = table("code", "name", "industry", ("incidents", "right"), ("debts", "right"), ("modules", "right"), "about")
     for s in rows:
         t.add_row(f"[cyan]{s['code']}[/]", s["name"], s["industry"], str(s["counts"]["incidents"]), str(s["counts"]["debts"]),
                   str(s["counts"]["modules"]), s["tagline"])
+    for s in packs:
+        t.add_row(f"[magenta]{s['code']}[/]", s["name"], s["industry"], str(s["counts"]["incidents"]),
+                  str(s["counts"]["debts"]), str(s["counts"]["modules"]),
+                  f"pack · {s['event']['name']}" if s.get("event") else "pack")
     out.print(t)
-    out.print("[dim]Try: debtlens demo healthtech · debtlens plan -s college --budget 40[/]")
+    out.print("[dim]Try: debtlens demo healthtech · debtlens plan -s college --budget 40 · "
+              "debtlens simulate spike -s tatkal[/]")
+
+
+# ----------------------------------------------------------------------------- scenario packs
+
+@pack_app.command("list")
+def pack_list(as_json: bool = JsonOpt):
+    """The bundled scenario packs and the event each one is built around."""
+    rows = PK.list_packs()
+    if as_json:
+        return emit_json(rows)
+    t = table("code", "name", "industry", "busiest day", ("peak", "right"), ("incidents", "right"), ("debts", "right"))
+    for s in rows:
+        ev = s.get("event") or {}
+        t.add_row(f"[magenta]{s['code']}[/]", s["name"], s["industry"], ev.get("name", "—"),
+                  f"{ev['peak']:g}× at {ev['peak_hour']:02d}:00" if ev else "—",
+                  str(s["counts"]["incidents"]), str(s["counts"]["debts"]))
+    out.print(t)
+    out.print("[dim]Open one: debtlens demo tatkal · debtlens simulate spike -s tatkal · "
+              "copy one to edit: debtlens pack export tatkal[/]")
+
+
+def _pack_arg(ref: str) -> dict:
+    p = Path(ref).expanduser()
+    if ref.lower().endswith(".json") or p.is_file():
+        return read_pack(p)
+    try:
+        return PK.get(ref.lower())
+    except KeyError:
+        raise CliError(f"no pack '{ref}' — try: {', '.join(PK.codes())}, or a .json file") from None
+
+
+@pack_app.command("show")
+def pack_show(ref: str = typer.Argument(..., help="Pack code or .json file."), as_json: bool = JsonOpt):
+    """What a pack contains: modules, incidents, debt and its load-spike event."""
+    pack = _pack_arg(ref)
+    if as_json:
+        return emit_json(PK.info(pack))
+    i = PK.info(pack)
+    out.print(f"[bold]{pack['name']}[/] · {pack['industry']} [dim]({pack['code']})[/]")
+    if pack.get("tagline"):
+        out.print(pack["tagline"])
+    out.print(f"{i['counts']['modules']} modules · {len(pack['dependencies'])} dependencies · "
+              f"{i['counts']['incidents']} incidents · {i['counts']['debts']} debt items · "
+              f"{len(pack['files'])} files · {len(pack['satd'])} TODO/FIXME markers")
+    ev = i.get("event")
+    if ev:
+        out.print(f"Busiest day: [bold]{ev['name']}[/] — {ev['peak']:g}× a normal peak at {ev['peak_hour']:02d}:00")
+        if ev.get("description"):
+            out.print(f"[dim]{ev['description']}[/]")
+    if i.get("headline"):
+        out.print(f"Story: {i['headline']}")
+    t = table("module", ("incidents", "right"), ("debts", "right"), "owner")
+    for m in pack["modules"]:
+        t.add_row(m["name"], str(sum(1 for x in pack["incidents"] if x["module"] == m["name"])),
+                  str(sum(1 for x in pack["debts"] if x["module"] == m["name"])),
+                  (pack["people"].get(m.get("owner") or "", {}) or {}).get("name", "—"))
+    out.print(t)
+
+
+@pack_app.command("validate")
+def pack_validate(file: Path = typer.Argument(..., help="Pack .json file."), as_json: bool = JsonOpt):
+    """Check a pack file: every problem at once, so it can be fixed in one pass."""
+    try:
+        pack, warnings = PK.load_file(file)
+    except PK.PackError as e:
+        if as_json:
+            emit_json({"valid": False, "problems": e.problems})
+        else:
+            err.print(f"[red]✗ {file} has {len(e.problems)} problem{'s' if len(e.problems) != 1 else ''}[/]")
+            for p in e.problems:
+                err.print(f"  • {p}")
+        raise typer.Exit(1) from None
+    if as_json:
+        return emit_json({"valid": True, "warnings": warnings, "info": PK.info(pack)})
+    i = PK.info(pack)
+    out.print(f"[green]✓ {file} is a valid pack[/]: {pack['name']} — {i['counts']['modules']} modules, "
+              f"{i['counts']['incidents']} incidents, {i['counts']['debts']} debt items"
+              + (f", event: {i['event']['name']}" if i.get("event") else ", no load-spike event"))
+    for w in warnings:
+        out.print(f"  [yellow]note[/] {w}")
+    out.print(f"[dim]Use it: debtlens demo {file} · debtlens simulate spike -s {file} · or upload it on the website[/]")
+
+
+@pack_app.command("export")
+def pack_export(code: str = typer.Argument(..., help="Bundled pack code."),
+                output: Optional[Path] = typer.Option(None, "--output", "-o", help="File to write (default <code>.json).")):
+    """Write a bundled pack to a file — edit it, then upload it or pass it back with --scenario."""
+    try:
+        pack = PK.get(code.lower())
+    except KeyError:
+        raise CliError(f"no pack '{code}' — try: {', '.join(PK.codes())}") from None
+    dest = output or Path(f"{pack['code']}.json")
+    dest.write_text(PK.dump(pack), encoding="utf-8")
+    out.print(f"[green]✓[/] wrote {dest} ({dest.stat().st_size // 1000} KB)")
 
 
 @app.command()

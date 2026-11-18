@@ -1,0 +1,1082 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "broker",
+ "order": 2,
+ "key": "NVST",
+ "name": "NiveshTrade",
+ "industry": "Stock broking",
+ "tagline": "A discount stock broker where 09:15 is the moment of truth",
+ "summary": "NiveshTrade serves 40 lakh investors: live prices, charts, order placement, risk checks, exchange connectivity, holdings, funds and alerts. Every trading day opens at 09:15 with a burst of orders, and on Budget day the Finance Minister's speech moves the whole market. Frozen prices, orders stuck in 'pending' and slow margin checks keep coming back.",
+ "repository_url": "https://github.com/example/niveshtrade (fictional)",
+ "tour": {
+  "incident": "INC-620",
+  "debt": "DEBT-603",
+  "module": "exchange",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "The exchange gateway has no circuit breaker or failover line, so every line drop leaves orders stuck in 'pending'; fixing it costs 14 hours."
+ },
+ "people": {
+  "sanjay": {
+   "name": "Sanjay Kulkarni",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "ananya": {
+   "name": "Ananya Iyer",
+   "role": "tech_lead",
+   "title": "Engineering lead, trading"
+  },
+  "vikram": {
+   "name": "Vikram Rathore",
+   "role": "developer",
+   "title": "Developer, orders & risk"
+  },
+  "farah": {
+   "name": "Farah Khan",
+   "role": "developer",
+   "title": "Developer, market data & funds"
+  },
+  "nitin": {
+   "name": "Nitin Patil",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "deepika": {
+   "name": "Deepika Menon",
+   "role": "manager",
+   "title": "Product manager, trading"
+  },
+  "guest": {
+   "name": "Compliance team",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "auth",
+   "path": "services/auth",
+   "description": "Login and two-factor authentication",
+   "churn": 18,
+   "complexity": 66,
+   "loc": 1900,
+   "files": 5,
+   "owner": "farah"
+  },
+  {
+   "name": "marketdata",
+   "path": "services/marketdata",
+   "description": "Live tick feed over websockets",
+   "churn": 46,
+   "complexity": 142,
+   "loc": 3600,
+   "files": 8,
+   "owner": "farah"
+  },
+  {
+   "name": "charts",
+   "path": "services/charts",
+   "description": "Historical candles and indicators",
+   "churn": 21,
+   "complexity": 83,
+   "loc": 2400,
+   "files": 6,
+   "owner": "farah"
+  },
+  {
+   "name": "orders",
+   "path": "services/oms",
+   "description": "Order management: place, modify, cancel",
+   "churn": 61,
+   "complexity": 214,
+   "loc": 5600,
+   "files": 12,
+   "owner": "vikram"
+  },
+  {
+   "name": "rms",
+   "path": "services/rms",
+   "description": "Risk management: margin and exposure checks",
+   "churn": 44,
+   "complexity": 177,
+   "loc": 4200,
+   "files": 9,
+   "owner": "vikram"
+  },
+  {
+   "name": "exchange",
+   "path": "services/exchange",
+   "description": "Order routing to the exchanges over leased lines",
+   "churn": 33,
+   "complexity": 129,
+   "loc": 3100,
+   "files": 7,
+   "owner": "vikram"
+  },
+  {
+   "name": "portfolio",
+   "path": "services/portfolio",
+   "description": "Holdings, positions and P&L",
+   "churn": 27,
+   "complexity": 101,
+   "loc": 2900,
+   "files": 7,
+   "owner": "farah"
+  },
+  {
+   "name": "funds",
+   "path": "services/funds",
+   "description": "Add funds by UPI and net banking, withdrawals",
+   "churn": 25,
+   "complexity": 92,
+   "loc": 2600,
+   "files": 6,
+   "owner": "farah"
+  },
+  {
+   "name": "notify",
+   "path": "services/notify",
+   "description": "Order alerts by push, SMS and email",
+   "churn": 12,
+   "complexity": 41,
+   "loc": 1200,
+   "files": 4,
+   "owner": "nitin"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "Orders, positions and ledger database",
+   "churn": 8,
+   "complexity": 28,
+   "loc": 800,
+   "files": 5,
+   "owner": "ananya"
+  }
+ ],
+ "dependencies": [
+  [
+   "orders",
+   "auth"
+  ],
+  [
+   "orders",
+   "rms"
+  ],
+  [
+   "orders",
+   "exchange"
+  ],
+  [
+   "orders",
+   "db"
+  ],
+  [
+   "orders",
+   "notify"
+  ],
+  [
+   "rms",
+   "portfolio"
+  ],
+  [
+   "rms",
+   "funds"
+  ],
+  [
+   "portfolio",
+   "marketdata"
+  ],
+  [
+   "portfolio",
+   "db"
+  ],
+  [
+   "charts",
+   "marketdata"
+  ],
+  [
+   "funds",
+   "db"
+  ],
+  [
+   "exchange",
+   "db"
+  ],
+  [
+   "auth",
+   "db"
+  ]
+ ],
+ "files": [
+  [
+   "services/marketdata/fanout.py",
+   "marketdata",
+   38,
+   34,
+   760,
+   1720,
+   4
+  ],
+  [
+   "services/marketdata/subscriptions.py",
+   "marketdata",
+   16,
+   15,
+   380,
+   420,
+   2
+  ],
+  [
+   "services/rms/check.py",
+   "rms",
+   35,
+   39,
+   880,
+   1610,
+   3
+  ],
+  [
+   "services/rms/margin_rules.py",
+   "rms",
+   22,
+   27,
+   540,
+   690,
+   3
+  ],
+  [
+   "services/exchange/router.py",
+   "exchange",
+   29,
+   31,
+   720,
+   1150,
+   3
+  ],
+  [
+   "services/oms/place.py",
+   "orders",
+   40,
+   36,
+   910,
+   1830,
+   4
+  ],
+  [
+   "services/oms/state.py",
+   "orders",
+   31,
+   33,
+   640,
+   1240,
+   3
+  ],
+  [
+   "services/funds/upi.py",
+   "funds",
+   20,
+   18,
+   450,
+   600,
+   2
+  ],
+  [
+   "services/funds/reconcile.py",
+   "funds",
+   5,
+   7,
+   170,
+   90,
+   1
+  ],
+  [
+   "services/auth/login.py",
+   "auth",
+   15,
+   17,
+   400,
+   380,
+   2
+  ],
+  [
+   "services/portfolio/history.py",
+   "portfolio",
+   14,
+   16,
+   420,
+   330,
+   2
+  ],
+  [
+   "services/charts/candles.sql",
+   "charts",
+   9,
+   4,
+   210,
+   150,
+   2
+  ],
+  [
+   "services/notify/alerts.py",
+   "notify",
+   11,
+   9,
+   260,
+   240,
+   2
+  ],
+  [
+   "infra/db/pools.py",
+   "db",
+   6,
+   8,
+   150,
+   90,
+   1
+  ]
+ ],
+ "satd": [
+  [
+   "services/marketdata/fanout.py",
+   57,
+   "FIXME",
+   "single loop pushes every tick to every socket"
+  ],
+  [
+   "services/rms/check.py",
+   102,
+   "OPTIMIZE",
+   "reads holdings and ledger from the DB for every order"
+  ],
+  [
+   "services/exchange/router.py",
+   88,
+   "TODO",
+   "fail over to the backup leased line"
+  ],
+  [
+   "services/oms/place.py",
+   61,
+   "TODO",
+   "dedupe orders by client order id"
+  ],
+  [
+   "services/oms/state.py",
+   133,
+   "XXX",
+   "cancel and fill updates can race"
+  ],
+  [
+   "services/funds/upi.py",
+   47,
+   "HACK",
+   "we trust the UPI callback; nothing re-checks it"
+  ],
+  [
+   "services/rms/margin_rules.py",
+   12,
+   "TODO",
+   "peak margin percentages should be configuration"
+  ],
+  [
+   "services/auth/login.py",
+   33,
+   "TODO",
+   "rate limit and backoff for login retries"
+  ],
+  [
+   "services/charts/candles.sql",
+   4,
+   "OPTIMIZE",
+   "no index on (symbol, ts)"
+  ],
+  [
+   "infra/db/pools.py",
+   18,
+   "FIXME",
+   "contract-note batch shares the trading pool"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-601",
+   "title": "Live prices froze for 3 minutes at market open",
+   "desc": "At 09:15 the price feed stopped updating for every user until 09:18; investors traded on stale prices.",
+   "module": "marketdata",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 168,
+   "fixed": 167.95,
+   "effort": 12,
+   "by": "nitin",
+   "group": "G-TICKS",
+   "whys": [
+    "Prices stopped updating at 09:15",
+    "The tick fan-out loop fell behind when subscriptions jumped at the open",
+    "One process fans out every tick to every socket in a single loop"
+   ],
+   "fix": "Restarted the feed process at 09:18.",
+   "lesson": "The open is the one moment the feed must not stall."
+  },
+  {
+   "key": "INC-602",
+   "title": "Login and two-factor failing for 6 minutes before the opening bell",
+   "desc": "From 09:12 to 09:18 most logins failed; the app retried every failed login immediately.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.9,
+   "effort": 6,
+   "by": "nitin",
+   "group": "G-LOGIN",
+   "whys": [
+    "Investors could not log in before 09:15",
+    "The app retried failed logins instantly and multiplied the traffic",
+    "Login has no rate limiting or backoff, so app retries become a storm"
+   ],
+   "fix": "Scaled the login service up for the morning.",
+   "lesson": "Retries without backoff turn a blip into an outage."
+  },
+  {
+   "key": "INC-603",
+   "title": "Orders took 8 seconds to be accepted at 09:15",
+   "desc": "Order acceptance slowed from 200 ms to 8 seconds in the first five minutes of trading.",
+   "module": "rms",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151.9,
+   "effort": 8,
+   "by": "vikram",
+   "group": "G-RMSSLOW",
+   "whys": [
+    "Order acceptance slowed to 8 seconds",
+    "Every order's margin check queried holdings and ledger balances",
+    "The RMS check reads holdings and margins from the database for every order"
+   ],
+   "fix": "Added database read capacity.",
+   "lesson": "Every order paying for the same reads does not scale."
+  },
+  {
+   "key": "INC-604",
+   "title": "Charts take 20 seconds to load for 5-year ranges",
+   "desc": "Long-range charts loaded slowly or timed out for popular stocks.",
+   "module": "charts",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 144,
+   "fixed": 143,
+   "effort": 4,
+   "by": "farah",
+   "whys": [
+    "Long-range charts were very slow",
+    "Candle queries scanned the whole candles table",
+    "Candle tables have no index on symbol and time"
+   ],
+   "fix": "Capped charts at 2 years.",
+   "lesson": "Users want the 5-year chart."
+  },
+  {
+   "key": "INC-605",
+   "title": "Orders stuck in 'pending' when the primary exchange line dropped",
+   "desc": "The primary leased line to the exchange dropped at 11:02 and orders stayed pending for 11 minutes.",
+   "module": "exchange",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 136,
+   "fixed": 135.95,
+   "effort": 12,
+   "by": "ananya",
+   "group": "G-PENDING",
+   "whys": [
+    "Orders were not confirmed for 11 minutes",
+    "Every order kept retrying the dead primary line",
+    "The exchange gateway has no circuit breaker or failover to the backup line"
+   ],
+   "fix": "Switched to the backup line by hand.",
+   "lesson": "Eleven minutes of pending orders on a volatile day is a disaster."
+  },
+  {
+   "key": "INC-606",
+   "title": "Order executed after the investor cancelled it",
+   "desc": "An investor cancelled a limit order; the fill arrived at the same moment and both updates were applied.",
+   "module": "orders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 128,
+   "fixed": 127,
+   "effort": 6,
+   "by": "vikram",
+   "whys": [
+    "A cancelled order was executed",
+    "The cancel and fill updates were applied out of order",
+    "Order updates are applied without row-level locking or version checks"
+   ],
+   "fix": "Reversed the trade with the investor's consent.",
+   "lesson": "Order state needs a single, ordered writer."
+  },
+  {
+   "key": "INC-607",
+   "title": "Same buy order placed twice after the app retried",
+   "desc": "Investors on slow networks got two identical buy orders; the app retried after 3 seconds and the OMS accepted both.",
+   "module": "orders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 120,
+   "fixed": 119,
+   "effort": 7,
+   "by": "deepika",
+   "group": "G-DUPORDER",
+   "whys": [
+    "Investors got two identical orders",
+    "The app retried after a slow response and both orders were accepted",
+    "Orders are accepted without a client order ID to detect repeats"
+   ],
+   "fix": "Cancelled the duplicates and compensated losses.",
+   "lesson": "Any retry can double an order."
+  },
+  {
+   "key": "INC-608",
+   "title": "UPI fund additions not reflected in trading balance",
+   "desc": "Money added by UPI between 09:00 and 09:20 did not appear in the trading balance for 2 hours.",
+   "module": "funds",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 112,
+   "fixed": 111,
+   "effort": 6,
+   "by": "farah",
+   "group": "G-FUNDS",
+   "whys": [
+    "Money added by UPI did not show up",
+    "The bank's confirmation callback was lost",
+    "Fund additions are never reconciled with the bank statement"
+   ],
+   "fix": "Credited the balances from the bank's file.",
+   "lesson": "We relied on a callback that can be lost."
+  },
+  {
+   "key": "INC-609",
+   "title": "Holdings page shows yesterday's quantities after 15:30",
+   "desc": "During the contract-note run, holdings and positions showed stale quantities for 40 minutes.",
+   "module": "portfolio",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103,
+   "effort": 4,
+   "by": "nitin",
+   "whys": [
+    "Holdings were stale after 15:30",
+    "Portfolio queries waited for database connections",
+    "Back-office batch jobs share the trading database pool during market hours"
+   ],
+   "fix": "Moved the job to 16:00.",
+   "lesson": "The batch still runs while trading systems need the database."
+  },
+  {
+   "key": "INC-610",
+   "title": "Price feed lagged 90 seconds on results day",
+   "desc": "When a large company announced results, subscriptions tripled and prices lagged by 90 seconds.",
+   "module": "marketdata",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95.95,
+   "effort": 10,
+   "by": "nitin",
+   "group": "G-TICKS",
+   "whys": [
+    "Prices lagged by 90 seconds",
+    "The fan-out loop could not keep up with the surge in subscriptions",
+    "One process fans out every tick to every socket in a single loop"
+   ],
+   "fix": "Moved half the users to a second feed process.",
+   "lesson": "Splitting users by hand is not a design."
+  },
+  {
+   "key": "INC-611",
+   "title": "Two-factor login storm at 09:14 locks out investors",
+   "desc": "Login requests tripled at 09:14 as apps retried failures instantly; many investors were locked out.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87.9,
+   "effort": 6,
+   "by": "nitin",
+   "group": "G-LOGIN",
+   "whys": [
+    "Logins failed just before the open",
+    "Apps retried instantly and overwhelmed the login service",
+    "Login has no rate limiting or backoff, so app retries become a storm"
+   ],
+   "fix": "Released an app update that waits 1 second before retrying.",
+   "lesson": "Old app versions still retry instantly."
+  },
+  {
+   "key": "INC-612",
+   "title": "Margin checks slow at open; orders rejected with a timeout",
+   "desc": "Orders were rejected with 'RMS timeout' between 09:15 and 09:21 on expiry day.",
+   "module": "rms",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 76,
+   "fixed": 75.9,
+   "effort": 8,
+   "by": "vikram",
+   "group": "G-RMSSLOW",
+   "whys": [
+    "Orders were rejected at 09:15",
+    "Margin checks took over 5 seconds each",
+    "The RMS check reads holdings and margins from the database for every order"
+   ],
+   "fix": "Raised the RMS time limit.",
+   "lesson": "A longer limit only delays the rejection."
+  },
+  {
+   "key": "INC-613",
+   "title": "Wrong margin blocked after the peak-margin circular",
+   "desc": "After a margin rule change, intraday orders were blocked with excess margin for one day.",
+   "module": "rms",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 66,
+   "fixed": 65,
+   "effort": 5,
+   "by": "deepika",
+   "whys": [
+    "Investors were blocked with excess margin",
+    "The new margin percentage was updated in only one code path",
+    "Margin rules are hard-coded in the RMS code"
+   ],
+   "fix": "Patched the second code path.",
+   "lesson": "Regulator rules change; code releases should not be needed."
+  },
+  {
+   "key": "INC-614",
+   "title": "Orders pending for 7 minutes during an exchange line flap",
+   "desc": "The primary exchange line flapped for 7 minutes and orders hung in pending until it stabilised.",
+   "module": "exchange",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 54,
+   "fixed": 53.95,
+   "effort": 10,
+   "by": "ananya",
+   "group": "G-PENDING",
+   "whys": [
+    "Orders stayed pending",
+    "Order routing kept waiting on the failing primary line",
+    "The exchange gateway has no circuit breaker or failover to the backup line"
+   ],
+   "fix": "Waited for the line to recover.",
+   "lesson": "The backup line sat idle the whole time."
+  },
+  {
+   "key": "INC-615",
+   "title": "Order execution alerts arriving 10 minutes late",
+   "desc": "Push and SMS alerts for executed orders were delayed by up to 10 minutes at the open.",
+   "module": "notify",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 44,
+   "fixed": 43,
+   "effort": 3,
+   "by": "nitin",
+   "whys": [
+    "Alerts were late",
+    "Alerts are sent inline by the order service and were dropped under load",
+    "Order alerts are sent synchronously without a queue"
+   ],
+   "fix": "Re-sent the missed alerts.",
+   "lesson": "Alerts should never slow the order path."
+  },
+  {
+   "key": "INC-616",
+   "title": "Duplicate sell orders after a slow network response",
+   "desc": "An investor sold twice the intended quantity when the app retried a sell order on a slow mobile network.",
+   "module": "orders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 30,
+   "fixed": 29,
+   "effort": 6,
+   "by": "deepika",
+   "group": "G-DUPORDER",
+   "whys": [
+    "An investor sold twice the intended quantity",
+    "The retried order was accepted as a new order",
+    "Orders are accepted without a client order ID to detect repeats"
+   ],
+   "fix": "Bought back the extra quantity.",
+   "lesson": "The same bug, a costlier day."
+  },
+  {
+   "key": "INC-617",
+   "title": "Funds added this morning not available for trading",
+   "desc": "UPI additions made before 09:15 are missing from trading balances; investors cannot buy.",
+   "module": "funds",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 19,
+   "effort": 6,
+   "by": "farah",
+   "group": "G-FUNDS",
+   "whys": [
+    "Fund additions are missing",
+    "Bank callbacks failed and nothing re-checked them",
+    "Fund additions are never reconciled with the bank statement"
+   ]
+  },
+  {
+   "key": "INC-618",
+   "title": "Orders rejected with 'pool exhausted' at 15:20",
+   "desc": "In the last 10 minutes of trading, order placement failed for 6 minutes while the contract-note job ran early.",
+   "module": "orders",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 12,
+   "fixed": 11.95,
+   "effort": 8,
+   "by": "ananya",
+   "whys": [
+    "Orders failed in the last 10 minutes of trading",
+    "The contract-note job held most database connections",
+    "Back-office batch jobs share the trading database pool during market hours"
+   ],
+   "fix": "Killed the contract-note job.",
+   "lesson": "Back office and trading must not share connections."
+  },
+  {
+   "key": "INC-619",
+   "title": "Live prices frozen for 2 minutes after the open",
+   "desc": "Prices froze again at 09:15 this morning; the feed caught up at 09:17.",
+   "module": "marketdata",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 5,
+   "effort": 10,
+   "by": "nitin",
+   "group": "G-TICKS",
+   "whys": [
+    "Prices stopped updating at the open",
+    "The fan-out loop could not keep up with new subscriptions",
+    "One process fans out every tick to every socket in a single loop"
+   ]
+  },
+  {
+   "key": "INC-620",
+   "title": "Orders stuck in pending again during a line failure",
+   "desc": "The primary exchange line failed at 10:40 and orders have been pending for 9 minutes.",
+   "module": "exchange",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 1,
+   "effort": 10,
+   "by": "ananya",
+   "group": "G-PENDING",
+   "whys": [
+    "Orders are stuck in pending",
+    "Routing keeps retrying the failed primary line",
+    "The exchange gateway has no circuit breaker or failover to the backup line"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-601",
+   "title": "Fan out ticks through a message queue to socket workers",
+   "desc": "Publish each tick once to a message queue and let a pool of socket workers push it to subscribers, so the open cannot stall one loop.",
+   "module": "marketdata",
+   "cat": "ARCHITECTURAL",
+   "principal": 20,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "farah",
+   "incidents": [
+    "INC-601",
+    "INC-610",
+    "INC-619"
+   ],
+   "cause": "One process fans out every tick to every socket in a single loop",
+   "ago": 166,
+   "file": "services/marketdata/fanout.py"
+  },
+  {
+   "key": "DEBT-602",
+   "title": "Serve RMS checks from cached holdings and margins",
+   "desc": "Keep each account's holdings, limits and ledger balance cached in memory, updated on every fill and fund change, so a margin check never reads the database.",
+   "module": "rms",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "vikram",
+   "incidents": [
+    "INC-603",
+    "INC-612"
+   ],
+   "cause": "The RMS check reads holdings and margins from the database for every order",
+   "ago": 150,
+   "file": "services/rms/check.py"
+  },
+  {
+   "key": "DEBT-603",
+   "title": "Circuit breaker with failover to the backup exchange line",
+   "desc": "Open a circuit breaker when the primary line fails and fail over to the backup line within seconds; close it again when the primary recovers.",
+   "module": "exchange",
+   "cat": "ARCHITECTURAL",
+   "principal": 14,
+   "status": "PRIORITIZED",
+   "priority": "CRITICAL",
+   "owner": "vikram",
+   "incidents": [
+    "INC-605",
+    "INC-614",
+    "INC-620"
+   ],
+   "cause": "The exchange gateway has no circuit breaker or failover to the backup line",
+   "ago": 134,
+   "file": "services/exchange/router.py"
+  },
+  {
+   "key": "DEBT-604",
+   "title": "Client order IDs to make order placement idempotent",
+   "desc": "Every order carries a client order ID; a repeat with the same ID returns the first order instead of creating a new one.",
+   "module": "orders",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "vikram",
+   "incidents": [
+    "INC-607",
+    "INC-616"
+   ],
+   "cause": "Orders are accepted without a client order ID to detect repeats",
+   "ago": 118,
+   "file": "services/oms/place.py"
+  },
+  {
+   "key": "DEBT-605",
+   "title": "Row-level locks and a version column on order updates",
+   "desc": "Apply cancel, modify and fill updates under a row lock with a version check so they cannot be applied out of order.",
+   "module": "orders",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "vikram",
+   "incidents": [
+    "INC-606"
+   ],
+   "cause": "Order updates are applied without row-level locking or version checks",
+   "ago": 126,
+   "file": "services/oms/state.py"
+  },
+  {
+   "key": "DEBT-606",
+   "title": "Reconcile UPI fund additions with the bank every 10 minutes",
+   "desc": "Match every UPI and net-banking credit in the bank statement with a fund addition and credit any that were missed.",
+   "module": "funds",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "farah",
+   "incidents": [
+    "INC-608",
+    "INC-617"
+   ],
+   "cause": "Fund additions are never reconciled with the bank statement",
+   "ago": 110,
+   "file": "services/funds/reconcile.py"
+  },
+  {
+   "key": "DEBT-607",
+   "title": "Rate limits and exponential backoff for login retries",
+   "desc": "Server-side rate limits per account and IP, and clients that back off with jitter after a failed login.",
+   "module": "auth",
+   "cat": "CODE_SMELL",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "farah",
+   "incidents": [
+    "INC-602",
+    "INC-611"
+   ],
+   "cause": "Login has no rate limiting or backoff, so app retries become a storm",
+   "ago": 158,
+   "file": "services/auth/login.py"
+  },
+  {
+   "key": "DEBT-608",
+   "title": "Separate connection pools for trading and back-office batch jobs",
+   "desc": "Give the contract-note and other back-office batch jobs their own small connection pool so they can never starve order placement.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "ananya",
+   "incidents": [
+    "INC-609",
+    "INC-618"
+   ],
+   "cause": "Back-office batch jobs share the trading database pool during market hours",
+   "ago": 102,
+   "file": "infra/db/pools.py"
+  },
+  {
+   "key": "DEBT-609",
+   "title": "Composite index on candles by symbol and time",
+   "desc": "Index the candles table on (symbol, timestamp) so long-range charts read only the rows they draw.",
+   "module": "charts",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "farah",
+   "incidents": [
+    "INC-604"
+   ],
+   "cause": "Candle tables have no index on symbol and time",
+   "ago": 142,
+   "file": "services/charts/candles.sql"
+  },
+  {
+   "key": "DEBT-610",
+   "title": "Send order alerts through a durable queue",
+   "desc": "The order service publishes alert events to a durable queue; a worker sends push, SMS and email.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "nitin",
+   "incidents": [
+    "INC-615"
+   ],
+   "cause": "Order alerts are sent synchronously without a queue",
+   "ago": 42,
+   "file": "services/notify/alerts.py"
+  },
+  {
+   "key": "DEBT-611",
+   "title": "Move margin rules into configuration",
+   "desc": "Margin percentages and peak-margin rules become configuration with an effective date, used by every code path.",
+   "module": "rms",
+   "cat": "CODE_SMELL",
+   "principal": 5,
+   "status": "IN_PROGRESS",
+   "priority": "MEDIUM",
+   "owner": "vikram",
+   "incidents": [
+    "INC-613"
+   ],
+   "cause": "Margin rules are hard-coded in the RMS code",
+   "ago": 64,
+   "file": "services/rms/margin_rules.py"
+  },
+  {
+   "key": "DEBT-612",
+   "title": "Load test the market open at 15x before Budget day",
+   "desc": "Replay a market open at 15 times normal order traffic against staging before Budget day and each monthly expiry.",
+   "module": "orders",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "nitin",
+   "incidents": [],
+   "needs": [
+    "DEBT-601"
+   ],
+   "ago": 50
+  },
+  {
+   "key": "DEBT-613",
+   "title": "Paginate and archive trade history older than two years",
+   "desc": "Archive old trades to cold storage and paginate the trade-history API instead of returning every trade.",
+   "module": "portfolio",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "LOW",
+   "owner": "farah",
+   "incidents": [],
+   "ago": 80,
+   "file": "services/portfolio/history.py"
+  },
+  {
+   "key": "DEBT-614",
+   "title": "Use the exchange holiday calendar for order validity",
+   "desc": "Good-till-date orders now expire using the exchange calendar in IST.",
+   "module": "orders",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "vikram",
+   "incidents": [],
+   "ago": 140
+  }
+ ],
+ "spike": {
+  "key": "budget-day",
+  "name": "Union Budget day",
+  "description": "The market opens at 09:15 and the Finance Minister's speech at 11:00 moves every stock: order traffic peaks at twelve times a normal day's open, and the closing half hour is busy again.",
+  "profile": [
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.4,
+   1.5,
+   8.0,
+   6.0,
+   12.0,
+   9.0,
+   5.0,
+   4.0,
+   6.0,
+   1.0,
+   0.6,
+   0.4,
+   0.3,
+   0.2,
+   0.2,
+   0.1,
+   0.1
+  ],
+  "entry": {
+   "orders": 1.0,
+   "marketdata": 1.0,
+   "auth": 0.9,
+   "portfolio": 0.8,
+   "charts": 0.7,
+   "notify": 0.7,
+   "funds": 0.5
+  },
+  "baseline": {
+   "auth": 0.0683,
+   "charts": 0.0943,
+   "db": 0.0683,
+   "exchange": 0.0583,
+   "funds": 0.0583,
+   "marketdata": 0.0683,
+   "notify": 0.0683,
+   "orders": 0.0683,
+   "portfolio": 0.0683,
+   "rms": 0.0683
+  }
+ }
+}

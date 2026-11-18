@@ -72,10 +72,11 @@ def regressions(pid: int):
 def evaluation(pid: int):
     """Measured accuracy of the similarity engine against the scenario's labelled ground truth."""
     proj = project(pid)
-    if not proj.scenario_code:
-        raise ApiError(400, "evaluation needs labelled data — open an industry scenario")
+    sc = S.scenario_of(proj)
+    if sc is None:
+        raise ApiError(400, "evaluation needs labelled data — open an industry scenario or a scenario pack")
     snap, alpha, tau, fn = S.intel(db(), proj)
-    labels = SC.labels(proj.scenario_code)
+    labels = SC.labels(sc)
     return ok(E.evaluate(snap, labels, fn, alpha, tau))
 
 

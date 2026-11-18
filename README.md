@@ -31,7 +31,7 @@ people. DebtLens keeps that chain visible:
 | **M6 Intelligence** | Hybrid similarity (TF-IDF + MiniLM sentence embeddings) for duplicates, knowledge search and regression detection, with measured accuracy. |
 | **M7 Ledger & optimiser** | Interest *I(d) = Σ w(sev)·effort + λ₁·churn + λ₂·blast radius* and a break-even flag for each item. An exact precedence-constrained 0/1 knapsack picks what to fix, compared live with greedy and with v1's planner. |
 | **M8 Knowledge & reports** | Lessons learned, PDF/CSV/JSON exports, CI quality gate, activity log. |
-| **Simulation Lab** | **Industry scenarios** side by side · **What-if** economics sliders · **Monte Carlo** sprint forecast with paired 95% confidence intervals · **Failure injection** (independent-cascade model) with drill incidents · **Load spike**: a traffic event hour by hour (salary day, OPD rush, a Diwali sale, results day, or your own), which modules overload, the hours lost, and which debt to fix before it. |
+| **Simulation Lab** | **Industry scenarios** side by side · **What-if** economics sliders · **Monte Carlo** sprint forecast with paired 95% confidence intervals · **Failure injection** (independent-cascade model) with drill incidents · **Load spike**: a traffic event hour by hour (salary day, OPD rush, a Diwali sale, results day, Tatkal, Budget day, an IPL or World Cup final, New Year's Eve, the ITR deadline, a stadium on-sale, or your own), which modules overload, the hours lost, and which debt to fix before it. |
 
 **Load spikes.** Open debt costs capacity (a shared pool, a slow query) and adds fragility (no timeout, no
 circuit breaker). The simulation replays the event 300 times: modules overload when load passes capacity, a down
@@ -55,6 +55,13 @@ Examiners can take the **guided tour**, which walks through these features on li
 DebtLens auditing its own v1) and a role. You get a private 24-hour copy to change freely. Create a team to
 get real accounts.
 
+**Scenario packs.** Seven more systems, each on its busiest day: railway Tatkal at 10 AM (`tatkal`), a stock
+broker on Budget day (`broker`), food delivery on IPL final night (`food`), cricket streaming of a World Cup
+final (`stream`), ride-hailing on New Year's Eve (`rides`), income-tax e-filing on deadline night (`taxfiling`)
+and a stadium ticket on-sale (`tickets`). Open one with a click, download it as a .json file, or upload your own
+pack. Every terminal command takes a pack code or file with `--scenario`. See [docs/PACKS.md](docs/PACKS.md)
+for the format and a live-demo walkthrough.
+
 **Terminal.**
 
 ```bash
@@ -64,6 +71,8 @@ debtlens demo healthtech              # dashboard of a scenario (offline)
 debtlens plan --scenario fintech --budget 40
 debtlens simulate forecast --scenario college
 debtlens simulate spike --scenario college      # results day: what to fix before it
+debtlens pack list                               # seven scenario packs
+debtlens simulate spike --scenario tatkal        # Tatkal at 10 AM, hour by hour
 debtlens playbook DEBT-101 --scenario fintech   # how to fix one debt item
 debtlens scan .                       # mine your own repository
 debtlens ingest logs/app.log          # error logs -> incident candidates
@@ -94,7 +103,8 @@ debtlens/api/      Flask REST API (/api/v1), SQLAlchemy models, auth (bcrypt + J
 debtlens/core/     the analysis engine, pure Python, shared by the API and the CLI
 debtlens/cli/      the `debtlens` command (Typer + Rich)
 debtlens/scenarios five labelled industry scenarios (JSON)
-tests/             131 tests: engine checked against scikit-learn, networkx and radon; API, roles and sandboxes
+debtlens/packs     seven scenario packs: a system plus its busiest day, in one JSON file each
+tests/             144 tests: engine checked against scikit-learn, networkx and radon; API, roles, sandboxes, packs
 ```
 
 - **Database:** TiDB Cloud Starter (MySQL-compatible, TLS) on Vercel; MySQL 8 or SQLite locally. The tables keep
@@ -126,7 +136,7 @@ the same wording, so TF-IDF alone reaches 1.00. The defaults α = 0.4 and τ = 0
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                      # 131 tests
+python -m pytest tests -q                      # 144 tests
 DATABASE_URL=sqlite:///dev.db flask --app app run    # website on http://127.0.0.1:5000
 python scripts/build_package.py                # build the PyPI package into dist/
 ```

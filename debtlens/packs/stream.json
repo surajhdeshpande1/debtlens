@@ -1,0 +1,1045 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "stream",
+ "order": 4,
+ "key": "KHEL",
+ "name": "KhelStream",
+ "industry": "Sports streaming (OTT)",
+ "tagline": "Live cricket streaming where the last over brings the most viewers",
+ "summary": "KhelStream streams live cricket to phones and TVs: login and device limits, subscriptions, payments, playback sessions, DRM licences, the CDN, server-side ads, the live scorecard and chat. A World Cup final brings twenty times a normal match's viewers in the last overs. Streams that will not start at the toss, ads that cut into play and subscriptions that do not activate keep coming back.",
+ "repository_url": "https://github.com/example/khelstream (fictional)",
+ "tour": {
+  "incident": "INC-820",
+  "debt": "DEBT-801",
+  "module": "playback",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Every playback start checks the subscription in the database, so the toss knocks over streams, licences and logins together; fixing it costs 20 hours."
+ },
+ "people": {
+  "manoj": {
+   "name": "Manoj Bhatt",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "priya": {
+   "name": "Priya Raghavan",
+   "role": "tech_lead",
+   "title": "Engineering lead, playback"
+  },
+  "kunal": {
+   "name": "Kunal Desai",
+   "role": "developer",
+   "title": "Developer, playback & DRM"
+  },
+  "anjali": {
+   "name": "Anjali Verma",
+   "role": "developer",
+   "title": "Developer, subscriptions & payments"
+  },
+  "suresh": {
+   "name": "Suresh Naidu",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "tanvi": {
+   "name": "Tanvi Shah",
+   "role": "manager",
+   "title": "Product manager, live sports"
+  },
+  "guest": {
+   "name": "Content partners",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "auth",
+   "path": "svc/auth",
+   "description": "Login, sessions and device limits",
+   "churn": 26,
+   "complexity": 88,
+   "loc": 2500,
+   "files": 6,
+   "owner": "anjali"
+  },
+  {
+   "name": "subs",
+   "path": "svc/subscriptions",
+   "description": "Plans and entitlements",
+   "churn": 33,
+   "complexity": 109,
+   "loc": 3000,
+   "files": 7,
+   "owner": "anjali"
+  },
+  {
+   "name": "payments",
+   "path": "svc/payments",
+   "description": "Subscription purchase and renewals",
+   "churn": 29,
+   "complexity": 97,
+   "loc": 2700,
+   "files": 6,
+   "owner": "anjali"
+  },
+  {
+   "name": "playback",
+   "path": "svc/playback",
+   "description": "Playback sessions and manifests",
+   "churn": 57,
+   "complexity": 193,
+   "loc": 5000,
+   "files": 11,
+   "owner": "kunal"
+  },
+  {
+   "name": "drm",
+   "path": "svc/drm",
+   "description": "DRM licence server",
+   "churn": 22,
+   "complexity": 84,
+   "loc": 2200,
+   "files": 5,
+   "owner": "kunal"
+  },
+  {
+   "name": "cdn",
+   "path": "infra/cdn",
+   "description": "Origin, edge configuration and renditions",
+   "churn": 31,
+   "complexity": 62,
+   "loc": 1900,
+   "files": 8,
+   "owner": "priya"
+  },
+  {
+   "name": "ads",
+   "path": "svc/ads",
+   "description": "Server-side ad insertion in live breaks",
+   "churn": 38,
+   "complexity": 126,
+   "loc": 3400,
+   "files": 8,
+   "owner": "kunal"
+  },
+  {
+   "name": "scores",
+   "path": "svc/scores",
+   "description": "Live scorecard and match events",
+   "churn": 19,
+   "complexity": 66,
+   "loc": 1800,
+   "files": 4,
+   "owner": "suresh"
+  },
+  {
+   "name": "chat",
+   "path": "svc/chat",
+   "description": "Live chat and reactions",
+   "churn": 24,
+   "complexity": 79,
+   "loc": 2100,
+   "files": 5,
+   "owner": "anjali"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "Users, devices and entitlements database",
+   "churn": 7,
+   "complexity": 25,
+   "loc": 700,
+   "files": 5,
+   "owner": "priya"
+  }
+ ],
+ "dependencies": [
+  [
+   "playback",
+   "auth"
+  ],
+  [
+   "playback",
+   "subs"
+  ],
+  [
+   "playback",
+   "drm"
+  ],
+  [
+   "playback",
+   "cdn"
+  ],
+  [
+   "playback",
+   "ads"
+  ],
+  [
+   "subs",
+   "payments"
+  ],
+  [
+   "subs",
+   "db"
+  ],
+  [
+   "auth",
+   "db"
+  ],
+  [
+   "ads",
+   "cdn"
+  ],
+  [
+   "chat",
+   "auth"
+  ],
+  [
+   "drm",
+   "subs"
+  ],
+  [
+   "payments",
+   "db"
+  ]
+ ],
+ "files": [
+  [
+   "svc/playback/start.py",
+   "playback",
+   42,
+   40,
+   950,
+   2010,
+   4
+  ],
+  [
+   "svc/playback/manifest.py",
+   "playback",
+   23,
+   21,
+   540,
+   700,
+   3
+  ],
+  [
+   "svc/drm/licence.py",
+   "drm",
+   18,
+   20,
+   470,
+   520,
+   2
+  ],
+  [
+   "svc/ads/breaks.py",
+   "ads",
+   30,
+   32,
+   720,
+   1100,
+   3
+  ],
+  [
+   "svc/scores/poller.py",
+   "scores",
+   14,
+   12,
+   330,
+   380,
+   2
+  ],
+  [
+   "svc/payments/activate.py",
+   "payments",
+   21,
+   19,
+   480,
+   610,
+   2
+  ],
+  [
+   "svc/auth/devices.py",
+   "auth",
+   20,
+   23,
+   510,
+   640,
+   3
+  ],
+  [
+   "svc/chat/store.py",
+   "chat",
+   17,
+   14,
+   360,
+   420,
+   2
+  ],
+  [
+   "infra/cdn/edge.vcl",
+   "cdn",
+   25,
+   9,
+   300,
+   680,
+   3
+  ],
+  [
+   "infra/db/pools.py",
+   "db",
+   5,
+   6,
+   130,
+   70,
+   1
+  ],
+  [
+   "svc/subscriptions/fallback.py",
+   "subs",
+   8,
+   9,
+   200,
+   140,
+   1
+  ],
+  [
+   "svc/playback/clients.py",
+   "playback",
+   12,
+   11,
+   280,
+   260,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "svc/playback/start.py",
+   76,
+   "FIXME",
+   "entitlement looked up in the DB on every start"
+  ],
+  [
+   "svc/drm/licence.py",
+   58,
+   "TODO",
+   "fall back to a cached entitlement when the lookup is slow"
+  ],
+  [
+   "svc/ads/breaks.py",
+   44,
+   "HACK",
+   "break length hard-coded to 120 s"
+  ],
+  [
+   "svc/scores/poller.py",
+   21,
+   "TODO",
+   "receive pushed events instead of polling every 30 s"
+  ],
+  [
+   "svc/payments/activate.py",
+   63,
+   "TODO",
+   "reconcile payments with the gateway"
+  ],
+  [
+   "svc/auth/devices.py",
+   97,
+   "XXX",
+   "SELECT ... FOR UPDATE on every heartbeat"
+  ],
+  [
+   "svc/chat/store.py",
+   35,
+   "OPTIMIZE",
+   "one transaction per message"
+  ],
+  [
+   "infra/cdn/edge.vcl",
+   12,
+   "TODO",
+   "cache live manifests at the edge"
+  ],
+  [
+   "svc/playback/clients.py",
+   18,
+   "FIXME",
+   "no timeout on ads and licence calls"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-801",
+   "title": "Video failed to start for 12 minutes at the toss",
+   "desc": "At 13:30 millions of viewers opened the match together and most saw 'Something went wrong' instead of video.",
+   "module": "playback",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 170,
+   "fixed": 169.95,
+   "effort": 14,
+   "by": "tanvi",
+   "group": "G-START",
+   "whys": [
+    "Streams would not start at 13:30",
+    "Every start request waited on the entitlement database",
+    "Every playback start checks entitlement in the database"
+   ],
+   "fix": "Added database read replicas.",
+   "lesson": "Replicas bought minutes, not a design."
+  },
+  {
+   "key": "INC-802",
+   "title": "Ad break cut off the first ball of the innings",
+   "desc": "An ad break ran 40 seconds longer than the real break and viewers missed the first ball.",
+   "module": "ads",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 162,
+   "fixed": 161,
+   "effort": 6,
+   "by": "tanvi",
+   "group": "G-ADS",
+   "whys": [
+    "Viewers missed the first ball",
+    "The ad break ran 40 seconds longer than the real break",
+    "Ad break length is hard-coded instead of read from the live signal"
+   ],
+   "fix": "Shortened the default break.",
+   "lesson": "Breaks are never the same length twice."
+  },
+  {
+   "key": "INC-803",
+   "title": "Scorecard two overs behind the video",
+   "desc": "The scorecard lagged the video by two overs during the chase.",
+   "module": "scores",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 154,
+   "fixed": 153.9,
+   "effort": 4,
+   "by": "suresh",
+   "group": "G-SCORE",
+   "whys": [
+    "The scorecard lagged the video",
+    "The provider was polled every 30 seconds and requests queued up",
+    "The scorecard polls the data provider instead of receiving pushed updates"
+   ],
+   "fix": "Polled every 10 seconds.",
+   "lesson": "Polling faster made the provider throttle us."
+  },
+  {
+   "key": "INC-804",
+   "title": "Subscription bought at the toss not activated",
+   "desc": "2,600 viewers paid for a subscription at the toss but still saw 'Subscribe to watch'.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 146,
+   "fixed": 145,
+   "effort": 7,
+   "by": "anjali",
+   "group": "G-PAY",
+   "whys": [
+    "Paid viewers could not watch",
+    "The payment success callback was lost",
+    "Subscription payments are not reconciled with the payment gateway"
+   ],
+   "fix": "Activated subscriptions from the gateway's report.",
+   "lesson": "A lost callback means a paying customer who cannot watch."
+  },
+  {
+   "key": "INC-805",
+   "title": "Viewers logged out on all devices mid-match",
+   "desc": "Viewers on TVs and phones were logged out during the chase and could not log in again for 10 minutes.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 138,
+   "fixed": 137.95,
+   "effort": 8,
+   "by": "suresh",
+   "group": "G-LOGIN",
+   "whys": [
+    "Viewers were logged out",
+    "Device-limit checks failed with lock wait timeouts",
+    "Device-limit checks lock the user row on every heartbeat"
+   ],
+   "fix": "Raised the lock wait time.",
+   "lesson": "Longer waits mean more blocked heartbeats."
+  },
+  {
+   "key": "INC-806",
+   "title": "Live chat froze when India won the toss",
+   "desc": "Chat and reactions stopped updating for 6 minutes after the toss.",
+   "module": "chat",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 130,
+   "fixed": 129.9,
+   "effort": 4,
+   "by": "suresh",
+   "group": "G-CHAT",
+   "whys": [
+    "Chat stopped updating",
+    "Every message was written in its own database transaction",
+    "Chat writes every message to the database in its own transaction"
+   ],
+   "fix": "Disabled reactions for the match.",
+   "lesson": "Fans notice when reactions vanish."
+  },
+  {
+   "key": "INC-807",
+   "title": "Licence errors for Android viewers at the start of the chase",
+   "desc": "Android viewers saw 'licence error' for 9 minutes as the chase began.",
+   "module": "drm",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 122,
+   "fixed": 121.95,
+   "effort": 10,
+   "by": "kunal",
+   "whys": [
+    "Android viewers saw licence errors",
+    "The licence server waited on entitlement lookups",
+    "Every playback start checks entitlement in the database"
+   ],
+   "fix": "Extended licence validity to 24 hours.",
+   "lesson": "The licence server inherits every database problem."
+  },
+  {
+   "key": "INC-808",
+   "title": "Origin overloaded when live manifests bypassed the edge",
+   "desc": "Viewers buffered for 8 minutes because every player fetched live manifests from the origin.",
+   "module": "cdn",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 114,
+   "fixed": 113.9,
+   "effort": 8,
+   "by": "priya",
+   "group": "G-ORIGIN",
+   "whys": [
+    "Buffering for 8 minutes",
+    "Every viewer's player fetched manifests from the origin",
+    "Live manifests are not cached at the edge"
+   ],
+   "fix": "Added origin servers.",
+   "lesson": "The origin should never see every viewer."
+  },
+  {
+   "key": "INC-809",
+   "title": "Playback start failures during the super over",
+   "desc": "The super over drew record viewers and new streams failed to start for 7 minutes.",
+   "module": "playback",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 106,
+   "fixed": 105.95,
+   "effort": 12,
+   "by": "tanvi",
+   "group": "G-START",
+   "whys": [
+    "New streams would not start",
+    "Start requests queued behind entitlement queries",
+    "Every playback start checks entitlement in the database"
+   ],
+   "fix": "Added more replicas.",
+   "lesson": "The super over will not be the biggest night."
+  },
+  {
+   "key": "INC-810",
+   "title": "Ads overlapped live play after the strategic time-out",
+   "desc": "After a strategic time-out, ads kept playing for 30 seconds after play resumed.",
+   "module": "ads",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 98,
+   "fixed": 97,
+   "effort": 5,
+   "by": "tanvi",
+   "group": "G-ADS",
+   "whys": [
+    "Ads covered live play",
+    "The break length did not match the actual time-out",
+    "Ad break length is hard-coded instead of read from the live signal"
+   ],
+   "fix": "Cut the break short by hand.",
+   "lesson": "Someone has to watch every break."
+  },
+  {
+   "key": "INC-811",
+   "title": "Paying subscribers asked to subscribe again",
+   "desc": "During the toss, paying subscribers saw 'Subscribe to watch' because the entitlement lookup timed out.",
+   "module": "subs",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 90,
+   "fixed": 89,
+   "effort": 6,
+   "by": "anjali",
+   "whys": [
+    "Subscribers saw 'Subscribe to watch'",
+    "The entitlement lookup timed out and defaulted to 'not subscribed'",
+    "Every playback start checks entitlement in the database"
+   ],
+   "fix": "Apologised and extended subscriptions by a day.",
+   "lesson": "Failing closed punishes paying customers."
+  },
+  {
+   "key": "INC-812",
+   "title": "Toss-time subscriptions charged but not activated",
+   "desc": "1,100 viewers were charged at the toss but their subscriptions did not activate for an hour.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 82,
+   "fixed": 81,
+   "effort": 6,
+   "by": "anjali",
+   "group": "G-PAY",
+   "whys": [
+    "Paid viewers could not watch",
+    "Gateway callbacks failed under load and were not retried",
+    "Subscription payments are not reconciled with the payment gateway"
+   ],
+   "fix": "Activated them from the gateway report again.",
+   "lesson": "Same manual report, bigger list."
+  },
+  {
+   "key": "INC-813",
+   "title": "Reactions and chat lagged by 3 minutes in the final over",
+   "desc": "Chat messages appeared 3 minutes late during the final over.",
+   "module": "chat",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 74,
+   "fixed": 73.9,
+   "effort": 4,
+   "by": "suresh",
+   "group": "G-CHAT",
+   "whys": [
+    "Chat lagged by 3 minutes",
+    "Message writes queued behind each other",
+    "Chat writes every message to the database in its own transaction"
+   ],
+   "fix": "Slowed down chat for everyone.",
+   "lesson": "A slow-mode is not a fix."
+  },
+  {
+   "key": "INC-814",
+   "title": "Mass logouts during the semi-final",
+   "desc": "Thousands of viewers were logged out as device heartbeats blocked each other.",
+   "module": "auth",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 66,
+   "fixed": 65.95,
+   "effort": 7,
+   "by": "suresh",
+   "group": "G-LOGIN",
+   "whys": [
+    "Viewers were logged out",
+    "Heartbeats waited on locked user rows",
+    "Device-limit checks lock the user row on every heartbeat"
+   ],
+   "fix": "Checked device limits less often.",
+   "lesson": "The lock is still taken."
+  },
+  {
+   "key": "INC-815",
+   "title": "Scorecard stuck on the 18th over",
+   "desc": "The scorecard stopped at 17.6 overs while the match finished.",
+   "module": "scores",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 58,
+   "fixed": 57,
+   "effort": 3,
+   "by": "suresh",
+   "group": "G-SCORE",
+   "whys": [
+    "The scorecard stopped updating",
+    "Polling requests were throttled by the provider",
+    "The scorecard polls the data provider instead of receiving pushed updates"
+   ],
+   "fix": "Restarted the poller.",
+   "lesson": "Polling is fragile at the end of a match."
+  },
+  {
+   "key": "INC-816",
+   "title": "Buffering storm when the stream switched to 4K",
+   "desc": "When 4K renditions were added for the final overs, viewers buffered for 5 minutes.",
+   "module": "cdn",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 48,
+   "fixed": 47.95,
+   "effort": 10,
+   "by": "priya",
+   "group": "G-ORIGIN",
+   "whys": [
+    "Everyone buffered",
+    "The new 4K manifests were fetched from the origin by every player",
+    "Live manifests are not cached at the edge"
+   ],
+   "fix": "Removed the 4K renditions.",
+   "lesson": "Every new rendition repeats the problem."
+  },
+  {
+   "key": "INC-817",
+   "title": "Entitlement database CPU at 100% at the toss",
+   "desc": "The entitlement database hit 100% CPU at 13:30; starts, licences and heartbeats all slowed.",
+   "module": "db",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 36,
+   "fixed": 35.9,
+   "effort": 6,
+   "by": "priya",
+   "whys": [
+    "Entitlement queries slowed down",
+    "Every start, licence and heartbeat queried the database",
+    "Every playback start checks entitlement in the database"
+   ],
+   "fix": "Moved to a larger database instance.",
+   "lesson": "Bigger hardware for the same pattern."
+  },
+  {
+   "key": "INC-818",
+   "title": "Subscriptions bought at the toss still inactive",
+   "desc": "Viewers who paid during today's toss still cannot watch; callbacks failed and nothing re-checked them.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 20,
+   "effort": 6,
+   "by": "anjali",
+   "group": "G-PAY",
+   "whys": [
+    "Paid viewers cannot watch",
+    "Payment callbacks failed under load",
+    "Subscription payments are not reconciled with the payment gateway"
+   ]
+  },
+  {
+   "key": "INC-819",
+   "title": "Ad break overran into the first over",
+   "desc": "The innings-break ads ran into the first over again today.",
+   "module": "ads",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 8,
+   "effort": 4,
+   "by": "tanvi",
+   "group": "G-ADS",
+   "whys": [
+    "Ads covered the first over",
+    "The break length was the hard-coded default",
+    "Ad break length is hard-coded instead of read from the live signal"
+   ]
+  },
+  {
+   "key": "INC-820",
+   "title": "Video not starting for many viewers at the toss",
+   "desc": "At today's toss many viewers see 'Something went wrong'; start requests are timing out.",
+   "module": "playback",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 1,
+   "effort": 12,
+   "by": "tanvi",
+   "group": "G-START",
+   "whys": [
+    "Streams are not starting",
+    "Start requests wait on entitlement lookups",
+    "Every playback start checks entitlement in the database"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-801",
+   "title": "Serve cached entitlements from a signed playback token",
+   "desc": "Issue a signed token with the viewer's entitlement at login and renewal; playback, licence and heartbeat checks read the cached token instead of the database.",
+   "module": "playback",
+   "cat": "ARCHITECTURAL",
+   "principal": 20,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "kunal",
+   "incidents": [
+    "INC-801",
+    "INC-809",
+    "INC-811",
+    "INC-817",
+    "INC-820"
+   ],
+   "cause": "Every playback start checks entitlement in the database",
+   "ago": 168,
+   "file": "svc/playback/start.py"
+  },
+  {
+   "key": "DEBT-802",
+   "title": "Circuit breaker and cached fallback for licence requests",
+   "desc": "When entitlement lookups slow down, the licence server opens a circuit breaker and falls back to the cached entitlement.",
+   "module": "drm",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kunal",
+   "incidents": [
+    "INC-807"
+   ],
+   "needs": [
+    "DEBT-801"
+   ],
+   "ago": 120,
+   "file": "svc/drm/licence.py"
+  },
+  {
+   "key": "DEBT-803",
+   "title": "Read ad break length from the live signal instead of hard-coded values",
+   "desc": "Use the cue-in and cue-out markers in the live feed to start and end every ad break.",
+   "module": "ads",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kunal",
+   "incidents": [
+    "INC-802",
+    "INC-810",
+    "INC-819"
+   ],
+   "cause": "Ad break length is hard-coded instead of read from the live signal",
+   "ago": 160,
+   "file": "svc/ads/breaks.py"
+  },
+  {
+   "key": "DEBT-804",
+   "title": "Receive pushed score updates through a message queue",
+   "desc": "Subscribe to the provider's pushed match events through a message queue instead of polling every 30 seconds.",
+   "module": "scores",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "suresh",
+   "incidents": [
+    "INC-803",
+    "INC-815"
+   ],
+   "cause": "The scorecard polls the data provider instead of receiving pushed updates",
+   "ago": 152,
+   "file": "svc/scores/poller.py"
+  },
+  {
+   "key": "DEBT-805",
+   "title": "Reconcile subscription payments with the gateway every 5 minutes",
+   "desc": "Match every captured payment with an active subscription and activate any that were missed.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "anjali",
+   "incidents": [
+    "INC-804",
+    "INC-812",
+    "INC-818"
+   ],
+   "cause": "Subscription payments are not reconciled with the payment gateway",
+   "ago": 144,
+   "file": "svc/payments/activate.py"
+  },
+  {
+   "key": "DEBT-806",
+   "title": "Optimistic version checks instead of row locks for device limits",
+   "desc": "Track devices with an optimistic version column; heartbeats no longer lock the user row.",
+   "module": "auth",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "anjali",
+   "incidents": [
+    "INC-805",
+    "INC-814"
+   ],
+   "cause": "Device-limit checks lock the user row on every heartbeat",
+   "ago": 136,
+   "file": "svc/auth/devices.py"
+  },
+  {
+   "key": "DEBT-807",
+   "title": "Batch writes for chat messages, one transaction per second",
+   "desc": "Buffer chat messages and reactions and save them in bulk once a second.",
+   "module": "chat",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "anjali",
+   "incidents": [
+    "INC-806",
+    "INC-813"
+   ],
+   "cause": "Chat writes every message to the database in its own transaction",
+   "ago": 128,
+   "file": "svc/chat/store.py"
+  },
+  {
+   "key": "DEBT-808",
+   "title": "Serve cached live manifests from the edge for two seconds",
+   "desc": "Cache live manifests at the edge with a 2-second lifetime and request collapsing, so the origin sees one request per edge, not one per viewer.",
+   "module": "cdn",
+   "cat": "INFRASTRUCTURE",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "priya",
+   "incidents": [
+    "INC-808",
+    "INC-816"
+   ],
+   "cause": "Live manifests are not cached at the edge",
+   "ago": 112,
+   "file": "infra/cdn/edge.vcl"
+  },
+  {
+   "key": "DEBT-809",
+   "title": "Separate connection pools for playback reads and billing batch jobs",
+   "desc": "Renewal and billing batch jobs get their own small pool so they never starve playback and login.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "priya",
+   "incidents": [],
+   "ago": 70,
+   "file": "infra/db/pools.py"
+  },
+  {
+   "key": "DEBT-810",
+   "title": "Timeouts on ad and licence calls during playback start",
+   "desc": "Playback start gives the ads and licence calls a strict timeout so one slow service cannot block a stream from starting.",
+   "module": "playback",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kunal",
+   "incidents": [],
+   "ago": 60,
+   "file": "svc/playback/clients.py"
+  },
+  {
+   "key": "DEBT-811",
+   "title": "Graceful fallback to the cached entitlement when lookups time out",
+   "desc": "If the entitlement lookup times out, degrade gracefully: let a viewer with a recent valid entitlement keep watching.",
+   "module": "subs",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "anjali",
+   "incidents": [],
+   "needs": [
+    "DEBT-801"
+   ],
+   "ago": 88,
+   "file": "svc/subscriptions/fallback.py"
+  },
+  {
+   "key": "DEBT-812",
+   "title": "Load test the toss at 20x before the final",
+   "desc": "Replay a toss and final-over surge at 20 times a normal match against staging before every final.",
+   "module": "playback",
+   "cat": "TEST_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "suresh",
+   "incidents": [],
+   "needs": [
+    "DEBT-801",
+    "DEBT-808"
+   ],
+   "ago": 40
+  },
+  {
+   "key": "DEBT-813",
+   "title": "Rate limit chat messages per viewer",
+   "desc": "Limit each viewer to one message every 2 seconds during live matches.",
+   "module": "chat",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "anjali",
+   "incidents": [],
+   "ago": 150
+  }
+ ],
+ "spike": {
+  "key": "world-cup-final",
+  "name": "World Cup final",
+  "description": "The toss is at 13:30 and the match runs into the night: viewers jump at the toss, again at the start of the chase, and peak in the last overs at twenty times a normal match.",
+  "profile": [
+   0.2,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.3,
+   0.5,
+   0.8,
+   1.2,
+   1.8,
+   2.5,
+   6.0,
+   10.0,
+   9.0,
+   8.0,
+   7.0,
+   12.0,
+   14.0,
+   18.0,
+   20.0,
+   6.0,
+   2.0
+  ],
+  "entry": {
+   "playback": 1.0,
+   "auth": 1.0,
+   "cdn": 1.0,
+   "ads": 0.9,
+   "scores": 0.8,
+   "chat": 0.7
+  },
+  "exposure": {
+   "payments": 0.4
+  },
+  "baseline": {
+   "ads": 0.035,
+   "auth": 0.041,
+   "cdn": 0.041,
+   "chat": 0.0573,
+   "db": 0.041,
+   "drm": 0.035,
+   "payments": 0.0814,
+   "playback": 0.041,
+   "scores": 0.0506,
+   "subs": 0.035
+  }
+ }
+}

@@ -437,8 +437,8 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     stats = module_stats(snap)
     mods = sorted(stats)
     deps = [(a, b) for a, b in dependency_pairs(snap) if a in stats and b in stats]
-    scen = (snap.get("project") or {}).get("scenario")
-    preset = SPIKE.PRESETS.get(scen or "")
+    proj = snap.get("project") or {}
+    preset = proj.get("spike") if isinstance(proj.get("spike"), dict) else SPIKE.PRESETS.get(proj.get("scenario") or "")
     if isinstance(event, dict):
         profile = SPIKE.custom_profile(event.get("peak", 5), event.get("start_hour", 20), event.get("duration", 2),
                                        event.get("ramp", 1), event.get("base", 1.0))

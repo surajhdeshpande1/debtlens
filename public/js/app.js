@@ -104,6 +104,43 @@ function scenarioCard(s) {
   </div>`;
 }
 
+function roleSelect() {
+  return html`<select aria-label="Role" data-role>${(S.meta.roles || []).map((r) => html`<option value="${r.code}" ${r.code === "tech_lead" ? "selected" : ""}>${r.label}</option>`)}</select>`;
+}
+
+function hourLabel(h) { return `${String(h).padStart(2, "0")}:00`; }
+
+function packCard(s) {
+  const ev = s.event;
+  return html`<div class="scen pack" data-scen="${s.code}">
+    <div class="ind">${s.industry}</div>
+    <h3>${s.name}</h3>
+    <div class="tag">${s.tagline}</div>
+    ${ev ? html`<div class="event-pill" title="${ev.description}">⚡ ${ev.name} · ${ev.peak}× at ${hourLabel(ev.peak_hour)}</div>` : ""}
+    <div class="stats">${s.counts.incidents} incidents · ${s.counts.debts} debt items · ${s.counts.modules} modules</div>
+    <div class="row tight">${roleSelect()}<button class="btn primary" data-open="${s.code}">Open</button></div>
+    <div class="row tight pack-links">
+      <button class="btn sm ghost" data-tour="${s.code}">▶ Guided tour</button>
+      <a class="btn sm ghost" href="/api/v1/packs/${s.code}" download="${s.code}.debtlens-pack.json" title="Download this pack as a .json file">⬇ .json</a>
+    </div>
+  </div>`;
+}
+
+function uploadCard() {
+  const fmt = S.meta.pack_format || {};
+  return html`<div class="scen pack upload" data-upload>
+    <div class="ind">Your own system</div>
+    <h3>Open a pack file</h3>
+    <div class="tag">Upload any DebtLens pack (.json, up to ${fmt.max_kb || 400} KB) — one of the seven above after editing it, or one your team wrote.
+      It is checked completely and opened as a private sandbox.</div>
+    <label class="file-drop" data-drop><input type="file" accept=".json,application/json" data-file hidden>
+      <span data-file-label>Choose or drop a .json file</span></label>
+    <div class="row tight">${roleSelect()}<button class="btn primary" data-open-file disabled>Open pack</button></div>
+    <div class="pack-problems hidden" data-problems></div>
+    <a class="small" href="#/cli">Pack format and terminal commands →</a>
+  </div>`;
+}
+
 function renderLanding(tab) {
   document.title = "DebtLens — Developer Incident & Technical Debt Management";
   const v = el(html`<header class="topbar"><a class="brand" href="#/"><span class="mark">D</span>DebtLens</a><span class="grow"></span>
@@ -119,6 +156,7 @@ function renderLanding(tab) {
             <li>Evidence from your own Git history: churn, complexity hotspots, TODO/FIXME debt</li>
             <li>Interest ledger, exact knapsack sprint planner, Monte Carlo forecast, failure injection</li>
             <li>Load-spike simulation: which debt to fix before salary day, a sale or results day</li>
+            <li>Seven scenario packs — Tatkal, Budget day, IPL final, World Cup final, New Year's Eve, ITR deadline, a stadium on-sale — and your own as a .json file</li>
             <li>A fix playbook for every debt item: steps, how to verify, references</li>
             <li>Same engine in the browser and in your terminal: <code>pipx install debtlens</code></li>
           </ul>
@@ -145,6 +183,10 @@ function renderLanding(tab) {
       </section>
       <div class="section-title"><h2>Try a live scenario</h2><span class="muted small">No account needed — you get a private copy for 24 hours. Pick the role you want to play.</span></div>
       <div class="scen-grid">${(S.meta.scenarios || []).map(scenarioCard)}</div>
+      ${(S.meta.packs || []).length ? html`<div class="section-title" id="packs"><h2>Scenario packs — seven systems on their busiest day</h2>
+        <span class="muted small">Each pack is a whole system in one file: modules, incidents with 5 Whys, debt and its own load-spike event.
+          Open one, run the load spike, failure injection and forecast live — or download it and upload your own.</span></div>
+      <div class="scen-grid">${S.meta.packs.map(packCard)}${uploadCard()}</div>` : ""}
       <div class="section-title"><h2>Works in your terminal too</h2><span class="muted small"><a href="#/cli">Full CLI guide →</a></span></div>
       <div class="grid c2">
         <div>${codeBlock("pipx install debtlens\ndebtlens scan .              # mine your repo's git history\ndebtlens similar \"payment timeout\"\ndebtlens plan --budget 40     # what to fix this sprint\ndebtlens simulate forecast\ndebtlens ci --max-open-critical 0")}</div>
@@ -185,10 +227,50 @@ function renderLanding(tab) {
       if (b.dataset.tour) tour.start();
     } catch (ex) { fail(ex); } finally { b.disabled = false; }
   });
+  wirePackUpload(w);
 }
 
-export async function openSandbox(code, role) {
-  const r = await api("/sandbox", { method: "POST", body: { scenario: code, role } });
+function wirePackUpload(w) {
+  const card = $("[data-upload]", w);
+  if (!card) return;
+  const input = $("[data-file]", card), label = $("[data-file-label]", card), btn = $("[data-open-file]", card);
+  const box = $("[data-problems]", card), drop = $("[data-drop]", card);
+  let pack = null;
+  const show = (title, items, note = false) => {
+    box.innerHTML = String(html`<b>${title}</b>${items && items.length ? html`<ul>${items.slice(0, 12).map((p) => html`<li>${p}</li>`)}</ul>${items.length > 12 ? html`<div class="muted small">…and ${items.length - 12} more</div>` : ""}` : ""}`);
+    box.classList.toggle("note", note);
+    box.classList.remove("hidden");
+  };
+  const read = async (file) => {
+    pack = null; btn.disabled = true; box.classList.add("hidden");
+    if (!file) return;
+    label.textContent = file.name;
+    const max = ((S.meta.pack_format || {}).max_kb || 400) * 1000;
+    if (file.size > max) return show(`${file.name} is larger than ${max / 1000} KB.`);
+    try { pack = JSON.parse(await file.text()); } catch (ex) { return show(`${file.name} is not valid JSON.`, [ex.message]); }
+    try {
+      const r = await api("/packs/validate", { method: "POST", body: { pack }, quiet: true });
+      if (!r.valid) { pack = null; return show(`${file.name} has ${r.problems.length} problem${r.problems.length === 1 ? "" : "s"} to fix:`, r.problems); }
+      const i = r.info;
+      label.textContent = `${file.name} — ${i.name}: ${i.counts.incidents} incidents, ${i.counts.debts} debt items${i.event ? `, ${i.event.name}` : ""}`;
+      if (r.warnings && r.warnings.length) show("Opens fine. Notes:", r.warnings, true);
+      btn.disabled = false;
+    } catch (ex) { pack = null; show("Could not check the file.", [ex.message]); }
+  };
+  input.addEventListener("change", () => read(input.files[0]));
+  drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); read(e.dataTransfer.files[0]); });
+  btn.addEventListener("click", async () => {
+    if (!pack) return;
+    btn.disabled = true;
+    try { await openSandbox(null, $("[data-role]", card).value, pack); }
+    catch (ex) { show(ex.message, (ex.data && ex.data.problems) || []); btn.disabled = false; }
+  });
+}
+
+export async function openSandbox(code, role, pack = null) {
+  const r = await api("/sandbox", { method: "POST", body: pack ? { pack, role } : { scenario: code, role } });
   auth.token = r.token;
   S.me = null; S.project = null;
   toast(r.persona ? `You are ${r.persona.name} — ${r.persona.title}` : "Sandbox ready", "ok");
@@ -209,7 +291,7 @@ async function renderProjects() {
       : html`<div class="callout">No projects yet.${can("project.manage") ? " Create one below — start from an industry scenario or an empty project." : " Ask your admin to add you to a project."}</div>`}
     ${can("project.manage") ? html`<div class="section-title"><h2>New project</h2></div>
       <form class="card" data-new><div class="card-body"><div class="inline-fields">
-        <div class="field"><label>Start from</label><select name="scenario"><option value="">Empty project</option>${S.meta.scenarios.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry} scenario</option>`)}</select></div>
+        <div class="field"><label>Start from</label><select name="scenario"><option value="">Empty project</option><optgroup label="Industry scenarios">${S.meta.scenarios.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry} scenario</option>`)}</optgroup>${(S.meta.packs || []).length ? html`<optgroup label="Scenario packs">${S.meta.packs.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry} pack</option>`)}</optgroup>` : ""}</select></div>
         <div class="field"><label>Name</label><input name="name" type="text" placeholder="e.g. Payments API"></div>
         <div class="field"><label>Repository URL (optional)</label><input name="repository_url" type="url" placeholder="https://github.com/org/repo"></div>
       </div><button class="btn primary" type="submit">Create project</button></div></form>` : ""}
@@ -236,7 +318,7 @@ function topbar() {
   return html`<header class="topbar">
     <a class="brand" href="#/"><span class="mark">D</span>DebtLens</a>
     ${p ? html`<span class="sep"></span><span class="proj">${p.name}</span><span class="badge accent">${p.key}</span>
-      ${p.scenario_info ? html`<span class="muted small">${p.scenario_info.industry} scenario</span>` : ""}
+      ${p.scenario_info ? html`<span class="muted small">${p.scenario_info.industry} ${p.scenario_info.pack ? "pack" : "scenario"}</span>` : ""}
       ${!sandbox && S.projects.length > 1 ? html`<select data-switch aria-label="Switch project">${S.projects.map((x) => html`<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${x.name}</option>`)}</select>` : ""}` : ""}
     <span class="grow"></span>
     ${sandbox ? html`<span class="sandbox-pill" title="Private copy — changes are yours only">Sandbox · ${p && p.persona ? p.persona.name : "visitor"} as

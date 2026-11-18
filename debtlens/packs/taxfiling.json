@@ -1,0 +1,1045 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "taxfiling",
+ "order": 6,
+ "key": "TAXS",
+ "name": "TaxSetu",
+ "industry": "Government e-services",
+ "tagline": "Income-tax e-filing where the last night before the deadline is the busiest of the year",
+ "summary": "TaxSetu lets 8 crore taxpayers file income-tax returns: PAN and Aadhaar login, prefilled data, return forms, validation and tax computation, uploads, challan payments, e-verification, refunds and notifications. On the last night before the 31 July deadline traffic runs at four times normal all day and fifteen times normal from 22:00 to midnight. Stuck uploads, missing challans and late e-verification OTPs keep coming back.",
+ "repository_url": "https://github.com/example/taxsetu (fictional)",
+ "tour": {
+  "incident": "INC-1020",
+  "debt": "DEBT-1006",
+  "module": "upload",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Uploads are processed inside the web request, so every deadline night ends with returns stuck in 'processing'; a durable queue costs 12 hours."
+ },
+ "people": {
+  "venkatesh": {
+   "name": "Venkatesh Prasad",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "radhika": {
+   "name": "Radhika Sundaram",
+   "role": "tech_lead",
+   "title": "Engineering lead, e-filing"
+  },
+  "abhishek": {
+   "name": "Abhishek Jain",
+   "role": "developer",
+   "title": "Developer, forms & validation"
+  },
+  "pooja": {
+   "name": "Pooja Reddy",
+   "role": "developer",
+   "title": "Developer, payments & refunds"
+  },
+  "manjunath": {
+   "name": "Manjunath H",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "seema": {
+   "name": "Seema Kapoor",
+   "role": "manager",
+   "title": "Programme manager, taxpayer services"
+  },
+  "guest": {
+   "name": "Department officers",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "login",
+   "path": "portal/login",
+   "description": "PAN and Aadhaar login with OTP",
+   "churn": 24,
+   "complexity": 79,
+   "loc": 2300,
+   "files": 6,
+   "owner": "abhishek"
+  },
+  {
+   "name": "prefill",
+   "path": "portal/prefill",
+   "description": "AIS, 26AS and Form 16 prefill data",
+   "churn": 38,
+   "complexity": 121,
+   "loc": 3400,
+   "files": 7,
+   "owner": "abhishek"
+  },
+  {
+   "name": "forms",
+   "path": "portal/forms",
+   "description": "ITR forms, drafts and schedules",
+   "churn": 62,
+   "complexity": 219,
+   "loc": 6100,
+   "files": 13,
+   "owner": "abhishek"
+  },
+  {
+   "name": "validate",
+   "path": "portal/validate",
+   "description": "Validation rules and tax computation",
+   "churn": 47,
+   "complexity": 188,
+   "loc": 5200,
+   "files": 10,
+   "owner": "abhishek"
+  },
+  {
+   "name": "upload",
+   "path": "portal/upload",
+   "description": "Offline-utility JSON and document uploads",
+   "churn": 29,
+   "complexity": 94,
+   "loc": 2500,
+   "files": 6,
+   "owner": "radhika"
+  },
+  {
+   "name": "payments",
+   "path": "portal/payments",
+   "description": "Tax challans through bank payment gateways",
+   "churn": 26,
+   "complexity": 99,
+   "loc": 2700,
+   "files": 6,
+   "owner": "pooja"
+  },
+  {
+   "name": "everify",
+   "path": "portal/everify",
+   "description": "E-verification by Aadhaar OTP and EVC",
+   "churn": 21,
+   "complexity": 72,
+   "loc": 2000,
+   "files": 5,
+   "owner": "pooja"
+  },
+  {
+   "name": "refunds",
+   "path": "portal/refunds",
+   "description": "Refund processing and bank account checks",
+   "churn": 23,
+   "complexity": 91,
+   "loc": 2600,
+   "files": 6,
+   "owner": "pooja"
+  },
+  {
+   "name": "notify",
+   "path": "portal/notify",
+   "description": "SMS and email to taxpayers",
+   "churn": 15,
+   "complexity": 46,
+   "loc": 1300,
+   "files": 4,
+   "owner": "manjunath"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "Returns, taxpayers and payments database",
+   "churn": 8,
+   "complexity": 29,
+   "loc": 900,
+   "files": 5,
+   "owner": "radhika"
+  }
+ ],
+ "dependencies": [
+  [
+   "forms",
+   "prefill"
+  ],
+  [
+   "forms",
+   "validate"
+  ],
+  [
+   "forms",
+   "db"
+  ],
+  [
+   "login",
+   "db"
+  ],
+  [
+   "login",
+   "notify"
+  ],
+  [
+   "prefill",
+   "db"
+  ],
+  [
+   "validate",
+   "db"
+  ],
+  [
+   "upload",
+   "validate"
+  ],
+  [
+   "upload",
+   "db"
+  ],
+  [
+   "everify",
+   "notify"
+  ],
+  [
+   "everify",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ],
+  [
+   "refunds",
+   "db"
+  ]
+ ],
+ "files": [
+  [
+   "portal/prefill/fetch.py",
+   "prefill",
+   36,
+   33,
+   820,
+   1650,
+   4
+  ],
+  [
+   "portal/everify/otp.py",
+   "everify",
+   17,
+   15,
+   360,
+   410,
+   2
+  ],
+  [
+   "portal/forms/session.py",
+   "forms",
+   25,
+   22,
+   520,
+   760,
+   3
+  ],
+  [
+   "portal/forms/schedules.py",
+   "forms",
+   44,
+   47,
+   1200,
+   2240,
+   5
+  ],
+  [
+   "portal/payments/challan.py",
+   "payments",
+   21,
+   23,
+   560,
+   640,
+   2
+  ],
+  [
+   "portal/validate/rules.py",
+   "validate",
+   39,
+   45,
+   1150,
+   1980,
+   4
+  ],
+  [
+   "portal/validate/rebate.py",
+   "validate",
+   18,
+   24,
+   480,
+   520,
+   2
+  ],
+  [
+   "portal/upload/process.py",
+   "upload",
+   27,
+   28,
+   640,
+   980,
+   3
+  ],
+  [
+   "portal/refunds/accounts.py",
+   "refunds",
+   16,
+   17,
+   410,
+   350,
+   2
+  ],
+  [
+   "portal/login/history.sql",
+   "login",
+   7,
+   3,
+   160,
+   90,
+   1
+  ],
+  [
+   "infra/db/pools.py",
+   "db",
+   6,
+   7,
+   140,
+   80,
+   1
+  ],
+  [
+   "portal/notify/campaigns.py",
+   "notify",
+   12,
+   10,
+   290,
+   260,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "portal/prefill/fetch.py",
+   88,
+   "FIXME",
+   "AIS fetched again on every form step"
+  ],
+  [
+   "portal/everify/otp.py",
+   24,
+   "HACK",
+   "e-verification OTPs share the bulk SMS queue"
+  ],
+  [
+   "portal/forms/session.py",
+   61,
+   "TODO",
+   "autosave before the 15-minute session expiry"
+  ],
+  [
+   "portal/payments/challan.py",
+   77,
+   "TODO",
+   "reconcile challans with bank payments"
+  ],
+  [
+   "portal/validate/rebate.py",
+   33,
+   "XXX",
+   "rebate rule duplicated from the form code"
+  ],
+  [
+   "portal/upload/process.py",
+   40,
+   "FIXME",
+   "processing runs inside the web request"
+  ],
+  [
+   "portal/refunds/accounts.py",
+   52,
+   "TODO",
+   "validate the bank account at filing time"
+  ],
+  [
+   "portal/login/history.sql",
+   6,
+   "OPTIMIZE",
+   "no index on PAN"
+  ],
+  [
+   "portal/notify/campaigns.py",
+   18,
+   "TODO",
+   "throttle reminder campaigns on deadline day"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1001",
+   "title": "Prefill took 2 minutes to load on the deadline evening",
+   "desc": "Opening a return took up to 2 minutes on the evening of 31 July as prefill data was fetched again and again.",
+   "module": "prefill",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 172,
+   "fixed": 171.9,
+   "effort": 8,
+   "by": "manjunath",
+   "group": "G-PREFILL",
+   "whys": [
+    "Opening a return took 2 minutes",
+    "Each form step re-fetched AIS and 26AS data",
+    "Every form step fetches prefill data live instead of once per session"
+   ],
+   "fix": "Added servers to the prefill service.",
+   "lesson": "The same data was fetched six times per return."
+  },
+  {
+   "key": "INC-1002",
+   "title": "Aadhaar OTP for e-verification arrived after 15 minutes",
+   "desc": "Taxpayers trying to e-verify on deadline night got OTPs after 15 minutes while reminder SMS went out.",
+   "module": "everify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 164,
+   "fixed": 163,
+   "effort": 6,
+   "by": "seema",
+   "group": "G-OTP",
+   "whys": [
+    "E-verification OTPs arrived late",
+    "OTP messages waited behind bulk reminder SMS",
+    "E-verification OTPs share the SMS queue with bulk reminder messages"
+   ],
+   "fix": "Stopped the reminder campaign.",
+   "lesson": "Reminders and OTPs peak on the same night."
+  },
+  {
+   "key": "INC-1003",
+   "title": "Draft lost when the session expired during filing",
+   "desc": "Taxpayers filling long schedules lost 15 minutes of entries when their session expired.",
+   "module": "forms",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 156,
+   "fixed": 155.95,
+   "effort": 6,
+   "by": "manjunath",
+   "group": "G-DRAFT",
+   "whys": [
+    "Taxpayers lost entered data",
+    "The session expired after 15 minutes and unsaved pages were discarded",
+    "Sessions expire after 15 minutes without saving the draft"
+   ],
+   "fix": "Showed a warning a minute before expiry.",
+   "lesson": "People filling capital gains schedules take longer than 15 minutes."
+  },
+  {
+   "key": "INC-1004",
+   "title": "Challan paid but not shown while filing",
+   "desc": "Self-assessment tax paid in the morning did not appear in the return, so the return showed tax payable.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 148,
+   "fixed": 147,
+   "effort": 6,
+   "by": "pooja",
+   "group": "G-CHALLAN",
+   "whys": [
+    "Paid tax was not credited in the return",
+    "The bank's challan confirmation reached the portal two days later",
+    "Tax challans are not reconciled with bank payments before filing"
+   ],
+   "fix": "Asked taxpayers to enter challan details by hand.",
+   "lesson": "Manual entry causes mismatches later."
+  },
+  {
+   "key": "INC-1005",
+   "title": "Valid returns rejected with 'tax computation mismatch'",
+   "desc": "Correct returns claiming the section 87A rebate were rejected by validation.",
+   "module": "validate",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 140,
+   "fixed": 139,
+   "effort": 8,
+   "by": "abhishek",
+   "group": "G-VALID",
+   "whys": [
+    "Correct returns were rejected",
+    "The form and the validation engine computed the rebate differently",
+    "Tax computation rules are duplicated in the form and the validation engine"
+   ],
+   "fix": "Patched the validation engine's copy of the rule.",
+   "lesson": "Two copies of a rule drift apart."
+  },
+  {
+   "key": "INC-1006",
+   "title": "JSON uploads stuck at 'processing' at 23:40",
+   "desc": "On deadline night returns uploaded from the offline utility stayed at 'processing' and many requests timed out.",
+   "module": "upload",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 132,
+   "fixed": 131.9,
+   "effort": 12,
+   "by": "radhika",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Uploads never completed",
+    "Each upload was processed inside the web request and timed out",
+    "Uploads are processed synchronously in the web request"
+   ],
+   "fix": "Raised the request time limit.",
+   "lesson": "Longer requests held more servers busy."
+  },
+  {
+   "key": "INC-1007",
+   "title": "Refunds failed for accounts with old IFSC codes",
+   "desc": "Refunds bounced for taxpayers whose bank branches had merged; the accounts were never checked.",
+   "module": "refunds",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 124,
+   "fixed": 123,
+   "effort": 5,
+   "by": "pooja",
+   "group": "G-REFUND",
+   "whys": [
+    "Refunds bounced",
+    "Bank accounts were not checked until payout",
+    "Refund bank accounts are validated only at payout time"
+   ],
+   "fix": "Asked taxpayers to update their accounts.",
+   "lesson": "They found out months later."
+  },
+  {
+   "key": "INC-1008",
+   "title": "Login slow for 20 minutes on the advance-tax deadline",
+   "desc": "Logins took over a minute on 15 September as each login scanned the password history table.",
+   "module": "login",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 116,
+   "fixed": 115.95,
+   "effort": 5,
+   "by": "manjunath",
+   "whys": [
+    "Logins took over a minute",
+    "Each login scanned the whole password history table",
+    "Login looks up password history with a full table scan"
+   ],
+   "fix": "Skipped the history check on deadline days.",
+   "lesson": "Skipping a check is a security risk."
+  },
+  {
+   "key": "INC-1009",
+   "title": "Form pages failing with 'pool exhausted' at 22:30",
+   "desc": "Taxpayers could not save forms for 15 minutes as prefill fetches held database connections.",
+   "module": "forms",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 108,
+   "fixed": 107.9,
+   "effort": 10,
+   "by": "radhika",
+   "whys": [
+    "Taxpayers could not save forms",
+    "Prefill fetches held database connections for each form step",
+    "Every form step fetches prefill data live instead of once per session"
+   ],
+   "fix": "Increased the connection pool.",
+   "lesson": "The pool fills again at 23:00."
+  },
+  {
+   "key": "INC-1010",
+   "title": "E-verification OTP delayed during a reminder SMS blast",
+   "desc": "OTPs for Aadhaar e-verification took 10 minutes while 'file before the deadline' reminders were sent.",
+   "module": "everify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 100,
+   "fixed": 99,
+   "effort": 5,
+   "by": "seema",
+   "group": "G-OTP",
+   "whys": [
+    "OTPs were delayed",
+    "Reminder SMS filled the shared queue",
+    "E-verification OTPs share the SMS queue with bulk reminder messages"
+   ],
+   "fix": "Moved reminders to the morning.",
+   "lesson": "Someone will schedule them in the evening again."
+  },
+  {
+   "key": "INC-1011",
+   "title": "AIS prefill timing out for salaried taxpayers",
+   "desc": "Prefill for salaried taxpayers timed out as the same data was fetched for every page.",
+   "module": "prefill",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 92,
+   "fixed": 91.9,
+   "effort": 7,
+   "by": "manjunath",
+   "group": "G-PREFILL",
+   "whys": [
+    "Prefill timed out",
+    "AIS data was fetched again on every page",
+    "Every form step fetches prefill data live instead of once per session"
+   ],
+   "fix": "Raised the prefill time limit.",
+   "lesson": "Waiting longer helps nobody."
+  },
+  {
+   "key": "INC-1012",
+   "title": "Section 87A rebate rejected by validation",
+   "desc": "Returns with income just under the rebate limit were rejected after a rounding change in one copy of the rule.",
+   "module": "validate",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 84,
+   "fixed": 83,
+   "effort": 7,
+   "by": "abhishek",
+   "group": "G-VALID",
+   "whys": [
+    "Correct rebates were rejected",
+    "Rounding was changed in the form but not in validation",
+    "Tax computation rules are duplicated in the form and the validation engine"
+   ],
+   "fix": "Patched the second copy again.",
+   "lesson": "The copies keep drifting."
+  },
+  {
+   "key": "INC-1013",
+   "title": "Upload processing stuck for 2 hours at the deadline",
+   "desc": "Uploads queued up in web servers and stayed in processing for two hours before midnight.",
+   "module": "upload",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 76,
+   "fixed": 75.95,
+   "effort": 12,
+   "by": "radhika",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Uploads stayed in processing",
+    "Web servers were busy processing earlier uploads",
+    "Uploads are processed synchronously in the web request"
+   ],
+   "fix": "Added web servers.",
+   "lesson": "Processing should not need a web server."
+  },
+  {
+   "key": "INC-1014",
+   "title": "Self-assessment tax payment not reflected",
+   "desc": "Tax paid through net banking did not appear in returns for 3 days.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 68,
+   "fixed": 67,
+   "effort": 5,
+   "by": "pooja",
+   "group": "G-CHALLAN",
+   "whys": [
+    "Paid tax was missing from returns",
+    "Bank confirmations were delayed and nothing matched them",
+    "Tax challans are not reconciled with bank payments before filing"
+   ],
+   "fix": "Uploaded the bank's file by hand.",
+   "lesson": "Every deadline, the same manual upload."
+  },
+  {
+   "key": "INC-1015",
+   "title": "Validation engine timing out under load",
+   "desc": "Validation took over 60 seconds per return as each run fetched prefill data again.",
+   "module": "validate",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 60,
+   "fixed": 59.9,
+   "effort": 6,
+   "by": "abhishek",
+   "whys": [
+    "Validation took over 60 seconds",
+    "Each validation fetched prefill data again",
+    "Every form step fetches prefill data live instead of once per session"
+   ],
+   "fix": "Skipped prefill cross-checks under load.",
+   "lesson": "Skipped checks let wrong returns through."
+  },
+  {
+   "key": "INC-1016",
+   "title": "Taxpayers lost drafts after 15 minutes idle",
+   "desc": "Drafts of long returns were lost when taxpayers paused to find documents.",
+   "module": "forms",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 50,
+   "fixed": 49,
+   "effort": 5,
+   "by": "manjunath",
+   "group": "G-DRAFT",
+   "whys": [
+    "Drafts were lost",
+    "The session expired without saving",
+    "Sessions expire after 15 minutes without saving the draft"
+   ],
+   "fix": "Added a bigger warning.",
+   "lesson": "Warnings do not save drafts."
+  },
+  {
+   "key": "INC-1017",
+   "title": "Refund failed due to an unvalidated bank account",
+   "desc": "Refunds bounced for accounts closed before filing.",
+   "module": "refunds",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 38,
+   "fixed": 37,
+   "effort": 4,
+   "by": "pooja",
+   "group": "G-REFUND",
+   "whys": [
+    "Refunds bounced",
+    "The account was checked only at payout",
+    "Refund bank accounts are validated only at payout time"
+   ],
+   "fix": "Reissued refunds after taxpayers updated accounts.",
+   "lesson": "Months of delay for taxpayers."
+  },
+  {
+   "key": "INC-1018",
+   "title": "OTP for e-verification not received tonight",
+   "desc": "Taxpayers report e-verification OTPs arriving after 10 minutes while reminders are being sent.",
+   "module": "everify",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 24,
+   "effort": 5,
+   "by": "seema",
+   "group": "G-OTP",
+   "whys": [
+    "OTPs are late",
+    "Bulk reminders are in the same SMS queue",
+    "E-verification OTPs share the SMS queue with bulk reminder messages"
+   ]
+  },
+  {
+   "key": "INC-1019",
+   "title": "Challan payments missing from returns",
+   "desc": "Payments made this week are not visible while filing; returns show tax payable.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 10,
+   "effort": 5,
+   "by": "pooja",
+   "group": "G-CHALLAN",
+   "whys": [
+    "Paid tax is missing from returns",
+    "Bank confirmations have not been matched",
+    "Tax challans are not reconciled with bank payments before filing"
+   ]
+  },
+  {
+   "key": "INC-1020",
+   "title": "Return uploads stuck in processing",
+   "desc": "Uploads have been stuck in 'processing' since 22:00 tonight as web servers process them one by one.",
+   "module": "upload",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 1,
+   "effort": 12,
+   "by": "radhika",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Uploads are stuck in processing",
+    "Processing happens inside the web request",
+    "Uploads are processed synchronously in the web request"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1001",
+   "title": "Precompute prefill data once per session and serve it cached",
+   "desc": "Fetch AIS, 26AS and Form 16 data once at login, precompute the prefill and serve it cached to every form step and validation.",
+   "module": "prefill",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "abhishek",
+   "incidents": [
+    "INC-1001",
+    "INC-1011",
+    "INC-1009",
+    "INC-1015"
+   ],
+   "cause": "Every form step fetches prefill data live instead of once per session",
+   "ago": 170,
+   "file": "portal/prefill/fetch.py"
+  },
+  {
+   "key": "DEBT-1002",
+   "title": "Separate priority queue for e-verification OTP SMS",
+   "desc": "Send e-verification OTPs through their own durable queue and SMS route, ahead of any bulk reminder messages.",
+   "module": "everify",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "pooja",
+   "incidents": [
+    "INC-1002",
+    "INC-1010",
+    "INC-1018"
+   ],
+   "cause": "E-verification OTPs share the SMS queue with bulk reminder messages",
+   "ago": 162,
+   "file": "portal/everify/otp.py"
+  },
+  {
+   "key": "DEBT-1003",
+   "title": "Autosave drafts and extend the session TTL while a return is open",
+   "desc": "Autosave every page and keep the session alive while the taxpayer is active, instead of discarding work when it expires after 15 minutes.",
+   "module": "forms",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "abhishek",
+   "incidents": [
+    "INC-1003",
+    "INC-1016"
+   ],
+   "cause": "Sessions expire after 15 minutes without saving the draft",
+   "ago": 154,
+   "file": "portal/forms/session.py"
+  },
+  {
+   "key": "DEBT-1004",
+   "title": "Reconcile challans with bank payments every 15 minutes",
+   "desc": "Match every bank payment with a challan and credit it to the taxpayer before they file.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "pooja",
+   "incidents": [
+    "INC-1004",
+    "INC-1014",
+    "INC-1019"
+   ],
+   "cause": "Tax challans are not reconciled with bank payments before filing",
+   "ago": 146,
+   "file": "portal/payments/challan.py"
+  },
+  {
+   "key": "DEBT-1005",
+   "title": "Single source for tax computation rules",
+   "desc": "One shared, versioned module computes tax, rebates and rounding for both the form and the validation engine; the duplicated copies are removed.",
+   "module": "validate",
+   "cat": "ARCHITECTURAL",
+   "principal": 14,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "abhishek",
+   "incidents": [
+    "INC-1005",
+    "INC-1012"
+   ],
+   "cause": "Tax computation rules are duplicated in the form and the validation engine",
+   "ago": 138,
+   "file": "portal/validate/rules.py"
+  },
+  {
+   "key": "DEBT-1006",
+   "title": "Process uploads asynchronously from a durable queue",
+   "desc": "Accept the upload, put it on a durable queue and process it with workers; the taxpayer sees progress instead of a hanging request.",
+   "module": "upload",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "radhika",
+   "incidents": [
+    "INC-1006",
+    "INC-1013",
+    "INC-1020"
+   ],
+   "cause": "Uploads are processed synchronously in the web request",
+   "ago": 130,
+   "file": "portal/upload/process.py"
+  },
+  {
+   "key": "DEBT-1007",
+   "title": "Bank account validation when the return is filed",
+   "desc": "Check the refund bank account with the bank at filing time, a structured validation of account number and IFSC, and ask the taxpayer to fix it then, not months later.",
+   "module": "refunds",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "pooja",
+   "incidents": [
+    "INC-1007",
+    "INC-1017"
+   ],
+   "cause": "Refund bank accounts are validated only at payout time",
+   "ago": 122,
+   "file": "portal/refunds/accounts.py"
+  },
+  {
+   "key": "DEBT-1008",
+   "title": "Index the password history table by PAN",
+   "desc": "Add an index on PAN so login reads only the taxpayer's own history instead of a full table scan.",
+   "module": "login",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "abhishek",
+   "incidents": [
+    "INC-1008"
+   ],
+   "cause": "Login looks up password history with a full table scan",
+   "ago": 114,
+   "file": "portal/login/history.sql"
+  },
+  {
+   "key": "DEBT-1009",
+   "title": "Separate connection pools for filing and batch processing jobs",
+   "desc": "Refund and notice batch jobs get their own pool so they never take connections needed for filing.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "radhika",
+   "incidents": [],
+   "ago": 60,
+   "file": "infra/db/pools.py"
+  },
+  {
+   "key": "DEBT-1010",
+   "title": "Load test the deadline night at 15x",
+   "desc": "Replay a deadline night at 15 times normal traffic against staging every June.",
+   "module": "forms",
+   "cat": "TEST_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "manjunath",
+   "incidents": [],
+   "needs": [
+    "DEBT-1001",
+    "DEBT-1006"
+   ],
+   "ago": 45
+  },
+  {
+   "key": "DEBT-1011",
+   "title": "Rate limit bulk reminder campaigns on deadline day",
+   "desc": "Throttle reminder SMS and email campaigns during peak hours so they cannot crowd out OTPs and confirmations.",
+   "module": "notify",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "manjunath",
+   "incidents": [],
+   "ago": 98,
+   "file": "portal/notify/campaigns.py"
+  },
+  {
+   "key": "DEBT-1012",
+   "title": "Unit tests for rebate and surcharge edge cases",
+   "desc": "Unit tests for incomes at the rebate and surcharge limits, run against the shared tax rules.",
+   "module": "validate",
+   "cat": "TEST_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "manjunath",
+   "incidents": [],
+   "needs": [
+    "DEBT-1005"
+   ],
+   "ago": 80
+  },
+  {
+   "key": "DEBT-1013",
+   "title": "Use IST for the filing deadline cut-off",
+   "desc": "The deadline is checked in IST so returns filed at 23:59 are on time.",
+   "module": "forms",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "abhishek",
+   "incidents": [],
+   "ago": 160
+  }
+ ],
+ "spike": {
+  "key": "itr-deadline",
+  "name": "ITR deadline night (31 July)",
+  "description": "Traffic runs at four times normal all day, climbs after office hours and stays at fifteen times normal from 22:00 to midnight as taxpayers file at the last minute.",
+  "profile": [
+   1.0,
+   0.6,
+   0.4,
+   0.3,
+   0.4,
+   0.6,
+   1.0,
+   1.6,
+   2.4,
+   3.0,
+   3.6,
+   4.0,
+   4.0,
+   4.0,
+   3.8,
+   3.8,
+   4.2,
+   4.8,
+   5.6,
+   7.0,
+   10.0,
+   12.0,
+   15.0,
+   15.0
+  ],
+  "entry": {
+   "login": 1.0,
+   "forms": 1.0,
+   "upload": 0.9,
+   "everify": 1.0,
+   "payments": 0.6
+  },
+  "exposure": {
+   "refunds": 0.05
+  },
+  "baseline": {
+   "db": 0.0547,
+   "everify": 0.0547,
+   "forms": 0.0547,
+   "login": 0.0547,
+   "notify": 0.0547,
+   "payments": 0.0745,
+   "prefill": 0.0547,
+   "refunds": 0.2647,
+   "upload": 0.0603,
+   "validate": 0.0467
+  }
+ }
+}

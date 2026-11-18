@@ -1,0 +1,1126 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "tatkal",
+ "order": 1,
+ "key": "RAIL",
+ "name": "RailYatra",
+ "industry": "Railways & ticketing",
+ "tagline": "Train ticketing where the busiest minute of the day is 10:00 AM",
+ "summary": "RailYatra books train tickets for 12 lakh passengers a day: search, booking, berth allocation, payments, PNR status, cancellations and SMS. Every morning at 10:00 the Tatkal window opens and a busy site becomes one of the busiest in the country. Double-booked berths, 'money debited, no ticket' and late OTPs keep coming back.",
+ "repository_url": "https://github.com/example/railyatra (fictional)",
+ "tour": {
+  "incident": "INC-519",
+  "debt": "DEBT-501",
+  "module": "seats",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Berths are allotted without a row lock, so every Tatkal rush can double-book a seat; fixing it costs 20 hours."
+ },
+ "people": {
+  "rakesh": {
+   "name": "Rakesh Tiwari",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "lakshmi": {
+   "name": "Lakshmi Narayanan",
+   "role": "tech_lead",
+   "title": "Engineering lead, reservations"
+  },
+  "imran": {
+   "name": "Imran Sheikh",
+   "role": "developer",
+   "title": "Developer, booking & berths"
+  },
+  "kavya": {
+   "name": "Kavya Hegde",
+   "role": "developer",
+   "title": "Developer, payments & refunds"
+  },
+  "prakash": {
+   "name": "Prakash Joshi",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "meenakshi": {
+   "name": "Meenakshi Rao",
+   "role": "manager",
+   "title": "Product manager, ticketing"
+  },
+  "guest": {
+   "name": "Zonal railway officers",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "gateway",
+   "path": "edge/gateway",
+   "description": "API gateway, routing and admission control",
+   "churn": 24,
+   "complexity": 64,
+   "loc": 1900,
+   "files": 5,
+   "owner": "lakshmi"
+  },
+  {
+   "name": "auth",
+   "path": "auth",
+   "description": "Login, OTP and sessions",
+   "churn": 22,
+   "complexity": 71,
+   "loc": 2100,
+   "files": 5,
+   "owner": "kavya"
+  },
+  {
+   "name": "search",
+   "path": "reservation/search",
+   "description": "Train search and seat availability",
+   "churn": 35,
+   "complexity": 112,
+   "loc": 3300,
+   "files": 7,
+   "owner": "imran"
+  },
+  {
+   "name": "booking",
+   "path": "reservation/booking",
+   "description": "Passenger details, quotas and the Tatkal window",
+   "churn": 58,
+   "complexity": 196,
+   "loc": 5200,
+   "files": 11,
+   "owner": "imran"
+  },
+  {
+   "name": "seats",
+   "path": "reservation/seats",
+   "description": "Berth allocation, RAC and waitlist",
+   "churn": 51,
+   "complexity": 168,
+   "loc": 4100,
+   "files": 8,
+   "owner": "imran"
+  },
+  {
+   "name": "payments",
+   "path": "payments",
+   "description": "UPI, cards and net banking through bank gateways",
+   "churn": 47,
+   "complexity": 151,
+   "loc": 3900,
+   "files": 9,
+   "owner": "kavya"
+  },
+  {
+   "name": "pnr",
+   "path": "pnr",
+   "description": "PNR status, e-tickets and My Bookings",
+   "churn": 19,
+   "complexity": 74,
+   "loc": 2200,
+   "files": 5,
+   "owner": "kavya"
+  },
+  {
+   "name": "refunds",
+   "path": "refunds",
+   "description": "Cancellations, TDR and refunds",
+   "churn": 21,
+   "complexity": 88,
+   "loc": 2500,
+   "files": 6,
+   "owner": "kavya"
+  },
+  {
+   "name": "notify",
+   "path": "notify",
+   "description": "SMS and email: OTPs, tickets, alerts",
+   "churn": 16,
+   "complexity": 47,
+   "loc": 1400,
+   "files": 4,
+   "owner": "prakash"
+  },
+  {
+   "name": "db",
+   "path": "db",
+   "description": "Central reservation database",
+   "churn": 9,
+   "complexity": 30,
+   "loc": 900,
+   "files": 6,
+   "owner": "lakshmi"
+  }
+ ],
+ "dependencies": [
+  [
+   "gateway",
+   "auth"
+  ],
+  [
+   "gateway",
+   "search"
+  ],
+  [
+   "gateway",
+   "booking"
+  ],
+  [
+   "gateway",
+   "pnr"
+  ],
+  [
+   "search",
+   "seats"
+  ],
+  [
+   "booking",
+   "auth"
+  ],
+  [
+   "booking",
+   "seats"
+  ],
+  [
+   "booking",
+   "payments"
+  ],
+  [
+   "booking",
+   "notify"
+  ],
+  [
+   "booking",
+   "pnr"
+  ],
+  [
+   "seats",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ],
+  [
+   "pnr",
+   "db"
+  ],
+  [
+   "refunds",
+   "payments"
+  ],
+  [
+   "refunds",
+   "seats"
+  ],
+  [
+   "refunds",
+   "db"
+  ],
+  [
+   "auth",
+   "notify"
+  ]
+ ],
+ "files": [
+  [
+   "reservation/seats/allocate.py",
+   "seats",
+   44,
+   38,
+   820,
+   1900,
+   4
+  ],
+  [
+   "reservation/seats/waitlist.py",
+   "seats",
+   18,
+   22,
+   540,
+   610,
+   2
+  ],
+  [
+   "edge/gateway/admission.py",
+   "gateway",
+   12,
+   9,
+   260,
+   300,
+   2
+  ],
+  [
+   "edge/gateway/routes.py",
+   "gateway",
+   21,
+   14,
+   410,
+   520,
+   3
+  ],
+  [
+   "reservation/search/availability.py",
+   "search",
+   33,
+   27,
+   690,
+   1340,
+   3
+  ],
+  [
+   "reservation/booking/flow.py",
+   "booking",
+   41,
+   44,
+   1120,
+   2210,
+   5
+  ],
+  [
+   "reservation/booking/tatkal_rules.py",
+   "booking",
+   26,
+   31,
+   560,
+   880,
+   3
+  ],
+  [
+   "payments/gateway/client.py",
+   "payments",
+   29,
+   25,
+   620,
+   980,
+   3
+  ],
+  [
+   "payments/gateway/callbacks.py",
+   "payments",
+   24,
+   21,
+   480,
+   760,
+   3
+  ],
+  [
+   "payments/reconcile/job.py",
+   "payments",
+   6,
+   8,
+   190,
+   110,
+   1
+  ],
+  [
+   "notify/sms/sender.py",
+   "notify",
+   19,
+   12,
+   330,
+   450,
+   2
+  ],
+  [
+   "auth/login/otp.py",
+   "auth",
+   17,
+   15,
+   380,
+   400,
+   2
+  ],
+  [
+   "auth/login/limits.py",
+   "auth",
+   8,
+   7,
+   150,
+   120,
+   1
+  ],
+  [
+   "pnr/history.py",
+   "pnr",
+   15,
+   16,
+   360,
+   340,
+   2
+  ],
+  [
+   "refunds/worker.py",
+   "refunds",
+   14,
+   18,
+   420,
+   390,
+   2
+  ],
+  [
+   "db/replicas.py",
+   "db",
+   5,
+   6,
+   140,
+   80,
+   1
+  ]
+ ],
+ "satd": [
+  [
+   "reservation/seats/allocate.py",
+   112,
+   "FIXME",
+   "read-then-write without a row lock: two bookings can take the same berth"
+  ],
+  [
+   "edge/gateway/admission.py",
+   23,
+   "TODO",
+   "admission control (waiting room) for the Tatkal window"
+  ],
+  [
+   "reservation/search/availability.py",
+   58,
+   "OPTIMIZE",
+   "queries the reservation DB on every refresh"
+  ],
+  [
+   "payments/gateway/client.py",
+   41,
+   "FIXME",
+   "no timeout on bank gateway calls"
+  ],
+  [
+   "payments/gateway/callbacks.py",
+   77,
+   "TODO",
+   "dedupe bank callbacks by idempotency key"
+  ],
+  [
+   "notify/sms/sender.py",
+   30,
+   "HACK",
+   "OTP and promotional SMS share one queue"
+  ],
+  [
+   "reservation/booking/tatkal_rules.py",
+   15,
+   "TODO",
+   "move Tatkal timings to configuration"
+  ],
+  [
+   "pnr/history.py",
+   64,
+   "OPTIMIZE",
+   "full scan of PNRs by mobile number"
+  ],
+  [
+   "refunds/worker.py",
+   88,
+   "XXX",
+   "a hung bank call blocks the whole refund worker"
+  ],
+  [
+   "auth/login/limits.py",
+   9,
+   "TODO",
+   "per-IP rate limit before Tatkal opens"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-501",
+   "title": "My Bookings page takes 40 seconds to load",
+   "desc": "Passengers opening My Bookings waited up to 40 seconds; the page searched every PNR for the passenger's mobile number.",
+   "module": "pnr",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 170,
+   "fixed": 169,
+   "effort": 4,
+   "by": "prakash",
+   "group": "G-PNRSLOW",
+   "whys": [
+    "My Bookings was very slow",
+    "Each load searched all PNRs for the passenger's mobile number",
+    "My Bookings looks up PNRs with a full table scan by mobile number"
+   ],
+   "fix": "Limited the page to the last 90 days of bookings.",
+   "lesson": "Limiting the window hides the missing index."
+  },
+  {
+   "key": "INC-502",
+   "title": "Booking site down for 14 minutes when Tatkal opened",
+   "desc": "At 10:00 the AC Tatkal window opened and the site returned 503 errors until 10:14; about 1.8 lakh passengers could not book.",
+   "module": "gateway",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.9,
+   "effort": 16,
+   "by": "lakshmi",
+   "group": "G-TATKAL",
+   "whys": [
+    "The site returned 503 errors from 10:00 to 10:14",
+    "Booking servers ran out of worker threads within seconds",
+    "Every Tatkal request hits the booking servers at once with no admission queue"
+   ],
+   "fix": "Added 20 more booking servers for the Tatkal hour.",
+   "lesson": "More servers move the cliff; they do not remove it."
+  },
+  {
+   "key": "INC-503",
+   "title": "Same berth allotted to two passengers on the Rajdhani",
+   "desc": "Two passengers with confirmed Tatkal tickets were given berth B2-34 on the same journey; the TTE had to move one of them.",
+   "module": "seats",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151,
+   "effort": 10,
+   "by": "prakash",
+   "group": "G-DOUBLE",
+   "whys": [
+    "Two confirmed tickets had the same berth",
+    "Two bookings allocated the berth at the same moment",
+    "Berth allocation reads and writes seats without a row-level lock"
+   ],
+   "fix": "Added a uniqueness check when the chart is prepared.",
+   "lesson": "A check at chart time finds the clash hours too late."
+  },
+  {
+   "key": "INC-504",
+   "title": "Login OTPs arriving 6 minutes late before Tatkal",
+   "desc": "Between 09:50 and 10:05 OTP SMS took up to 6 minutes to arrive, and most affected passengers missed the Tatkal window.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 145,
+   "fixed": 144,
+   "effort": 5,
+   "by": "meenakshi",
+   "group": "G-OTP",
+   "whys": [
+    "Passengers did not get their OTPs in time",
+    "OTP messages waited behind a bulk SMS campaign",
+    "OTP SMS share one queue with bulk promotional messages"
+   ],
+   "fix": "Paused the promotional campaign.",
+   "lesson": "Someone will schedule a bulk SMS at 9:45 again."
+  },
+  {
+   "key": "INC-505",
+   "title": "Money debited but no ticket for 2,100 passengers",
+   "desc": "UPI and card payments were debited but the bookings were marked failed; refunds took 5 to 7 days and support was flooded.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 140,
+   "fixed": 138,
+   "effort": 12,
+   "by": "kavya",
+   "group": "G-DEBIT",
+   "whys": [
+    "Passengers were charged without a ticket",
+    "The booking was marked failed when the bank confirmation arrived after the session expired",
+    "There is no reconciliation of bank debits against bookings"
+   ],
+   "fix": "Refunded the affected passengers from a manual report.",
+   "lesson": "We only find these when passengers complain."
+  },
+  {
+   "key": "INC-506",
+   "title": "Seat availability enquiry times out at 09:59",
+   "desc": "In the minute before Tatkal opens, availability checks take over 30 seconds and many fail, so passengers refresh again and again.",
+   "module": "search",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 132,
+   "fixed": 131.8,
+   "effort": 6,
+   "by": "prakash",
+   "whys": [
+    "Availability checks failed just before Tatkal",
+    "Each refresh ran a fresh availability query on the reservation database",
+    "Every availability enquiry queries the reservation database directly"
+   ],
+   "fix": "Asked passengers on social media not to refresh.",
+   "lesson": "Refreshing is what people do; the system has to expect it."
+  },
+  {
+   "key": "INC-507",
+   "title": "Sleeper Tatkal opened at 10:00 after the timing change",
+   "desc": "After the circular moving non-AC Tatkal to 11:00, sleeper-class Tatkal still opened at 10:00 for two days.",
+   "module": "booking",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 125,
+   "fixed": 124,
+   "effort": 6,
+   "by": "meenakshi",
+   "whys": [
+    "Sleeper Tatkal opened an hour early",
+    "The new timing was changed in one place but not in the booking checks",
+    "Tatkal quota and timing rules are hard-coded in the booking code"
+   ],
+   "fix": "Patched the hour in two files.",
+   "lesson": "Rules that change by circular should not live in code."
+  },
+  {
+   "key": "INC-508",
+   "title": "Passengers charged twice for one ticket",
+   "desc": "A retry after a slow bank response created a second debit for 340 bookings; each one was refunded by hand.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 118,
+   "fixed": 117,
+   "effort": 8,
+   "by": "kavya",
+   "group": "G-TWICE",
+   "whys": [
+    "Passengers were debited twice",
+    "The app retried the payment and the bank processed both requests",
+    "Bank callbacks are processed without an idempotency key"
+   ],
+   "fix": "Refunded the duplicate debits.",
+   "lesson": "Any retry can double-charge until requests carry a key."
+  },
+  {
+   "key": "INC-509",
+   "title": "Cancellation refunds stuck in 'processing' for 3 days",
+   "desc": "Refund requests stayed in processing because calls to one bank hung and blocked the refund worker.",
+   "module": "refunds",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 110,
+   "fixed": 108,
+   "effort": 5,
+   "by": "kavya",
+   "whys": [
+    "Refunds did not complete",
+    "The refund worker waited forever on one bank's API",
+    "Calls to the bank payment gateway have no timeout"
+   ],
+   "fix": "Restarted the refund worker.",
+   "lesson": "One slow bank stops all refunds."
+  },
+  {
+   "key": "INC-510",
+   "title": "PNR history API timing out for frequent travellers",
+   "desc": "Passengers with many past journeys see 'request timed out' on My Bookings; the query reads every PNR row.",
+   "module": "pnr",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 95,
+   "fixed": 94,
+   "effort": 4,
+   "by": "prakash",
+   "group": "G-PNRSLOW",
+   "whys": [
+    "My Bookings failed for frequent travellers",
+    "The query reads every PNR row to find the passenger's bookings",
+    "My Bookings looks up PNRs with a full table scan by mobile number"
+   ],
+   "fix": "Raised the API time limit to 60 seconds.",
+   "lesson": "A longer limit is a slower failure."
+  },
+  {
+   "key": "INC-511",
+   "title": "Two Tatkal passengers allotted the same lower berth",
+   "desc": "Berth S5-1 on the Karnataka Express was allotted to two passengers who booked within the same second.",
+   "module": "seats",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87,
+   "effort": 9,
+   "by": "prakash",
+   "group": "G-DOUBLE",
+   "whys": [
+    "Two passengers got the same berth",
+    "Both bookings saw the berth as free at the same time",
+    "Berth allocation reads and writes seats without a row-level lock"
+   ],
+   "fix": "Moved one passenger when the chart was prepared.",
+   "lesson": "The race is still there."
+  },
+  {
+   "key": "INC-512",
+   "title": "Debited, no ticket: 900 failed bookings on Diwali Tatkal",
+   "desc": "Bank confirmations arrived after the bookings had expired, so 900 passengers were charged without tickets.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79,
+   "effort": 10,
+   "by": "kavya",
+   "group": "G-DEBIT",
+   "whys": [
+    "Passengers were charged without tickets",
+    "Late bank confirmations were ignored after the booking expired",
+    "There is no reconciliation of bank debits against bookings"
+   ],
+   "fix": "Ran the manual refund report again.",
+   "lesson": "Same as last time."
+  },
+  {
+   "key": "INC-513",
+   "title": "Booking servers hung at 10:02 waiting on one bank",
+   "desc": "Every booking thread was waiting for one bank's payment page, so new bookings could not start for 9 minutes.",
+   "module": "booking",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 72,
+   "fixed": 71.9,
+   "effort": 10,
+   "by": "lakshmi",
+   "whys": [
+    "Booking stopped accepting new requests",
+    "Every booking thread was blocked on calls to the slow bank",
+    "Calls to the bank payment gateway have no timeout"
+   ],
+   "fix": "Removed the slow bank from the payment page.",
+   "lesson": "A slow dependency is worse than a dead one."
+  },
+  {
+   "key": "INC-514",
+   "title": "503 errors for 9 minutes at the 10 AM Tatkal opening",
+   "desc": "Despite the extra servers the site returned 'Service unavailable' from 10:00 to 10:09 as 2.5 lakh passengers pressed Book together.",
+   "module": "gateway",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 60,
+   "fixed": 59.9,
+   "effort": 14,
+   "by": "lakshmi",
+   "group": "G-TATKAL",
+   "whys": [
+    "The site returned 503 errors at 10:00",
+    "Booking servers were saturated by simultaneous requests",
+    "Every Tatkal request hits the booking servers at once with no admission queue"
+   ],
+   "fix": "Added more servers again.",
+   "lesson": "The peak grows faster than our server count."
+  },
+  {
+   "key": "INC-515",
+   "title": "OTP SMS delayed 4 minutes at 09:55",
+   "desc": "Passengers logging in for Tatkal got their OTPs after 4 minutes while a festival-offer SMS blast was running.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 45,
+   "fixed": 44,
+   "effort": 4,
+   "by": "meenakshi",
+   "group": "G-OTP",
+   "whys": [
+    "OTPs arrived late",
+    "OTP messages queued behind the festival SMS blast",
+    "OTP SMS share one queue with bulk promotional messages"
+   ],
+   "fix": "Stopped the SMS blast.",
+   "lesson": "It happened again because the queue is still shared."
+  },
+  {
+   "key": "INC-516",
+   "title": "Double debit after a UPI retry",
+   "desc": "UPI collect requests retried after a slow response were debited twice for 180 tickets.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 33,
+   "fixed": 32,
+   "effort": 6,
+   "by": "kavya",
+   "group": "G-TWICE",
+   "whys": [
+    "Passengers paid twice",
+    "The retried UPI request was treated as a new payment",
+    "Bank callbacks are processed without an idempotency key"
+   ],
+   "fix": "Refunded the duplicates.",
+   "lesson": "Retries need idempotency keys."
+  },
+  {
+   "key": "INC-517",
+   "title": "Charged but booking failed for 600 Tatkal passengers",
+   "desc": "Payments succeeded at the bank but the bookings show failed; refunds have not been started yet.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 21,
+   "effort": 8,
+   "by": "kavya",
+   "group": "G-DEBIT",
+   "whys": [
+    "Passengers were charged without tickets",
+    "Bank confirmations arrived after the booking sessions expired",
+    "There is no reconciliation of bank debits against bookings"
+   ]
+  },
+  {
+   "key": "INC-518",
+   "title": "UPI payment page spins forever when a bank is slow",
+   "desc": "When one bank's UPI service slowed down, the payment page waited indefinitely and Tatkal passengers lost their seats.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 14,
+   "fixed": 13,
+   "effort": 5,
+   "by": "kavya",
+   "whys": [
+    "The payment page never completed",
+    "The call to the bank's UPI service never returned",
+    "Calls to the bank payment gateway have no timeout"
+   ],
+   "fix": "Moved traffic away from the slow bank by hand.",
+   "lesson": "A manual switch takes 20 minutes we do not have at 10 AM."
+  },
+  {
+   "key": "INC-519",
+   "title": "Duplicate berth allocation on the Shatabdi",
+   "desc": "Seat C3-45 was allotted twice in this morning's Tatkal rush; both passengers hold confirmed e-tickets.",
+   "module": "seats",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 6,
+   "effort": 9,
+   "by": "prakash",
+   "group": "G-DOUBLE",
+   "whys": [
+    "Two confirmed tickets share a seat",
+    "Concurrent bookings allocated the same seat",
+    "Berth allocation reads and writes seats without a row-level lock"
+   ]
+  },
+  {
+   "key": "INC-520",
+   "title": "OTP not delivered for 5 minutes before Tatkal",
+   "desc": "Passengers report OTPs arriving after 10:00 while a bulk SMS campaign was running.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 2,
+   "effort": 4,
+   "by": "meenakshi",
+   "group": "G-OTP",
+   "whys": [
+    "Login OTPs were late",
+    "The OTP queue was full of promotional messages",
+    "OTP SMS share one queue with bulk promotional messages"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-501",
+   "title": "Allocate berths with row-level locks and a version check",
+   "desc": "Lock the berth row being allotted and reject the write if its version changed, so concurrent Tatkal bookings cannot take the same berth.",
+   "module": "seats",
+   "cat": "ARCHITECTURAL",
+   "principal": 20,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "imran",
+   "incidents": [
+    "INC-503",
+    "INC-511",
+    "INC-519"
+   ],
+   "cause": "Berth allocation reads and writes seats without a row-level lock",
+   "ago": 150,
+   "file": "reservation/seats/allocate.py"
+  },
+  {
+   "key": "DEBT-502",
+   "title": "Virtual waiting room: a durable queue for the Tatkal window",
+   "desc": "Admit passengers to booking at the rate the servers can take and hold the rest in a durable queue that shows their place, instead of every request hitting booking at 10:00.",
+   "module": "gateway",
+   "cat": "ARCHITECTURAL",
+   "principal": 16,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "lakshmi",
+   "incidents": [
+    "INC-502",
+    "INC-514"
+   ],
+   "cause": "Every Tatkal request hits the booking servers at once with no admission queue",
+   "ago": 158,
+   "file": "edge/gateway/admission.py"
+  },
+  {
+   "key": "DEBT-503",
+   "title": "Serve seat availability from a precomputed cache",
+   "desc": "Precompute availability per train and class every few seconds and serve cached results, so refreshes before Tatkal do not query the reservation database.",
+   "module": "search",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "imran",
+   "incidents": [
+    "INC-506"
+   ],
+   "cause": "Every availability enquiry queries the reservation database directly",
+   "ago": 130,
+   "file": "reservation/search/availability.py"
+  },
+  {
+   "key": "DEBT-504",
+   "title": "Put a timeout on every bank gateway call",
+   "desc": "Give every call to a bank or UPI service a connect and read timeout so a slow bank fails fast and frees the thread.",
+   "module": "payments",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "PRIORITIZED",
+   "priority": "CRITICAL",
+   "owner": "kavya",
+   "incidents": [
+    "INC-509",
+    "INC-513",
+    "INC-518"
+   ],
+   "cause": "Calls to the bank payment gateway have no timeout",
+   "ago": 105,
+   "file": "payments/gateway/client.py"
+  },
+  {
+   "key": "DEBT-505",
+   "title": "Idempotency keys on payment requests and bank callbacks",
+   "desc": "Send a unique key with every payment request and ignore repeated callbacks for the same key, so a retry can never debit twice.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kavya",
+   "incidents": [
+    "INC-508",
+    "INC-516"
+   ],
+   "cause": "Bank callbacks are processed without an idempotency key",
+   "ago": 116,
+   "file": "payments/gateway/callbacks.py"
+  },
+  {
+   "key": "DEBT-506",
+   "title": "Reconcile bank debits against bookings every 15 minutes",
+   "desc": "A reconciliation job matches every debit with a booking; an unmatched debit is booked if seats remain, or refunded automatically.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kavya",
+   "incidents": [
+    "INC-505",
+    "INC-512",
+    "INC-517"
+   ],
+   "needs": [
+    "DEBT-505"
+   ],
+   "cause": "There is no reconciliation of bank debits against bookings",
+   "ago": 136,
+   "file": "payments/reconcile/job.py"
+  },
+  {
+   "key": "DEBT-507",
+   "title": "Separate priority queue for OTP SMS",
+   "desc": "Send OTP messages through their own durable queue ahead of bulk and promotional SMS, and alert when OTP delivery takes over 20 seconds.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "prakash",
+   "incidents": [
+    "INC-504",
+    "INC-515",
+    "INC-520"
+   ],
+   "cause": "OTP SMS share one queue with bulk promotional messages",
+   "ago": 143,
+   "file": "notify/sms/sender.py"
+  },
+  {
+   "key": "DEBT-508",
+   "title": "Throttle logins and rate-limit bots before the Tatkal window",
+   "desc": "Per-IP and per-account rate limits on login and booking, with a CAPTCHA only when a limit is crossed, so scripted bots cannot use up booking capacity.",
+   "module": "auth",
+   "cat": "SECURITY_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kavya",
+   "incidents": [],
+   "ago": 64,
+   "file": "auth/login/limits.py"
+  },
+  {
+   "key": "DEBT-509",
+   "title": "Serve PNR status from a read replica with a lag check",
+   "desc": "Route PNR status and booking-history reads to a read replica, falling back to the primary when replica lag is over 5 seconds.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 14,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "lakshmi",
+   "incidents": [],
+   "ago": 90,
+   "file": "db/replicas.py"
+  },
+  {
+   "key": "DEBT-510",
+   "title": "Index PNR lookups by passenger mobile number",
+   "desc": "Add a composite index on (mobile, journey date) so My Bookings reads only the passenger's own PNRs.",
+   "module": "pnr",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "kavya",
+   "incidents": [
+    "INC-501",
+    "INC-510"
+   ],
+   "cause": "My Bookings looks up PNRs with a full table scan by mobile number",
+   "ago": 168,
+   "file": "pnr/history.py"
+  },
+  {
+   "key": "DEBT-511",
+   "title": "Process refunds from a durable queue with retries",
+   "desc": "Each refund becomes a message in a durable queue with retries and a dead-letter list, so one hung bank cannot stop every refund.",
+   "module": "refunds",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "kavya",
+   "incidents": [
+    "INC-509"
+   ],
+   "needs": [
+    "DEBT-504"
+   ],
+   "ago": 107,
+   "file": "refunds/worker.py"
+  },
+  {
+   "key": "DEBT-512",
+   "title": "Load test the Tatkal window at 25x before each holiday season",
+   "desc": "A repeatable load test that replays a Tatkal opening at 25 times a normal peak against staging, run before Diwali, Chhath and summer holidays.",
+   "module": "booking",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "prakash",
+   "incidents": [],
+   "needs": [
+    "DEBT-502"
+   ],
+   "ago": 58
+  },
+  {
+   "key": "DEBT-513",
+   "title": "Move Tatkal quota and timing rules into configuration",
+   "desc": "Quota sizes and opening hours per class become configuration with an effective date, changed without a code release.",
+   "module": "booking",
+   "cat": "CODE_SMELL",
+   "principal": 5,
+   "status": "IN_PROGRESS",
+   "priority": "MEDIUM",
+   "owner": "imran",
+   "incidents": [
+    "INC-507"
+   ],
+   "cause": "Tatkal quota and timing rules are hard-coded in the booking code",
+   "ago": 123,
+   "file": "reservation/booking/tatkal_rules.py"
+  },
+  {
+   "key": "DEBT-514",
+   "title": "Idempotent booking confirmation SMS",
+   "desc": "Send one confirmation SMS per PNR even when the booking event is delivered twice.",
+   "module": "notify",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "prakash",
+   "incidents": [],
+   "ago": 150
+  }
+ ],
+ "spike": {
+  "key": "tatkal-10am",
+  "name": "Tatkal opening at 10 AM",
+  "description": "AC Tatkal opens at 10:00 and non-AC at 11:00: lakhs of passengers log in from 09:45 and press Book in the same second, twenty-five times a normal peak.",
+  "profile": [
+   0.3,
+   0.2,
+   0.2,
+   0.2,
+   0.3,
+   0.5,
+   0.8,
+   1.2,
+   1.8,
+   4.0,
+   25.0,
+   18.0,
+   4.0,
+   2.0,
+   1.6,
+   1.4,
+   1.3,
+   1.2,
+   1.2,
+   1.1,
+   1.0,
+   0.9,
+   0.6,
+   0.4
+  ],
+  "entry": {
+   "gateway": 1.0,
+   "auth": 1.0,
+   "booking": 1.0,
+   "search": 0.9,
+   "payments": 0.8,
+   "notify": 0.7,
+   "pnr": 0.4,
+   "refunds": 0.05
+  },
+  "exposure": {
+   "pnr": 0.5,
+   "refunds": 0.05
+  },
+  "baseline": {
+   "auth": 0.0328,
+   "booking": 0.0328,
+   "db": 0.0328,
+   "gateway": 0.0328,
+   "notify": 0.0328,
+   "payments": 0.0328,
+   "pnr": 0.0631,
+   "refunds": 0.2045,
+   "search": 0.0328,
+   "seats": 0.0328
+  }
+ }
+}

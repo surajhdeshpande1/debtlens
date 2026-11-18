@@ -94,7 +94,7 @@ async function evalTab(box) {
   chart($("[data-ret]", box), { type: "bar", data: { labels: r.retrieval.map((m) => m.method.replace(" (lexical)", "").replace("Char n-gram TF-IDF", "Char n-gram").replace(" embeddings", "").replace("Hybrid α=", "Hybrid ")), datasets: [
       { label: "Precision@1", data: r.retrieval.map((m) => m["p@1"]), backgroundColor: COLORS.accent },
       { label: "MRR", data: r.retrieval.map((m) => m.mrr), backgroundColor: COLORS.accent2 }] },
-    options: { scales: { y: { min: 0, max: 1, grid: { color: COLORS.grid } }, x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, font: { size: 10.5 } } } } } });
+    options: { scales: { y: { min: 0, max: 1, grid: { color: COLORS.grid } }, x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 50, minRotation: 35, font: { size: 10.5 } } } } } });
   chart($("[data-reg]", box), { type: "line", data: { labels: r.regression.map((x) => x.tau), datasets: [
       { label: "Precision", data: r.regression.map((x) => x.precision), borderColor: COLORS.accent, backgroundColor: COLORS.accent, tension: 0.2 },
       { label: "Recall", data: r.regression.map((x) => x.recall), borderColor: COLORS.warn, backgroundColor: COLORS.warn, tension: 0.2 },

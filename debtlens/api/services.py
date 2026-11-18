@@ -108,7 +108,8 @@ def snapshot(s: Session, proj: Project, with_embeddings: bool = True) -> dict:
     res = s.execute(select(Resolution).where(Resolution.incident_id.in_(inc_ids))).scalars().all() if inc_ids else []
     return {
         "project": {"id": proj.id, "name": proj.project_name, "key": proj.project_key, "description": proj.description,
-                    "repository_url": proj.repository_url, "scenario": proj.scenario_code, "industry": proj.industry},
+                    "repository_url": proj.repository_url, "scenario": proj.scenario_code, "industry": proj.industry,
+                    "spike": spike_preset(proj)},
         "now": iso(utcnow()),
         "modules": [{"id": m.id, "name": m.module_name, "path": m.path, "description": m.description, "churn": m.churn,
                      "complexity": m.complexity, "loc": m.loc, "files": m.files} for m in mods],
@@ -270,14 +271,20 @@ def record_whys(s: Session, proj: Project, inc: Incident, whys: list[str], use_m
 
 # ----------------------------------------------------------------------------- seeding
 
-def seed_scenario(s: Session, org: Organization, code: str, *, sandbox_key: str | None = None,
+UPLOADED = "upload"   # scenario_code of a project opened from an uploaded pack (the pack is kept in its settings)
+
+
+def seed_scenario(s: Session, org: Organization, code: str | dict, *, sandbox_key: str | None = None,
                   expires_at: datetime | None = None, name: str | None = None) -> Project:
-    snap = SC.materialize(code)
-    sc = SC.get(code)
+    """Create a project from a built-in scenario or bundled pack (by code) or from an uploaded, validated pack."""
+    sc = SC.resolve(code)
+    uploaded = isinstance(code, dict)
+    snap = SC.materialize(sc)
     now = utcnow()
     proj = Project(org_id=org.id, project_name=name or snap["project"]["name"], project_key=snap["project"]["key"],
                    description=snap["project"]["description"], repository_url=snap["project"]["repository_url"],
-                   industry=snap["project"]["industry"], scenario_code=code, is_sandbox=sandbox_key is not None,
+                   industry=snap["project"]["industry"], scenario_code=UPLOADED if uploaded else sc["code"],
+                   is_sandbox=sandbox_key is not None,
                    sandbox_key=sandbox_key, expires_at=expires_at,
                    next_incident_no=_next_no([i["key"] for i in snap["incidents"]]),
                    next_debt_no=_next_no([d["key"] for d in snap["debts"]]), created_at=now)
@@ -369,9 +376,30 @@ def seed_scenario(s: Session, org: Organization, code: str, *, sandbox_key: str 
     for m in sc["modules"]:
         if m.get("owner"):
             owners[m["name"]] = m["owner"]
-    proj.settings = {"people": snap.get("people", {}), "tour": sc.get("tour"), "module_owners": owners}
+    proj.settings = {"people": snap.get("people", {}), "people_order": list(snap.get("people", {})),
+                     "tour": sc.get("tour"), "module_owners": owners}
+    if uploaded:
+        proj.settings["pack"] = sc
     s.flush()
     return proj
+
+
+def scenario_of(proj: Project) -> dict | None:
+    """The scenario or pack a project was opened from (None for a team's own project)."""
+    st = proj.settings or {}
+    if isinstance(st.get("pack"), dict):
+        return st["pack"]
+    if proj.scenario_code and proj.scenario_code != UPLOADED:
+        try:
+            return SC.resolve(proj.scenario_code)
+        except KeyError:
+            return None
+    return None
+
+
+def spike_preset(proj: Project) -> dict | None:
+    sc = scenario_of(proj)
+    return SC.spike_preset(sc) if sc else None
 
 
 def _next_no(keys: list[str]) -> int:
@@ -434,7 +462,7 @@ def cleanup_sandboxes(s: Session, limit: int = 20) -> int:
     return len(expired)
 
 
-def create_sandbox(s: Session, code: str) -> Project:
+def create_sandbox(s: Session, code: str | dict) -> Project:
     cleanup_sandboxes(s)
     org = sandbox_org(s)
     key = secrets.token_urlsafe(18)
@@ -553,10 +581,12 @@ def warm_cache(s: Session, budget_s: float = 25.0) -> dict:
     if model is None:
         return {"model": False, "error": EMB.status().get("error")}
     added = 0
-    for sc in SC.list_scenarios():
+    from ..core import packs as PK
+
+    for code in [sc["code"] for sc in SC.list_scenarios()] + PK.codes():
         if time.time() - t0 > budget_s:
             break
-        snap = SC.materialize(sc["code"])
+        snap = SC.materialize(code)
         texts = [incident_text(i) for i in snap["incidents"]] + [c["label"] for c in snap["causes"]]
         keys = {_h(t): t for t in texts}
         have = {r for (r,) in s.execute(select(EmbeddingCache.text_hash).where(EmbeddingCache.text_hash.in_(list(keys))))}

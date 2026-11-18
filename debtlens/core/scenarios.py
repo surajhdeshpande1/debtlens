@@ -15,6 +15,7 @@ same module, was resolved.
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -47,9 +48,50 @@ def get(code: str) -> dict:
     return _load(code)
 
 
+_CODE = re.compile(r"^[a-z0-9][a-z0-9-]{0,29}$")
+
+
+def resolve(code_or_sc) -> dict:
+    """A built-in scenario or a bundled scenario pack by code, or a (validated) pack dict as it is.
+    Raises KeyError for an unknown code."""
+    if isinstance(code_or_sc, dict):
+        return code_or_sc
+    code = str(code_or_sc or "").strip().lower()
+    if not _CODE.match(code):
+        raise KeyError(f"unknown scenario {code!r}")
+    if (SCENARIO_DIR / f"{code}.json").is_file():
+        return _load(code)
+    from . import packs
+
+    return packs.get(code)
+
+
+def known(code: str) -> bool:
+    try:
+        resolve(code)
+        return True
+    except KeyError:
+        return False
+
+
+def is_pack(sc: dict) -> bool:
+    return bool(sc.get("format"))
+
+
+def spike_preset(code_or_sc) -> dict | None:
+    """The load-spike event that comes with a scenario: a pack's own, or a built-in scenario's preset."""
+    from . import spike as SPIKE
+
+    try:
+        sc = resolve(code_or_sc)
+    except KeyError:
+        return None
+    return sc.get("spike") if is_pack(sc) else SPIKE.PRESETS.get(sc.get("code") or "")
+
+
 def materialize(code_or_sc, now: datetime | None = None) -> dict:
-    """Scenario -> analysis snapshot with integer ids and absolute timestamps."""
-    sc = _load(code_or_sc) if isinstance(code_or_sc, str) else code_or_sc
+    """Scenario or pack -> analysis snapshot with integer ids and absolute timestamps."""
+    sc = resolve(code_or_sc)
     now = (now or datetime.now(timezone.utc)).replace(tzinfo=None, microsecond=0)
 
     def at(days_ago) -> str | None:
@@ -135,7 +177,8 @@ def materialize(code_or_sc, now: datetime | None = None) -> dict:
             c["category"] = "ROOT"
     return {
         "project": {"name": sc["name"], "key": sc.get("key", sc["code"][:4].upper()), "description": sc["summary"],
-                    "repository_url": sc.get("repository_url"), "scenario": sc["code"], "industry": sc["industry"]},
+                    "repository_url": sc.get("repository_url"), "scenario": sc["code"], "industry": sc["industry"],
+                    "spike": spike_preset(sc)},
         "now": now.isoformat(),
         "people": people,
         "modules": modules,
@@ -153,7 +196,7 @@ def materialize(code_or_sc, now: datetime | None = None) -> dict:
 
 def labels(code_or_sc) -> dict:
     """Ground truth: duplicate families and the regressions they imply."""
-    sc = _load(code_or_sc) if isinstance(code_or_sc, str) else code_or_sc
+    sc = resolve(code_or_sc)
     groups: dict[str, list[str]] = {}
     for inc in sc["incidents"]:
         if inc.get("group"):

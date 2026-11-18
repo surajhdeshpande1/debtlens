@@ -90,6 +90,33 @@ def test_playbooks_and_load_spike_offline():
     assert run("simulate", "spike", "-s", "fintech", "--event", "nonsense").exit_code != 0
 
 
+def test_scenario_pack_commands(tmp_path):
+    packs = json.loads(run("pack", "list", "--json").output)
+    assert [p["code"] for p in packs] == ["tatkal", "broker", "food", "stream", "rides", "taxfiling", "tickets"]
+    listed = {s["code"] for s in json.loads(run("scenarios", "--json").output)}
+    assert listed >= {"fintech", "tatkal", "tickets"}
+    r = run("pack", "show", "food")
+    assert r.exit_code == 0 and "IPL final night" in r.output and "dispatch" in r.output, r.output
+    out = tmp_path / "rail.json"
+    assert run("pack", "export", "tatkal", "-o", str(out)).exit_code == 0 and out.stat().st_size > 10_000
+    r = run("pack", "validate", str(out))
+    assert r.exit_code == 0 and "valid pack" in r.output, r.output
+    s = json.loads(run("simulate", "spike", "-s", str(out), "--runs", "60", "--json").output)
+    assert s["event"]["key"] == "tatkal-10am" and s["plan"]["hours_used"] <= 40
+    assert json.loads(run("plan", "-s", "rides", "--budget", "40", "--json").output)["total_weight"] <= 40
+    r = run("demo", str(out))
+    assert r.exit_code == 0 and "RailYatra" in r.output, r.output
+    broken = json.loads(out.read_text())
+    broken["debts"][0]["module"] = "space"
+    bad = tmp_path / "broken.json"
+    bad.write_text(json.dumps(broken))
+    r = run("pack", "validate", str(bad))
+    assert r.exit_code == 1 and "space" in r.output
+    r = run("plan", "-s", str(bad))
+    assert r.exit_code != 0 and "not a usable pack" in (r.output + str(r.exception))
+    assert run("pack", "show", "nope").exit_code != 0
+
+
 def test_ci_exit_codes():
     assert run("ci", "-s", "fintech", "--max-open-critical", "0").exit_code == 1
     assert run("ci", "-s", "fintech", "--max-open-critical", "10").exit_code == 0

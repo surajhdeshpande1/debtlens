@@ -39,4 +39,4 @@ Source = "https://github.com/surajhdeshpande1/debtlens"
 include = ["debtlens*"]
 
 [tool.setuptools.package-data]
-debtlens = ["scenarios/*.json", "web/*", "web/**/*"]
+debtlens = ["scenarios/*.json", "packs/*.json", "web/*", "web/**/*"]

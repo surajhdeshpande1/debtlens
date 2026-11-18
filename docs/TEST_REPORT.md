@@ -1,16 +1,16 @@
 # DebtLens v2 — Test report
 
-Run on 18 November 2026 (IST), branch `v2`. Every number below comes from a run of the code in this repository;
+Run on 19 November 2026 (IST), branch `v2`. Every number below comes from a run of the code in this repository;
 none is typed in by hand.
 
 ## Summary
 
 | Suite | File | Tests | Result | Time |
 |---|---|---|---|---|
-| Engine | `tests/test_core.py` | 83 | all passed | 3.8 s |
-| REST API, roles, sandboxes | `tests/test_api.py` | 33 | all passed on SQLite, and again on MySQL 8.0.46 | 9.3 s / 38.7 s |
-| Terminal tool | `tests/test_cli.py` | 15 | all passed | 3.0 s |
-| **Total** | | **131** | **0 failed, 0 skipped** | **16.1 s** |
+| Engine and scenario packs | `tests/test_core.py` | 93 | all passed | 3.2 s |
+| REST API, roles, sandboxes, packs | `tests/test_api.py` | 35 | all passed on SQLite, and again on MySQL 8.0.46 | 7.3 s / 28.3 s |
+| Terminal tool | `tests/test_cli.py` | 16 | all passed | 2.3 s |
+| **Total** | | **144** | **0 failed, 0 skipped** | **12.7 s** |
 
 - **Local run:** Linux, Python 3.13, with the MiniLM model loaded (`DEBTLENS_MODEL_DIR` set).
 - **GitHub Actions:** runs on every push with Python 3.12 (the version Vercel uses) and MiniLM switched off, so the TF-IDF
@@ -21,7 +21,7 @@ How to run:
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                                   # 131 tests, SQLite
+python -m pytest tests -q                                   # 144 tests, SQLite
 DEBTLENS_TEST_DATABASE_URL=mysql+pymysql://user:pass@localhost/debtlens_test \
   python -m pytest tests/test_api.py -q                     # the API suite on a real MySQL 8 server
 ```
@@ -145,6 +145,25 @@ best items are also the best value per hour.
   They agree on CareStream and differ most on ShopSwift, where the sale stresses modules that rarely fail on a normal
   day. DEBT-411 enters the CampusOne plan only because DEBT-401 needs it first. The self-audit scenario has no
   traffic event of its own, and its default custom spike finds nothing worth fixing (1.8 h lost either way).
+
+## 5a. Scenario packs
+
+`tests/test_core.py` runs every page and simulation on each of the seven bundled packs. It checks that each pack is
+valid, that every debt item matches a specific playbook, and that each pack's own load-spike event is used. It
+also checks that the spike plan cuts the hours lost on the day by at least 40% and does at least as well as the
+regular sprint plan. `tests/test_api.py` opens packs by code and by upload (including a broken upload that must
+list its problems and a reset that keeps the uploaded pack), and `tests/test_cli.py` exports, validates and
+simulates a pack file. With MiniLM on, 40 hours to prepare and 300 simulated days:
+
+| Code | System | Busiest day | P@1 (hybrid) | Regression F1 | Hours lost: now → after | Spike plan saves (95% CI) | Regular plan saves |
+|---|---|---|---|---|---|---|---|
+| `tatkal` | RailYatra | Tatkal opening at 10 AM (25×) | 0.93 | 0.90 | 131.7 → 46.1 h | 85.7 h (82.5–88.8) | 34.6 h |
+| `broker` | NiveshTrade | Union Budget day (12×) | 0.93 | 0.89 | 141.1 → 59.7 h | 81.4 h (78.6–84.3) | 45.3 h |
+| `food` | ZaikaNow | IPL final night (9×) | 1.00 | 1.00 | 152.8 → 61.5 h | 91.3 h (88.4–94.2) | 60.5 h |
+| `stream` | KhelStream | World Cup final (20×) | 1.00 | 1.00 | 149.5 → 51.5 h | 98.0 h (95.0–100.9) | 50.2 h |
+| `rides` | SawariGo | New Year's Eve (8×) | 0.88 | 0.89 | 113.1 → 28.4 h | 84.7 h (82.6–86.9) | 53.9 h |
+| `taxfiling` | TaxSetu | ITR deadline night (31 July) (15×) | 0.94 | 0.95 | 151.8 → 38.0 h | 113.8 h (111.1–116.4) | 71.1 h |
+| `tickets` | ShowPass | Stadium tour on-sale at noon (30×) | 1.00 | 0.90 | 146.8 → 42.0 h | 104.7 h (101.8–107.7) | 67.4 h |
 
 ## 6. Browser checks
 

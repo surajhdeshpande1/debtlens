@@ -1,0 +1,1042 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "rides",
+ "order": 5,
+ "key": "SWRI",
+ "name": "SawariGo",
+ "industry": "Ride-hailing",
+ "tagline": "Cabs and autos in 25 cities, where New Year's Eve ends the year with its busiest hour",
+ "summary": "SawariGo matches riders with 3 lakh cab and auto drivers: rider and driver apps, matching, fares and surge, maps, trips, payments, SOS safety and notifications. On New Year's Eve demand climbs all evening and peaks at eight times a normal busy hour just before midnight. Riders stuck on 'searching for drivers', fares that change after the quote and late SOS alerts keep coming back.",
+ "repository_url": "https://github.com/example/sawarigo (fictional)",
+ "tour": {
+  "incident": "INC-920",
+  "debt": "DEBT-901",
+  "module": "matching",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Matching searches every driver in the city for every ride request, so every busy night leaves riders searching; a geospatial index costs 12 hours."
+ },
+ "people": {
+  "gopal": {
+   "name": "Gopal Krishna",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "neeraj": {
+   "name": "Neeraj Chauhan",
+   "role": "tech_lead",
+   "title": "Engineering lead, marketplace"
+  },
+  "aisha": {
+   "name": "Aisha Siddiqui",
+   "role": "developer",
+   "title": "Developer, matching & pricing"
+  },
+  "rahul": {
+   "name": "Rahul Nair",
+   "role": "developer",
+   "title": "Developer, trips & payments"
+  },
+  "swati": {
+   "name": "Swati Kulkarni",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "varun": {
+   "name": "Varun Malhotra",
+   "role": "manager",
+   "title": "Product manager, rider experience"
+  },
+  "guest": {
+   "name": "Safety team",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "rider",
+   "path": "svc/rider-api",
+   "description": "Rider app API: quotes, booking, tracking",
+   "churn": 37,
+   "complexity": 113,
+   "loc": 3300,
+   "files": 8,
+   "owner": "varun"
+  },
+  {
+   "name": "driver",
+   "path": "svc/driver-api",
+   "description": "Driver app API and location pings",
+   "churn": 41,
+   "complexity": 127,
+   "loc": 3500,
+   "files": 8,
+   "owner": "rahul"
+  },
+  {
+   "name": "matching",
+   "path": "svc/matching",
+   "description": "Matching riders with nearby drivers",
+   "churn": 53,
+   "complexity": 181,
+   "loc": 4600,
+   "files": 10,
+   "owner": "aisha"
+  },
+  {
+   "name": "pricing",
+   "path": "svc/pricing",
+   "description": "Fares, surge and fare holds",
+   "churn": 36,
+   "complexity": 124,
+   "loc": 3200,
+   "files": 7,
+   "owner": "aisha"
+  },
+  {
+   "name": "maps",
+   "path": "svc/maps",
+   "description": "Routing, ETAs and the road graph",
+   "churn": 22,
+   "complexity": 115,
+   "loc": 3100,
+   "files": 6,
+   "owner": "aisha"
+  },
+  {
+   "name": "trips",
+   "path": "svc/trips",
+   "description": "Trip lifecycle, ride OTPs and status",
+   "churn": 44,
+   "complexity": 152,
+   "loc": 4000,
+   "files": 9,
+   "owner": "rahul"
+  },
+  {
+   "name": "payments",
+   "path": "svc/payments",
+   "description": "Wallet, UPI and cash settlement",
+   "churn": 30,
+   "complexity": 108,
+   "loc": 2900,
+   "files": 7,
+   "owner": "rahul"
+  },
+  {
+   "name": "safety",
+   "path": "svc/safety",
+   "description": "SOS alerts and trip sharing",
+   "churn": 16,
+   "complexity": 52,
+   "loc": 1500,
+   "files": 4,
+   "owner": "swati"
+  },
+  {
+   "name": "notify",
+   "path": "svc/notify",
+   "description": "Push, SMS and in-app messages",
+   "churn": 13,
+   "complexity": 43,
+   "loc": 1200,
+   "files": 4,
+   "owner": "swati"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "Trips, drivers and payments database",
+   "churn": 8,
+   "complexity": 27,
+   "loc": 800,
+   "files": 5,
+   "owner": "neeraj"
+  }
+ ],
+ "dependencies": [
+  [
+   "rider",
+   "pricing"
+  ],
+  [
+   "rider",
+   "matching"
+  ],
+  [
+   "rider",
+   "trips"
+  ],
+  [
+   "matching",
+   "driver"
+  ],
+  [
+   "matching",
+   "maps"
+  ],
+  [
+   "trips",
+   "payments"
+  ],
+  [
+   "trips",
+   "notify"
+  ],
+  [
+   "trips",
+   "db"
+  ],
+  [
+   "pricing",
+   "maps"
+  ],
+  [
+   "driver",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ],
+  [
+   "safety",
+   "trips"
+  ],
+  [
+   "safety",
+   "notify"
+  ]
+ ],
+ "files": [
+  [
+   "svc/matching/nearby.py",
+   "matching",
+   45,
+   42,
+   990,
+   2120,
+   4
+  ],
+  [
+   "svc/matching/assign.py",
+   "matching",
+   27,
+   29,
+   610,
+   980,
+   3
+  ],
+  [
+   "svc/driver-api/location.py",
+   "driver",
+   33,
+   24,
+   560,
+   1300,
+   3
+  ],
+  [
+   "svc/pricing/quote.py",
+   "pricing",
+   29,
+   33,
+   700,
+   1050,
+   3
+  ],
+  [
+   "svc/payments/wallet.py",
+   "payments",
+   22,
+   21,
+   520,
+   690,
+   2
+  ],
+  [
+   "svc/safety/sos.py",
+   "safety",
+   10,
+   9,
+   240,
+   210,
+   2
+  ],
+  [
+   "svc/trips/otp.py",
+   "trips",
+   14,
+   11,
+   260,
+   300,
+   2
+  ],
+  [
+   "svc/trips/status.py",
+   "trips",
+   31,
+   30,
+   760,
+   1210,
+   3
+  ],
+  [
+   "svc/maps/graph.py",
+   "maps",
+   12,
+   26,
+   640,
+   330,
+   2
+  ],
+  [
+   "svc/notify/send.py",
+   "notify",
+   11,
+   8,
+   230,
+   240,
+   2
+  ],
+  [
+   "svc/rider-api/estimates.py",
+   "rider",
+   18,
+   16,
+   400,
+   470,
+   2
+  ],
+  [
+   "infra/db/pools.py",
+   "db",
+   6,
+   7,
+   140,
+   80,
+   1
+  ]
+ ],
+ "satd": [
+  [
+   "svc/matching/nearby.py",
+   64,
+   "FIXME",
+   "scans every online driver in the city"
+  ],
+  [
+   "svc/driver-api/location.py",
+   41,
+   "OPTIMIZE",
+   "writes every ping to the main database"
+  ],
+  [
+   "svc/pricing/quote.py",
+   118,
+   "TODO",
+   "honour the quoted fare for 2 minutes"
+  ],
+  [
+   "svc/matching/assign.py",
+   77,
+   "XXX",
+   "driver state read and written without a lock"
+  ],
+  [
+   "svc/payments/wallet.py",
+   52,
+   "TODO",
+   "reconcile wallet debits with completed trips"
+  ],
+  [
+   "svc/safety/sos.py",
+   19,
+   "FIXME",
+   "SOS shares the promotional notification queue"
+  ],
+  [
+   "svc/trips/otp.py",
+   28,
+   "BUG",
+   "expiry computed in UTC"
+  ],
+  [
+   "svc/maps/graph.py",
+   203,
+   "TODO",
+   "flyovers and underpasses have no levels"
+  ],
+  [
+   "svc/notify/send.py",
+   14,
+   "TODO",
+   "send from a durable queue"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-901",
+   "title": "Riders stuck on 'searching for drivers' for 15 minutes",
+   "desc": "On Saturday night riders in Bengaluru saw 'searching for drivers' for up to 15 minutes while drivers were nearby.",
+   "module": "matching",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 168,
+   "fixed": 167.9,
+   "effort": 12,
+   "by": "varun",
+   "group": "G-MATCH",
+   "whys": [
+    "Matching took over 15 minutes",
+    "Each match request scanned every online driver in the city",
+    "Matching searches every driver in the city instead of nearby cells"
+   ],
+   "fix": "Limited the search radius to 3 km.",
+   "lesson": "A radius cut hides drivers just outside it."
+  },
+  {
+   "key": "INC-902",
+   "title": "Driver locations frozen on the rider's map",
+   "desc": "Riders saw their driver's car stuck on the map for 10 minutes while the driver was moving.",
+   "module": "driver",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.95,
+   "effort": 7,
+   "by": "swati",
+   "group": "G-LOC",
+   "whys": [
+    "Riders saw drivers stuck in place",
+    "Location pings queued behind slow database writes",
+    "Driver location pings are written to the main database every 3 seconds"
+   ],
+   "fix": "Dropped pings older than 30 seconds.",
+   "lesson": "Dropping pings is not the same as keeping up."
+  },
+  {
+   "key": "INC-903",
+   "title": "Fare jumped from Rs 240 to Rs 410 between quote and booking",
+   "desc": "Riders were shown one fare and charged a much higher one because surge changed while they booked.",
+   "module": "pricing",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151,
+   "effort": 6,
+   "by": "varun",
+   "group": "G-SURGE",
+   "whys": [
+    "Riders were charged more than the quote",
+    "Surge was recalculated at booking time",
+    "Surge is recalculated at booking instead of honouring the quoted fare"
+   ],
+   "fix": "Refunded the difference to complaining riders.",
+   "lesson": "Only the riders who complained got refunds."
+  },
+  {
+   "key": "INC-904",
+   "title": "Two riders assigned the same driver",
+   "desc": "A driver received two ride requests at once and accepted both; one rider waited 20 minutes and cancelled.",
+   "module": "matching",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 144,
+   "fixed": 143.9,
+   "effort": 6,
+   "by": "swati",
+   "group": "G-DOUBLE",
+   "whys": [
+    "A driver received two rides at once",
+    "Two matches read the driver as free at the same time",
+    "Driver assignment has no lock on the driver's state"
+   ],
+   "fix": "Cancelled the second ride.",
+   "lesson": "The race returns whenever demand spikes."
+  },
+  {
+   "key": "INC-905",
+   "title": "Wallet debited but trip shows unpaid",
+   "desc": "Riders paid from the wallet but drivers saw the trip as unpaid and asked for cash.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 136,
+   "fixed": 135,
+   "effort": 6,
+   "by": "rahul",
+   "group": "G-PAY",
+   "whys": [
+    "Riders were asked to pay cash after a wallet debit",
+    "The wallet callback failed after the debit",
+    "Wallet debits are not reconciled with completed trips"
+   ],
+   "fix": "Refunded double payments from a report.",
+   "lesson": "Drivers and riders both lost trust."
+  },
+  {
+   "key": "INC-906",
+   "title": "SOS alert reached the emergency contact 9 minutes late",
+   "desc": "A rider pressed SOS at 23:40; the SMS to her emergency contact arrived 9 minutes later.",
+   "module": "safety",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 128,
+   "fixed": 127.95,
+   "effort": 10,
+   "by": "swati",
+   "group": "G-SOS",
+   "whys": [
+    "An SOS SMS was delayed",
+    "SOS messages waited behind a promotional campaign",
+    "SOS alerts share a queue with promotional notifications"
+   ],
+   "fix": "Paused promotions during late hours.",
+   "lesson": "Safety cannot depend on the marketing calendar."
+  },
+  {
+   "key": "INC-907",
+   "title": "Trip status updates delayed during Diwali night",
+   "desc": "Trips stayed 'driver arriving' after drivers had arrived because status writes waited for database connections.",
+   "module": "trips",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 120,
+   "fixed": 119.9,
+   "effort": 6,
+   "by": "swati",
+   "whys": [
+    "Trips stayed 'arriving' after drivers arrived",
+    "Trip updates waited for database connections used by location writes",
+    "Driver location pings are written to the main database every 3 seconds"
+   ],
+   "fix": "Increased the database connection limit.",
+   "lesson": "More connections, same writes."
+  },
+  {
+   "key": "INC-908",
+   "title": "Ride-start OTP rejected as expired at midnight",
+   "desc": "Drivers could not start rides between 00:00 and 00:15 because valid OTPs were rejected as expired.",
+   "module": "trips",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 112,
+   "fixed": 111,
+   "effort": 4,
+   "by": "rahul",
+   "group": "G-OTP",
+   "whys": [
+    "Drivers could not start rides",
+    "OTP expiry was computed in UTC and crossed the day boundary",
+    "Trip OTP expiry uses the server's UTC clock"
+   ],
+   "fix": "Allowed drivers to skip the OTP.",
+   "lesson": "Skipping the OTP removes a safety check."
+  },
+  {
+   "key": "INC-909",
+   "title": "Matching timeouts across Bengaluru at 22:30",
+   "desc": "After a concert ended, match requests timed out across the city for 12 minutes.",
+   "module": "matching",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103.9,
+   "effort": 10,
+   "by": "varun",
+   "group": "G-MATCH",
+   "whys": [
+    "Match requests timed out",
+    "Every request scanned all online drivers again",
+    "Matching searches every driver in the city instead of nearby cells"
+   ],
+   "fix": "Added matching servers.",
+   "lesson": "The scan grows with drivers and riders together."
+  },
+  {
+   "key": "INC-910",
+   "title": "Quoted fare not honoured on New Year's morning",
+   "desc": "Riders booking at 00:30 on New Year's morning were charged up to 70% above their quote.",
+   "module": "pricing",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95,
+   "effort": 5,
+   "by": "varun",
+   "group": "G-SURGE",
+   "whys": [
+    "Riders paid more than their quote",
+    "Surge changed between quote and booking",
+    "Surge is recalculated at booking instead of honouring the quoted fare"
+   ],
+   "fix": "Refunded the difference again.",
+   "lesson": "Every busy night repeats it."
+  },
+  {
+   "key": "INC-911",
+   "title": "Driver app shows the wrong location for 10 minutes",
+   "desc": "Drivers' positions lagged 10 minutes behind during the cricket final.",
+   "module": "driver",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87.95,
+   "effort": 6,
+   "by": "swati",
+   "group": "G-LOC",
+   "whys": [
+    "Driver positions lagged",
+    "Location writes backed up in the main database",
+    "Driver location pings are written to the main database every 3 seconds"
+   ],
+   "fix": "Sent pings every 10 seconds instead of 3.",
+   "lesson": "Less frequent pings make ETAs worse."
+  },
+  {
+   "key": "INC-912",
+   "title": "UPI payment marked failed though the rider was debited",
+   "desc": "UPI payments succeeded at the bank but trips were marked unpaid for 400 rides.",
+   "module": "payments",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79,
+   "effort": 5,
+   "by": "rahul",
+   "group": "G-PAY",
+   "whys": [
+    "Paid trips were marked unpaid",
+    "The bank's confirmation reached us after the trip closed",
+    "Wallet debits are not reconciled with completed trips"
+   ],
+   "fix": "Marked the trips paid from the bank report.",
+   "lesson": "Again found by drivers, not by us."
+  },
+  {
+   "key": "INC-913",
+   "title": "Pickup ETA off by 20 minutes on flyovers",
+   "desc": "Pickups near flyovers were routed under the flyover and back, and ETAs were 20 minutes wrong.",
+   "module": "maps",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 72,
+   "fixed": 71,
+   "effort": 5,
+   "by": "aisha",
+   "whys": [
+    "Pickup ETAs were wrong",
+    "Routing treated flyovers and the roads below as connected",
+    "The road graph has no levels for flyovers and underpasses"
+   ],
+   "fix": "Blocked the worst junctions by hand.",
+   "lesson": "There are hundreds of flyovers."
+  },
+  {
+   "key": "INC-914",
+   "title": "Driver received two simultaneous ride requests",
+   "desc": "Drivers again got two rides at once during the evening peak; both riders were left waiting.",
+   "module": "matching",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 64,
+   "fixed": 63.95,
+   "effort": 6,
+   "by": "swati",
+   "group": "G-DOUBLE",
+   "whys": [
+    "A driver was assigned two rides",
+    "Two matching workers saw the driver as available",
+    "Driver assignment has no lock on the driver's state"
+   ],
+   "fix": "Cancelled the duplicate rides.",
+   "lesson": "Busy nights make the race likely."
+  },
+  {
+   "key": "INC-915",
+   "title": "SOS alert delayed during a festival campaign",
+   "desc": "An SOS alert took 6 minutes to reach the emergency contact during a festival promotion.",
+   "module": "safety",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 56,
+   "fixed": 55,
+   "effort": 10,
+   "by": "swati",
+   "group": "G-SOS",
+   "whys": [
+    "The SOS SMS was delayed",
+    "SOS messages queued behind festival promotions",
+    "SOS alerts share a queue with promotional notifications"
+   ],
+   "fix": "Stopped the campaign.",
+   "lesson": "This must never happen a third time."
+  },
+  {
+   "key": "INC-916",
+   "title": "Main database at 100% during the cricket final",
+   "desc": "All services slowed for 20 minutes as location writes saturated the main database.",
+   "module": "db",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 44,
+   "fixed": 43.95,
+   "effort": 8,
+   "by": "neeraj",
+   "whys": [
+    "All services slowed",
+    "Location writes saturated the database",
+    "Driver location pings are written to the main database every 3 seconds"
+   ],
+   "fix": "Moved to a bigger database instance.",
+   "lesson": "Bigger hardware for the same writes."
+  },
+  {
+   "key": "INC-917",
+   "title": "Ride OTP failing just after midnight",
+   "desc": "Drivers could not start rides for 15 minutes after midnight because OTPs looked expired.",
+   "module": "trips",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 32,
+   "fixed": 31,
+   "effort": 4,
+   "by": "rahul",
+   "group": "G-OTP",
+   "whys": [
+    "Ride OTPs were rejected after midnight",
+    "Expiry used UTC and the date changed",
+    "Trip OTP expiry uses the server's UTC clock"
+   ],
+   "fix": "Let drivers skip the OTP again.",
+   "lesson": "The same midnight bug."
+  },
+  {
+   "key": "INC-918",
+   "title": "Riders charged more than the quoted fare",
+   "desc": "Riders were charged above their quoted fare during last night's rain surge.",
+   "module": "pricing",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 18,
+   "effort": 5,
+   "by": "varun",
+   "group": "G-SURGE",
+   "whys": [
+    "Riders paid more than quoted",
+    "Surge was recalculated while they booked",
+    "Surge is recalculated at booking instead of honouring the quoted fare"
+   ]
+  },
+  {
+   "key": "INC-919",
+   "title": "Driver-arrived notifications 5 minutes late",
+   "desc": "Riders got 'Your driver has arrived' 5 minutes after the driver arrived.",
+   "module": "notify",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 7,
+   "effort": 3,
+   "by": "swati",
+   "whys": [
+    "Notifications were late",
+    "Notifications are sent inline from the trip service",
+    "Trip notifications are sent synchronously without a queue"
+   ]
+  },
+  {
+   "key": "INC-920",
+   "title": "Riders waiting 20 minutes for a match across the city",
+   "desc": "Since 22:00 riders across Bengaluru and Pune are waiting up to 20 minutes for a match.",
+   "module": "matching",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 1,
+   "effort": 12,
+   "by": "varun",
+   "group": "G-MATCH",
+   "whys": [
+    "Riders wait 20 minutes for a match",
+    "Each request scans every online driver",
+    "Matching searches every driver in the city instead of nearby cells"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-901",
+   "title": "Geospatial index of drivers by map cell",
+   "desc": "Index online drivers by map cell and search only the rider's cell and its neighbours, instead of a full table scan of every online driver.",
+   "module": "matching",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "aisha",
+   "incidents": [
+    "INC-901",
+    "INC-909",
+    "INC-920"
+   ],
+   "cause": "Matching searches every driver in the city instead of nearby cells",
+   "ago": 166,
+   "file": "svc/matching/nearby.py"
+  },
+  {
+   "key": "DEBT-902",
+   "title": "Keep live driver locations in memory and batch writes to the database",
+   "desc": "Hold the latest location of each driver in an in-memory store and save trip trails with batch writes once a minute.",
+   "module": "driver",
+   "cat": "ARCHITECTURAL",
+   "principal": 18,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "rahul",
+   "incidents": [
+    "INC-902",
+    "INC-907",
+    "INC-911",
+    "INC-916"
+   ],
+   "cause": "Driver location pings are written to the main database every 3 seconds",
+   "ago": 158,
+   "file": "svc/driver-api/location.py"
+  },
+  {
+   "key": "DEBT-903",
+   "title": "Fare holds: honour the quoted fare for two minutes",
+   "desc": "A quote reserves its fare for two minutes; booking within that time uses the held fare even if surge changes.",
+   "module": "pricing",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "aisha",
+   "incidents": [
+    "INC-903",
+    "INC-910",
+    "INC-918"
+   ],
+   "cause": "Surge is recalculated at booking instead of honouring the quoted fare",
+   "ago": 150,
+   "file": "svc/pricing/quote.py"
+  },
+  {
+   "key": "DEBT-904",
+   "title": "Lock the driver's state when assigning a ride",
+   "desc": "Assign a driver with a row-level lock on the driver's state so two concurrent matches cannot both take the same driver.",
+   "module": "matching",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "aisha",
+   "incidents": [
+    "INC-904",
+    "INC-914"
+   ],
+   "cause": "Driver assignment has no lock on the driver's state",
+   "ago": 142,
+   "file": "svc/matching/assign.py"
+  },
+  {
+   "key": "DEBT-905",
+   "title": "Reconcile wallet and UPI debits with completed trips every hour",
+   "desc": "Match every wallet and UPI debit with a completed trip and fix any trip marked unpaid.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "rahul",
+   "incidents": [
+    "INC-905",
+    "INC-912"
+   ],
+   "cause": "Wallet debits are not reconciled with completed trips",
+   "ago": 134,
+   "file": "svc/payments/wallet.py"
+  },
+  {
+   "key": "DEBT-906",
+   "title": "Dedicated priority queue for SOS alerts",
+   "desc": "SOS alerts go through their own durable queue and SMS route, never behind promotional messages, with delivery tracked to the second.",
+   "module": "safety",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "PRIORITIZED",
+   "priority": "CRITICAL",
+   "owner": "swati",
+   "incidents": [
+    "INC-906",
+    "INC-915"
+   ],
+   "cause": "SOS alerts share a queue with promotional notifications",
+   "ago": 126,
+   "file": "svc/safety/sos.py"
+  },
+  {
+   "key": "DEBT-907",
+   "title": "Use IST and a monotonic clock for ride OTP expiry",
+   "desc": "Compute OTP expiry from a monotonic clock and show times in IST, so midnight and the date change do not matter.",
+   "module": "trips",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "rahul",
+   "incidents": [
+    "INC-908",
+    "INC-917"
+   ],
+   "cause": "Trip OTP expiry uses the server's UTC clock",
+   "ago": 110,
+   "file": "svc/trips/otp.py"
+  },
+  {
+   "key": "DEBT-908",
+   "title": "Structured road levels for flyovers in the map data",
+   "desc": "Add structured level data to the road graph so routing never joins a flyover to the road below.",
+   "module": "maps",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "aisha",
+   "incidents": [
+    "INC-913"
+   ],
+   "cause": "The road graph has no levels for flyovers and underpasses",
+   "ago": 70,
+   "file": "svc/maps/graph.py"
+  },
+  {
+   "key": "DEBT-909",
+   "title": "Send trip notifications through a durable queue",
+   "desc": "Trip milestones publish to a durable queue; workers send push and SMS without slowing the trip service.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "swati",
+   "incidents": [
+    "INC-919"
+   ],
+   "cause": "Trip notifications are sent synchronously without a queue",
+   "ago": 6,
+   "file": "svc/notify/send.py"
+  },
+  {
+   "key": "DEBT-910",
+   "title": "Separate connection pools for trips and location writes",
+   "desc": "Location writes and nightly batch jobs get their own pools so they can never starve trip updates.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "neeraj",
+   "incidents": [],
+   "ago": 42,
+   "file": "infra/db/pools.py"
+  },
+  {
+   "key": "DEBT-911",
+   "title": "Serve cached fare estimates per route for 60 seconds",
+   "desc": "Cache fare estimates per pickup cell and destination cell for a minute instead of recomputing for every app refresh.",
+   "module": "rider",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "varun",
+   "incidents": [],
+   "ago": 30,
+   "file": "svc/rider-api/estimates.py"
+  },
+  {
+   "key": "DEBT-912",
+   "title": "Load test New Year's Eve at 8x",
+   "desc": "Replay a New Year's Eve evening at 8 times a normal busy hour against staging every December.",
+   "module": "matching",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "swati",
+   "incidents": [],
+   "needs": [
+    "DEBT-901"
+   ],
+   "ago": 25
+  },
+  {
+   "key": "DEBT-913",
+   "title": "Retry rider app requests with backoff and jitter",
+   "desc": "The rider app retries failed requests with exponential backoff and jitter.",
+   "module": "rider",
+   "cat": "CODE_SMELL",
+   "principal": 3,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "varun",
+   "incidents": [],
+   "ago": 140
+  }
+ ],
+ "spike": {
+  "key": "new-years-eve",
+  "name": "New Year's Eve",
+  "description": "Demand climbs from the evening, doubles by 21:00 and peaks at eight times a normal busy hour between 23:00 and midnight as parties end and everyone books at once.",
+  "profile": [
+   1.0,
+   0.6,
+   0.4,
+   0.3,
+   0.3,
+   0.5,
+   0.9,
+   1.4,
+   1.8,
+   1.4,
+   1.2,
+   1.2,
+   1.3,
+   1.2,
+   1.2,
+   1.3,
+   1.6,
+   2.2,
+   2.8,
+   3.2,
+   3.6,
+   4.5,
+   6.0,
+   8.0
+  ],
+  "entry": {
+   "rider": 1.0,
+   "driver": 1.0,
+   "trips": 1.0,
+   "safety": 0.6
+  },
+  "exposure": {
+   "payments": 0.8
+  },
+  "baseline": {
+   "db": 0.1025,
+   "driver": 0.1025,
+   "maps": 0.0875,
+   "matching": 0.0888,
+   "notify": 0.1025,
+   "payments": 0.1061,
+   "pricing": 0.1025,
+   "rider": 0.1025,
+   "safety": 0.1577,
+   "trips": 0.0875
+  }
+ }
+}

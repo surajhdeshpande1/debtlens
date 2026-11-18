@@ -112,10 +112,10 @@ def custom_profile(peak: float, start_hour: int, duration: int, ramp: int = 1, b
     return prof
 
 
-def events_for(scenario: str | None) -> list[dict]:
-    """Preset events offered for a project (its scenario's event, if any) plus the custom template."""
+def events_for(scenario: str | dict | None) -> list[dict]:
+    """Preset events offered for a project (its scenario's or pack's event, if any) plus the custom template."""
     out = []
-    p = PRESETS.get(scenario or "")
+    p = scenario if isinstance(scenario, dict) else PRESETS.get(scenario or "")
     if p:
         out.append({k: p[k] for k in ("key", "name", "description", "profile")} | {"peak": max(p["profile"]),
                                                                                    "preset": True})

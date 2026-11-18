@@ -108,7 +108,7 @@ def cascade(pid: int):
 @require("read")
 def spike_events(pid: int):
     proj = project(pid)
-    return ok({"events": SPIKE.events_for(proj.scenario_code)})
+    return ok({"events": SPIKE.events_for(S.spike_preset(proj))})
 
 
 @bp.post("/projects/<int:pid>/simulate/spike")
