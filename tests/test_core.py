@@ -352,7 +352,7 @@ def test_overload_curve_and_exposure_propagation():
     late = SPIKE.custom_profile(6, 22, 3, ramp=1)  # the simulated day ends at midnight
     assert late[21] == 3.5 and late[22] == late[23] == 6 and late[0] == 1.0
     ev = engine.spike(scenarios.materialize("fintech"), {"peak": 6, "start_hour": 22, "duration": 3}, 0, runs=50)["event"]
-    assert "for 2 h (cut at midnight" in ev["description"]
+    assert "for 2 h (cut at midnight" in ev["description"] and "1 h falls outside" in ev["description"]
 
 
 def test_spike_plan_fits_the_budget_includes_prerequisites_and_helps():

@@ -8,14 +8,18 @@ your own words. Every file path is in this repository.
 | What | Value |
 |---|---|
 | Scenarios | 5: PayCore (FinTech), CareStream HIS (HealthTech), ShopSwift (E-commerce), CampusOne ERP (College), DebtLens v1 self-audit |
-| Tables | 23 (8 kept from Demo 1 + 15 new) |
+| Tables | 24 (8 kept from Demo 1 + 16 new) |
 | Roles | 6: Admin, Tech Lead, Developer, QA, Manager, Viewer |
-| Tests | 123 automated (engine 78, API 31, CLI 14); the API tests also pass on MySQL 8 |
+| Tests | 131 automated (engine 83, API 33, CLI 15); the API tests also pass on MySQL 8 |
 | Similarity | sim = α·TF-IDF + (1−α)·MiniLM, α = 0.4; regression threshold τ = 0.30 |
 | Accuracy | mean precision@1: TF-IDF 0.69, MiniLM 0.87, hybrid 0.91; regression F1 ≈ 0.88 |
 | Interest | I(d) = Σ w(sev)·effort + λ₁·churn + λ₂·blast; w = 3.5/2.5/1.5/1.0, λ₁ = 0.15, λ₂ = 1.8 |
 | PayCore at 40 h | 4 items, 39 h, retires 177.2 h/month; +7.1% vs greedy, +2.0% vs v1 |
 | Forecast (PayCore, 12 sprints) | optimal plan saves ≈ 582 h vs doing nothing (95% CI ≈ 565–598 h) |
+| Load spike (CampusOne results day, 12×) | 51 h lost → 1 h after 35 h of fixes; requests failing 11.3% → 0.1%; clean day 1% → 96% |
+| Load spike (PayCore salary day, 4×) | 212 h → 25 h; the spike plan saves 187 h, the regular sprint plan 163 h |
+| Playbooks | 24 built-in; matched from the debt's own words; editable per project |
+| Website | https://debtlens-bec.vercel.app |
 
 ## The 5-minute live demo (Suraj drives, each member speaks to their part)
 
@@ -24,9 +28,14 @@ your own words. Every file path is in this repository.
 3. **Causal analysis**: the graph and the systemic-causes table. *(Sushma Hiremath)*
 4. **Debt registry → DEBT-101**: principal 24 h vs interest 98.6 h per month, past break-even. **Ledger & optimiser**: move the budget slider, show exact vs greedy vs v1. *(Sushma Mathapati)*
 5. **Repository evidence**: hotspots, TODO/FIXME → “→ debt”, dependency graph. *(Sushma K Patil)*
-6. **Simulation Lab**: five industries side by side → *Sprint forecast* → *Failure injection* on `db`. *(Suraj)*
-7. Switch role to **Developer** in the top bar: the home view changes, and approving a plan is refused by the server. *(Suraj)*
-8. **Terminal**: `debtlens plan -s fintech --budget 40` and `debtlens ci -s fintech --max-open-critical 0` (exit code 1). *(Suraj / Sushma K Patil)*
+6. **Simulation Lab**: five industries side by side → *Sprint forecast* → *Failure injection* on `db` → *Load spike*:
+   open **CampusOne ERP** for this one, pick *Exam results day*, show the chart, the plan (DEBT-411 is in it only
+   because DEBT-401 needs it) and the heatmap's *Now / After* switch. *(Suraj)*
+7. **Debt registry → DEBT-101 → Fix playbook**: tick a step, show *matched on …*, choose another playbook, and
+   *Edit for this project*. Then **Fix playbooks** for the whole library. *(Sushma Mathapati)*
+8. Switch role to **Developer** in the top bar: the home view changes, and approving a plan is refused by the server. *(Suraj)*
+9. **Terminal**: `debtlens plan -s fintech --budget 40`, `debtlens simulate spike -s college`, `debtlens playbook DEBT-101 -s fintech`
+   and `debtlens ci -s fintech --max-open-critical 0` (exit code 1). *(Suraj / Sushma K Patil)*
 
 Backup if there is no internet: `scripts\windows\start.bat` (see `docs/LOCAL_SETUP.md`). It runs the same website on your laptop's MySQL 8.
 
@@ -36,9 +45,11 @@ Backup if there is no internet: `scripts\windows\start.bat` (see `docs/LOCAL_SET
 stays and causes the next incident. DebtLens links incident → root cause → technical debt, and gives each debt item
 a cost so it can be planned.
 
-**What changed since Demo 1?** The panel asked for two things: simulate multiple scenarios (the Simulation Lab:
-5 industries plus what-if, forecast and failure injection) and work in the terminal (the `debtlens` CLI and a CI
-gate). We also moved hosting to Vercel without Supabase (Flask on Vercel with TiDB, which is MySQL-compatible).
+**What changed since Demo 1?** The panel asked for three things. *Simulate multiple scenarios*: the Simulation Lab
+runs five industries plus what-if, a Monte Carlo forecast, failure injection and load spikes. *Work in the terminal*:
+the `debtlens` CLI, offline or connected, with a CI gate. *Help the engineers*: every debt item has a fix playbook
+(steps, how to verify, references) on its page, in the CLI and in the PDF report. We also chose to host on Vercel
+without Supabase (Flask on Vercel with TiDB, which is MySQL-compatible).
 
 **Why Flask and MySQL?** That is what we proposed at Demo 1. Flask runs as a single Vercel Python function. TiDB Cloud
 speaks the MySQL protocol, so the same code runs on TiDB online and on MySQL 8 on our laptops.
@@ -53,7 +64,7 @@ or their own repository with the CLI. Nothing in the analysis is hard-coded: eve
 **What is a sandbox?** A private 24-hour copy of a scenario for a visitor without an account. It is isolated: a
 sandbox token can only reach its own project, which is tested in `tests/test_api.py`.
 
-**How do you know it works?** There are 123 automated tests. Our algorithms are compared against reference
+**How do you know it works?** There are 131 automated tests. Our algorithms are compared against reference
 libraries: scikit-learn for TF-IDF and DBSCAN, networkx for centrality, radon for complexity, and brute force for the
 optimiser. The tests run on every push (`.github/workflows/ci.yml`).
 
@@ -79,6 +90,23 @@ Likely questions:
 - *What stops someone creating thousands of sandboxes?* A rate limit of 40 per hour per IP (`deps.rate_limit`), expired sandboxes being deleted, and a global cap.
 - *Why Monte Carlo and not one calculation?* Incidents are random. One run could be lucky or unlucky. Many runs give an average and an uncertainty range.
 - *How does the CLI work offline?* It imports the same engine and reads bundled scenarios, a JSON snapshot, or your own git history. Only `--project` talks to the server.
+
+**Load spikes** (`core/spike.py`, `engine.spike`, Simulation Lab → Load spike, `debtlens simulate spike`):
+
+- **The event** is 24 hourly traffic multipliers, e.g. results day: 12× a normal peak at 10:00, then tailing off. Each scenario has a preset; you can also set your own peak, start hour and length.
+- **Who gets the traffic:** each preset says where users come in (on results day: `results`, `auth` and `notifications`). Load flows to every module those call, through the dependency graph.
+- **What debt does to a module:** each open debt's playbook says how much capacity it costs (a shared pool, a slow query) and how much fragility it adds (no timeout, no circuit breaker). Load = baseline × traffic ÷ the capacity left.
+- **Overload:** P(overload) = 1/(1 + e^−(ρ−1)/0.05), where ρ is load ÷ capacity: 50% at full capacity, almost certain at 1.2. A module that goes down stays down until ρ drops below 0.9.
+- **Cascades:** each hour a down module can take each caller down with probability 0.6 × fragility.
+- **Cost:** every incident costs severity weight × the module's mean incident effort, so hours lost are comparable with the ledger.
+- **The plan:** 300 simulated days. For each module we try every combination of its open debts (the four with the biggest effect, if it has more) and value it by simulation, then pick the best combination per module within the hours available, exactly, as a multiple-choice knapsack, with prerequisites added. A second round re-values fixes given the first choice.
+- **Fair comparison:** the same random numbers are used before and after (common random numbers), so the saving is caused by the fixes alone, and we report a paired 95% confidence interval.
+
+Likely questions:
+- *Why not just use the sprint plan?* The sprint plan ranks debt by its monthly interest. A spike stresses different things: on ShopSwift's Diwali sale the spike plan saves 40 h, the regular plan only 9 h.
+- *Why logistic and not a hard limit?* Real systems degrade before 100% and some survive a little above it. A hard cliff would make the result jump on tiny changes.
+- *Where do capacity and fragility numbers come from?* From the playbook that matches the debt (e.g. a shared connection pool: 30% capacity lost). They are assumptions, shown on each playbook and editable per project.
+- *Is it validated?* It is a model, not a measurement. The tests check its logic: more traffic never loses fewer hours, the plan fits the hours and its prerequisites, and it never does worse than fixing nothing.
 
 ## Sushma Hiremath — M2 incidents, M3 5 Whys and causal graph, M6 intelligence
 
@@ -116,7 +144,7 @@ Likely questions:
 - *How do you map files to modules?* By the first meaningful folder (skipping `src/`, `app/`…), or by explicit rules in a `debtlens.json` file.
 - *Why mask numbers in log messages?* So that “timeout after 3000 ms” and “timeout after 2950 ms” count as the same error.
 
-## Sushma Mathapati — M4 debt registry, M7 ledger and optimiser, M8 reports
+## Sushma Mathapati — M4 debt registry and fix playbooks, M7 ledger and optimiser, M8 reports
 
 **Code:** `core/economics.py`, `core/optimiser.py`, `api/routes/debts.py`, `core/engine.py` (`ledger`, `plan`, `whatif`), `api/routes/reports.py` (PDF), `public/js/views/debts.js`, `ledger.js`.
 
@@ -126,10 +154,13 @@ Likely questions:
 - **Risk score (0–120):** 100 × (0.5·I/Imax + 0.2·blast/max + 0.2·severity/max + 0.1·centrality/max), × 1.2 if past break-even.
 - **Optimiser:** a 0/1 knapsack (choose items whose hours fit the budget and whose total risk is largest) with prerequisites (B cannot be chosen without A). We solve it exactly with a tree DP or branch and bound. Prerequisite cycles are merged first with Tarjan's SCC. Greedy (best value per hour) and our v1 DP are shown for comparison.
 - **What-if:** change λ₁, λ₂, severity weights or risk weights and see which items change rank or cross break-even, and how the optimal plan changes with the budget.
-- **Reports:** a PDF with KPIs, top risks, the plan and its comparison, systemic causes, regressions and hotspots.
+- **Reports:** a PDF with KPIs, top risks, the plan and its comparison, each planned item's fix playbook, systemic causes, regressions and hotspots.
+- **Fix playbooks** (`core/playbooks.py`, `api/routes/playbooks.py`): 24 built-in playbooks, each with the problem, steps, how to verify it worked, risks, and references (Azure architecture patterns, the AWS Builders' Library, Google's SRE book). A debt is matched by weighted keywords: a phrase or a strong word scores 3, a plain word 1, matches in the title count double, and a matching category adds 1. Below 3.5 points it falls back to "refactor". The team can choose another playbook, tick steps as they go, edit a playbook for the project or add its own; a scenario can also fix the choice.
 
 Likely questions:
 - *Why is greedy not enough?* Greedy picks by value per hour and can leave a large valuable item out, or waste hours. On PayCore the exact plan is 7.1% better than greedy at 40 h.
 - *What was wrong with v1's planner?* It ignored prerequisites in the DP and then dropped items afterwards. The result was not optimal and left budget unused. On the CampusOne backlog at 40 h, v1 used only 17 h and the exact plan retires 60.6% more risk.
 - *Is knapsack not NP-hard?* Yes, in general. Our backlogs are small (15–30 items) and hours come in half-hour steps, so DP over the budget is fast (milliseconds). Branch and bound handles prerequisite shapes the tree DP cannot.
 - *Why are most items past break-even?* The scenarios focus on debt that actually caused incidents. Pure code smells with no incidents usually stay below break-even.
+- *Why keyword matching and not MiniLM for playbooks?* It is explainable: the card shows exactly which words matched, and a wrong match is fixed by choosing another playbook. With only 24 playbooks, a few strong terms each are enough.
+- *What if the match is wrong?* The team picks the right one from the list; the choice is saved per debt and used by the CLI, the PDF and the load-spike simulation.

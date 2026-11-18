@@ -1,7 +1,7 @@
 # GitHub Action: DebtLens quality gate.  In another repository:
 #   - uses: surajhdeshpande1/debtlens@v2
 #     with: { project: 3, max-open-critical: 0 }
-#     env: { DEBTLENS_URL: https://debtlens-cloud.vercel.app, DEBTLENS_TOKEN: ${{ secrets.DEBTLENS_TOKEN }} }
+#     env: { DEBTLENS_URL: https://debtlens-bec.vercel.app, DEBTLENS_TOKEN: ${{ secrets.DEBTLENS_TOKEN }} }
 name: DebtLens quality gate
 description: Push a git-history scan to DebtLens and fail the build when incident/debt risk crosses your limits.
 branding: { icon: shield, color: blue }

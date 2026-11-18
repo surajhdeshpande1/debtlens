@@ -968,7 +968,7 @@ def export(out_file: Path = typer.Option(Path("debtlens-snapshot.json"), "--out"
 # ----------------------------------------------------------------------------- account
 
 @app.command()
-def login(url: str = typer.Argument(..., help="Website address, e.g. https://debtlens-cloud.vercel.app"),
+def login(url: str = typer.Argument(..., help="Website address, e.g. https://debtlens-bec.vercel.app"),
           token: Optional[str] = typer.Option(None, "--token", "-t", help="API token from Team & settings (dlt_…)."),
           email: Optional[str] = typer.Option(None, help="Sign in with email + password instead (creates a token)."),
           project: Optional[int] = ProjectOpt):

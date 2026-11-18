@@ -32,7 +32,7 @@ all = ["debtlens[ml,server]"]
 debtlens = "debtlens.cli.main:run"
 
 [project.urls]
-Homepage = "https://debtlens-cloud.vercel.app"
+Homepage = "https://debtlens-bec.vercel.app"
 Source = "https://github.com/surajhdeshpande1/debtlens"
 
 [tool.setuptools.packages.find]

@@ -37,6 +37,8 @@ def _view(s, proj, did: int) -> dict:
     out["steps_done"] = steps
     out["progress"] = {"done": len(steps), "total": len(out["steps"])}
     out["choices"] = [{"key": k, "title": v.title} for k, v in sorted(PB.library(edits).items(), key=lambda x: x[1].title)]
+    out["custom"] = out["key"] not in PB.BY_KEY  # added by this project
+    out["edited"] = not out["custom"] and out["key"] in edits  # a built-in playbook changed for this project
     return out
 
 

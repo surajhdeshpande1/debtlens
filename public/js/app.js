@@ -118,6 +118,8 @@ function renderLanding(tab) {
             <li>5 Whys that converge: one root cause, many incidents, measured on a causal graph</li>
             <li>Evidence from your own Git history: churn, complexity hotspots, TODO/FIXME debt</li>
             <li>Interest ledger, exact knapsack sprint planner, Monte Carlo forecast, failure injection</li>
+            <li>Load-spike simulation: which debt to fix before salary day, a sale or results day</li>
+            <li>A fix playbook for every debt item: steps, how to verify, references</li>
             <li>Same engine in the browser and in your terminal: <code>pipx install debtlens</code></li>
           </ul>
         </div>

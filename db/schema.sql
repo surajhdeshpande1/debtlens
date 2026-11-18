@@ -323,6 +323,19 @@ CREATE TABLE debt_incident (
 CREATE INDEX ix_debt_incident_debt_id ON debt_incident (debt_id);
 CREATE INDEX ix_debt_incident_incident_id ON debt_incident (incident_id);
 
+CREATE TABLE debt_playbook (
+	id INTEGER NOT NULL AUTO_INCREMENT, 
+	debt_id INTEGER NOT NULL, 
+	playbook_key VARCHAR(40), 
+	steps_done JSON, 
+	updated_by_id INTEGER, 
+	updated_at DATETIME NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (debt_id), 
+	FOREIGN KEY(debt_id) REFERENCES technical_debt (id) ON DELETE CASCADE, 
+	FOREIGN KEY(updated_by_id) REFERENCES user (id) ON DELETE SET NULL
+);
+
 CREATE TABLE resolution (
 	id INTEGER NOT NULL AUTO_INCREMENT, 
 	incident_id INTEGER NOT NULL, 

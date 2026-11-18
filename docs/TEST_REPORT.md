@@ -7,10 +7,10 @@ none is typed in by hand.
 
 | Suite | File | Tests | Result | Time |
 |---|---|---|---|---|
-| Engine | `tests/test_core.py` | 78 | all passed | 1.7 s |
-| REST API, roles, sandboxes | `tests/test_api.py` | 31 | all passed on SQLite, and again on MySQL 8.0.46 | 6.5 s / 27.5 s |
-| Terminal tool | `tests/test_cli.py` | 14 | all passed | 1.1 s |
-| **Total** | | **123** | **0 failed, 0 skipped** | **9.6 s** |
+| Engine | `tests/test_core.py` | 83 | all passed | 3.8 s |
+| REST API, roles, sandboxes | `tests/test_api.py` | 33 | all passed on SQLite, and again on MySQL 8.0.46 | 9.3 s / 38.7 s |
+| Terminal tool | `tests/test_cli.py` | 15 | all passed | 3.0 s |
+| **Total** | | **131** | **0 failed, 0 skipped** | **16.1 s** |
 
 - **Local run:** Linux, Python 3.13, with the MiniLM model loaded (`DEBTLENS_MODEL_DIR` set).
 - **GitHub Actions:** runs on every push with Python 3.12 (the version Vercel uses) and MiniLM switched off, so the TF-IDF
@@ -21,7 +21,7 @@ How to run:
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                                   # 123 tests, SQLite
+python -m pytest tests -q                                   # 131 tests, SQLite
 DEBTLENS_TEST_DATABASE_URL=mysql+pymysql://user:pass@localhost/debtlens_test \
   python -m pytest tests/test_api.py -q                     # the API suite on a real MySQL 8 server
 ```
@@ -48,6 +48,17 @@ real `git log` mining on a temporary repository, TODO/FIXME found only in commen
 normalisation, all five scenarios end to end, the evaluation settings, forecast reproducibility, and cascade extremes
 (p = 1 fails everything downstream, p = 0 fails nothing).
 
+Load spikes and fix playbooks (added 18 November):
+
+| Check | Test |
+|---|---|
+| Overload probability is 0.5 at full capacity and rises steeply past it; traffic reaches only the modules an entry point calls | `test_overload_curve_and_exposure_propagation` |
+| A spike that runs past midnight is cut at the end of the simulated day, and the description says so | same test |
+| The plan fits the hours available, includes every prerequisite of a chosen fix, never does worse than fixing nothing, and saves at least as much as the regular sprint plan | `test_spike_plan_fits_the_budget_includes_prerequisites_and_helps` |
+| A bigger spike loses more hours; the same seed gives the same result; every scenario runs | `test_bigger_spikes_hurt_more_and_runs_are_reproducible` |
+| Each debt gets the playbook its evidence points to; text with no evidence falls back to "refactor"; all 24 playbooks have steps, checks and https references | `test_playbooks_match_the_evidence_and_fall_back_when_there_is_none` |
+| A choice made in the scenario or by the team wins over matching; project edits are used; custom playbooks are cleaned (no `javascript:` links) | `test_playbook_choices_and_project_edits_win_over_matching` |
+
 ## 2. Security and roles (API suite)
 
 | Check | Test |
@@ -65,8 +76,11 @@ normalisation, all five scenarios end to end, the evaluation settings, forecast 
 | The database engine starts lazily without a deadlock (the Vercel cold-start path) | `test_lazy_engine_from_environment_does_not_deadlock` |
 
 Workflow tests cover the incident lifecycle with 5 Whys and the duplicate check, debt links with cycle detection,
-plan approval, all three simulations, idempotent CSV import, log ingestion that raises a recurrence as a regression,
-repository scan upload with TODO → debt conversion, and reports, the CI gate and export.
+plan approval, all the simulations including load spikes (preset and custom, saved to the run history), idempotent CSV
+import, log ingestion that raises a recurrence as a regression, repository scan upload with TODO → debt conversion,
+fix playbooks (choose, tick steps, edit for the project, add and remove a custom one, with a Viewer refused and a
+Developer unable to edit the library), and reports (the PDF lists each planned item's playbook), the CI gate and
+export (which keeps the team's playbook choices and ticked steps).
 
 ## 3. Measured accuracy
 
@@ -118,18 +132,41 @@ best items are also the best value per hour.
 - **Reproducibility:** the same seed gives identical results (`test_forecast_is_reproducible_and_ranks_policies`).
 - **Failure injection:** extremes checked (`test_cascade_extremes`); on PayCore a failure of `db` takes down 1.93
   dependent modules on average at p = 0.35 (90th percentile 4, worst case 8).
+- **Load spikes (each scenario's preset event, 40 h to fix before it, 300 simulated days, seed 17):**
+
+| Scenario | Event | Hours lost: now → after fixes | Requests failing | Chance of a clean day | Plan | Saves (95% CI) | Regular sprint plan saves |
+|---|---|---|---|---|---|---|---|
+| PayCore | Salary day, 4× | 211.6 → 25.0 h | 20.3% → 2.6% | 0% → 33% | DEBT-101, 112, 105 (40 h) | 186.6 h (181.0–192.1) | 163.1 h |
+| CareStream HIS | Monday OPD rush, 3.5× | 85.7 → 6.6 h | 8.7% → 0.4% | 0% → 77% | 5 items (40 h) | 79.1 h (75.8–82.4) | 79.1 h |
+| ShopSwift | Diwali sale, 8× | 58.3 → 18.6 h | 8.2% → 4.8% | 0% → 2% | DEBT-301, 302, 314 (38 h) | 39.8 h (37.6–41.9) | 9.3 h |
+| CampusOne ERP | Exam results day, 12× | 51.4 → 1.0 h | 11.3% → 0.1% | 1% → 96% | DEBT-401, 413, 408 + 411 (35 h) | 50.3 h (48.2–52.4) | 24.0 h |
+
+  The regular sprint plan ranks debt by its monthly interest; the spike plan ranks it by what it protects on the day.
+  They agree on CareStream and differ most on ShopSwift, where the sale stresses modules that rarely fail on a normal
+  day. DEBT-411 enters the CampusOne plan only because DEBT-401 needs it first. The self-audit scenario has no
+  traffic event of its own, and its default custom spike finds nothing worth fixing (1.8 h lost either way).
 
 ## 6. Browser checks
 
 Headless Chromium (Playwright) against the local server, 17–18 November 2026: register → create a project from a
 scenario → report an incident with 5 Whys and the duplicate check → record a resolution → approve a plan → create an
 API token → add a demo team → sign in as a Developer, who cannot approve a plan. The Intelligence → Evaluation page
-was re-checked on 18 November: it shows α = 0.4 marked "in use" and τ = 0.30 highlighted. No console errors.
+was re-checked on 18 November: it shows α = 0.4 marked "in use" and τ = 0.30 highlighted. The Load spike tab (chart,
+plan, heatmap with its now/after switch), the playbook card on a debt page (ticking steps, choosing another playbook,
+editing it for the project) and the playbook library were checked the same day. No console errors.
 
-## 7. Not yet covered
+## 7. Production check on Vercel (18 November)
 
-- **Production smoke test on Vercel:** to be run after deployment (health check with model warm-up, sandbox, one
-  write, PDF report).
-- **Load testing:** not done. The target is a class demo and small teams, not high traffic.
+https://debtlens-bec.vercel.app, one Vercel Python function in Singapore with TiDB Cloud Starter:
+
+- `GET /api/v1/health?warm=1`: database `tidb` (TiDB v8.5.3), MiniLM downloaded and 386 scenario texts embedded in 5.5 s.
+- A CampusOne sandbox opened in the browser; the Load spike tab gave the same figures as the table above (3.4 → 0.1
+  incidents, 51 h → 1 h, 11.3% → 0.1% of requests failing).
+- A write on TiDB: ticking a playbook step (`PUT …/debts/1/playbook` → 200), then reading it back.
+- `report.pdf` → 200, 11.7 KB; a custom spike at 22:00 for 3 h → 200, with the midnight note.
+
+## 8. Not yet covered
+
+- **Load testing of DebtLens itself:** not done. The target is a class demo and small teams, not high traffic.
 - **Small labelled sets:** 8 to 16 queries per scenario, labelled by the team. The accuracy figures show the method
   works; they are not a benchmark.

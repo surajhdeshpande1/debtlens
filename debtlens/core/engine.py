@@ -447,8 +447,8 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
         cut = start + hours > 24
         ev = {"key": "custom", "name": event.get("name") or "Custom spike", "preset": False,
               "description": f"{max(profile):g}× traffic from {start:02d}:00 for {min(hours, 24 - start)} h"
-                             + (f" (cut at midnight: the simulation covers one day, so {start + hours - 24} h fall outside it)"
-                                if cut else "")}
+                             + (f" (cut at midnight: the simulation covers one day, so {start + hours - 24} h "
+                                f"{'falls' if start + hours - 24 == 1 else 'fall'} outside it)" if cut else "")}
     elif preset and event in (None, "", preset["key"], "preset"):
         profile = list(preset["profile"])
         ev = {"key": preset["key"], "name": preset["name"], "description": preset["description"], "preset": True}

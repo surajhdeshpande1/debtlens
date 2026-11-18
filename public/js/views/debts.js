@@ -171,7 +171,7 @@ function editPlaybook(pb, after) {
         <div class="field"><label>Watch out</label><textarea name="risks" rows="3">${lines(pb.risks)}</textarea></div></div>
       <div class="inline-fields"><div class="field"><label>Capacity lost while open (0–0.6)</label><input name="capacity" type="number" min="0" max="0.6" step="0.05" value="${pb.capacity}"></div>
         <div class="field"><label>Added fragility (0–0.6)</label><input name="resilience" type="number" min="0" max="0.6" step="0.05" value="${pb.resilience}"></div></div></form>`,
-    foot: html`${pb.builtin ? "" : html`<button class="btn" type="button" data-reset>Reset to built-in</button>`}<span class="grow"></span><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button>`,
+    foot: html`${pb.edited ? html`<button class="btn" type="button" data-reset>Reset to built-in</button>` : ""}${pb.custom ? html`<button class="btn danger" type="button" data-reset>Delete this playbook</button>` : ""}<span class="grow"></span><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button>`,
     onSubmit: async (f, close) => {
       const d = formData(f);
       const split = (v) => String(v || "").split("\n").map((t) => t.trim()).filter(Boolean);
@@ -181,7 +181,7 @@ function editPlaybook(pb, after) {
     } });
   const reset = document.querySelector(".modal [data-reset]");
   if (reset) reset.addEventListener("click", async () => {
-    try { await api(`${P()}/playbooks/${pb.key}`, { method: "DELETE" }); toast("Back to the built-in playbook", "ok"); document.querySelector(".modal-back").remove(); after(); } catch (e) { fail(e); }
+    try { await api(`${P()}/playbooks/${pb.key}`, { method: "DELETE" }); toast(pb.custom ? "Playbook deleted; its debt items are matched again" : "Back to the built-in playbook", "ok"); document.querySelector(".modal-back").remove(); after(); } catch (e) { fail(e); }
   });
 }
 

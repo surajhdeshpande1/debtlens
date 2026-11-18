@@ -324,11 +324,13 @@ def test_playbooks_choice_progress_and_project_edits(client):
     e = api(client, "put", f"/projects/{pid}/playbooks/pool-isolation", lead,
             json={"steps": ["Ask the DBA for the real limit", "Split the pool"]}).json
     assert e["edited"] and e["steps"] == ["Ask the DBA for the real limit", "Split the pool"]
-    assert api(client, "get", url, lead).json["steps"] == e["steps"]
+    v = api(client, "get", url, lead).json
+    assert v["steps"] == e["steps"] and v["edited"] and not v["custom"]
     c = api(client, "put", f"/projects/{pid}/playbooks/upi-fallback", lead, json={"title": "UPI fallback", "steps": ["Add a second PSP"]})
     assert c.status_code == 200 and c.json["custom"]
     assert api(client, "put", f"/projects/{pid}/playbooks/bad", lead, json={"title": ""}).status_code == 400
-    assert api(client, "put", url, lead, json={"playbook": "upi-fallback", "steps_done": [0]}).json["progress"] == {"done": 1, "total": 1}
+    v = api(client, "put", url, lead, json={"playbook": "upi-fallback", "steps_done": [0]}).json
+    assert v["progress"] == {"done": 1, "total": 1} and v["custom"] and not v["edited"]
     assert api(client, "delete", f"/projects/{pid}/playbooks/upi-fallback", lead).json == {"removed": "upi-fallback", "builtin": False}
     v = api(client, "get", url, lead).json
     assert v["key"] == "pool-isolation" and v["steps_done"] == []  # the deleted playbook's debts go back to automatic
