@@ -27,7 +27,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Callable
 
-from . import clustering, economics, evaluation, graph, optimiser, similarity, simulation
+from . import clustering, economics, evaluation, graph, optimiser, playbooks, similarity, simulation
+from . import spike as SPIKE
 from . import text as T
 
 EmbedFn = Callable[[list[str]], list[list[float]]]
@@ -402,6 +403,83 @@ def cascade(snap: dict, module: str, p: float = 0.35, runs: int = 2000, seed: in
     res["debts_in_path"] = [{"key": r["key"], "title": r["title"], "module": r["module"], "risk": r["risk"]}
                             for r in led["rows"] if r["is_open"] and (r["module"] == res["start"] or r["module"] in
                                                                        {m["module"] for m in res["modules"] if m["probability"] >= 0.25})]
+    return res
+
+
+# ----------------------------------------------------------------------------- playbooks and load spikes
+
+def playbook_assignment(snap: dict, overrides: dict | None = None, chosen: dict | None = None) -> tuple[dict, dict]:
+    """(library, assignment): the playbook for every debt item, with project edits and explicit choices applied."""
+    lib = playbooks.library(overrides)
+    causes = {c["id"]: c["label"] for c in snap.get("causes") or []}
+    return lib, playbooks.assign(snap.get("debts") or [], causes, lib, chosen)
+
+
+def debt_playbook(snap: dict, debt_id, overrides: dict | None = None, chosen: dict | None = None) -> dict:
+    """The fix playbook for one debt item, made specific to its module, root cause and incidents."""
+    lib, assignment = playbook_assignment(snap, overrides, chosen)
+    debt = next((d for d in snap.get("debts") or [] if d["id"] == debt_id or d.get("key") == debt_id), None)
+    if debt is None:
+        raise KeyError(debt_id)
+    a = assignment[debt["id"]]
+    pb = lib.get(a["key"]) or playbooks.BY_KEY[playbooks.FALLBACK]
+    causes = {c["id"]: c["label"] for c in snap.get("causes") or []}
+    incs = {i["id"]: i for i in snap.get("incidents") or []}
+    out = playbooks.for_debt(debt, pb, [incs.get(i) for i in debt.get("incident_ids") or []],
+                             causes.get(debt.get("root_cause_id")))
+    out["match"] = a
+    return out
+
+
+def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, runs: int = 300, seed: int = 17,
+          params=None, overrides: dict | None = None, chosen: dict | None = None) -> dict:
+    """Load-spike simulation for a snapshot: before, the spike-aware fix plan, after, and the regular plan."""
+    stats = module_stats(snap)
+    mods = sorted(stats)
+    deps = [(a, b) for a, b in dependency_pairs(snap) if a in stats and b in stats]
+    scen = (snap.get("project") or {}).get("scenario")
+    preset = SPIKE.PRESETS.get(scen or "")
+    if isinstance(event, dict):
+        profile = SPIKE.custom_profile(event.get("peak", 5), event.get("start_hour", 20), event.get("duration", 2),
+                                       event.get("ramp", 1), event.get("base", 1.0))
+        start = int(event.get("start_hour", 20)) % 24
+        hours = max(1, min(24, int(event.get("duration", 2))))
+        cut = start + hours > 24
+        ev = {"key": "custom", "name": event.get("name") or "Custom spike", "preset": False,
+              "description": f"{max(profile):g}× traffic from {start:02d}:00 for {min(hours, 24 - start)} h"
+                             + (f" (cut at midnight: the simulation covers one day, so {start + hours - 24} h fall outside it)"
+                                if cut else "")}
+    elif preset and event in (None, "", preset["key"], "preset"):
+        profile = list(preset["profile"])
+        ev = {"key": preset["key"], "name": preset["name"], "description": preset["description"], "preset": True}
+    elif event in (None, "", "preset", "custom"):
+        profile = SPIKE.custom_profile(5, 20, 2)
+        ev = {"key": "custom", "name": "Custom spike", "preset": False, "description": "5× traffic from 20:00 for 2 h"}
+    else:
+        raise ValueError(f"unknown spike event {event!r}")
+    entry = dict(preset["entry"]) if preset else SPIKE.default_entry(mods, deps)
+    entry = {m: w for m, w in entry.items() if m in stats}
+    baseline = {m: float((preset or {}).get("baseline", {}).get(m, SPIKE.DEFAULT_BASELINE)) for m in mods}
+    expo = SPIKE.exposure(mods, deps, entry, (preset or {}).get("exposure"))
+    efforts: dict = defaultdict(list)
+    for i in snap.get("incidents") or []:
+        efforts[(i.get("module") or "").lower()].append(float(i.get("effort_hours") or 4))
+    severity, cost = {}, {}
+    for m in mods:
+        sev = "CRITICAL" if entry.get(m, 0) >= 0.8 else "HIGH" if expo[m] >= 0.5 else "MEDIUM"
+        severity[m] = sev
+        eff = efforts.get(m) or [4.0]
+        cost[m] = round(SPIKE.SEVERITY_WEIGHT[sev] * sum(eff) / len(eff), 2)
+    lib, assignment = playbook_assignment(snap, overrides, chosen)
+    debts = [{**d, "module": (d.get("module") or "").lower()} for d in snap.get("debts") or []]
+    factors = playbooks.load_factors(debts, assignment, lib)
+    open_debts = [d for d in debts if economics.is_open(d)]
+    reg = plan(snap, budget, params, compare=False)
+    model = SPIKE.Model(mods, deps, baseline, expo, entry, cost, severity, profile)
+    res = SPIKE.simulate(model, open_debts, factors, budget, runs, seed, regular_plan=list(reg["selected"]),
+                         playbook_of={d["id"]: assignment[d["id"]]["key"] for d in debts})
+    res["event"] = ev | {"peak": max(profile), "entry": entry}
+    res["playbook_titles"] = {k: v.title for k, v in lib.items()}
     return res
 
 

@@ -70,6 +70,26 @@ def test_simulations_offline():
     assert w["summary_after"]["total_interest"] > w["summary_before"]["total_interest"]
 
 
+def test_playbooks_and_load_spike_offline():
+    r = run("playbook", "debt-101", "-s", "fintech")
+    assert r.exit_code == 0 and "connection pool" in r.output.lower() and "1." in r.output, r.output
+    d = json.loads(run("playbook", "DEBT-203", "-s", "healthtech", "--json").output)
+    assert d["key"] == "reconciliation" and d["match"]["chosen"]
+    assert run("playbook", "DEBT-999", "-s", "fintech").exit_code != 0
+    assert run("playbook", "DEBT-101", "-s", "fintech", "--done", "1").exit_code != 0  # progress lives on the website
+    lib = json.loads(run("playbooks", "-s", "college", "--json").output)
+    assert len(lib["playbooks"]) == 24 and {x["key"] for x in lib["debts"]} >= {"DEBT-401", "DEBT-411"}
+    s = json.loads(run("simulate", "spike", "-s", "college", "--runs", "80", "--json").output)
+    assert s["event"]["key"] == "results-day" and s["plan"]["hours_used"] <= 40
+    c = json.loads(run("simulate", "spike", "-s", "fintech", "--peak", "6", "--start", "9", "--hours", "2", "--budget", "0",
+                       "--runs", "50", "--json").output)
+    assert c["event"]["key"] == "custom" and c["plan"]["selected"] == []
+    r = run("simulate", "spike", "-s", "ecommerce", "--runs", "60")
+    assert r.exit_code == 0 and "What to fix before the event" in r.output, r.output
+    assert any(ch in r.output for ch in "▁▂▃▄▅▆▇█")  # hour-by-hour sparklines
+    assert run("simulate", "spike", "-s", "fintech", "--event", "nonsense").exit_code != 0
+
+
 def test_ci_exit_codes():
     assert run("ci", "-s", "fintech", "--max-open-critical", "0").exit_code == 1
     assert run("ci", "-s", "fintech", "--max-open-critical", "10").exit_code == 0
@@ -125,3 +145,10 @@ def test_login_and_remote_commands_against_the_api(monkeypatch):
             "--why", "Duplicate refund events", "--why", "The retry worker re-sent events that were already delivered", "-y")
     assert r.exit_code == 0 and "reported INC-" in r.output, r.output
     assert run("ci", "--max-open-critical", "0").exit_code == 1
+    d = json.loads(run("playbook", "DEBT-101", "--done", "1,3", "--json").output)
+    assert d["steps_done"] == [0, 2] and d["progress"]["done"] == 2
+    d = json.loads(run("playbook", "DEBT-101", "--use", "load-testing", "--json").output)
+    assert d["key"] == "load-testing" and d["steps_done"] == []
+    assert "load" in run("playbooks").output.lower()
+    s = json.loads(run("simulate", "spike", "--runs", "50", "--json").output)
+    assert s["event"]["key"] == "salary-day" and s["plan"]["hours_used"] <= 40

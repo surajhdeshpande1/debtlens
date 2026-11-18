@@ -30,8 +30,14 @@ def export(pid: int):
         c.pop("embedding", None)
     snap["format"] = "debtlens-snapshot/1"
     snap["exported_by"] = me().name
+    edits, chosen, done = S.playbook_state(db(), proj.id)
+    for d in snap["debts"]:
+        if chosen.get(d["id"]):
+            d["playbook"] = chosen[d["id"]]
+        if done.get(d["id"]):
+            d["playbook_steps_done"] = done[d["id"]]
     snap["settings"] = {"economics": S.project_params(proj), "alpha": S.project_alpha_tau(proj)[0],
-                        "tau": S.project_alpha_tau(proj)[1]}
+                        "tau": S.project_alpha_tau(proj)[1], "playbooks": edits}
     return ok(snap)
 
 
@@ -90,17 +96,36 @@ def report_pdf(pid: int):
     led = E.ledger(snap, params)
     plan = E.plan(snap, budget, params, led=led)
     graph = E.causal_graph(snap)
-    pdf = build_pdf(proj.project_name, me().name, dash, led, plan, graph, budget, bundle.semantic_method if bundle else None)
+    edits, chosen, done = S.playbook_state(s, proj.id)
+    guides = plan_guides(snap, plan, edits, chosen, done)
+    pdf = build_pdf(proj.project_name, me().name, dash, led, plan, graph, budget, bundle.semantic_method if bundle else None,
+                    guides)
     return Response(pdf, mimetype="application/pdf",
                     headers={"Content-Disposition": f"attachment; filename={proj.project_key}-debtlens-report.pdf"})
 
 
-def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dict, budget: float, method) -> bytes:
+def plan_guides(snap: dict, plan: dict, edits: dict | None = None, chosen: dict | None = None,
+                done: dict | None = None) -> dict:
+    """The fix playbook for every item in the plan, keyed by debt id, with the steps already ticked."""
+    out = {}
+    for x in plan.get("selected_items") or []:
+        try:
+            g = E.debt_playbook(snap, x["id"], edits, chosen)
+        except KeyError:
+            continue
+        g["steps_done"] = list((done or {}).get(x["id"]) or [])
+        out[x["id"]] = g
+    return out
+
+
+def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dict, budget: float, method,
+              guides: dict | None = None) -> bytes:
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import mm
     from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    from xml.sax.saxutils import escape as esc
 
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=16 * mm, rightMargin=16 * mm, topMargin=14 * mm,
@@ -111,10 +136,10 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
     body = ParagraphStyle("b", parent=ss["BodyText"], fontSize=9, leading=12)
     cell = ParagraphStyle("c", parent=body, fontSize=8.2, leading=10)
     small = ParagraphStyle("s", parent=body, fontSize=8, textColor=colors.HexColor("#555555"))
-    accent = colors.HexColor("#2457c5")
 
     def table(rows, widths, header=True):
-        t = Table([[Paragraph(str(c), cell) for c in r] for r in rows], colWidths=[w * mm for w in widths], repeatRows=1)
+        t = Table([[Paragraph(esc(str(c)), cell) for c in r] for r in rows], colWidths=[w * mm for w in widths],
+                  repeatRows=1)
         style = [("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cccccc")), ("VALIGN", (0, 0), (-1, -1), "TOP"),
                  ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]
         if header:
@@ -124,8 +149,8 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
 
     lsum = led["summary"]
     inc = dash["incidents"]
-    el = [Paragraph(f"DebtLens report — {name}", h1),
-          Paragraph(f"Generated {utcnow().strftime('%d %b %Y %H:%M')} UTC by {who} · DebtLens {__version__} · "
+    el = [Paragraph(f"DebtLens report — {esc(name)}", h1),
+          Paragraph(f"Generated {utcnow().strftime('%d %b %Y %H:%M')} UTC by {esc(who)} · DebtLens {__version__} · "
                     f"similarity: {method or 'n/a'}", small), Spacer(1, 6)]
     el.append(Paragraph("Summary", h2))
     el.append(table([["Measure", "Value"],
@@ -147,9 +172,11 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
     el.append(Paragraph(f"Method: {plan['method']} (exact, precedence-constrained 0/1 knapsack). "
                         f"Uses {plan['total_weight']:g} h ({plan['utilization']}%), retires "
                         f"{plan['interest_retired']} h/month of interest.", body))
-    rows = [["Key", "Debt", "Hours", "Interest h/mo"]] + [[x["key"], x["title"], x["principal"], x["interest"]]
-                                                          for x in plan["selected_items"]]
-    el.append(table(rows, [20, 110, 20, 25]))
+    guides = guides or {}
+    rows = [["Key", "Debt", "Hours", "Interest h/mo", "Fix playbook"]]
+    rows += [[x["key"], x["title"], x["principal"], x["interest"], (guides.get(x["id"]) or {}).get("title", "")]
+             for x in plan["selected_items"]]
+    el.append(table(rows, [18, 80, 15, 21, 44]))
     comp = plan.get("comparison") or {}
     if comp:
         rows = [["Method", "Risk value", "Hours used", "Unused hours"]]
@@ -161,6 +188,29 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
         el.append(table(rows, [70, 35, 35, 35]))
         el.append(Paragraph(f"Exact optimiser is {comp['gain_vs_greedy_pct']}% better than greedy and "
                             f"{comp['gain_vs_naive_pct']}% better than the v1 planner on this backlog.", small))
+    if guides and plan["selected_items"]:
+        el.append(Paragraph("How to fix the planned items", h2))
+        el.append(Paragraph("Each item's fix playbook, in plan order. Steps the team has already ticked on the website "
+                            "are marked [done].", small))
+        step = ParagraphStyle("st", parent=cell, leftIndent=10, firstLineIndent=-10)
+        for x in plan["selected_items"][:10]:
+            g = guides.get(x["id"])
+            if not g:
+                continue
+            ctx = g.get("context") or {}
+            el.append(Spacer(1, 5))
+            el.append(Paragraph(f"<b>{esc(x['key'])} · {esc(x['title'])}</b> — playbook: <b>{esc(g['title'])}</b>"
+                                f" ({len(g.get('steps_done') or [])}/{len(g['steps'])} steps done)", body))
+            if ctx.get("root_cause"):
+                el.append(Paragraph(f"Root cause: {esc(ctx['root_cause'])}", small))
+            done_set = set(g.get("steps_done") or [])
+            for i, st in enumerate(g["steps"]):
+                mark = " <b>[done]</b>" if i in done_set else ""
+                el.append(Paragraph(f"{i + 1}. {esc(st)}{mark}", step))
+            if g.get("verify"):
+                el.append(Paragraph("<b>Verify:</b> " + " · ".join(esc(v) for v in g["verify"]), cell))
+            if g.get("risks"):
+                el.append(Paragraph("<b>Watch out:</b> " + " · ".join(esc(v) for v in g["risks"][:2]), cell))
     el.append(Paragraph("Systemic root causes (causal graph)", h2))
     rows = [["Cause", "Incidents", "Paths through", "Degree"]] + [[n["label"], n["incidents"], n["paths"], n["degree"]]
                                                                   for n in graph["nodes"][:6]]
@@ -179,7 +229,8 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
             rows.append([f.get("path"), f.get("module"), f.get("churn"), f.get("complexity"), f.get("hotspot_score")])
         el.append(table(rows, [85, 30, 18, 22, 20]))
     el.append(Spacer(1, 8))
-    el.append(Paragraph("Interest I(d) = Σ severity weight × effort of linked incidents + λ₁·churn + λ₂·blast radius. "
+    el.append(Paragraph("Interest I(d) = Σ severity weight × effort of linked incidents + λ<sub>1</sub>·churn + "
+                        "λ<sub>2</sub>·blast radius. "
                         "Risk combines normalised interest, blast radius, worst severity and root-cause centrality, "
                         "boosted ×1.2 past break-even.", small))
     doc.build(el)

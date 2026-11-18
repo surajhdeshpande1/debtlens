@@ -15,7 +15,8 @@ from ..core import engine as E
 from ..core import scenarios as SC
 from ..core import text as T
 from .errors import ApiError
-from .models import (ApiToken, Assignment, AuditLog, CauseEdge, CauseNode, DebtDependency, DebtIncident, EmbeddingCache,
+from .models import (ApiToken, Assignment, AuditLog, CauseEdge, CauseNode, DebtDependency, DebtIncident, DebtPlaybook,
+                     EmbeddingCache,
                      FileMetric, Incident, Module, ModuleDependency, Organization, Project, ProjectMember,
                      RemediationPlan, RepoScan, Resolution, RootCause, SatdMarker, SimulationRun, TechnicalDebt, User,
                      utcnow)
@@ -143,6 +144,17 @@ def snapshot(s: Session, proj: Project, with_embeddings: bool = True) -> dict:
                    "prerequisite_ids": prereq.get(d.id, []), "created_at": iso(d.created_at), "file_path": d.file_path,
                    "source": d.source} for d in debts],
     }
+
+
+def playbook_state(s: Session, pid: int) -> tuple[dict, dict, dict]:
+    """(project playbook edits, chosen playbook per debt id, steps done per debt id)."""
+    rows = s.execute(select(DebtPlaybook).join(TechnicalDebt, TechnicalDebt.id == DebtPlaybook.debt_id)
+                     .where(TechnicalDebt.project_id == pid)).scalars().all()
+    chosen = {r.debt_id: r.playbook_key for r in rows if r.playbook_key}
+    done = {r.debt_id: list(r.steps_done or []) for r in rows}
+    proj = s.get(Project, pid)
+    edits = dict(((proj.settings or {}).get("playbooks") or {})) if proj else {}
+    return edits, chosen, done
 
 
 def project_params(proj: Project) -> dict:
@@ -349,6 +361,10 @@ def seed_scenario(s: Session, org: Organization, code: str, *, sandbox_key: str 
     pre_rows = [{"debt_id": did[d["id"]], "prerequisite_debt_id": did[p]} for d in snap["debts"] for p in d["prerequisite_ids"]]
     if pre_rows:
         s.execute(insert(DebtDependency), pre_rows)
+    pb_rows = [{"debt_id": did[d["id"]], "playbook_key": d["playbook"], "steps_done": []}
+               for d in snap["debts"] if d.get("playbook")]
+    if pb_rows:
+        s.execute(insert(DebtPlaybook), pb_rows)
     owners = {}
     for m in sc["modules"]:
         if m.get("owner"):
@@ -377,6 +393,7 @@ def delete_project(s: Session, pid: int) -> None:
     for stmt in (
         delete(DebtIncident).where(DebtIncident.debt_id.in_(debt_ids)),
         delete(DebtDependency).where(DebtDependency.debt_id.in_(debt_ids)),
+        delete(DebtPlaybook).where(DebtPlaybook.debt_id.in_(debt_ids)),
         delete(RootCause).where(RootCause.incident_id.in_(inc_ids)),
         delete(Resolution).where(Resolution.incident_id.in_(inc_ids)),
         delete(SatdMarker).where(SatdMarker.project_id == pid),

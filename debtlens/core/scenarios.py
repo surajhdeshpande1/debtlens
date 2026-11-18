@@ -128,6 +128,7 @@ def materialize(code_or_sc, now: datetime | None = None) -> dict:
             "root_cause_id": root, "incident_ids": [key_to_id[k] for k in d.get("incidents", []) if k in key_to_id],
             "prerequisite_ids": [debt_key_to_id[k] for k in d.get("needs", []) if k in debt_key_to_id],
             "created_at": at(d.get("ago", 90)), "file_path": d.get("file"), "source": d.get("source", "manual"),
+            "playbook": d.get("playbook"),
         })
     for c in causes:  # deepest answers are root causes
         if c["category"] == "PROCESS":

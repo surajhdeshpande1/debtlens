@@ -1,5 +1,5 @@
 // M4 Debt registry: register, link to incidents and prerequisites, see each item's price.
-import { $, api, bar, date, download, fail, formData, html, hrs, label, n, on, status, toast } from "../lib.js";
+import { $, $$, api, bar, date, download, fail, formData, html, hrs, label, modal, n, on, safeUrl, status, toast } from "../lib.js";
 import { can, go, link, S } from "../app.js";
 import { card, empty, head, moduleOptions } from "./_parts.js";
 
@@ -10,6 +10,7 @@ const STATUSES = ["IDENTIFIED", "PRIORITIZED", "IN_PROGRESS", "REMEDIATED", "DEF
 export async function render(root, ctx) {
   const sub = ctx.sub[0];
   if (sub === "new") return renderForm(root);
+  if (sub === "playbooks") return renderLibrary(root);
   if (sub) return renderDetail(root, sub);
   return renderList(root);
 }
@@ -20,7 +21,7 @@ async function renderList(root) {
   const d = await api(`${P()}/debts${st ? "?status=" + st : ""}`);
   const maxRisk = Math.max(1, ...d.items.map((r) => r.risk || 0));
   root.innerHTML = String(html`${head("Debt registry", "Each item is a structural weakness with a price: principal (hours to fix) and interest (hours it costs every month). Sorted by risk.",
-      html`<button class="btn" data-csv>Export ledger CSV</button>${can("debt.write") ? html`<a class="btn primary" href="${link("debts", "new")}">Add debt</a>` : ""}`)}
+      html`<a class="btn" href="${link("debts", "playbooks")}">Fix playbooks</a><button class="btn" data-csv>Export ledger CSV</button>${can("debt.write") ? html`<a class="btn primary" href="${link("debts", "new")}">Add debt</a>` : ""}`)}
     <section class="card"><div class="table-tools"><div class="tabs" style="margin:0;border:0">${["", ...STATUSES].map((s) => html`<a href="${link("debts")}${s ? "?status=" + s : ""}" class="${s === st ? "active" : ""}">${s ? label(s) : "All"}</a>`)}</div>
       <span class="grow"></span><span class="muted small">${d.total} item${d.total === 1 ? "" : "s"}</span></div>
       ${d.items.length ? html`<div class="table-wrap"><table class="data"><thead><tr><th>Key</th><th>Debt</th><th>Module</th><th>Category</th><th>Status</th><th>Assignee</th>
@@ -106,6 +107,7 @@ async function renderDetail(root, sub) {
           <tr><td>Blast radius</td><td class="num">${n(L.blast_interest)}</td><td class="small">λ₂ × modules that transitively depend on “${x.module}”</td></tr>
           <tr><td><b>Total</b></td><td class="num"><b>${n(L.interest)}</b></td><td class="small">churn ${n(L.churn, 0)} commits · blast radius ${L.blast_radius} module${L.blast_radius === 1 ? "" : "s"}</td></tr></tbody></table>`)
         : card("Status", html`<p style="margin:0">${open ? "Not in the ledger." : "Paid off — this item no longer accrues interest."}</p>`)}
+      <div data-playbook>${card("Fix playbook", html`<div class="loading"><span class="spinner"></span></div>`)}</div>
       ${card("Description", x.description ? html`<p style="white-space:pre-wrap;margin:0">${x.description}</p>` : html`<p class="muted" style="margin:0">No description.</p>`)}
       ${card("Incidents caused by this debt", d.incidents.length ? html`<table class="data"><tbody>${d.incidents.map((i) => html`<tr><td class="key">${i.key}</td><td><a href="${link("incidents", i.id)}">${i.title}</a></td><td>${status(i.status)}</td><td class="num">${hrs(i.effort_hours)}</td></tr>`)}</tbody></table>` : empty("No incidents linked — interest comes only from churn and blast radius."), { flush: !!d.incidents.length })}
     </div><div class="stack">
@@ -123,4 +125,76 @@ async function renderDetail(root, sub) {
     if (!confirm(`Delete ${x.key}? This cannot be undone.`)) return;
     try { await api(`${P()}/debts/${x.id}`, { method: "DELETE" }); toast("Deleted", "ok"); go(`/p/${S.project.id}/debts`); } catch (ex) { fail(ex); }
   });
+  playbookCard($("[data-playbook]", root), x);
+}
+
+// ------------------------------------------------------------------ fix playbook on a debt page
+async function playbookCard(box, x) {
+  let pb;
+  try { pb = await api(`${P()}/debts/${x.id}/playbook`); } catch (e) { box.innerHTML = ""; return fail(e); }
+  const done = new Set(pb.steps_done || []);
+  const m = pb.match || {};
+  const why = m.chosen ? "chosen by the team" : (m.matched || []).length ? `matched on “${m.matched.slice(0, 4).join("”, “")}”` : "general guidance (no specific pattern found)";
+  const edit = can("debt.write");
+  const effect = pb.capacity || pb.resilience ? html`<p class="tiny muted" style="margin:10px 0 0">While open, this kind of debt costs the module ${n(pb.capacity * 100, 0)}% of its capacity and adds ${n(pb.resilience, 2)} to its fragility in the <a href="${link("sim", "spike")}">load-spike simulation</a>.</p>` : "";
+  box.innerHTML = String(card(html`Fix playbook <span class="muted small" style="font-weight:400">· ${pb.title}</span>`, html`<div data-tour="playbook">
+      <div class="row tight" style="margin-bottom:8px"><span class="small muted">${why}</span><span class="grow"></span>
+        ${edit ? html`<select data-choose aria-label="Use another playbook" style="width:auto;max-width:260px"><option value="">Automatic match</option>${pb.choices.map((c) => html`<option value="${c.key}" ${m.chosen && c.key === pb.key ? "selected" : ""}>${c.title}</option>`)}</select>` : ""}
+        ${can("settings.write") ? html`<button class="btn sm" data-edit-pb>Edit for this project</button>` : ""}</div>
+      ${pb.problem ? html`<p class="small" style="margin:0 0 6px"><b>Problem.</b> ${pb.problem}</p>` : ""}
+      ${pb.context && pb.context.root_cause ? html`<p class="small" style="margin:0 0 10px"><b>Here:</b> ${pb.context.root_cause}</p>` : ""}
+      <div class="row tight" style="margin-bottom:6px"><b class="small">Steps</b><span class="grow"></span><span class="small muted">${pb.progress.done} of ${pb.progress.total} done</span></div>
+      <div class="progress" role="progressbar" aria-valuenow="${pb.progress.done}" aria-valuemax="${pb.progress.total}"><span style="width:${Math.round(100 * pb.progress.done / Math.max(1, pb.progress.total))}%"></span></div>
+      <ol class="steps">${pb.steps.map((st, i) => html`<li><label class="check"><input type="checkbox" data-step="${i}" ${done.has(i) ? "checked" : ""} ${edit ? "" : "disabled"}> <span>${st}</span></label></li>`)}</ol>
+      ${pb.verify.length ? html`<p class="small" style="margin:10px 0 4px"><b>Done when</b></p><ul class="small" style="margin:0;padding-left:18px">${pb.verify.map((v) => html`<li>${v}</li>`)}</ul>` : ""}
+      ${pb.risks.length ? html`<p class="small" style="margin:10px 0 4px"><b>Watch out</b></p><ul class="small" style="margin:0;padding-left:18px">${pb.risks.map((v) => html`<li>${v}</li>`)}</ul>` : ""}
+      ${pb.references.length ? html`<p class="small" style="margin:10px 0 4px"><b>Read more</b></p><ul class="small" style="margin:0;padding-left:18px">${pb.references.map((r) => html`<li>${safeUrl(r.url) ? html`<a href="${r.url}" target="_blank" rel="noopener">${r.title}</a>` : r.title}</li>`)}</ul>` : ""}
+      ${effect}</div>`));
+  on(box, "change", "[data-step]", async () => {
+    const steps = $$("[data-step]", box).filter((c) => c.checked).map((c) => +c.dataset.step);
+    try { await api(`${P()}/debts/${x.id}/playbook`, { method: "PUT", body: { steps_done: steps } }); playbookCard(box, x); } catch (e) { fail(e); playbookCard(box, x); }
+  });
+  on(box, "change", "[data-choose]", async (e, sel) => {
+    try { await api(`${P()}/debts/${x.id}/playbook`, { method: "PUT", body: { playbook: sel.value || null } }); toast("Playbook changed — progress reset", "ok"); playbookCard(box, x); } catch (ex) { fail(ex); }
+  });
+  on(box, "click", "[data-edit-pb]", () => editPlaybook(pb, () => playbookCard(box, x)));
+}
+
+function editPlaybook(pb, after) {
+  const lines = (a) => (a || []).join("\n");
+  modal({ title: `Edit playbook: ${pb.title}`, wide: true,
+    body: html`<form><p class="small muted" style="margin-top:0">Changes apply to every debt item in this project that uses this playbook, and to the load-spike simulation. One item per line.</p>
+      <div class="field"><label>Title</label><input name="title" required maxlength="120" value="${pb.title}"></div>
+      <div class="field"><label>Problem</label><textarea name="problem" rows="2">${pb.problem}</textarea></div>
+      <div class="field"><label>Steps</label><textarea name="steps" rows="7" required>${lines(pb.steps)}</textarea></div>
+      <div class="grid c2"><div class="field"><label>Done when</label><textarea name="verify" rows="3">${lines(pb.verify.filter((v) => !v.startsWith("No recurrence of the linked incidents")))}</textarea></div>
+        <div class="field"><label>Watch out</label><textarea name="risks" rows="3">${lines(pb.risks)}</textarea></div></div>
+      <div class="inline-fields"><div class="field"><label>Capacity lost while open (0–0.6)</label><input name="capacity" type="number" min="0" max="0.6" step="0.05" value="${pb.capacity}"></div>
+        <div class="field"><label>Added fragility (0–0.6)</label><input name="resilience" type="number" min="0" max="0.6" step="0.05" value="${pb.resilience}"></div></div></form>`,
+    foot: html`${pb.builtin ? "" : html`<button class="btn" type="button" data-reset>Reset to built-in</button>`}<span class="grow"></span><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button>`,
+    onSubmit: async (f, close) => {
+      const d = formData(f);
+      const split = (v) => String(v || "").split("\n").map((t) => t.trim()).filter(Boolean);
+      await api(`${P()}/playbooks/${pb.key}`, { method: "PUT", body: { title: d.title, problem: d.problem, steps: split(d.steps), verify: split(d.verify), risks: split(d.risks),
+        capacity: +d.capacity, resilience: +d.resilience, keywords: pb.keywords, categories: pb.categories, references: pb.references } });
+      toast("Playbook saved for this project", "ok"); close(); after();
+    } });
+  const reset = document.querySelector(".modal [data-reset]");
+  if (reset) reset.addEventListener("click", async () => {
+    try { await api(`${P()}/playbooks/${pb.key}`, { method: "DELETE" }); toast("Back to the built-in playbook", "ok"); document.querySelector(".modal-back").remove(); after(); } catch (e) { fail(e); }
+  });
+}
+
+// ------------------------------------------------------------------ playbook library
+async function renderLibrary(root) {
+  const r = await api(`${P()}/playbooks`);
+  const used = r.playbooks.filter((p) => p.used_by > 0);
+  root.innerHTML = String(html`${head("Fix playbooks", "Step-by-step guidance for each kind of debt. Every debt item is matched to one automatically from its title, description and root cause; the team can pick another or edit a playbook for this project.", "",
+      html`<a href="${link("debts")}">Debt registry</a> / playbooks`)}
+    <section class="card"><div class="table-wrap"><table class="data"><thead><tr><th>Debt</th><th>Module</th><th>Status</th><th>Playbook</th><th>Why</th><th class="num">Steps done</th></tr></thead><tbody>
+      ${r.debts.map((d) => html`<tr><td class="key"><a href="${link("debts", d.id)}">${d.key}</a></td><td>${d.module || ""}</td><td>${status(d.status)}</td><td>${d.playbook_title}</td>
+        <td class="small muted">${d.chosen ? "team choice" : (d.matched || []).slice(0, 3).join(", ") || "general"}</td><td class="num">${d.steps_done} / ${d.steps_total}</td></tr>`)}</tbody></table></div></section>
+    <h2 class="section-title" style="margin-top:22px">Library <span class="muted small">(${r.playbooks.length} playbooks, ${used.length} in use here)</span></h2>
+    <div class="grid c2">${r.playbooks.map((p) => card(html`${p.title} ${p.edited ? html`<span class="badge warn">edited</span>` : ""}${p.custom ? html`<span class="badge accent">project</span>` : ""}`,
+      html`<p class="small" style="margin:0 0 6px">${p.problem}</p><p class="tiny muted" style="margin:0">${p.steps.length} steps · used by ${p.used_by} item${p.used_by === 1 ? "" : "s"}${p.capacity || p.resilience ? ` · spike effect −${n(p.capacity * 100, 0)}% capacity, +${n(p.resilience, 2)} fragility` : ""}</p>`))}</div>`);
 }

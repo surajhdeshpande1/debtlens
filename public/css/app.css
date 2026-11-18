@@ -243,3 +243,24 @@ table.data .title-cell { min-width: 220px; }
 .tour .tour-foot { display: flex; justify-content: space-between; padding: 8px 12px; border-top: 1px solid var(--border); background: var(--bg-subtle); border-radius: 0 0 8px 8px; }
 .tour-highlight { outline: 3px solid var(--accent) !important; outline-offset: 3px; border-radius: 4px; transition: outline-color .2s; }
 .progress { height: 3px; background: var(--border); } .progress > span { display: block; height: 100%; background: var(--accent); }
+
+/* ---------------------------------------------------------------- fix playbooks */
+ol.steps { margin: 8px 0 0; padding-left: 0; list-style: none; counter-reset: step; }
+ol.steps li { counter-increment: step; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+ol.steps li:last-child { border-bottom: 0; }
+label.check { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; font-weight: 400; margin: 0; }
+label.check input { margin-top: 3px; flex: none; width: auto; }
+label.check span::before { content: counter(step) ". "; color: var(--faint); font-variant-numeric: tabular-nums; }
+label.check input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--faint); }
+
+/* ---------------------------------------------------------------- load-spike heatmap */
+.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: 100%; }
+.heat th { font-weight: 500; color: var(--faint); text-align: center; padding: 0 1px; }
+.heat th.m { text-align: right; padding-right: 8px; color: var(--text); font-weight: 600; white-space: nowrap; }
+.heat td { height: 22px; min-width: 14px; border-radius: 3px; text-align: center; color: transparent; }
+.heat td:hover { color: var(--text); outline: 1px solid var(--border-strong); }
+.heat .h0 { background: #eef6f1; } .heat .h1 { background: #cfe9da; } .heat .h2 { background: #fbe7b5; }
+.heat .h3 { background: #f6c27a; } .heat .h4 { background: #e8826f; } .heat .h5 { background: #b42318; }
+.heat-legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+.heat-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; }
+.vs { font-size: 12px; color: var(--muted); } .vs b { color: var(--ok); }

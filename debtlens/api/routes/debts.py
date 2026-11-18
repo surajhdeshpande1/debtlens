@@ -15,7 +15,8 @@ from .. import services as S
 from .. import validation as V
 from ..deps import db, me, ok, project
 from ..errors import ApiError
-from ..models import (CauseNode, DebtDependency, DebtIncident, Incident, RemediationPlan, SatdMarker, TechnicalDebt,
+from ..models import (CauseNode, DebtDependency, DebtIncident, DebtPlaybook, Incident, RemediationPlan, SatdMarker,
+                      TechnicalDebt,
                       User, utcnow)
 from ..security import require
 from ..services import iso
@@ -178,6 +179,7 @@ def delete_debt(pid: int, did: int):
     d = _debt(s, proj, did)
     s.execute(delete(DebtIncident).where(DebtIncident.debt_id == d.id))
     s.execute(delete(DebtDependency).where((DebtDependency.debt_id == d.id) | (DebtDependency.prerequisite_debt_id == d.id)))
+    s.execute(delete(DebtPlaybook).where(DebtPlaybook.debt_id == d.id))
     s.execute(update(SatdMarker).where(SatdMarker.debt_id == d.id).values(debt_id=None, status="DETECTED"))
     S.audit(s, proj.id, me(), "debt.deleted", d.debt_key)
     s.delete(d)

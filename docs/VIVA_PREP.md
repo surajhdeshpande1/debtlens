@@ -22,7 +22,7 @@ your own words. Every file path is in this repository.
 1. **Landing page** → *PayCore · FinTech* → role **Tech Lead** → *Open*. Point at the role home and KPIs.
 2. **Incidents → INC-118**: regression banner, 5 Whys with “shared with 2 other incidents”, similar incidents with lexical and semantic bars. *(Sushma Hiremath)*
 3. **Causal analysis**: the graph and the systemic-causes table. *(Sushma Hiremath)*
-4. **Debt registry → DEBT-101**: principal 24 h vs interest 98.5 h per month, past break-even. **Ledger & optimiser**: move the budget slider, show exact vs greedy vs v1. *(Sushma Mathapati)*
+4. **Debt registry → DEBT-101**: principal 24 h vs interest 98.6 h per month, past break-even. **Ledger & optimiser**: move the budget slider, show exact vs greedy vs v1. *(Sushma Mathapati)*
 5. **Repository evidence**: hotspots, TODO/FIXME → “→ debt”, dependency graph. *(Sushma K Patil)*
 6. **Simulation Lab**: five industries side by side → *Sprint forecast* → *Failure injection* on `db`. *(Suraj)*
 7. Switch role to **Developer** in the top bar: the home view changes, and approving a plan is refused by the server. *(Suraj)*

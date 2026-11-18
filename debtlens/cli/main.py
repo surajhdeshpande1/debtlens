@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+from decimal import ROUND_HALF_UP, Decimal
 import sys
 from pathlib import Path
 from typing import List, Optional
@@ -29,7 +30,8 @@ app = typer.Typer(name="debtlens", help="DebtLens — incidents, root causes and
                   no_args_is_help=True, rich_markup_mode="rich", add_completion=False,
                   context_settings={"help_option_names": ["-h", "--help"]})
 incidents_app = typer.Typer(help="Browse and report incidents (record 5 Whys).", no_args_is_help=True)
-simulate_app = typer.Typer(help="Simulation Lab: what-if, Monte Carlo forecast, failure injection.", no_args_is_help=True)
+simulate_app = typer.Typer(help="Simulation Lab: what-if, Monte Carlo forecast, failure injection, load spikes.",
+                           no_args_is_help=True)
 model_app = typer.Typer(help="Manage the optional MiniLM model used for semantic similarity.", no_args_is_help=True)
 app.add_typer(incidents_app, name="incidents")
 app.add_typer(simulate_app, name="simulate")
@@ -144,8 +146,16 @@ def emit_json(obj) -> None:
     out.print_json(json.dumps(obj, default=str))
 
 
+def r1(v) -> str:
+    """One decimal, rounding halves up like the website does (98.55 -> 98.6, where Python's float format gives 98.5)."""
+    if v is None:
+        return "–"
+    d = Decimal(repr(float(v))).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    return f"{d:,}"
+
+
 def fmt_h(v) -> str:
-    return "–" if v is None else f"{float(v):,.1f} h"
+    return "–" if v is None else f"{r1(v)} h"
 
 
 def sev(s: str) -> str:
@@ -224,7 +234,7 @@ def dashboard_cmd(src: Source, as_json: bool):
               title="Highest-risk debt")
     for r in d["top_debts"]:
         t.add_row(f"[cyan]{r['key']}[/]", r["title"], r["module"], fmt_h(r["principal"]), fmt_h(r["interest"]),
-                  f"{r['risk']:.1f}", "[red]past[/]" if r["break_even"] else "not yet")
+                  r1(r["risk"]), "[red]past[/]" if r["break_even"] else "not yet")
     out.print(t)
     out.print()
     t = table("root cause", ("incidents", "right"), ("paths", "right"), title="Systemic root causes")
@@ -473,7 +483,7 @@ def debt(project: Optional[int] = ProjectOpt, scenario: Optional[str] = Scenario
     t = table("debt", "title", "module", "status", ("principal", "right"), ("interest/mo", "right"), ("risk", "right"), "break-even")
     for r in rows:
         t.add_row(f"[cyan]{r['key']}[/]", r["title"], r["module"], status(r["status"]), fmt_h(r["principal"]), fmt_h(r["interest"]),
-                  f"{r['risk']:.1f}", "[red]past[/]" if r["break_even"] else "not yet")
+                  r1(r["risk"]), "[red]past[/]" if r["break_even"] else "not yet")
     out.print(t)
 
 
@@ -526,7 +536,7 @@ def plan(budget: float = typer.Option(40, "--budget", "-b", help="Sprint effort 
     t = table("debt", "title", ("hours", "right"), ("interest/mo", "right"),
               title=f"Fix this sprint — {r['total_weight']:g} of {budget:g} h ({r['method'].replace('_', ' ')}, {tag})")
     for x in r["selected_items"]:
-        t.add_row(f"[cyan]{x['key']}[/]", x["title"], f"{x['principal']:g}", f"{x['interest']:.1f}")
+        t.add_row(f"[cyan]{x['key']}[/]", x["title"], f"{x['principal']:g}", r1(x["interest"]))
     out.print(t)
     out.print(f"\nRetires [bold green]{r['interest_retired']:g} h/month[/] of interest.")
     c = r.get("comparison")
@@ -539,6 +549,124 @@ def plan(budget: float = typer.Option(40, "--budget", "-b", help="Sprint effort 
         _need_remote(src, "approving a plan")
         a = src.api.post(src.path("/plans"), {"budget": budget, "method": method, "force": force_ids, "notes": "approved from the CLI"})
         out.print(f"[green]✓ approved — {len(a['plan']['selected_keys'])} items moved to PRIORITIZED[/]")
+
+
+# ----------------------------------------------------------------------------- fix playbooks
+
+def _playbook_edits(src: Source) -> dict:
+    return dict((src.snap().get("settings") or {}).get("playbooks") or {})
+
+
+SPARK = "▁▂▃▄▅▆▇█"
+
+
+def spark(values, top: float = 1.5) -> str:
+    """Hour-by-hour bar of utilisation: full block at `top` (150%) or more."""
+    out_ = []
+    for v in values:
+        k = min(len(SPARK) - 1, int(round(max(0.0, v) / top * (len(SPARK) - 1))))
+        ch = SPARK[k]
+        out_.append(f"[red]{ch}[/]" if v >= 1.0 else f"[yellow]{ch}[/]" if v >= 0.85 else ch)
+    return "".join(out_)
+
+
+@app.command()
+def playbook(key: str = typer.Argument(..., help="Debt key, e.g. DEBT-101."),
+             done: Optional[str] = typer.Option(None, "--done", help="Mark steps done, e.g. 1,2 (website projects)."),
+             use: Optional[str] = typer.Option(None, "--use", help="Choose another playbook by key (website projects)."),
+             project: Optional[int] = ProjectOpt, scenario: Optional[str] = ScenarioOpt, snapshot: Optional[Path] = SnapshotOpt,
+             as_json: bool = JsonOpt):
+    """Step-by-step fix guidance for one debt item, with how to verify it and what can go wrong."""
+    src = Source(project, scenario, snapshot)
+    key = key.upper()
+    if src.remote:
+        lib = src.api.get(src.path("/playbooks"))
+        row = next((d for d in lib["debts"] if d["key"] == key), None)
+        if row is None:
+            raise CliError(f"unknown debt {key}")
+        body = {}
+        if use:
+            body["playbook"] = use
+        if done is not None:
+            try:
+                body["steps_done"] = sorted({int(x) - 1 for x in done.split(",") if x.strip()})
+            except ValueError:
+                raise CliError("--done takes step numbers like 1,2,4") from None
+        r = (src.api.put(src.path(f"/debts/{row['id']}/playbook"), body) if body
+             else src.api.get(src.path(f"/debts/{row['id']}/playbook")))
+    else:
+        if done is not None or use:
+            raise CliError("--done and --use save progress on a website project (use --project)")
+        snap = src.snap()
+        try:
+            r = E.debt_playbook(snap, key, _playbook_edits(src))
+        except KeyError:
+            raise CliError(f"unknown debt {key}") from None
+        row = next((d for d in snap.get("debts") or [] if d.get("key") == key), {})
+        r["steps_done"] = list(row.get("playbook_steps_done") or [])  # ticked on the website, kept in an exported snapshot
+    if as_json:
+        return emit_json(r)
+    ctx = r.get("context") or {}
+    m = r.get("match") or {}
+    why = ("chosen by the team" if m.get("chosen") else
+           f"matched on: {', '.join(m.get('matched') or [])}" if m.get("matched") else "general guidance")
+    out.print(Panel.fit(f"[bold]{r['title']}[/]\n[dim]{ctx.get('debt_key')} · module {ctx.get('module')} · {why}[/]",
+                        border_style="cyan"))
+    if r.get("problem"):
+        out.print(f"[bold]Problem.[/] {r['problem']}")
+    if ctx.get("root_cause"):
+        out.print(f"[bold]Root cause here.[/] {ctx['root_cause']}")
+    out.print()
+    done_set = set(r.get("steps_done") or [])
+    for i, step in enumerate(r["steps"]):
+        mark = "[green]✓[/]" if i in done_set else f"[bold]{i + 1}.[/]"
+        out.print(f" {mark} {step}")
+    if r.get("verify"):
+        out.print("\n[bold]Done when[/]")
+        for v in r["verify"]:
+            out.print(f"  • {v}")
+    if r.get("risks"):
+        out.print("\n[bold]Watch out[/]")
+        for v in r["risks"]:
+            out.print(f"  • {v}")
+    if r.get("references"):
+        out.print("\n[bold]Read more[/]")
+        for ref in r["references"]:
+            out.print(f"  • {ref['title']} — [link={ref['url']}]{ref['url']}[/link]")
+    if r.get("capacity") or r.get("resilience"):
+        out.print(f"\n[dim]Load-spike effect while open: −{100 * r['capacity']:.0f}% capacity, "
+                  f"+{r['resilience']:.2f} fragility (see `debtlens simulate spike`).[/]")
+    if src.remote and r.get("progress"):
+        out.print(f"\n[dim]{r['progress']['done']} of {r['progress']['total']} steps done.[/]")
+
+
+@app.command()
+def playbooks(project: Optional[int] = ProjectOpt, scenario: Optional[str] = ScenarioOpt, snapshot: Optional[Path] = SnapshotOpt,
+              as_json: bool = JsonOpt):
+    """Which fix playbook each debt item uses, and why."""
+    src = Source(project, scenario, snapshot)
+    if src.remote:
+        r = src.api.get(src.path("/playbooks"))
+    else:
+        snap = src.snap()
+        lib, assignment = E.playbook_assignment(snap, _playbook_edits(src))
+        r = {"debts": [{"key": d["key"], "title": d["title"], "module": d.get("module"), "status": d.get("status"),
+                        "playbook": assignment[d["id"]]["key"], "playbook_title": lib[assignment[d["id"]]["key"]].title,
+                        "chosen": assignment[d["id"]].get("chosen", False), "matched": assignment[d["id"]].get("matched", []),
+                        "steps_done": len(d.get("playbook_steps_done") or []),
+                        "steps_total": len(lib[assignment[d["id"]]["key"]].steps)}
+                       for d in snap.get("debts") or []],
+             "playbooks": [pb.to_dict() for pb in lib.values()]}
+    if as_json:
+        return emit_json(r)
+    t = table("debt", "module", "status", "playbook", "why", ("steps", "right"), title=f"Fix playbooks — {src.title()}")
+    for d in r["debts"]:
+        why = "team choice" if d.get("chosen") else ", ".join(d.get("matched") or []) or "general"
+        steps = f"{d['steps_done']}/{d['steps_total']}" if src.remote or d["steps_done"] else str(d["steps_total"])
+        t.add_row(f"[cyan]{d['key']}[/]", d.get("module") or "", status(d.get("status") or ""), d["playbook_title"],
+                  f"[dim]{why}[/]", steps)
+    out.print(t)
+    out.print(f"\n[dim]{len(r['playbooks'])} playbooks available. Show one with `debtlens playbook DEBT-…`.[/]")
 
 
 # ----------------------------------------------------------------------------- simulation lab
@@ -600,6 +728,65 @@ def sim_cascade(module: str = typer.Argument(..., help="Module to fail."), p: fl
         out.print("\n[bold]Debt on the failure paths:[/] " + ", ".join(f"{d['key']} ({d['module']})" for d in r["debts_in_path"]))
     if r.get("incident"):
         out.print(f"[green]✓ drill incident {r['incident']['key']} raised[/]")
+
+
+@simulate_app.command("spike")
+def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="Preset event key (default: the scenario's own)."),
+              peak: Optional[float] = typer.Option(None, help="Custom spike: traffic multiplier at the peak."),
+              start: int = typer.Option(20, help="Custom spike: start hour (0-23)."),
+              hours: int = typer.Option(2, help="Custom spike: hours at the peak."),
+              budget: float = typer.Option(40, "--budget", "-b", help="Hours available to fix things before the event."),
+              runs: int = typer.Option(300), seed: int = typer.Option(17),
+              project: Optional[int] = ProjectOpt, scenario: Optional[str] = ScenarioOpt, snapshot: Optional[Path] = SnapshotOpt,
+              as_json: bool = JsonOpt):
+    """Load spike: which modules overload hour by hour, and what to fix before the event."""
+    src = Source(project, scenario, snapshot)
+    ev = {"peak": peak, "start_hour": start, "duration": hours} if peak else event
+    with out.status(f"Simulating {runs} days of traffic…", spinner="dots") if not as_json else _null():
+        if src.remote:
+            r = src.api.post(src.path("/simulate/spike"), {"event": ev, "budget": budget, "runs": runs, "seed": seed})
+        else:
+            try:
+                r = E.spike(src.snap(), ev, budget, runs, seed, src.params(), _playbook_edits(src))
+            except ValueError as e:
+                raise CliError(str(e)) from None
+    if as_json:
+        return emit_json(r)
+    e = r["event"]
+    out.print(f"[bold]{e['name']}[/] — peak {r['peak']:g}× normal traffic. {e.get('description', '')}\n")
+    b, a = r["before"], r["after"]
+    t = table("", ("incidents", "right"), ("engineer hours lost", "right"), ("failed requests", "right"),
+              ("no incident at all", "right"), title=f"Expected over the day ({r['runs']} simulated days)")
+    t.add_row("now", f"[red]{b['incidents']:.1f}[/]", f"[red]{b['hours_lost']:,.1f}[/]", f"[red]{b['failed_traffic_pct']}%[/]",
+              f"{100 * b['p_no_incident']:.0f}%")
+    t.add_row("after the fixes", f"[green]{a['incidents']:.1f}[/]", f"[green]{a['hours_lost']:,.1f}[/]",
+              f"[green]{a['failed_traffic_pct']}%[/]", f"{100 * a['p_no_incident']:.0f}%")
+    out.print(t)
+    sv = r["saved_hours"]
+    out.print(f"Saves [bold green]{sv['mean']:,.1f} h[/] (95% CI {sv['ci95'][0]:,.1f}–{sv['ci95'][1]:,.1f}), better in "
+              f"{sv['better_runs']} of {sv['runs']} simulated days.")
+    reg = r.get("regular_plan")
+    if reg:
+        out.print(f"[dim]The regular sprint plan would save {reg['saved_hours']['mean']:,.1f} h on this day.[/]")
+    out.print()
+    pl = r["plan"]
+    t = table("fix first", "module", ("hours", "right"), ("protects", "right"), "playbook",
+              title=f"What to fix before the event — {pl['hours_used']:g} of {budget:g} h")
+    titles = r.get("playbook_titles") or {}
+    for x in pl["selected"]:
+        prot = (f"needed for {', '.join(x['prerequisite_of'])}" if x.get("prerequisite_of") and not x["protects_hours"]
+                else f"{x['protects_hours']:,.1f} h")
+        t.add_row(f"[cyan]{x['key']}[/] {x['title']}", x["module"], f"{x['principal']:g}", prot,
+                  titles.get(x.get("playbook"), x.get("playbook") or ""))
+    out.print(t if pl["selected"] else "[dim]No open debt changes the outcome of this event.[/]")
+    out.print()
+    t = table("module", ("peak load", "right"), ("P(incident)", "right"), "hour by hour (now)", ("after", "right"),
+              title="Modules under the most pressure (load vs capacity; red ≥ 100%)")
+    for m in r["modules"][:8]:
+        t.add_row(m["module"], f"{100 * m['peak_utilisation_before']:.0f}%", f"{100 * m['p_incident_before']:.0f}%",
+                  spark(m["utilisation_before"]), f"{100 * m['peak_utilisation_after']:.0f}% · {100 * m['p_incident_after']:.0f}%")
+    out.print(t)
+    out.print("[dim]Columns run 00:00 → 23:00. Load = traffic ÷ capacity left after open debt.[/]")
 
 
 @simulate_app.command("whatif")
@@ -747,15 +934,18 @@ def report(out_file: Path = typer.Option(Path("debtlens-report.pdf"), "--out", "
         data = src.api.download(src.path(f"/report.pdf?budget={budget}"))
     else:
         try:
-            from ..api.routes.reports import build_pdf
+            from ..api.routes.reports import build_pdf, plan_guides
         except ImportError:
             raise CliError('offline PDF reports need the server extras: pip install "debtlens[server]"') from None
         snap = src.snap()
         alpha, _ = src.alpha_tau()
         bundle = E.similarity_bundle(snap, alpha, embedder())
         led = E.ledger(snap, src.params())
+        plan = E.plan(snap, budget, src.params(), led=led)
+        done = {d["id"]: d.get("playbook_steps_done") or [] for d in snap.get("debts") or []}
         data = build_pdf(snap["project"]["name"], "debtlens CLI", E.dashboard(snap, src.params(), bundle=bundle), led,
-                         E.plan(snap, budget, src.params(), led=led), E.causal_graph(snap), budget, bundle.semantic_method)
+                         plan, E.causal_graph(snap), budget, bundle.semantic_method,
+                         plan_guides(snap, plan, _playbook_edits(src), None, done))
     out_file.write_bytes(data)
     out.print(f"[green]✓ wrote {out_file}[/] ({len(data) // 1024} KB)")
 

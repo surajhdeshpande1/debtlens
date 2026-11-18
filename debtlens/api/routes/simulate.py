@@ -1,4 +1,4 @@
-"""Simulation Lab: what-if economics, Monte Carlo sprint forecast, failure injection."""
+"""Simulation Lab: what-if economics, Monte Carlo sprint forecast, failure injection, load spikes."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from ...core import engine as E
 from ...core import simulation as SIM
+from ...core import spike as SPIKE
 from .. import serial
 from .. import services as S
 from .. import validation as V
@@ -100,6 +101,46 @@ def cascade(pid: int):
         out["incident"] = serial.incident(inc, serial.module_names(s, proj.id))
     _save(proj, "cascade", {"module": module, "p": p, "runs": runs},
           {"expected_affected": out["expected_affected"], "worst_case": out["worst_case_affected"]})
+    return ok(out)
+
+
+@bp.get("/projects/<int:pid>/simulate/spike/events")
+@require("read")
+def spike_events(pid: int):
+    proj = project(pid)
+    return ok({"events": SPIKE.events_for(proj.scenario_code)})
+
+
+@bp.post("/projects/<int:pid>/simulate/spike")
+@require("simulate")
+def spike(pid: int):
+    """Load spike: who overloads hour by hour, incidents and hours lost, and what to fix before the event."""
+    proj = project(pid)
+    data = V.body(request)
+    event = data.get("event") or None
+    if isinstance(event, dict):
+        event = {"peak": V.number(event, "peak", default=5, lo=1, hi=50),
+                 "start_hour": int(V.number(event, "start_hour", default=20, lo=0, hi=23)),
+                 "duration": int(V.number(event, "duration", default=2, lo=1, hi=24)),
+                 "ramp": int(V.number(event, "ramp", default=1, lo=0, hi=6)),
+                 "name": V.text(event, "name", max_len=80) or "Custom spike"}
+    elif event is not None and not isinstance(event, str):
+        raise ApiError(400, "'event' must be a preset key or {peak, start_hour, duration, ramp}")
+    budget = V.number(data, "budget", default=40, lo=0, hi=500)
+    runs = int(V.number(data, "runs", default=300, lo=50, hi=1000))
+    seed = int(V.number(data, "seed", default=17, lo=0, hi=10**9))
+    s = db()
+    snap = S.snapshot(s, proj, with_embeddings=False)
+    edits, chosen, _ = S.playbook_state(s, proj.id)
+    try:
+        out = E.spike(snap, event, budget, runs, seed, S.project_params(proj), edits, chosen)
+    except ValueError as e:
+        raise ApiError(400, str(e)) from e
+    _save(proj, "spike", {"event": out["event"]["key"], "peak": out["peak"], "budget": budget, "runs": runs},
+          {"before_hours": out["before"]["hours_lost"], "after_hours": out["after"]["hours_lost"],
+           "failed_traffic_before": out["before"]["failed_traffic_pct"],
+           "failed_traffic_after": out["after"]["failed_traffic_pct"],
+           "plan": [x["key"] for x in out["plan"]["selected"]]})
     return ok(out)
 
 

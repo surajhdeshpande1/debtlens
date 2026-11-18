@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (JSON, Boolean, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text,
                         UniqueConstraint, Index)
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 def utcnow() -> datetime:
@@ -229,6 +229,17 @@ class DebtDependency(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     debt_id: Mapped[int] = mapped_column(ForeignKey("technical_debt.id", ondelete="CASCADE"), index=True)
     prerequisite_debt_id: Mapped[int] = mapped_column(ForeignKey("technical_debt.id", ondelete="CASCADE"))
+
+
+class DebtPlaybook(Base):
+    """The fix playbook chosen for a debt item (None = matched automatically) and the steps already done."""
+    __tablename__ = "debt_playbook"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    debt_id: Mapped[int] = mapped_column(ForeignKey("technical_debt.id", ondelete="CASCADE"), unique=True)
+    playbook_key: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    steps_done: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    updated_by_id: Mapped[int | None] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
 
 
 class FileMetric(Base):

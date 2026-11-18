@@ -283,6 +283,60 @@ def test_simulations(client):
     assert len(api(client, "get", f"/projects/{pid}/simulations", tok).json["runs"]) == 3
 
 
+def test_load_spike_simulation(client):
+    tok, pid = sandbox(client, "college")
+    events = api(client, "get", f"/projects/{pid}/simulate/spike/events", tok).json["events"]
+    assert events[0]["key"] == "results-day"
+    r = api(client, "post", f"/projects/{pid}/simulate/spike", tok, json={"event": "results-day", "budget": 40, "runs": 80}).json
+    assert r["plan"]["hours_used"] <= 40 and r["after"]["hours_lost"] < r["before"]["hours_lost"]
+    keys = {x["key"] for x in r["plan"]["selected"]}
+    assert all(set(x["prerequisite_of"]) <= keys for x in r["plan"]["selected"])
+    viewer = as_role(client, tok, "viewer")  # simulations change nothing, so every role may run them
+    c = api(client, "post", f"/projects/{pid}/simulate/spike", viewer,
+            json={"event": {"peak": 6, "start_hour": 9, "duration": 2}, "budget": 0, "runs": 50}).json
+    assert c["event"]["key"] == "custom" and c["plan"]["selected"] == [] and c["peak"] == 6
+    assert api(client, "post", f"/projects/{pid}/simulate/spike", tok, json={"event": "nonsense"}).status_code == 400
+    runs = api(client, "get", f"/projects/{pid}/simulations", tok).json["runs"]
+    assert [x["kind"] for x in runs].count("spike") == 2
+
+
+def test_playbooks_choice_progress_and_project_edits(client):
+    tok, pid = sandbox(client)
+    lib = api(client, "get", f"/projects/{pid}/playbooks", tok).json
+    assert len(lib["playbooks"]) == 24
+    row = next(d for d in lib["debts"] if d["key"] == "DEBT-101")
+    assert row["playbook"] == "pool-isolation" and not row["chosen"]
+    url = f"/projects/{pid}/debts/{row['id']}/playbook"
+    v = api(client, "get", url, tok).json
+    assert v["key"] == "pool-isolation" and v["progress"] == {"done": 0, "total": len(v["steps"])}
+    v = api(client, "put", url, tok, json={"steps_done": [0, 2, 99]}).json
+    assert v["steps_done"] == [0, 2] and v["progress"]["done"] == 2
+    v = api(client, "put", url, tok, json={"playbook": "load-testing"}).json
+    assert v["key"] == "load-testing" and v["match"]["chosen"] and v["steps_done"] == []  # new playbook, fresh progress
+    assert api(client, "put", url, tok, json={"playbook": "nope"}).status_code == 400
+    viewer = as_role(client, tok, "viewer")
+    assert api(client, "get", url, viewer).status_code == 200
+    assert api(client, "put", url, viewer, json={"steps_done": [1]}).status_code == 403
+    dev = as_role(client, tok, "developer")
+    assert api(client, "put", url, dev, json={"playbook": None}).json["key"] == "pool-isolation"  # back to automatic
+    assert api(client, "put", f"/projects/{pid}/playbooks/pool-isolation", dev, json={"steps": ["x"]}).status_code == 403
+    lead = as_role(client, tok, "tech_lead")
+    e = api(client, "put", f"/projects/{pid}/playbooks/pool-isolation", lead,
+            json={"steps": ["Ask the DBA for the real limit", "Split the pool"]}).json
+    assert e["edited"] and e["steps"] == ["Ask the DBA for the real limit", "Split the pool"]
+    assert api(client, "get", url, lead).json["steps"] == e["steps"]
+    c = api(client, "put", f"/projects/{pid}/playbooks/upi-fallback", lead, json={"title": "UPI fallback", "steps": ["Add a second PSP"]})
+    assert c.status_code == 200 and c.json["custom"]
+    assert api(client, "put", f"/projects/{pid}/playbooks/bad", lead, json={"title": ""}).status_code == 400
+    assert api(client, "put", url, lead, json={"playbook": "upi-fallback", "steps_done": [0]}).json["progress"] == {"done": 1, "total": 1}
+    assert api(client, "delete", f"/projects/{pid}/playbooks/upi-fallback", lead).json == {"removed": "upi-fallback", "builtin": False}
+    v = api(client, "get", url, lead).json
+    assert v["key"] == "pool-isolation" and v["steps_done"] == []  # the deleted playbook's debts go back to automatic
+    assert api(client, "delete", f"/projects/{pid}/playbooks/upi-fallback", lead).status_code == 404
+    assert api(client, "delete", f"/projects/{pid}/playbooks/pool-isolation", lead).json["builtin"] is True
+    assert api(client, "get", url, lead).json["steps"] != e["steps"]  # the built-in text is back
+
+
 def test_csv_import_is_idempotent(client):
     tok, pid = sandbox(client, "college")
     text = ("id,summary,component,priority,status,created\n"
@@ -350,8 +404,16 @@ def test_scan_upload_and_satd_conversion(client, tmp_path: Path):
 
 def test_reports_gate_and_export(client):
     tok, pid = sandbox(client)
+    lib = api(client, "get", f"/projects/{pid}/playbooks", tok).json
+    d101 = next(d for d in lib["debts"] if d["key"] == "DEBT-101")
+    api(client, "put", f"/projects/{pid}/debts/{d101['id']}/playbook", tok, json={"playbook": "load-testing", "steps_done": [0]})
     pdf = api(client, "get", f"/projects/{pid}/report.pdf", tok)
     assert pdf.status_code == 200 and pdf.data[:4] == b"%PDF"
+    pypdf = pytest.importorskip("pypdf")
+    import io
+
+    text = "".join(pg.extract_text() for pg in pypdf.PdfReader(io.BytesIO(pdf.data)).pages)
+    assert "Fix playbook" in text and "How to fix the planned items" in text
     g = api(client, "get", f"/projects/{pid}/gate", tok, query_string={"max_open_critical": 100}).json
     assert g["pass"] is True
     api(client, "post", f"/projects/{pid}/incidents", tok, json={"title": "Card network outage", "severity": "CRITICAL",
@@ -360,6 +422,9 @@ def test_reports_gate_and_export(client):
     assert g["pass"] is False
     snap = api(client, "get", f"/projects/{pid}/export", tok).json
     assert snap["format"] == "debtlens-snapshot/1" and "embedding" not in snap["incidents"][0]
+    exported = next(d for d in snap["debts"] if d["key"] == "DEBT-101")
+    assert exported["playbook"] == "load-testing" and exported["playbook_steps_done"] == [0]
+    assert snap["settings"]["playbooks"] == {}
     assert len(api(client, "get", f"/projects/{pid}/activity", tok).json["events"]) >= 1
 
 

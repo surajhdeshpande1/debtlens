@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from debtlens.core import clustering, economics, engine, graph, ingest, mining, optimiser, scenarios, simulation
+from debtlens.core import clustering, economics, engine, graph, ingest, mining, optimiser, playbooks, scenarios, simulation
+from debtlens.core import spike as SPIKE
 from debtlens.core import text as T
 from debtlens.core.tfidf import TfidfModel, cosine_matrix
 
@@ -291,3 +292,99 @@ def test_cascade_extremes():
     none = simulation.cascade(mods, deps, {m: 1.0 for m in mods}, "a", p=0.0, runs=50)
     assert full["expected_affected"] == 2 and full["worst_case_affected"] == 2
     assert none["expected_affected"] == 0
+
+
+# ----------------------------------------------------------------------------- fix playbooks
+
+def test_playbooks_match_the_evidence_and_fall_back_when_there_is_none():
+    snap = scenarios.materialize("fintech")
+    _, a = engine.playbook_assignment(snap)
+    key = {d["key"]: a[d["id"]]["key"] for d in snap["debts"]}
+    assert key["DEBT-101"] == "pool-isolation" and key["DEBT-102"] == "idempotency" and key["DEBT-104"] == "circuit-breaker"
+    pool = playbooks.match({"title": "Connection pool exhausted under load", "description": "pool size 10", "category": "ARCHITECTURE"})
+    assert pool["key"] == "pool-isolation" and pool["confident"] and "connection pool" in pool["matched"]
+    vague = playbooks.match({"title": "Rename variables in a helper", "module": "misc"})
+    assert vague == {"key": playbooks.FALLBACK, "score": 0.0, "matched": [], "confident": False}
+    assert len(playbooks.LIBRARY) == len(playbooks.BY_KEY) == 24
+    for pb in playbooks.LIBRARY:
+        assert pb.steps and pb.verify and 0 <= pb.capacity <= 0.6 and 0 <= pb.resilience <= 0.6
+        assert all(u.startswith("https://") for _, u in pb.references)
+
+
+def test_playbook_choices_and_project_edits_win_over_matching():
+    h = scenarios.materialize("healthtech")
+    d203 = next(d for d in h["debts"] if d["key"] == "DEBT-203")
+    assert engine.playbook_assignment(h)[1][d203["id"]] == {"key": "reconciliation", "score": None, "matched": [],
+                                                            "confident": True, "chosen": True}  # set in the scenario file
+    snap = scenarios.materialize("fintech")
+    d101 = next(d for d in snap["debts"] if d["key"] == "DEBT-101")
+    _, a = engine.playbook_assignment(snap, chosen={d101["id"]: "load-testing"})
+    assert a[d101["id"]]["key"] == "load-testing" and a[d101["id"]]["chosen"]
+    _, a = engine.playbook_assignment(snap, chosen={d101["id"]: "no-such-playbook"})
+    assert a[d101["id"]]["key"] == "pool-isolation"  # an unknown choice is ignored
+    edits = {"pool-isolation": {"steps": ["Ask the DBA for the real pool limit", "Split the pool"]}}
+    pb = engine.debt_playbook(snap, "DEBT-101", edits)
+    assert pb["steps"] == edits["pool-isolation"]["steps"] and pb["title"] == playbooks.BY_KEY["pool-isolation"].title
+    assert pb["context"]["debt_key"] == "DEBT-101" and pb["context"]["incidents"]
+    assert any("No recurrence of the linked incidents" in v for v in pb["verify"])
+    clean = playbooks.validate_custom({"title": "UPI fallback PSP!", "steps": ["Add a second PSP", " "], "capacity": 9,
+                                       "references": [{"url": "javascript:alert(1)"}, {"url": "https://npci.org.in"}]})
+    assert clean["key"] == "upi-fallback-psp" and clean["steps"] == ["Add a second PSP"] and clean["capacity"] == 0.6
+    assert [r["url"] for r in clean["references"]] == ["https://npci.org.in"]
+    with pytest.raises(ValueError):
+        playbooks.validate_custom({"title": "No steps"})
+
+
+# ----------------------------------------------------------------------------- load spikes
+
+def test_overload_curve_and_exposure_propagation():
+    assert SPIKE.p_overload(1.0) == pytest.approx(0.5)
+    assert SPIKE.p_overload(0.7) < 0.01 < 0.99 < SPIKE.p_overload(1.3)
+    # traffic entering at the API reaches everything it calls; a module only the batch job uses is not exposed
+    mods = ["api", "db", "batch", "ledger"]
+    deps = [("api", "db"), ("batch", "ledger"), ("ledger", "db")]
+    e = SPIKE.exposure(mods, deps, {"api": 1.0})
+    assert e["api"] == e["db"] == 1.0 and e["batch"] == e["ledger"] == 0.0
+    e = SPIKE.exposure(mods, deps, {"api": 1.0}, fixed={"db": 0.3})
+    assert e["db"] == 0.3
+    prof = SPIKE.custom_profile(6, 9, 2, ramp=1)
+    assert len(prof) == 24 and prof[8] == prof[11] == 3.5 and prof[9] == prof[10] == 6 and prof[7] == prof[12] == 1.0
+    late = SPIKE.custom_profile(6, 22, 3, ramp=1)  # the simulated day ends at midnight
+    assert late[21] == 3.5 and late[22] == late[23] == 6 and late[0] == 1.0
+    ev = engine.spike(scenarios.materialize("fintech"), {"peak": 6, "start_hour": 22, "duration": 3}, 0, runs=50)["event"]
+    assert "for 2 h (cut at midnight" in ev["description"]
+
+
+def test_spike_plan_fits_the_budget_includes_prerequisites_and_helps():
+    snap = scenarios.materialize("college")
+    r = engine.spike(snap, None, 40, runs=120, seed=3)
+    assert r["event"]["key"] == "results-day" and r["peak"] == 12
+    plan = r["plan"]
+    assert plan["hours_used"] <= 40 and plan["method"]
+    keys = {x["key"] for x in plan["selected"]}
+    by_key = {d["key"]: d for d in snap["debts"]}
+    by_id = {d["id"]: d for d in snap["debts"]}
+    for k in keys:  # every prerequisite of a planned fix is planned too
+        assert {by_id[p]["key"] for p in by_key[k].get("prerequisite_ids") or [] if by_id[p]["status"] != "RESOLVED"} <= keys
+    assert {"DEBT-401", "DEBT-411"} <= keys
+    assert r["after"]["hours_lost"] < r["before"]["hours_lost"]
+    assert r["saved_hours"]["worse_runs"] == 0 and r["saved_hours"]["ci95"][0] > 0
+    assert r["saved_hours"]["mean"] >= r["regular_plan"]["saved_hours"]["mean"] - 1e-9
+    zero = engine.spike(snap, None, 0, runs=60, seed=3)
+    assert zero["plan"]["selected"] == [] and zero["after"]["hours_lost"] == zero["before"]["hours_lost"]
+
+
+def test_bigger_spikes_hurt_more_and_runs_are_reproducible():
+    snap = scenarios.materialize("fintech")
+    lost = [engine.spike(snap, {"peak": p, "start_hour": 12, "duration": 3}, 0, runs=80, seed=5)["before"]["hours_lost"]
+            for p in (1, 4, 8)]
+    assert lost[0] == 0 and lost[0] < lost[1] < lost[2]
+    a = engine.spike(snap, None, 40, runs=60, seed=9)
+    b = engine.spike(snap, None, 40, runs=60, seed=9)
+    assert a["before"] == b["before"] and a["plan"]["selected"] == b["plan"]["selected"]
+    assert a["event"]["key"] == "salary-day"
+    with pytest.raises(ValueError):
+        engine.spike(snap, "no-such-event")
+    for code in ("healthtech", "ecommerce", "self"):  # every scenario has an event (self uses the custom default)
+        r = engine.spike(scenarios.materialize(code), None, 40, runs=50, seed=1)
+        assert r["plan"]["hours_used"] <= 40 and r["after"]["hours_lost"] <= r["before"]["hours_lost"]

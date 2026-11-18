@@ -332,7 +332,7 @@ def github_issues(repo: str, token: str | None = None, labels: str = "bug", stat
         for it in batch:
             if "pull_request" in it:
                 continue
-            names = [l["name"].lower() for l in it.get("labels") or []]
+            names = [lab["name"].lower() for lab in it.get("labels") or []]
             sev = next((norm_severity(n.split(":")[-1].strip(), "") for n in names
                         if norm_severity(n.split(":")[-1].strip(), "")), "MEDIUM")
             module = next((n.split(":", 1)[1].strip() for n in names

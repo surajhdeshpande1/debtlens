@@ -8,7 +8,7 @@ const SAMPLE = html`<div class="term"><span class="p">$</span> debtlens plan --s
 
 <span class="y">Fix this sprint</span> — 39 of 40 h (tree dp, proven optimal)
 debt      title                                                     hours  interest/mo
-DEBT-101  Separate connection pools for API traffic and batch jobs     24         98.5
+DEBT-101  Separate connection pools for API traffic and batch jobs     24         98.6
 DEBT-105  Apply configurable timeouts on the UPI code path              4         42.9
 DEBT-108  Invalidate the API-key cache on rotation and revocation       8         23.9
 DEBT-113  Extend the checkout session TTL during the OTP step           3         11.8

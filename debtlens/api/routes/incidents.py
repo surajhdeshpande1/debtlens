@@ -13,9 +13,9 @@ from ...core import similarity as SIM
 from .. import serial
 from .. import services as S
 from .. import validation as V
-from ..deps import args_float, args_int, db, me, ok, project
+from ..deps import args_int, db, me, ok, project
 from ..errors import ApiError
-from ..models import (CauseEdge, CauseNode, DebtIncident, Incident, Module, Resolution, RootCause, TechnicalDebt,
+from ..models import (CauseEdge, CauseNode, DebtIncident, Incident, Resolution, RootCause, TechnicalDebt,
                       utcnow)
 from ..security import require
 from ..services import iso, parse_dt
