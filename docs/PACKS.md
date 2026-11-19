@@ -48,6 +48,9 @@ limits), a 5-hour fix whose login incidents already cost about 34 hours a month.
 Each pack has 10 modules, 20 incidents (with 6 or 7 families of repeated incidents and the regressions they
 imply), 13 to 15 debt items and 7 people (one for each role).
 
+A step-by-step demo script for every pack, with the times and numbers to expect, is in
+[PACK_MANUAL.md](PACK_MANUAL.md).
+
 ## Live replay: watch the day happen
 
 After **Simulation Lab → Load spike → Simulate the day**, press **▶ Live replay**. DebtLens plays one simulated
