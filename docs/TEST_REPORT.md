@@ -7,10 +7,10 @@ none is typed in by hand.
 
 | Suite | File | Tests | Result | Time |
 |---|---|---|---|---|
-| Engine and scenario packs | `tests/test_core.py` | 93 | all passed | 3.2 s |
-| REST API, roles, sandboxes, packs | `tests/test_api.py` | 35 | all passed on SQLite, and again on MySQL 8.0.46 | 7.3 s / 28.3 s |
-| Terminal tool | `tests/test_cli.py` | 16 | all passed | 2.3 s |
-| **Total** | | **144** | **0 failed, 0 skipped** | **12.7 s** |
+| Engine and scenario packs | `tests/test_core.py` | 99 | all passed | 6.8 s |
+| REST API, roles, sandboxes, packs | `tests/test_api.py` | 36 | all passed on SQLite, and again on MySQL 8.0.46 | 9.0 s / 37.5 s |
+| Terminal tool | `tests/test_cli.py` | 17 | all passed | 4.4 s |
+| **Total** | | **152** | **0 failed, 0 skipped** | **20.4 s** |
 
 - **Local run:** Linux, Python 3.13, with the MiniLM model loaded (`DEBTLENS_MODEL_DIR` set).
 - **GitHub Actions:** runs on every push with Python 3.12 (the version Vercel uses) and MiniLM switched off, so the TF-IDF
@@ -21,7 +21,7 @@ How to run:
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                                   # 144 tests, SQLite
+python -m pytest tests -q                                   # 152 tests, SQLite
 DEBTLENS_TEST_DATABASE_URL=mysql+pymysql://user:pass@localhost/debtlens_test \
   python -m pytest tests/test_api.py -q                     # the API suite on a real MySQL 8 server
 ```
@@ -159,11 +159,31 @@ simulates a pack file. With MiniLM on, 40 hours to prepare and 300 simulated day
 |---|---|---|---|---|---|---|---|
 | `tatkal` | RailYatra | Tatkal opening at 10 AM (25×) | 0.93 | 0.90 | 131.7 → 46.1 h | 85.7 h (82.5–88.8) | 34.6 h |
 | `broker` | NiveshTrade | Union Budget day (12×) | 0.93 | 0.89 | 141.1 → 59.7 h | 81.4 h (78.6–84.3) | 45.3 h |
-| `food` | ZaikaNow | IPL final night (9×) | 1.00 | 1.00 | 152.8 → 61.5 h | 91.3 h (88.4–94.2) | 60.5 h |
-| `stream` | KhelStream | World Cup final (20×) | 1.00 | 1.00 | 149.5 → 51.5 h | 98.0 h (95.0–100.9) | 50.2 h |
-| `rides` | SawariGo | New Year's Eve (8×) | 0.88 | 0.89 | 113.1 → 28.4 h | 84.7 h (82.6–86.9) | 53.9 h |
-| `taxfiling` | TaxSetu | ITR deadline night (31 July) (15×) | 0.94 | 0.95 | 151.8 → 38.0 h | 113.8 h (111.1–116.4) | 71.1 h |
+| `food` | ZaikaNow | IPL final night (9×) | 1.00 | 1.00 | 157.4 → 67.1 h | 90.3 h (87.2–93.3) | 59.6 h |
+| `stream` | KhelStream | World Cup final (20×) | 1.00 | 1.00 | 152.6 → 63.3 h | 89.3 h (85.7–92.9) | 39.8 h |
+| `rides` | SawariGo | New Year's Eve (8×) | 0.88 | 0.89 | 113.1 → 33.5 h | 79.6 h (77.3–81.9) | 53.9 h |
+| `taxfiling` | TaxSetu | ITR deadline night (31 July) (15×) | 0.94 | 0.95 | 151.9 → 47.1 h | 104.8 h (102.1–107.5) | 63.4 h |
 | `tickets` | ShowPass | Stadium tour on-sale at noon (30×) | 1.00 | 0.90 | 146.8 → 42.0 h | 104.7 h (101.8–107.7) | 67.4 h |
+
+**Bot attacks and the live replay.** Each pack has a second event, a bot attack, with one debt item that blocks
+most of the bots once fixed (same settings as above):
+
+| Code | Bot attack | Blocked by | Hours lost: now → after | Spike plan saves (95% CI) | Regular plan saves |
+|---|---|---|---|---|---|
+| `tatkal` | Tatkal booking bots (60×) | DEBT-508 | 180.7 → 85.2 h | 95.5 h (91.5–99.6) | 4.9 h |
+| `broker` | Credential-stuffing attack (32×) | DEBT-607 | 107.6 → 0.0 h | 107.6 h (105.2–109.9) | 107.6 h |
+| `food` | Coupon-abuse bots (20×) | DEBT-715 | 109.1 → 0.1 h | 109.0 h (107.7–110.4) | 23.4 h |
+| `stream` | Restreaming bots (32×) | DEBT-814 | 269.2 → 36.1 h | 233.1 h (227.6–238.7) | 68.1 h |
+| `rides` | Fare-scraping bots (16×) | DEBT-914 | 112.0 → 0.7 h | 111.2 h (110.1–112.4) | 14.8 h |
+| `taxfiling` | Credential stuffing on PAN login (25×) | DEBT-1014 | 123.7 → 0.1 h | 123.6 h (121.4–125.8) | 22.3 h |
+| `tickets` | Scalper bots at the drop (50×) | DEBT-1106 | 159.2 → 2.6 h | 156.6 h (155.3–157.9) | 5.8 h |
+
+`test_bot_attacks_are_blocked_only_by_their_fix` checks that only the mitigating debt removes the bots' share of
+the traffic (and that with no time to fix anything, nothing is blocked). `test_replay_day_is_typical_and_consistent`
+checks the replayed day on four events: its module states, failing share, incidents and hours lost agree with its
+own events; every change happens inside its hour, a cascade after the failure it comes from; the day is within 25%
+(or 12 h) of the average before and after the fixes; and running it again gives exactly the same day.
+`test_live_replay_in_the_terminal` plays `simulate spike --live --side` and checks the totals it prints.
 
 ## 6. Browser checks
 
@@ -173,6 +193,14 @@ API token → add a demo team → sign in as a Developer, who cannot approve a p
 was re-checked on 18 November: it shows α = 0.4 marked "in use" and τ = 0.30 highlighted. The Load spike tab (chart,
 plan, heatmap with its now/after switch), the playbook card on a debt page (ticking steps, choosing another playbook,
 editing it for the project) and the playbook library were checked the same day. No console errors.
+
+On 19 November the **live replay** was played for every scenario and pack: the main event of all 12, and the bot
+attack of all 7 packs (19 replays at 4×, at 1366×768). Each reached its end card with the same totals as the engine,
+switched to side by side and closed with Esc. Module tiles went DOWN or FAILING in every replay except the
+self-audit scenario, whose default spike breaks nothing. The frozen-screen effect or the customer's "isn't
+responding" dialog appeared in 16 of the 19: not on CareStream or CampusOne, where at most 47% of requests fail and
+the way in stays up, and not on the self-audit. The Tatkal bot attack was also played at 1× (45 s), and other
+replays at 1920×1080 and 390×844; closing a replay restores the page title. No console errors.
 
 ## 7. Production check on Vercel (18 November)
 

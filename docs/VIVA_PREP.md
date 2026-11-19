@@ -10,7 +10,7 @@ your own words. Every file path is in this repository.
 | Scenarios | 5: PayCore (FinTech), CareStream HIS (HealthTech), ShopSwift (E-commerce), CampusOne ERP (College), DebtLens v1 self-audit |
 | Tables | 24 (8 kept from Demo 1 + 16 new) |
 | Roles | 6: Admin, Tech Lead, Developer, QA, Manager, Viewer |
-| Tests | 144 automated (engine and packs 93, API 35, CLI 16); the API tests also pass on MySQL 8 |
+| Tests | 152 automated (engine and packs 99, API 36, CLI 17); the API tests also pass on MySQL 8 |
 | Similarity | sim = α·TF-IDF + (1−α)·MiniLM, α = 0.4; regression threshold τ = 0.30 |
 | Accuracy | mean precision@1: TF-IDF 0.69, MiniLM 0.87, hybrid 0.91; regression F1 ≈ 0.88 |
 | Interest | I(d) = Σ w(sev)·effort + λ₁·churn + λ₂·blast; w = 3.5/2.5/1.5/1.0, λ₁ = 0.15, λ₂ = 1.8 |
@@ -67,13 +67,35 @@ An uploaded pack is checked completely first and every problem is listed at once
 the spike plan saves more on the day than the regular sprint plan. In the Tatkal pack it saves 85.7 h against 34.6 h,
 because the regular plan fixes the debt that cost the most in the past and not the debt that breaks at 10:00.
 
+**What is the live replay?** After a load-spike simulation, ▶ Live replay plays one simulated day minute by
+minute: a customer's phone going through the app (slow steps, error messages, an "isn't responding" freeze when the
+way in is down) and the on-call engineer's screens (load per module, failures spreading to callers, alerts, hours
+lost). It shows today and the same day after the fixes, alone or side by side, and also runs in the terminal
+(`debtlens simulate spike --live`). The day shown is the one of the 300 simulated days that is closest to the
+average both before and after the fixes, so it is typical, not the worst case.
+
+*Does it really hang the laptop?* No, and that is deliberate. A real hang on the presentation laptop could crash
+the demo, and flooding our free server would break it for everyone. The replay draws a hung device instead: the
+lane stops updating, turns pale, says "(Not Responding)" and shows a wait cursor, then catches up. Esc, pause and
+close always work, and no extra requests reach the server.
+
+*How are bot attacks modelled?* A bot event says what share of the extra traffic is bots, what share of them a fix
+blocks, and which debt items are that fix (a rate limit, a bot check). Bots load the modules like real users until
+that debt is fixed; then the blocked share never reaches them. The planner can choose that debt like any other. On
+Tatkal the bot attack costs 180.7 h; the spike plan, which starts with the 8-hour rate limit DEBT-508, saves 95.5 h,
+while the regular sprint plan saves 4.9 h because it does not include DEBT-508.
+
+*Are the minutes in the replay real?* The model works in whole hours. Inside an hour, overloads are spread over the
+first ten minutes, cascades follow a minute or so after the failure they come from, and recoveries come later. Those
+minutes only make the replay readable; the totals are the model's.
+
 **How are roles enforced?** On the server. Every endpoint that reads or changes project data is wrapped in `@require("permission")`
 (`debtlens/api/security.py`), and a disallowed call gets HTTP 403. The buttons in the website are only a convenience.
 
 **What is a sandbox?** A private 24-hour copy of a scenario for a visitor without an account. It is isolated: a
 sandbox token can only reach its own project, which is tested in `tests/test_api.py`.
 
-**How do you know it works?** There are 144 automated tests. Our algorithms are compared against reference
+**How do you know it works?** There are 152 automated tests. Our algorithms are compared against reference
 libraries: scikit-learn for TF-IDF and DBSCAN, networkx for centrality, radon for complexity, and brute force for the
 optimiser. The tests run on every push (`.github/workflows/ci.yml`).
 

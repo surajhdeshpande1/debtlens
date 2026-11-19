@@ -38,7 +38,11 @@ circuit breaker). The simulation replays the event 300 times: modules overload w
 module can take its callers with it, and each incident costs engineer hours. The planner then picks the fixes that
 protect the most hours within the time you have before the event, including any prerequisites. On CampusOne's
 results day, 35 of 40 hours of fixes cut the expected loss from 51 h to 1 h; ShopSwift's Diwali sale shows the
-spike plan saving 40 h where the regular sprint plan saves 9 h.
+spike plan saving 40 h where the regular sprint plan saves 9 h. **▶ Live replay** then plays one typical simulated
+day minute by minute: a customer's phone going through the app (slow steps, error messages, a frozen "isn't
+responding" app) next to the on-call engineer's modules and alerts, today and after the fixes, side by side if you
+like. Every scenario pack also has a **bot attack** (booking bots, credential stuffing, scalpers, scrapers) that one
+rate-limit fix blocks. In the terminal: `debtlens simulate spike -s tatkal -e tatkal-bots --live --side`.
 
 **Fix playbooks.** 24 built-in playbooks (connection pools, timeouts, circuit breakers, idempotency, durable
 queues, caching, indexing, reconciliation, and more), each matched to a debt item from its own words, with steps,
@@ -104,7 +108,7 @@ debtlens/core/     the analysis engine, pure Python, shared by the API and the C
 debtlens/cli/      the `debtlens` command (Typer + Rich)
 debtlens/scenarios five labelled industry scenarios (JSON)
 debtlens/packs     seven scenario packs: a system plus its busiest day, in one JSON file each
-tests/             144 tests: engine checked against scikit-learn, networkx and radon; API, roles, sandboxes, packs
+tests/             152 tests: engine checked against scikit-learn, networkx and radon; API, roles, sandboxes, packs
 ```
 
 - **Database:** TiDB Cloud Starter (MySQL-compatible, TLS) on Vercel; MySQL 8 or SQLite locally. The tables keep
@@ -136,7 +140,7 @@ the same wording, so TF-IDF alone reaches 1.00. The defaults α = 0.4 and τ = 0
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q                      # 144 tests
+python -m pytest tests -q                      # 152 tests
 DATABASE_URL=sqlite:///dev.db flask --app app run    # website on http://127.0.0.1:5000
 python scripts/build_package.py                # build the PyPI package into dist/
 ```
