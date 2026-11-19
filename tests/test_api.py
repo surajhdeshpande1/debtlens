@@ -341,6 +341,8 @@ def test_sandbox_from_a_pack_code_and_from_an_uploaded_pack(client):
     assert snap["project"]["spike"]["key"] == "stadium-drop"  # the terminal sees the pack's event too
     r = api(client, "post", "/sandbox/reset", tok2, json={})  # an uploaded pack resets to itself
     assert r.status_code == 201 and r.json["project"]["name"] == "My Show Co"
+    r = api(client, "post", "/sandbox/reset", r.json["token"], json={"scenario": "food"})  # the top-bar switcher
+    assert r.status_code == 201 and r.json["project"]["name"] == "ZaikaNow"
     assert api(client, "get", f"/projects/{pid}", tok2).status_code in (403, 404)  # still isolated from other sandboxes
 
     pack["debts"][0]["needs"] = ["DEBT-0"]

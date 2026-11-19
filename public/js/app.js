@@ -324,10 +324,21 @@ function topbar() {
     ${sandbox ? html`<span class="sandbox-pill" title="Private copy — changes are yours only">Sandbox · ${p && p.persona ? p.persona.name : "visitor"} as
         <select data-role aria-label="Play as role">${roles.map((r) => html`<option value="${r.code}" ${r.code === me.principal.role ? "selected" : ""}>${r.label}</option>`)}</select>
         <span class="tiny">expires ${ago(p && p.expires_at)}</span></span>
-      <button class="btn sm" data-tourbtn>▶ Tour</button><button class="btn sm" data-reset>Reset</button><button class="btn sm ghost" data-exit>Exit</button>`
+      ${scenarioSwitch(p)}<button class="btn sm" data-tourbtn>▶ Tour</button><button class="btn sm" data-reset>Reset</button><button class="btn sm ghost" data-exit>Exit</button>`
     : me ? html`<span class="small">${me.principal.name}</span><span class="badge">${me.principal.role_label}</span>
       <a class="btn sm ghost" href="#/projects">Projects</a><button class="btn sm ghost" data-exit>Sign out</button>` : ""}
   </header>`;
+}
+
+/** In a sandbox: jump to any industry scenario or pack in one step (handy on stage). */
+function scenarioSwitch(p) {
+  const cur = p && p.scenario_info ? p.scenario_info : null;
+  const opt = (s) => html`<option value="${s.code}" ${cur && !cur.uploaded && cur.code === s.code ? "selected" : ""}>${s.name}</option>`;
+  return html`<select data-scenario-switch aria-label="Open another scenario or pack" title="Open another scenario or pack">
+    ${cur && cur.uploaded ? html`<option value="" selected>${cur.name} (uploaded)</option>` : ""}
+    <optgroup label="Industry scenarios">${(S.meta.scenarios || []).map(opt)}</optgroup>
+    ${(S.meta.packs || []).length ? html`<optgroup label="Scenario packs">${S.meta.packs.map(opt)}</optgroup>` : ""}
+  </select>`;
 }
 
 function sidebar(view) {
@@ -358,6 +369,16 @@ function wireTopbar(root) {
       toast("Sandbox reset", "ok");
       go(`/p/${r.project.id}/home`);
     } catch (ex) { fail(ex); }
+  });
+  on(root, "change", "[data-scenario-switch]", async (e, s) => {
+    if (!s.value) return;
+    s.disabled = true;
+    try {
+      const r = await api("/sandbox/reset", { method: "POST", body: { scenario: s.value } });
+      auth.token = r.token; S.me = null; S.project = null; tour.stop();
+      toast(`Opened ${r.project.name}${r.persona ? ` — you are ${r.persona.name}` : ""}`, "ok");
+      go(`/p/${r.project.id}/home`);
+    } catch (ex) { s.disabled = false; fail(ex); }
   });
   on(root, "click", "[data-exit]", () => { auth.token = null; S.me = null; S.project = null; tour.stop(); go("/"); });
   on(root, "click", "[data-tourbtn]", () => tour.start());

@@ -95,6 +95,7 @@ input[type=checkbox] { accent-color: var(--accent); }
 .sandbox-pill { display: inline-flex; align-items: center; gap: 8px; padding: 3px 4px 3px 10px; border-radius: 999px; background: var(--warn-weak);
   color: var(--warn); font-size: 12.5px; border: 1px solid #f0d9a8; }
 .sandbox-pill select { border-color: #f0d9a8; height: 24px; font-size: 12.5px; border-radius: 999px; }
+.topbar [data-scenario-switch] { max-width: 190px; height: 28px; font-size: 12.5px; }
 .layout { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); min-height: calc(100vh - var(--topbar)); }
 .sidebar { border-right: 1px solid var(--border); background: var(--bg-subtle); padding: 12px 8px; position: sticky; top: var(--topbar);
   height: calc(100vh - var(--topbar)); overflow-y: auto; }
