@@ -34,6 +34,7 @@ imply), 13 or 14 debt items and 7 people (one for each role).
 **On the website** (home page → *Scenario packs*):
 
 * **Open** on a card opens a private 24-hour sandbox in the role you pick. **Guided tour** walks through it.
+  Inside a sandbox, the drop-down in the top bar jumps straight to any other scenario or pack.
 * **⬇ .json** downloads the pack file.
 * **Open a pack file** takes any pack (.json, up to 400 KB). It is checked completely before anything is stored.
   If something is wrong, every problem is listed at once, so the file can be fixed in one pass. **Reset** in the
