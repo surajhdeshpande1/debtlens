@@ -520,6 +520,7 @@ export function openReplay(r, opts = {}) {
       }
       catchUp(X, minute);
       if (playing && fx && X.severe && now >= X.nextFreeze) {
+        draw(X, now); // the screen hangs on the latest picture, errors and all
         X.frozen = true;
         X.freezeUntil = now + (650 + random() * 1000) / (SPEEDS[speedIx] > 2 ? 1.6 : 1);
         X.nextFreeze = X.freezeUntil + 1100 + random() * 1800;

@@ -7,10 +7,10 @@ none is typed in by hand.
 
 | Suite | File | Tests | Result | Time |
 |---|---|---|---|---|
-| Engine and scenario packs | `tests/test_core.py` | 99 | all passed | 6.8 s |
-| REST API, roles, sandboxes, packs | `tests/test_api.py` | 36 | all passed on SQLite, and again on MySQL 8.0.46 | 9.0 s / 37.5 s |
-| Terminal tool | `tests/test_cli.py` | 17 | all passed | 4.4 s |
-| **Total** | | **152** | **0 failed, 0 skipped** | **20.4 s** |
+| Engine and scenario packs | `tests/test_core.py` | 99 | all passed | 6.7 s |
+| REST API, roles, sandboxes, packs | `tests/test_api.py` | 36 | all passed on SQLite, and again on MySQL 8.0.46 | 8.8 s / 38.5 s |
+| Terminal tool | `tests/test_cli.py` | 17 | all passed | 4.8 s |
+| **Total** | | **152** | **0 failed, 0 skipped** | **20.0 s** |
 
 - **Local run:** Linux, Python 3.13, with the MiniLM model loaded (`DEBTLENS_MODEL_DIR` set).
 - **GitHub Actions:** runs on every push with Python 3.12 (the version Vercel uses) and MiniLM switched off, so the TF-IDF
