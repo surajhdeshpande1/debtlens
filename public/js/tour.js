@@ -35,7 +35,7 @@ function steps() {
       text: `Fail “${t.cascade_module || "a core module"}” and watch the failure spread to modules that depend on it (independent cascade, fragility from debt risk). The likely path and the debts on it are listed — and you can raise a drill incident.`,
       focus: "[data-tour=cascade]" },
     { view: "sim", route: r("sim", "spike"), title: "Simulation Lab · The busiest day",
-      text: "Run this system's busiest day hour by hour: which modules overload, how many engineer hours and requests it costs, and which debt to fix before it — compared with the regular sprint plan. Press Simulate, then try your own peak and budget.",
+      text: "Run this system's busiest day hour by hour: which modules overload, how many engineer hours and requests it costs, and which debt to fix before it — compared with the regular sprint plan. Then press ▶ Live replay to watch that day as the customer's phone and the on-call engineer see it, before and after the fixes.",
       focus: "[data-tour=spike]" },
     { view: "intel", route: r("intel", "eval"), title: "M6 · Measured, not claimed",
       text: "The scenario's or pack's incidents are labelled, so accuracy is measured live: precision@k for TF-IDF vs MiniLM vs the hybrid, clustering purity/ARI, and regression precision/recall at each threshold τ.",

@@ -438,7 +438,15 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     mods = sorted(stats)
     deps = [(a, b) for a, b in dependency_pairs(snap) if a in stats and b in stats]
     proj = snap.get("project") or {}
-    preset = proj.get("spike") if isinstance(proj.get("spike"), dict) else SPIKE.PRESETS.get(proj.get("scenario") or "")
+    presets = [p for p in (proj.get("events") or []) if isinstance(p, dict)]
+    if not presets:
+        main = proj.get("spike") if isinstance(proj.get("spike"), dict) else SPIKE.PRESETS.get(proj.get("scenario") or "")
+        presets = [main] if main else []
+    preset = presets[0] if presets else None
+    if isinstance(event, str) and event not in ("", "preset", "custom"):
+        preset = next((p for p in presets if p["key"] == event), None)
+        if preset is None:
+            raise ValueError(f"unknown spike event {event!r}")
     if isinstance(event, dict):
         profile = SPIKE.custom_profile(event.get("peak", 5), event.get("start_hour", 20), event.get("duration", 2),
                                        event.get("ramp", 1), event.get("base", 1.0))
@@ -451,7 +459,8 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
                                 f"{'falls' if start + hours - 24 == 1 else 'fall'} outside it)" if cut else "")}
     elif preset and event in (None, "", preset["key"], "preset"):
         profile = list(preset["profile"])
-        ev = {"key": preset["key"], "name": preset["name"], "description": preset["description"], "preset": True}
+        ev = {"key": preset["key"], "name": preset["name"], "description": preset["description"], "preset": True,
+              "kind": "bots" if preset.get("bots") else "traffic"}
     elif event in (None, "", "preset", "custom"):
         profile = SPIKE.custom_profile(5, 20, 2)
         ev = {"key": "custom", "name": "Custom spike", "preset": False, "description": "5× traffic from 20:00 for 2 h"}
@@ -459,7 +468,10 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
         raise ValueError(f"unknown spike event {event!r}")
     entry = dict(preset["entry"]) if preset else SPIKE.default_entry(mods, deps)
     entry = {m: w for m, w in entry.items() if m in stats}
-    baseline = {m: float((preset or {}).get("baseline", {}).get(m, SPIKE.DEFAULT_BASELINE)) for m in mods}
+    # Utilisation at a normal peak hour belongs to the system, not the event: an event without its own baseline
+    # (a bot attack, say) uses the main event's.
+    base_src = (preset or {}).get("baseline") or (presets[0].get("baseline") if presets else None) or {}
+    baseline = {m: float(base_src.get(m, SPIKE.DEFAULT_BASELINE)) for m in mods}
     expo = SPIKE.exposure(mods, deps, entry, (preset or {}).get("exposure"))
     efforts: dict = defaultdict(list)
     for i in snap.get("incidents") or []:
@@ -475,11 +487,18 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     factors = playbooks.load_factors(debts, assignment, lib)
     open_debts = [d for d in debts if economics.is_open(d)]
     reg = plan(snap, budget, params, compare=False)
-    model = SPIKE.Model(mods, deps, baseline, expo, entry, cost, severity, profile)
+    bots = None
+    if isinstance(event, (str, type(None))) and preset and preset.get("bots") and ev.get("preset"):
+        keys = {d["key"]: d["id"] for d in open_debts}
+        b = preset["bots"]
+        bots = {"share": float(b.get("share", 0.8)), "blocked": float(b.get("blocked", 0.9)),
+                "mitigated_by": {keys[k] for k in b.get("mitigated_by") or () if k in keys}}
+    model = SPIKE.Model(mods, deps, baseline, expo, entry, cost, severity, profile, bots=bots)
     res = SPIKE.simulate(model, open_debts, factors, budget, runs, seed, regular_plan=list(reg["selected"]),
                          playbook_of={d["id"]: assignment[d["id"]]["key"] for d in debts})
     res["event"] = ev | {"peak": max(profile), "entry": entry}
     res["playbook_titles"] = {k: v.title for k, v in lib.items()}
+    res["journey"] = proj.get("journey")
     return res
 
 

@@ -300,6 +300,21 @@ def test_load_spike_simulation(client):
     assert [x["kind"] for x in runs].count("spike") == 2
 
 
+def test_spike_events_bot_attacks_and_the_live_replay(client):
+    tok, pid = sandbox(client, "tatkal")
+    r = api(client, "get", f"/projects/{pid}/simulate/spike/events", tok).json
+    kinds = {e["key"]: e.get("kind") for e in r["events"] if e.get("preset")}
+    assert kinds == {"tatkal-10am": "traffic", "tatkal-bots": "bots"}
+    assert r["journey"]["app"] == "RailYatra" and len(r["journey"]["steps"]) == 7
+    s = api(client, "post", f"/projects/{pid}/simulate/spike", tok, json={"event": "tatkal-bots", "budget": 40, "runs": 80}).json
+    assert s["event"]["kind"] == "bots" and s["bots"]["blocked_in_plan"] and s["journey"]["who"].startswith("Priya")
+    rp = s["replay"]
+    assert len(rp["before"]["states"]) == 24 and all("minute" in e for e in rp["before"]["events"])
+    assert rp["before"]["total_hours_lost"] > rp["after"]["total_hours_lost"]
+    viewer = as_role(client, tok, "viewer")
+    assert api(client, "get", f"/projects/{pid}/simulate/spike/events", viewer).status_code == 200
+
+
 def test_scenario_packs_cards_download_and_validation(client):
     meta = api(client, "get", "/meta").json
     assert [p["code"] for p in meta["packs"]][:2] == ["tatkal", "broker"] and len(meta["packs"]) == 7

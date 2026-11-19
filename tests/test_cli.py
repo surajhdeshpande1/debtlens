@@ -90,6 +90,21 @@ def test_playbooks_and_load_spike_offline():
     assert run("simulate", "spike", "-s", "fintech", "--event", "nonsense").exit_code != 0
 
 
+def test_live_replay_in_the_terminal(monkeypatch):
+    from debtlens.cli import live as LIVE
+
+    monkeypatch.setattr(LIVE, "HOUR_BUSY", 0.05)  # play the day in a blink
+    monkeypatch.setattr(LIVE, "HOUR_QUIET", 0.005)
+    r = run("simulate", "spike", "-s", "tatkal", "-e", "tatkal-bots", "--runs", "80", "--live", "--side", "--speed", "8")
+    assert r.exit_code == 0, r.output
+    assert "LIVE REPLAY" in r.output and "Today, with the open debt" in r.output and "After the fixes" in r.output
+    assert "blocked at the edge" in r.output and "DEBT-508" in r.output and "replay stopped" not in r.output
+    s = json.loads(run("simulate", "spike", "-s", "tatkal", "-e", "tatkal-bots", "--runs", "80", "--json").output)
+    assert f"{s['replay']['before']['total_hours_lost']:,.1f} engineer-hours lost" in r.output
+    assert run("simulate", "spike", "-s", "tatkal", "--live", "--json").exit_code != 0
+    assert LIVE.count(4500) == "4,500" and LIVE.count(3.2e5) == "3.2 lakh" and LIVE.count(1.4e7) == "1.4 crore"
+
+
 def test_scenario_pack_commands(tmp_path):
     packs = json.loads(run("pack", "list", "--json").output)
     assert [p["code"] for p in packs] == ["tatkal", "broker", "food", "stream", "rides", "taxfiling", "tickets"]

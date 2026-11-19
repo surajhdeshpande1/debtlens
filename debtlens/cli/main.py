@@ -862,9 +862,16 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
               hours: int = typer.Option(2, help="Custom spike: hours at the peak."),
               budget: float = typer.Option(40, "--budget", "-b", help="Hours available to fix things before the event."),
               runs: int = typer.Option(300), seed: int = typer.Option(17),
+              live: bool = typer.Option(False, "--live", help="Play the day live: the customer's journey, modules and alerts, minute by minute."),
+              side: bool = typer.Option(False, "--side", help="With --live: today and after the fixes side by side."),
+              after: bool = typer.Option(False, "--after", help="With --live: play the day after the fixes."),
+              speed: float = typer.Option(2.0, "--speed", min=0.25, max=8.0, help="With --live: playback speed."),
+              no_freeze: bool = typer.Option(False, "--no-freeze", help="With --live: no frozen-screen effects."),
               project: Optional[int] = ProjectOpt, scenario: Optional[str] = ScenarioOpt, snapshot: Optional[Path] = SnapshotOpt,
               as_json: bool = JsonOpt):
     """Load spike: which modules overload hour by hour, and what to fix before the event."""
+    if live and as_json:
+        raise CliError("--live draws in the terminal; leave out --json")
     src = Source(project, scenario, snapshot)
     ev = {"peak": peak, "start_hour": start, "duration": hours} if peak else event
     with out.status(f"Simulating {runs} days of traffic…", spinner="dots") if not as_json else _null():
@@ -877,6 +884,8 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
                 raise CliError(str(e)) from None
     if as_json:
         return emit_json(r)
+    if live:
+        return _live_spike(r, "side" if side else "after" if after else "before", speed, not no_freeze)
     e = r["event"]
     out.print(f"[bold]{e['name']}[/] — peak {r['peak']:g}× normal traffic. {e.get('description', '')}\n")
     b, a = r["before"], r["after"]
@@ -912,6 +921,26 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
                   spark(m["utilisation_before"]), f"{100 * m['peak_utilisation_after']:.0f}% · {100 * m['p_incident_after']:.0f}%")
     out.print(t)
     out.print("[dim]Columns run 00:00 → 23:00. Load = traffic ÷ capacity left after open debt.[/]")
+
+
+def _live_spike(r: dict, mode: str, speed: float, effects: bool) -> None:
+    from . import live as LIVE
+
+    if mode == "side" and out.width < 120:
+        out.print("[yellow]The terminal is narrower than 120 columns: playing today, then after the fixes.[/]")
+        res = {**LIVE.run(r, out, "before", speed, effects), **LIVE.run(r, out, "after", speed, effects)}
+    else:
+        res = LIVE.run(r, out, mode, speed, effects)
+    rp = r["replay"]
+    out.print()
+    for s, label in (("before", "Today, with the open debt"), ("after", "After the fixes")):
+        tr = rp[s]
+        played = f" (replay stopped at {res[s]['until']})" if s in res and not res[s]["finished"] else ""
+        out.print(f"[bold]{label}[/]: {tr['total_hours_lost']:,.1f} engineer-hours lost, {tr['incidents']} incidents, "
+                  f"worst hour {100 * max(tr['failed_share']):.0f}% of requests failing{played}.")
+    keys = ", ".join(x["key"] for x in r["plan"]["selected"]) or "nothing"
+    out.print(f"Fix before the event: [cyan]{keys}[/] ({r['plan']['hours_used']:g} h). Simulated day {rp['run'] + 1} of {r['runs']}; "
+              f"on average the plan saves {r['saved_hours']['mean']:,.1f} h. [dim]Run without --live for the full report.[/]")
 
 
 @simulate_app.command("whatif")

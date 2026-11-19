@@ -1078,5 +1078,101 @@
    "portfolio": 0.0683,
    "rms": 0.0683
   }
- }
+ },
+ "journey": {
+  "app": "NiveshTrade",
+  "who": "Rahul, buying shares at the 09:15 open",
+  "peak_rpm": 40000,
+  "color": "#0f766e",
+  "steps": [
+   {
+    "module": "auth",
+    "label": "Log in with 2FA",
+    "ok": "Logged in",
+    "fail": "Login failed. Too many requests, try again later.",
+    "slow": "Verifying TOTP…"
+   },
+   {
+    "module": "marketdata",
+    "label": "Watch the live price of RELIANCE",
+    "ok": "₹2,947.35 ▲ live",
+    "fail": "Prices not updating. Showing last known price.",
+    "slow": "Connecting to live feed…"
+   },
+   {
+    "module": "rms",
+    "label": "Margin check",
+    "ok": "Margin available: ₹31,200",
+    "fail": "RMS timeout. Order rejected.",
+    "slow": "Checking margin…"
+   },
+   {
+    "module": "orders",
+    "label": "Buy 10 shares at market",
+    "ok": "Order placed",
+    "fail": "Order failed. Please try again.",
+    "slow": "Placing order…"
+   },
+   {
+    "module": "exchange",
+    "label": "Send the order to the exchange",
+    "ok": "Executed at ₹2,948.10",
+    "fail": "Order pending at exchange. Do not place again.",
+    "slow": "Waiting for exchange…"
+   },
+   {
+    "module": "portfolio",
+    "label": "See it in holdings",
+    "ok": "10 RELIANCE in holdings",
+    "fail": "Holdings unavailable right now.",
+    "slow": "Loading holdings…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "credential-stuffing",
+   "name": "Credential-stuffing attack",
+   "description": "From 02:00 a botnet tries leaked passwords against lakhs of accounts, thirty times a normal morning's logins, and keeps going into the 09:15 open.",
+   "profile": [
+    1.0,
+    1.0,
+    30.0,
+    30.0,
+    30.0,
+    30.0,
+    30.0,
+    30.0,
+    30.0,
+    32.0,
+    5.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "entry": {
+    "auth": 1.0
+   },
+   "exposure": {
+    "db": 0.5
+   },
+   "bots": {
+    "share": 0.97,
+    "blocked": 0.95,
+    "mitigated_by": [
+     "DEBT-607"
+    ]
+   }
+  }
+ ]
 }

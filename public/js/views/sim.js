@@ -226,8 +226,13 @@ async function spike(box) {
   const { events } = await api(`${P()}/simulate/spike/events`);
   const q = new URLSearchParams(location.hash.split("?")[1] || "");
   const start = q.get("event") || events[0].key;
+  const opt = (e) => html`<option value="${e.key}" ${e.key === start ? "selected" : ""}>${e.name}${e.preset ? ` (${n(e.peak)}× peak)` : ""}</option>`;
+  let autoLive = q.get("live");
   box.innerHTML = String(html`<form class="card" data-f><div class="card-body inline-fields" style="align-items:end">
-      <div class="field"><label>Event</label><select name="event">${events.map((e) => html`<option value="${e.key}" ${e.key === start ? "selected" : ""}>${e.name}${e.preset ? ` (${e.peak}× peak)` : ""}</option>`)}</select></div>
+      <div class="field"><label>Event</label><select name="event">${[["traffic", "Rush-hour traffic"], ["bots", "Bot attacks"]].map(([k, l]) => {
+        const xs = events.filter((e) => e.preset && (e.kind || "traffic") === k);
+        return xs.length ? html`<optgroup label="${l}">${xs.map(opt)}</optgroup>` : "";
+      })}${events.filter((e) => !e.preset).map(opt)}</select></div>
       <div class="field" data-custom><label>Peak traffic ×</label><input name="peak" type="number" min="1" max="50" step="0.5" value="5"></div>
       <div class="field" data-custom><label>Starts at (hour)</label><input name="start_hour" type="number" min="0" max="23" value="20"></div>
       <div class="field" data-custom><label>Lasts (hours)</label><input name="duration" type="number" min="1" max="24" value="2"></div>
@@ -255,7 +260,12 @@ async function spike(box) {
     const titles = r.playbook_titles || {};
     const kpi = (cls, now, after, label, unit = "") => html`<div class="kpi ${cls}"><div class="v">${now}${unit}</div><div class="l">${label}</div><div class="d">after the fixes: <b style="color:var(--ok)">${after}${unit}</b></div></div>`;
     const relevant = r.debts.filter((x) => x.capacity_effect > 0 || x.resilience_effect > 0);
+    const rp = r.replay;
+    const who = r.journey ? `${r.journey.who} on ${r.journey.app}` : "Your users";
     $("[data-out]", box).innerHTML = String(html`<div data-tour="spike">
+      ${rp ? html`<div class="replay-cta" data-tour="replay"><div><b><span class="dot"></span>Watch this day live</b>
+        <div class="small">Minute by minute${r.bots ? " through the bot attack" : ""}: ${who}, and what the on-call engineer sees. The same simulated day both ways: ${n(rp.before.total_hours_lost)} engineer-hours lost today, ${n(rp.after.total_hours_lost)} h after the fixes.</div></div>
+        <div class="row tight"><button class="btn live" data-replay="before">▶ Live replay</button><button class="btn" data-replay="side">Side by side</button></div></div>` : ""}
       <div class="kpis">
         ${kpi("bad", n(b.incidents, 1), n(a.incidents, 1), "Incidents expected")}
         ${kpi("bad", n(b.hours_lost, 0), n(a.hours_lost, 0), "Engineer hours lost", " h")}
@@ -300,6 +310,14 @@ async function spike(box) {
       options: { scales: { y: { beginAtZero: true, title: { display: true, text: "traffic ×" }, grid: { color: COLORS.grid } },
         y1: { beginAtZero: true, position: "right", title: { display: true, text: "modules down" }, grid: { display: false } }, x: { grid: { display: false } } } } });
     on(box, "click", "[data-view]", (e, btn) => heat(btn.dataset.view));
+    on(box, "click", "[data-replay]", (e, btn) => live(r, btn.dataset.replay, btn));
+    if (autoLive && rp) { live(r, q.get("view") || "before", null); autoLive = null; }
+  };
+  const live = async (r, mode, btn) => {
+    try {
+      const { openReplay } = await import("./replay.js");
+      openReplay(r, { mode, project: S.project, opener: btn });
+    } catch (e) { fail(e); }
   };
   on(box, "submit", "[data-f]", (e) => { e.preventDefault(); run(); });
   on(box, "change", "[name=event]", () => { sync(); run(); });

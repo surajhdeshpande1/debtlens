@@ -109,7 +109,7 @@ def snapshot(s: Session, proj: Project, with_embeddings: bool = True) -> dict:
     return {
         "project": {"id": proj.id, "name": proj.project_name, "key": proj.project_key, "description": proj.description,
                     "repository_url": proj.repository_url, "scenario": proj.scenario_code, "industry": proj.industry,
-                    "spike": spike_preset(proj)},
+                    "spike": spike_preset(proj), "events": spike_events(proj), "journey": journey(proj)},
         "now": iso(utcnow()),
         "modules": [{"id": m.id, "name": m.module_name, "path": m.path, "description": m.description, "churn": m.churn,
                      "complexity": m.complexity, "loc": m.loc, "files": m.files} for m in mods],
@@ -400,6 +400,16 @@ def scenario_of(proj: Project) -> dict | None:
 def spike_preset(proj: Project) -> dict | None:
     sc = scenario_of(proj)
     return SC.spike_preset(sc) if sc else None
+
+
+def spike_events(proj: Project) -> list[dict]:
+    sc = scenario_of(proj)
+    return SC.events(sc) if sc else []
+
+
+def journey(proj: Project) -> dict | None:
+    sc = scenario_of(proj)
+    return sc.get("journey") if sc else None
 
 
 def _next_no(keys: list[str]) -> int:

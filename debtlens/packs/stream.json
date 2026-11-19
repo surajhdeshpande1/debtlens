@@ -975,6 +975,20 @@
    "ago": 40
   },
   {
+   "key": "DEBT-814",
+   "title": "Tokenised manifest URLs and per-device rate limits",
+   "desc": "Sign every manifest and segment URL for one device and rate limit licence and manifest requests per account, so restreaming bots are cut off within seconds.",
+   "module": "cdn",
+   "cat": "SECURITY_DEBT",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "priya",
+   "incidents": [],
+   "ago": 25,
+   "file": "infra/cdn/edge.vcl"
+  },
+  {
    "key": "DEBT-813",
    "title": "Rate limit chat messages per viewer",
    "desc": "Limit each viewer to one message every 2 seconds during live matches.",
@@ -1041,5 +1055,114 @@
    "scores": 0.0506,
    "subs": 0.035
   }
- }
+ },
+ "journey": {
+  "app": "KhelStream",
+  "who": "The Sharma family, watching the final on their TV",
+  "peak_rpm": 120000,
+  "color": "#7c3aed",
+  "steps": [
+   {
+    "module": "auth",
+    "label": "Log in on the TV",
+    "ok": "Welcome back",
+    "fail": "You have been logged out. Please log in again.",
+    "slow": "Signing in…"
+   },
+   {
+    "module": "subs",
+    "label": "Check subscription",
+    "ok": "Premium active",
+    "fail": "Subscribe to watch this match.",
+    "slow": "Checking your plan…"
+   },
+   {
+    "module": "playback",
+    "label": "Start the final",
+    "ok": "Starting stream…",
+    "fail": "Something went wrong. Error code PB-503.",
+    "slow": "Loading video…"
+   },
+   {
+    "module": "drm",
+    "label": "Get a licence",
+    "ok": "Licence OK",
+    "fail": "Licence error. Video cannot be played on this device.",
+    "slow": "Requesting licence…"
+   },
+   {
+    "module": "cdn",
+    "label": "Stream in HD",
+    "ok": "Playing in HD ▶",
+    "fail": "Buffering…",
+    "slow": "Buffering…"
+   },
+   {
+    "module": "ads",
+    "label": "Ad break",
+    "ok": "Back to live",
+    "fail": "Ad overran into live play.",
+    "slow": "Loading ad…"
+   },
+   {
+    "module": "scores",
+    "label": "Live scorecard",
+    "ok": "IND 287/4 (48.2)",
+    "fail": "Scorecard stuck.",
+    "slow": "Updating score…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "restream-bots",
+   "name": "Restreaming bots",
+   "description": "Pirate sites restream the final through thousands of stolen accounts, pulling live manifests and licences every few seconds: about double the origin and licence traffic from the toss.",
+   "profile": [
+    0.2,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.8,
+    1.2,
+    1.8,
+    2.5,
+    10.0,
+    16.0,
+    15.0,
+    13.0,
+    11.0,
+    19.0,
+    22.0,
+    28.0,
+    32.0,
+    9.0,
+    3.0
+   ],
+   "entry": {
+    "cdn": 1.0,
+    "drm": 1.0,
+    "playback": 0.8,
+    "auth": 0.6
+   },
+   "exposure": {
+    "payments": 0.1,
+    "chat": 0.1,
+    "scores": 0.3,
+    "ads": 0.3
+   },
+   "bots": {
+    "share": 0.5,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-814"
+    ]
+   }
+  }
+ ]
 }

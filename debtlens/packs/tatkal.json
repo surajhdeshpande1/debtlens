@@ -1122,5 +1122,115 @@
    "search": 0.0328,
    "seats": 0.0328
   }
- }
+ },
+ "journey": {
+  "app": "RailYatra",
+  "who": "Priya, booking Tatkal tickets to Bengaluru for two",
+  "peak_rpm": 60000,
+  "color": "#1d4ed8",
+  "steps": [
+   {
+    "module": "gateway",
+    "label": "Open RailYatra at 09:59",
+    "ok": "Home page loaded",
+    "fail": "503 Service Unavailable — the server is busy. Please try after some time.",
+    "slow": "Connecting to RailYatra…"
+   },
+   {
+    "module": "auth",
+    "label": "Log in with OTP",
+    "ok": "OTP verified",
+    "fail": "OTP not received. Resend OTP?",
+    "slow": "Waiting for OTP SMS…"
+   },
+   {
+    "module": "search",
+    "label": "Check seats on 12627 Karnataka Express",
+    "ok": "AVAILABLE-0042 in 3A",
+    "fail": "Could not fetch availability. Request timed out.",
+    "slow": "Fetching availability…"
+   },
+   {
+    "module": "booking",
+    "label": "Book Tatkal: 2 passengers",
+    "ok": "Passenger details saved",
+    "fail": "Booking failed: session expired. Please start again.",
+    "slow": "Please wait, processing your request…"
+   },
+   {
+    "module": "seats",
+    "label": "Allot berths",
+    "ok": "Berths B3-41, B3-44 allotted",
+    "fail": "Berth allocation failed. Ticket not booked.",
+    "slow": "Allotting berths…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay ₹2,140 by UPI",
+    "ok": "Payment successful",
+    "fail": "Payment pending: money may be debited. Do not pay again.",
+    "slow": "Waiting for the bank…"
+   },
+   {
+    "module": "pnr",
+    "label": "Get e-ticket and PNR",
+    "ok": "PNR 4521873390 confirmed",
+    "fail": "PNR could not be generated. Check My Bookings later.",
+    "slow": "Generating e-ticket…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "tatkal-bots",
+   "name": "Tatkal booking bots",
+   "description": "Scripted booking tools log in thousands of accounts at 09:58 and fire bookings at 10:00:00 sharp, on top of the human Tatkal rush: sixty times a normal peak on login and booking.",
+   "profile": [
+    0.3,
+    0.2,
+    0.2,
+    0.2,
+    0.3,
+    0.5,
+    0.8,
+    1.2,
+    1.8,
+    8.0,
+    60.0,
+    30.0,
+    4.0,
+    2.0,
+    1.6,
+    1.4,
+    1.3,
+    1.2,
+    1.2,
+    1.1,
+    1.0,
+    0.9,
+    0.6,
+    0.4
+   ],
+   "entry": {
+    "gateway": 1.0,
+    "auth": 1.0,
+    "booking": 1.0,
+    "search": 1.0,
+    "payments": 0.3
+   },
+   "exposure": {
+    "payments": 0.35,
+    "pnr": 0.3,
+    "refunds": 0.05,
+    "notify": 0.8
+   },
+   "bots": {
+    "share": 0.6,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-508"
+    ]
+   }
+  }
+ ]
 }

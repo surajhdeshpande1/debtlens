@@ -1333,5 +1333,6 @@
  "evidence_source": {
   "commits": 29,
   "files": 66
- }
+ },
+ "journey": {"app": "DebtLens v1", "who": "An examiner trying the Demo 1 site", "peak_rpm": 300, "color": "#334155", "steps": [{"module": "app-shell", "label": "Open the site", "ok": "Site loaded", "fail": "Blank page.", "slow": "Loading…"}, {"module": "auth", "label": "Sign in", "ok": "Signed in", "fail": "Sign-in failed.", "slow": "Signing in…"}, {"module": "pages", "label": "Open the dashboard", "ok": "Dashboard shown", "fail": "Dashboard failed to render.", "slow": "Rendering…"}, {"module": "mock-engine", "label": "Analyse incidents", "ok": "Analysis done", "fail": "Analysis froze.", "slow": "Analysing…"}, {"module": "optimiser", "label": "Plan the sprint", "ok": "Plan ready", "fail": "Plan failed.", "slow": "Optimising…"}]}
 }

@@ -976,6 +976,20 @@
    "ago": 80
   },
   {
+   "key": "DEBT-1014",
+   "title": "Rate limits and CAPTCHA after failed PAN logins",
+   "desc": "Rate limit login attempts per PAN, device and IP, and ask for a CAPTCHA after repeated failures, so password-guessing bots cannot crowd out taxpayers.",
+   "module": "login",
+   "cat": "SECURITY_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "abhishek",
+   "incidents": [],
+   "ago": 30,
+   "file": "portal/login/attempts.py"
+  },
+  {
    "key": "DEBT-1013",
    "title": "Use IST for the filing deadline cut-off",
    "desc": "The deadline is checked in IST so returns filed at 23:59 are on time.",
@@ -1041,5 +1055,108 @@
    "upload": 0.0603,
    "validate": 0.0467
   }
- }
+ },
+ "journey": {
+  "app": "TaxSetu",
+  "who": "Mr Kulkarni, filing ITR-1 at 23:30 on 31 July",
+  "peak_rpm": 45000,
+  "color": "#b45309",
+  "steps": [
+   {
+    "module": "login",
+    "label": "Log in with PAN and OTP",
+    "ok": "Logged in",
+    "fail": "Login failed. Please try again after some time.",
+    "slow": "Verifying…"
+   },
+   {
+    "module": "prefill",
+    "label": "Load prefilled income data",
+    "ok": "Salary, TDS and interest prefilled",
+    "fail": "Prefill data could not be fetched.",
+    "slow": "Fetching AIS…"
+   },
+   {
+    "module": "forms",
+    "label": "Fill ITR-1",
+    "ok": "Draft saved",
+    "fail": "Session expired. Unsaved data is lost.",
+    "slow": "Saving draft…"
+   },
+   {
+    "module": "validate",
+    "label": "Validate the return",
+    "ok": "No errors found",
+    "fail": "Validation timed out. Try again.",
+    "slow": "Validating…"
+   },
+   {
+    "module": "upload",
+    "label": "Submit the return",
+    "ok": "Return submitted · ack 3218846122",
+    "fail": "Submission stuck in processing.",
+    "slow": "Submitting…"
+   },
+   {
+    "module": "everify",
+    "label": "E-verify with Aadhaar OTP",
+    "ok": "Return e-verified",
+    "fail": "OTP not received. Verify within 30 days.",
+    "slow": "Sending OTP…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "pan-login-bots",
+   "name": "Credential stuffing on PAN login",
+   "description": "On deadline night a botnet tries leaked PAN and password pairs, adding up to twenty-five times normal traffic to login and OTP messages while taxpayers rush to file.",
+   "profile": [
+    1.0,
+    0.6,
+    0.4,
+    0.3,
+    0.4,
+    0.6,
+    1.0,
+    1.6,
+    2.4,
+    3.0,
+    3.6,
+    4.0,
+    4.0,
+    4.0,
+    3.8,
+    3.8,
+    4.2,
+    4.8,
+    5.6,
+    9.0,
+    18.0,
+    22.0,
+    25.0,
+    25.0
+   ],
+   "entry": {
+    "login": 1.0,
+    "forms": 0.6,
+    "everify": 0.5,
+    "notify": 0.8
+   },
+   "exposure": {
+    "prefill": 0.4,
+    "validate": 0.4,
+    "upload": 0.4,
+    "payments": 0.2,
+    "refunds": 0.05
+   },
+   "bots": {
+    "share": 0.7,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1014"
+    ]
+   }
+  }
+ ]
 }

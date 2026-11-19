@@ -974,6 +974,20 @@
    "ago": 25
   },
   {
+   "key": "DEBT-914",
+   "title": "Rate-limit fare estimate requests per device and API key",
+   "desc": "Limit fare estimates per device, account and IP, and serve repeated estimates from a short cache, so scrapers cannot drown real riders.",
+   "module": "rider",
+   "cat": "SECURITY_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "varun",
+   "incidents": [],
+   "ago": 20,
+   "file": "svc/rider-api/estimates.py"
+  },
+  {
    "key": "DEBT-913",
    "title": "Retry rider app requests with backoff and jitter",
    "desc": "The rider app retries failed requests with exponential backoff and jitter.",
@@ -1038,5 +1052,107 @@
    "safety": 0.1577,
    "trips": 0.0875
   }
- }
+ },
+ "journey": {
+  "app": "SawariGo",
+  "who": "Neha, heading home at 23:45 on New Year's Eve",
+  "peak_rpm": 50000,
+  "color": "#15803d",
+  "steps": [
+   {
+    "module": "rider",
+    "label": "Open SawariGo",
+    "ok": "Where to?",
+    "fail": "Unable to connect. Check your connection.",
+    "slow": "Loading…"
+   },
+   {
+    "module": "pricing",
+    "label": "Get the fare",
+    "ok": "Mini · ₹340 · 6 min away",
+    "fail": "Could not get fares right now.",
+    "slow": "Calculating fare…"
+   },
+   {
+    "module": "matching",
+    "label": "Book and find a driver",
+    "ok": "Driver found: Suresh · KA-05-AB-1234",
+    "fail": "No drivers available. Try again.",
+    "slow": "Searching for drivers…"
+   },
+   {
+    "module": "driver",
+    "label": "Driver accepts and arrives",
+    "ok": "Driver arriving in 4 min",
+    "fail": "Driver location not updating.",
+    "slow": "Connecting to driver…"
+   },
+   {
+    "module": "trips",
+    "label": "Start the ride with OTP",
+    "ok": "Ride started",
+    "fail": "OTP invalid. Ride cannot start.",
+    "slow": "Verifying OTP…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay by UPI",
+    "ok": "Paid ₹340",
+    "fail": "Payment failed. Pay the driver in cash.",
+    "slow": "Processing payment…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "fare-scrapers",
+   "name": "Fare-scraping bots",
+   "description": "On New Year's Eve, competitors' scrapers ask for fare estimates on every route every few seconds, doubling the load on fares and maps right when riders need them.",
+   "profile": [
+    2.0,
+    1.2,
+    0.8,
+    0.6,
+    0.6,
+    1.0,
+    1.8,
+    2.8,
+    3.6,
+    2.8,
+    2.4,
+    2.4,
+    2.6,
+    2.4,
+    2.4,
+    2.6,
+    3.2,
+    4.4,
+    5.6,
+    6.4,
+    7.2,
+    9.0,
+    12.0,
+    16.0
+   ],
+   "entry": {
+    "rider": 1.0,
+    "pricing": 1.0,
+    "maps": 0.8
+   },
+   "exposure": {
+    "matching": 0.5,
+    "driver": 0.5,
+    "trips": 0.4,
+    "payments": 0.2,
+    "db": 0.5
+   },
+   "bots": {
+    "share": 0.6,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-914"
+    ]
+   }
+  }
+ ]
 }

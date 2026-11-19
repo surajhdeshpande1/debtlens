@@ -89,6 +89,20 @@ def spike_preset(code_or_sc) -> dict | None:
     return sc.get("spike") if is_pack(sc) else SPIKE.PRESETS.get(sc.get("code") or "")
 
 
+def events(code_or_sc) -> list[dict]:
+    """Every load-spike event of a scenario: its main event first, then any others (a bot attack, say)."""
+    from . import spike as SPIKE
+
+    try:
+        sc = resolve(code_or_sc)
+    except KeyError:
+        return []
+    if is_pack(sc):
+        return [e for e in [sc.get("spike"), *(sc.get("events") or [])] if e]
+    p = SPIKE.PRESETS.get(sc.get("code") or "")
+    return [p] if p else []
+
+
 def materialize(code_or_sc, now: datetime | None = None) -> dict:
     """Scenario or pack -> analysis snapshot with integer ids and absolute timestamps."""
     sc = resolve(code_or_sc)
@@ -178,7 +192,7 @@ def materialize(code_or_sc, now: datetime | None = None) -> dict:
     return {
         "project": {"name": sc["name"], "key": sc.get("key", sc["code"][:4].upper()), "description": sc["summary"],
                     "repository_url": sc.get("repository_url"), "scenario": sc["code"], "industry": sc["industry"],
-                    "spike": spike_preset(sc)},
+                    "spike": spike_preset(sc), "events": events(sc), "journey": sc.get("journey")},
         "now": now.isoformat(),
         "people": people,
         "modules": modules,

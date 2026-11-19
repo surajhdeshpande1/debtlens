@@ -28,6 +28,7 @@ import math
 import random
 import statistics
 import time
+import zlib
 from dataclasses import dataclass, field
 
 
@@ -112,13 +113,17 @@ def custom_profile(peak: float, start_hour: int, duration: int, ramp: int = 1, b
     return prof
 
 
-def events_for(scenario: str | dict | None) -> list[dict]:
-    """Preset events offered for a project (its scenario's or pack's event, if any) plus the custom template."""
+def events_for(scenario: str | dict | list | None) -> list[dict]:
+    """Preset events offered for a project (its scenario's or pack's events, if any) plus the custom template."""
     out = []
-    p = scenario if isinstance(scenario, dict) else PRESETS.get(scenario or "")
-    if p:
-        out.append({k: p[k] for k in ("key", "name", "description", "profile")} | {"peak": max(p["profile"]),
-                                                                                   "preset": True})
+    if isinstance(scenario, list):
+        presets = [p for p in scenario if isinstance(p, dict)]
+    else:
+        p = scenario if isinstance(scenario, dict) else PRESETS.get(scenario or "")
+        presets = [p] if p else []
+    for p in presets:
+        out.append({k: p[k] for k in ("key", "name", "description", "profile")}
+                   | {"peak": max(p["profile"]), "preset": True, "kind": "bots" if p.get("bots") else "traffic"})
     out.append({"key": "custom", "name": "Custom spike", "preset": False,
                 "description": "Choose the peak multiplier, the hour it starts and how long it lasts.",
                 "profile": custom_profile(5, 20, 2), "peak": 5})
@@ -177,6 +182,7 @@ class Model:
     severity: dict[str, str]
     profile: list[float]
     p_cascade: float = 0.6
+    bots: dict | None = None   # {"share": s, "blocked": b, "mitigated_by": {debt ids}}: bot traffic a fix can block
     dependents: dict[int, list[tuple[int, int]]] = field(default_factory=dict)
     edges: list[tuple[int, int]] = field(default_factory=list)
 
@@ -189,6 +195,18 @@ class Model:
 
     def load(self, m: str, t: int) -> float:
         return self.baseline[m] * (1.0 + (self.profile[t] - 1.0) * self.exposure[m])
+
+    def mitigated(self, fixed) -> bool:
+        return bool(self.bots and set(self.bots.get("mitigated_by") or ()) & set(fixed or ()))
+
+    def for_fixed(self, fixed) -> Model:
+        """The same event as experienced after ``fixed``: blocking bots removes that share of the extra traffic."""
+        if not self.mitigated(fixed):
+            return self
+        cut = max(0.0, min(1.0, float(self.bots.get("share", 0)) * float(self.bots.get("blocked", 0))))
+        prof = [1.0 + (m - 1.0) * (1.0 - cut) if m > 1.0 else m for m in self.profile]
+        return Model(self.modules, self.deps, self.baseline, self.exposure, self.entry, self.cost, self.severity,
+                     prof, self.p_cascade, None)
 
 
 def capacities(model: Model, open_debts: list[dict], factors: dict, fixed: set) -> tuple[list[float], list[float]]:
@@ -222,7 +240,9 @@ class Draws:
         return cls(mod, edg)
 
 
-def _simulate(model: Model, caps: list[float], frag: list[float], draws: Draws, runs: int) -> dict:
+def _simulate(model: Model, caps: list[float], frag: list[float], draws: Draws, runs: int,
+              trace_run: int | None = None) -> dict:
+    """Monte Carlo over ``runs`` days. With ``trace_run``, only that run is simulated and recorded hour by hour."""
     n = len(model.modules)
     rho = [[model.load(m, t) / caps[i] for t in range(HOURS)] for i, m in enumerate(model.modules)]
     pf = [[p_overload(rho[i][t]) for t in range(HOURS)] for i in range(n)]
@@ -233,14 +253,18 @@ def _simulate(model: Model, caps: list[float], frag: list[float], draws: Draws, 
     hours_lost, incidents, failed_share = [], [], []
     inc_by_mod = [0] * n
     down_hours = [[0] * HOURS for _ in range(n)]
-    for r in range(runs):
+    trace = None
+    for r in ([trace_run] if trace_run is not None else range(runs)):
         um, ue = draws.module[r], draws.edge[r]
         down = [0] * n
         prev = [False] * n
         lost = n_inc = 0.0
         traffic_lost = 0.0
         hit = [False] * n
+        if trace_run is not None:
+            trace = {"states": [], "failed_share": [], "hours_lost": [], "events": [], "cause": []}
         for t in range(HOURS):
+            cause = [None] * n
             for i in range(n):
                 if (down[i] == 1 and rho[i][t] < RECOVER) or down[i] == 2:
                     down[i] = 0
@@ -253,6 +277,7 @@ def _simulate(model: Model, caps: list[float], frag: list[float], draws: Draws, 
                 for e, y in model.dependents[x]:
                     if down[y] == 0 and ue[t][e] < p_edge[e]:
                         down[y] = 2
+                        cause[y] = model.modules[x]
                         stack.append(y)
             out_now = 0.0
             for i in range(n):
@@ -263,16 +288,33 @@ def _simulate(model: Model, caps: list[float], frag: list[float], draws: Draws, 
                         n_inc += 1
                         lost += cost[i]
                         hit[i] = True
+                        if trace is not None:
+                            trace["events"].append({"hour": t, "module": model.modules[i],
+                                                    "kind": "overload" if down[i] == 1 else "cascade",
+                                                    "from": cause[i], "utilisation": round(rho[i][t], 3),
+                                                    "severity": model.severity.get(model.modules[i], "MEDIUM"),
+                                                    "cost_hours": round(cost[i], 1)})
                     prev[i] = True
                 else:
+                    if trace is not None and prev[i]:  # down last hour, up for the whole of this one
+                        trace["events"].append({"hour": t, "module": model.modules[i], "kind": "recovered"})
                     prev[i] = False
             traffic_lost += model.profile[t] * min(out_now, sum(share) or 1.0)
+            if trace is not None:
+                trace["states"].append(list(down))
+                trace["failed_share"].append(round(min(1.0, out_now / (sum(share) or 1.0)), 3))
+                trace["hours_lost"].append(round(lost, 1))
+                trace["cause"].append(cause)
         for i in range(n):
             if hit[i]:
                 inc_by_mod[i] += 1
         hours_lost.append(lost)
         incidents.append(n_inc)
         failed_share.append(traffic_lost / total_traffic if total_traffic else 0.0)
+    if trace is not None:
+        trace["total_hours_lost"] = round(lost, 1)
+        trace["incidents"] = int(n_inc)
+        return {"trace": trace, "rho": rho}
     return {"rho": rho, "pf": pf, "hours_lost": hours_lost, "incidents": incidents, "failed_share": failed_share,
             "inc_by_mod": inc_by_mod, "down_hours": down_hours, "runs": runs}
 
@@ -355,21 +397,24 @@ def plan_fixes(model: Model, open_debts: list[dict], factors: dict, budget: floa
     """
     by_id = {d["id"]: d for d in open_debts}
     hours = {i: float(by_id[i].get("principal") or 0.0) for i in by_id}
-    cand = [d for d in open_debts if hours[d["id"]] > 0 and any(x > 0 for x in factors.get(d["id"], (0, 0)))]
+    blockers = set((model.bots or {}).get("mitigated_by") or ())
+    cand = [d for d in open_debts if hours[d["id"]] > 0
+            and (any(x > 0 for x in factors.get(d["id"], (0, 0))) or d["id"] in blockers)]
     cand_ids = {d["id"] for d in cand}
     groups: dict[str, list] = {}
     for d in cand:
         groups.setdefault(d["module"], []).append(d["id"])
     for m, ids in groups.items():
         if len(ids) > MAX_PER_MODULE:
-            ids.sort(key=lambda i: -(factors[i][0] + factors[i][1]))
+            ids.sort(key=lambda i: (i not in blockers, -(factors.get(i, (0, 0))[0] + factors.get(i, (0, 0))[1])))
             groups[m] = ids[:MAX_PER_MODULE]
     cache: dict[frozenset, float] = {}
 
     def lost(fixed: frozenset) -> float:
         if fixed not in cache:
             caps, frag = capacities(model, open_debts, factors, set(fixed))
-            cache[fixed] = statistics.mean(_simulate(model, caps, frag, draws, value_runs)["hours_lost"])
+            cache[fixed] = statistics.mean(_simulate(model.for_fixed(fixed), caps, frag, draws,
+                                                     value_runs)["hours_lost"])
         return cache[fixed]
 
     base = lost(frozenset())
@@ -423,6 +468,58 @@ def plan_fixes(model: Model, open_debts: list[dict], factors: dict, budget: floa
             "standalone": standalone, "in_plan": in_plan, "rounds": rounds, "simulations": len(cache)}
 
 
+def _jitter(name: str, hour: int, span: int) -> int:
+    return zlib.crc32(f"{name}:{hour}".encode()) % span
+
+
+def with_minutes(trace: dict) -> dict:
+    """Give each change in a replay trace a minute of the day, so a replay can unfold inside the hour.
+
+    The model works in whole hours. Within an hour, overloads land in its first ten minutes, a cascade a minute or
+    three after the failure it comes from, and a recovery between minutes 6 and 30. The offsets are deterministic
+    (a CRC of module and hour) and only change how the day is shown, never what happens in it.
+    """
+    evs = trace["events"]
+    for e in evs:
+        if e["kind"] == "overload":
+            e["minute"] = e["hour"] * 60 + 1 + _jitter(e["module"], e["hour"], 9)
+        elif e["kind"] == "recovered":
+            e["minute"] = e["hour"] * 60 + 6 + _jitter(e["module"], e["hour"], 25)
+    pending = [e for e in evs if e["kind"] == "cascade"]
+    for _ in range(len(pending) + 1):  # cascades can chain: resolve sources first
+        left = []
+        for e in pending:
+            src = next((x for x in evs if x["hour"] == e["hour"] and x["module"] == e.get("from")
+                        and x["kind"] != "recovered"), None)
+            if src is None:   # the source was already down at the start of the hour
+                e["minute"] = e["hour"] * 60 + 2 + _jitter(e["module"], e["hour"], 3)
+            elif "minute" in src:
+                e["minute"] = min(e["hour"] * 60 + 59, src["minute"] + 1 + _jitter(e["module"], e["hour"], 3))
+            else:
+                left.append(e)
+        if not left:
+            break
+        pending = left
+    for e in evs:
+        e.setdefault("minute", e["hour"] * 60 + 30)
+    evs.sort(key=lambda e: (e["minute"], e["kind"] == "recovered", e["module"]))
+    return trace
+
+
+def state_at(trace: dict, modules: list[str], minute: int) -> list[int]:
+    """Each module's state at a minute of the replayed day: 0 up, 1 overloaded, 2 failing because a dependency failed."""
+    h = max(0, min(HOURS - 1, minute // 60))
+    now, before = trace["states"][h], trace["states"][h - 1] if h else [0] * len(modules)
+    change = {e["module"]: e["minute"] for e in trace["events"] if e["hour"] == h}
+    out = []
+    for i, m in enumerate(modules):
+        s, p = now[i], before[i]
+        if s != p and (s == 0 or p == 0) and m in change and minute < change[m]:
+            s = p
+        out.append(s)
+    return out
+
+
 def simulate(model: Model, open_debts: list[dict], factors: dict, budget: float, runs: int = 300, seed: int = 17,
              value_runs: int = 150, regular_plan: list | None = None, playbook_of: dict | None = None) -> dict:
     """Before / spike-aware fix plan / after, plus how the regular sprint plan would fare."""
@@ -439,13 +536,25 @@ def simulate(model: Model, open_debts: list[dict], factors: dict, budget: float,
     values = plan["standalone"]
 
     caps1, frag1 = capacities(model, open_debts, factors, chosen)
-    after = _simulate(model, caps1, frag1, draws, runs)
+    model_after = model.for_fixed(chosen)
+    after = _simulate(model_after, caps1, frag1, draws, runs)
     regular = None
     if regular_plan is not None:
         caps2, frag2 = capacities(model, open_debts, factors, set(regular_plan))
-        reg = _simulate(model, caps2, frag2, draws, runs)
+        reg = _simulate(model.for_fixed(set(regular_plan)), caps2, frag2, draws, runs)
         regular = {"selected_ids": list(regular_plan), "summary": _summary(reg),
-                   "saved_hours": _paired(before["hours_lost"], reg["hours_lost"])}
+                   "saved_hours": _paired(before["hours_lost"], reg["hours_lost"]),
+                   "blocks_bots": model.mitigated(set(regular_plan))}
+
+    # One representative day to replay: the run closest to the average both before and after the fixes. Thanks to
+    # common random numbers, "after" replays exactly the same day (same users, same luck) with the fixes in place.
+    mb, ma = statistics.mean(before["hours_lost"]), statistics.mean(after["hours_lost"])
+    rep = min(range(runs), key=lambda r: (abs(before["hours_lost"][r] - mb) / max(mb, 1.0)
+                                          + abs(after["hours_lost"][r] - ma) / max(ma, 1.0), r))
+    replay = {"run": rep, "modules": model.modules,
+              "before": with_minutes(_simulate(model, caps0, frag0, draws, runs, trace_run=rep)["trace"]),
+              "after": with_minutes(_simulate(model_after, caps1, frag1, draws, runs, trace_run=rep)["trace"]),
+              "profile_after": model_after.profile}
 
     by_id = {d["id"]: d for d in open_debts}
     pb = playbook_of or {}
@@ -492,6 +601,10 @@ def simulate(model: Model, open_debts: list[dict], factors: dict, budget: float,
                  "hours_used": plan["hours"], "protects_hours": plan["value"], "rounds": plan["rounds"],
                  "combinations_simulated": plan["simulations"]},
         "regular_plan": regular,
+        "replay": replay,
+        "bots": ({"share": model.bots.get("share"), "blocked": model.bots.get("blocked"),
+                  "mitigated_by": [by_id[i]["key"] for i in model.bots.get("mitigated_by") or () if i in by_id],
+                  "blocked_in_plan": model.mitigated(chosen)} if model.bots else None),
         "modules": modules,
         "debts": debts,
         "assumptions": {"slope": SLOPE, "recover_below": RECOVER, "base_fragility": BASE_FRAGILITY,

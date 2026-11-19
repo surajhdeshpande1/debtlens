@@ -1031,5 +1031,113 @@
    "waitroom": 0.0273,
    "web": 0.0273
   }
- }
+ },
+ "journey": {
+  "app": "ShowPass",
+  "who": "Divya, buying two tickets for the stadium show",
+  "peak_rpm": 80000,
+  "color": "#be185d",
+  "steps": [
+   {
+    "module": "waitroom",
+    "label": "Join the queue at 11:59",
+    "ok": "You're in! Shop now",
+    "fail": "Queue error. You have lost your place.",
+    "slow": "You are #48,213 in the queue…"
+   },
+   {
+    "module": "web",
+    "label": "Open the stadium show",
+    "ok": "Event page loaded",
+    "fail": "Too many requests. Please try again.",
+    "slow": "Loading event…"
+   },
+   {
+    "module": "seatmap",
+    "label": "Pick seats on the map",
+    "ok": "Seat map loaded",
+    "fail": "Seat map failed to load.",
+    "slow": "Loading seat map…"
+   },
+   {
+    "module": "inventory",
+    "label": "Hold 2 seats",
+    "ok": "Seats C-14-21, C-14-22 held for 8 min",
+    "fail": "These seats were just taken.",
+    "slow": "Holding seats…"
+   },
+   {
+    "module": "checkout",
+    "label": "Checkout",
+    "ok": "Order summary ready",
+    "fail": "Checkout failed. Your seats were released.",
+    "slow": "Preparing checkout…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay ₹9,000",
+    "ok": "Payment successful",
+    "fail": "Payment taken but tickets not confirmed yet.",
+    "slow": "Processing payment…"
+   },
+   {
+    "module": "tickets",
+    "label": "Get QR tickets",
+    "ok": "2 QR tickets in your account",
+    "fail": "Tickets delayed. We'll email them.",
+    "slow": "Issuing tickets…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "scalper-bots",
+   "name": "Scalper bots at the drop",
+   "description": "Scalper bots open thousands of sessions at 11:59 and hammer checkout the second the sale opens: fifty times a normal hour on the storefront and checkout.",
+   "profile": [
+    0.3,
+    0.2,
+    0.2,
+    0.2,
+    0.2,
+    0.3,
+    0.5,
+    0.8,
+    1.2,
+    1.6,
+    2.5,
+    10.0,
+    50.0,
+    16.0,
+    4.0,
+    2.5,
+    2.0,
+    1.8,
+    1.6,
+    1.6,
+    1.4,
+    1.2,
+    0.8,
+    0.5
+   ],
+   "entry": {
+    "web": 1.0,
+    "waitroom": 1.0,
+    "checkout": 1.0,
+    "auth": 0.8
+   },
+   "exposure": {
+    "notify": 0.4,
+    "tickets": 0.5,
+    "payments": 0.6
+   },
+   "bots": {
+    "share": 0.6,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1106"
+    ]
+   }
+  }
+ ]
 }

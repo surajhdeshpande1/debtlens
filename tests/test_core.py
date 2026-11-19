@@ -481,3 +481,96 @@ def test_minimal_pack_gets_defaults_and_a_custom_spike_profile():
     assert "tour" not in pack and any("tour" in w for w in warnings)
     snap = scenarios.materialize(pack)
     assert engine.spike(snap, None, 10, 40)["event"]["name"] == "Sale"
+
+
+# ----------------------------------------------------------------------------- live replay and bot attacks
+
+
+def _check_trace(tr, mods, entry):
+    """A replay trace must agree with itself: states, events, minutes, totals."""
+    n = len(mods)
+    assert len(tr["states"]) == SPIKE.HOURS and all(len(s) == n for s in tr["states"])
+    share = [entry.get(m, 0.0) for m in mods]
+    total = sum(share) or 1.0
+    for h, st in enumerate(tr["states"]):
+        assert tr["failed_share"][h] == pytest.approx(min(1.0, sum(s for s, x in zip(share, st) if x) / total), abs=1e-3)
+    starts = [e for e in tr["events"] if e["kind"] != "recovered"]
+    assert tr["incidents"] == len(starts)
+    assert tr["total_hours_lost"] == pytest.approx(sum(e["cost_hours"] for e in starts), abs=0.2)
+    assert [e["minute"] for e in tr["events"]] == sorted(e["minute"] for e in tr["events"])
+    for e in tr["events"]:
+        h, i = e["hour"], mods.index(e["module"])
+        prev = tr["states"][h - 1][i] if h else 0
+        assert h * 60 <= e["minute"] < h * 60 + 60
+        if e["kind"] == "recovered":
+            assert prev and not tr["states"][h][i]
+        else:
+            assert tr["states"][h][i] == (1 if e["kind"] == "overload" else 2) and not prev
+        if e["kind"] == "cascade":
+            src = next((x for x in tr["events"] if x["hour"] == h and x["module"] == e["from"] and x["kind"] != "recovered"), None)
+            assert src is None or src["minute"] < e["minute"]
+            assert tr["cause"][h][i] == e["from"]
+    for h in range(SPIKE.HOURS):  # inside the hour, changes happen at their minute; by its end, the hour's state holds
+        assert SPIKE.state_at(tr, mods, h * 60 + 59) == tr["states"][h]
+        assert SPIKE.state_at(tr, mods, h * 60) == [p if any(e["module"] == m and e["hour"] == h and e["minute"] > h * 60
+                                                              for e in tr["events"]) else s
+                                                    for m, s, p in zip(mods, tr["states"][h],
+                                                                       tr["states"][h - 1] if h else [0] * n)]
+
+
+@pytest.mark.parametrize("code,event", [("tatkal", "tatkal-bots"), ("stream", None), ("fintech", None), ("broker", "credential-stuffing")])
+def test_replay_day_is_typical_and_consistent(code, event):
+    snap = scenarios.materialize(code)
+    r = engine.spike(snap, event, 40, runs=200, seed=17)
+    rp = r["replay"]
+    assert rp["modules"] == sorted(rp["modules"]) and 0 <= rp["run"] < r["runs"]
+    for side in ("before", "after"):
+        _check_trace(rp[side], rp["modules"], r["event"]["entry"])
+    # the replayed day is a typical one, before and after the fixes
+    for side, mean in (("before", r["before"]["hours_lost"]), ("after", r["after"]["hours_lost"])):
+        assert abs(rp[side]["total_hours_lost"] - mean) <= max(12.0, 0.25 * mean), side
+    again = engine.spike(snap, event, 40, runs=200, seed=17)["replay"]
+    assert again == rp  # minutes and all: a rehearsal shows exactly what the demo will show
+    assert r["journey"] and all(s["module"] in rp["modules"] for s in r["journey"]["steps"])
+
+
+def test_bot_attacks_are_blocked_only_by_their_fix():
+    snap = scenarios.materialize("tatkal")
+    bots = engine.spike(snap, "tatkal-bots", 40, runs=150, seed=17)
+    assert bots["event"]["kind"] == "bots" and bots["bots"]["mitigated_by"] == ["DEBT-508"]
+    assert bots["bots"]["blocked_in_plan"] and "DEBT-508" in {x["key"] for x in bots["plan"]["selected"]}
+    share, blocked = bots["bots"]["share"], bots["bots"]["blocked"]
+    for p, q in zip(bots["profile"], bots["replay"]["profile_after"]):
+        assert q == pytest.approx(p if p <= 1 else 1 + (p - 1) * (1 - share * blocked))
+    assert bots["regular_plan"]["blocks_bots"] is False  # the sprint plan does not see the attack coming
+    assert bots["saved_hours"]["mean"] > 3 * bots["regular_plan"]["saved_hours"]["mean"]
+    none = engine.spike(snap, "tatkal-bots", 0, runs=60, seed=17)  # no time to fix anything: nothing is blocked
+    assert not none["bots"]["blocked_in_plan"] and none["replay"]["profile_after"] == none["profile"]
+    main = engine.spike(snap, None, 40, runs=60, seed=17)
+    assert main["bots"] is None and main["event"]["kind"] == "traffic" and main["replay"]["profile_after"] == main["profile"]
+    model = SPIKE.Model(["a"], [], {"a": 0.5}, {"a": 1.0}, {"a": 1.0}, {"a": 6.0}, {"a": "HIGH"}, [1.0, 11.0] + [1.0] * 22,
+                        bots={"share": 0.5, "blocked": 0.8, "mitigated_by": {7}})
+    assert model.for_fixed({7}).profile[1] == pytest.approx(1 + 10 * 0.6) and model.for_fixed({8}).profile[1] == 11.0
+    for code in PK.codes():  # every pack has one bot attack, and the debt that stops it is open
+        pack = PK.get(code)
+        evs = [e for e in [pack["spike"], *pack.get("events", [])] if e.get("bots")]
+        assert len(evs) == 1, code
+        open_keys = {d["key"] for d in pack["debts"] if d.get("status", "IDENTIFIED") != "RESOLVED"}
+        assert set(evs[0]["bots"]["mitigated_by"]) <= open_keys
+        assert pack["journey"]["steps"] and pack["journey"]["app"]
+
+
+def test_pack_validation_checks_bots_and_the_journey():
+    p = PK.parse(PK.dump(PK.get("tatkal")))
+    p["events"][0]["bots"]["mitigated_by"] = ["DEBT-999"]
+    p["events"][0]["bots"]["share"] = 2
+    p["journey"]["steps"][0]["module"] = "moon"
+    with pytest.raises(PK.PackError) as e:
+        PK.validate(p)
+    text = "\n".join(e.value.problems)
+    for needle in ("'share' must be between 0 and 1", "names unknown debt DEBT-999", "module 'moon' is not listed"):
+        assert needle in text, needle
+    q = PK.parse(PK.dump(PK.get("tatkal")))
+    q["journey"]["color"] = "blue"
+    pack, warnings = PK.validate(q)
+    assert pack["journey"]["color"] is None and any("color" in w for w in warnings)

@@ -1023,6 +1023,20 @@
    "ago": 40
   },
   {
+   "key": "DEBT-715",
+   "title": "Rate limits and device checks on coupon redemption",
+   "desc": "Rate limit coupon checks per account, device and IP, and require a verified phone number before a coupon can be redeemed, so bots cannot farm a leaked code.",
+   "module": "cart",
+   "cat": "SECURITY_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "nisha",
+   "incidents": [],
+   "ago": 20,
+   "file": "services/cart/coupons.py"
+  },
+  {
    "key": "DEBT-714",
    "title": "Use IST for coupon validity windows",
    "desc": "Coupon start and end times are stored and checked in IST.",
@@ -1076,7 +1090,7 @@
   },
   "baseline": {
    "app": 0.0911,
-   "cart": 0.0778,
+   "cart": 0.0911,
    "dispatch": 0.0911,
    "maps": 0.0778,
    "menu": 0.0911,
@@ -1086,5 +1100,123 @@
    "payments": 0.0911,
    "search": 0.0911
   }
- }
+ },
+ "journey": {
+  "app": "ZaikaNow",
+  "who": "Arjun, ordering dinner at the innings break",
+  "peak_rpm": 30000,
+  "color": "#c2410c",
+  "steps": [
+   {
+    "module": "app",
+    "label": "Open ZaikaNow",
+    "ok": "Restaurants near you",
+    "fail": "Something went wrong. Pull to refresh.",
+    "slow": "Loading…"
+   },
+   {
+    "module": "search",
+    "label": "Find biryani near you",
+    "ok": "38 restaurants found",
+    "fail": "Search is taking too long.",
+    "slow": "Searching…"
+   },
+   {
+    "module": "menu",
+    "label": "Open Paradise Biryani's menu",
+    "ok": "Menu loaded",
+    "fail": "Menu unavailable right now.",
+    "slow": "Loading menu…"
+   },
+   {
+    "module": "cart",
+    "label": "Apply MATCHDAY coupon",
+    "ok": "Coupon applied: ₹100 off",
+    "fail": "Coupon could not be applied. Try again.",
+    "slow": "Applying coupon…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay ₹458 by UPI",
+    "ok": "Payment successful",
+    "fail": "Payment failed. Any amount debited will be refunded.",
+    "slow": "Waiting for UPI…"
+   },
+   {
+    "module": "orders",
+    "label": "Place the order",
+    "ok": "Order #ZK-88412 placed",
+    "fail": "Order not placed. Please retry.",
+    "slow": "Placing order…"
+   },
+   {
+    "module": "partner",
+    "label": "Restaurant accepts",
+    "ok": "Restaurant is preparing your food",
+    "fail": "Restaurant has not seen your order yet.",
+    "slow": "Waiting for the restaurant…"
+   },
+   {
+    "module": "dispatch",
+    "label": "Rider assigned",
+    "ok": "Ravi is on the way · 28 min",
+    "fail": "Still looking for a rider…",
+    "slow": "Finding a rider…"
+   }
+  ]
+ },
+ "events": [
+  {
+   "key": "coupon-bots",
+   "name": "Coupon-abuse bots",
+   "description": "A coupon code leaks on a deals channel at 19:00: bots create fake accounts and hammer the app and cart at fifteen to twenty times normal, on top of IPL dinner traffic.",
+   "profile": [
+    0.6,
+    0.4,
+    0.2,
+    0.1,
+    0.1,
+    0.1,
+    0.2,
+    0.4,
+    0.8,
+    1.0,
+    1.1,
+    1.4,
+    2.2,
+    2.0,
+    1.2,
+    1.0,
+    1.2,
+    1.6,
+    2.4,
+    15.0,
+    18.0,
+    20.0,
+    10.0,
+    3.0
+   ],
+   "entry": {
+    "app": 1.0,
+    "cart": 1.0,
+    "search": 0.6,
+    "payments": 0.2
+   },
+   "exposure": {
+    "orders": 0.5,
+    "partner": 0.3,
+    "dispatch": 0.3,
+    "payments": 0.3,
+    "maps": 0.3,
+    "notify": 0.4
+   },
+   "bots": {
+    "share": 0.85,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-715"
+    ]
+   }
+  }
+ ]
 }

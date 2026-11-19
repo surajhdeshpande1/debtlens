@@ -34,7 +34,9 @@ debtlens similar "lab results not showing" --scenario healthtech
 debtlens plan --scenario fintech --budget 40
 debtlens simulate forecast --scenario college --sprints 12
 debtlens simulate cascade db --scenario fintech
-debtlens simulate spike --scenario tatkal  # Tatkal at 10 AM, hour by hour`))}
+debtlens simulate spike --scenario tatkal  # Tatkal at 10 AM, hour by hour
+debtlens simulate spike -s tatkal -e tatkal-bots --live --side
+                                         # the bot attack, live: today vs after the fixes`))}
         ${card("Scenario packs", html`${codeBlock(`debtlens pack list                       # the 7 bundled packs and their busiest day
 debtlens pack show broker                # what a pack contains
 debtlens pack export tickets -o my.json  # copy one to edit
