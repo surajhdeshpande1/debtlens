@@ -78,7 +78,7 @@ def test_playbooks_and_load_spike_offline():
     assert run("playbook", "DEBT-999", "-s", "fintech").exit_code != 0
     assert run("playbook", "DEBT-101", "-s", "fintech", "--done", "1").exit_code != 0  # progress lives on the website
     lib = json.loads(run("playbooks", "-s", "college", "--json").output)
-    assert len(lib["playbooks"]) == 24 and {x["key"] for x in lib["debts"]} >= {"DEBT-401", "DEBT-411"}
+    assert len(lib["playbooks"]) == 25 and {x["key"] for x in lib["debts"]} >= {"DEBT-401", "DEBT-411"}
     s = json.loads(run("simulate", "spike", "-s", "college", "--runs", "80", "--json").output)
     assert s["event"]["key"] == "results-day" and s["plan"]["hours_used"] <= 40
     c = json.loads(run("simulate", "spike", "-s", "fintech", "--peak", "6", "--start", "9", "--hours", "2", "--budget", "0",

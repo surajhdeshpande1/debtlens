@@ -304,7 +304,8 @@ def test_spike_events_bot_attacks_and_the_live_replay(client):
     tok, pid = sandbox(client, "tatkal")
     r = api(client, "get", f"/projects/{pid}/simulate/spike/events", tok).json
     kinds = {e["key"]: e.get("kind") for e in r["events"] if e.get("preset")}
-    assert kinds == {"tatkal-10am": "traffic", "tatkal-bots": "bots"}
+    assert kinds["tatkal-10am"] == "traffic" and kinds["tatkal-bots"] == "bots" and len(kinds) == 6
+    assert set(kinds.values()) == {"traffic", "bots", "outage", "database", "deploy"}  # the rush and five situations
     assert r["journey"]["app"] == "RailYatra" and len(r["journey"]["steps"]) == 7
     s = api(client, "post", f"/projects/{pid}/simulate/spike", tok, json={"event": "tatkal-bots", "budget": 40, "runs": 80}).json
     assert s["event"]["kind"] == "bots" and s["bots"]["blocked_in_plan"] and s["journey"]["who"].startswith("Priya")
@@ -317,7 +318,7 @@ def test_spike_events_bot_attacks_and_the_live_replay(client):
 
 def test_scenario_packs_cards_download_and_validation(client):
     meta = api(client, "get", "/meta").json
-    assert [p["code"] for p in meta["packs"]][:2] == ["tatkal", "broker"] and len(meta["packs"]) == 7
+    assert [p["code"] for p in meta["packs"]][:2] == ["tatkal", "broker"] and len(meta["packs"]) == 11
     assert len(meta["scenarios"]) == 5  # packs never change the industry-scenario comparison
     r = api(client, "get", "/packs/tatkal")
     assert r.status_code == 200 and "attachment" in r.headers["Content-Disposition"]
@@ -370,7 +371,7 @@ def test_sandbox_from_a_pack_code_and_from_an_uploaded_pack(client):
 def test_playbooks_choice_progress_and_project_edits(client):
     tok, pid = sandbox(client)
     lib = api(client, "get", f"/projects/{pid}/playbooks", tok).json
-    assert len(lib["playbooks"]) == 24
+    assert len(lib["playbooks"]) == 25
     row = next(d for d in lib["debts"] if d["key"] == "DEBT-101")
     assert row["playbook"] == "pool-isolation" and not row["chosen"]
     url = f"/projects/{pid}/debts/{row['id']}/playbook"

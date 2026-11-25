@@ -1,6 +1,7 @@
 """Engine tests: every algorithm is checked against a reference implementation
 (scikit-learn, NetworkX, Radon, brute force) or against a hand-computed answer."""
 
+import json
 import random
 import subprocess
 from pathlib import Path
@@ -306,7 +307,7 @@ def test_playbooks_match_the_evidence_and_fall_back_when_there_is_none():
     assert pool["key"] == "pool-isolation" and pool["confident"] and "connection pool" in pool["matched"]
     vague = playbooks.match({"title": "Rename variables in a helper", "module": "misc"})
     assert vague == {"key": playbooks.FALLBACK, "score": 0.0, "matched": [], "confident": False}
-    assert len(playbooks.LIBRARY) == len(playbooks.BY_KEY) == 24
+    assert len(playbooks.LIBRARY) == len(playbooks.BY_KEY) == 25
     for pb in playbooks.LIBRARY:
         assert pb.steps and pb.verify and 0 <= pb.capacity <= 0.6 and 0 <= pb.resilience <= 0.6
         assert all(u.startswith("https://") for _, u in pb.references)
@@ -377,9 +378,12 @@ def test_spike_plan_fits_the_budget_includes_prerequisites_and_helps():
 
 def test_bigger_spikes_hurt_more_and_runs_are_reproducible():
     snap = scenarios.materialize("fintech")
-    lost = [engine.spike(snap, {"peak": p, "start_hour": 12, "duration": 3}, 0, runs=80, seed=5)["before"]["hours_lost"]
+    days = [engine.spike(snap, {"peak": p, "start_hour": 12, "duration": 3}, 0, runs=80, seed=5)["before"]
             for p in (1, 4, 8)]
-    assert lost[0] == 0 and lost[0] < lost[1] < lost[2]
+    lost = [d["hours_lost"] for d in days]
+    assert lost[0] < lost[1] < lost[2]
+    # an ordinary day overloads nothing, but it is not perfect either: modules still fail now and then at random
+    assert days[0]["by_kind"]["overload"]["hours"] == 0 and days[0]["by_kind"]["fault"]["hours"] > 0
     a = engine.spike(snap, None, 40, runs=60, seed=9)
     b = engine.spike(snap, None, 40, runs=60, seed=9)
     assert a["before"] == b["before"] and a["plan"]["selected"] == b["plan"]["selected"]
@@ -396,7 +400,7 @@ def test_bigger_spikes_hurt_more_and_runs_are_reproducible():
 
 def test_bundled_packs_are_valid_distinct_and_complete():
     codes = PK.codes()
-    assert len(codes) == 7 and len(set(codes)) == 7
+    assert len(codes) == 11 and len(set(codes)) == 11
     assert not set(codes) & {s["code"] for s in scenarios.list_scenarios()}
     keys = set()
     for code in codes:
@@ -467,6 +471,36 @@ def test_pack_validation_lists_every_problem():
         assert msg in str(e.value.problems)
 
 
+def test_pack_situations_are_checked_and_share_how_users_come_in():
+    raw = json.loads((PK.PACK_DIR / "grocery.json").read_text(encoding="utf-8"))
+    sit = next(e for e in raw["events"] if e["key"] == "upi-outage")
+    assert "entry" not in sit and "baseline" not in sit
+    pack, _ = PK.validate(raw)
+    got = next(e for e in pack["events"] if e["key"] == "upi-outage")
+    assert got["entry"] == pack["spike"]["entry"] and got["kind"] == "outage"  # users come in the same way
+    r = engine.spike(scenarios.materialize(pack), "upi-outage", 40, runs=60, seed=1)
+    assert r["event"]["kind"] == "outage" and r["modules"][0]["baseline"] > 0  # utilisation comes from the main event
+    sit["kind"] = "earthquake"
+    sit["effects"] = [{"type": "melt", "module": "payments"},
+                      {"type": "down", "module": "nowhere", "start": 3, "label": "x marks"},
+                      {"type": "capacity", "module": "payments", "start": 30, "factor": 3, "label": "too much"},
+                      {"type": "down", "module": "payments", "start": 2, "label": "Payments stop", "kind": "meteor",
+                       "mitigated_by": ["DEBT-0000"]},
+                      {"type": "down", "module": "payments", "start": 2}]
+    with pytest.raises(PK.PackError) as e:
+        PK.validate(raw)
+    text = "\n".join(e.value.problems)
+    for needle in ("'kind' must be one of", "must be a list of at most 4", ):
+        assert needle in text, needle
+    sit["effects"] = sit["effects"][:4]
+    with pytest.raises(PK.PackError) as e:
+        PK.validate(raw)
+    text = "\n".join(e.value.problems)
+    for needle in ("'type' must be 'down'", "'nowhere' is not listed in modules", "'start' must be",
+                   "'factor' must be", "'kind' must be 'outage' or 'deploy'", "unknown debt DEBT-0000"):
+        assert needle in text, needle
+
+
 def test_minimal_pack_gets_defaults_and_a_custom_spike_profile():
     pack, warnings = PK.validate({
         "name": "Tiny Shop", "modules": ["web", "db"], "dependencies": [["web", "db"]],
@@ -494,18 +528,25 @@ def _check_trace(tr, mods, entry):
     total = sum(share) or 1.0
     for h, st in enumerate(tr["states"]):
         assert tr["failed_share"][h] == pytest.approx(min(1.0, sum(s for s, x in zip(share, st) if x) / total), abs=1e-3)
-    starts = [e for e in tr["events"] if e["kind"] != "recovered"]
+    incident_kinds, markers = set(SPIKE.INCIDENT_KINDS), {"situation", "situation_end", "prevented"}
+    assert {e["kind"] for e in tr["events"]} <= incident_kinds | markers | {"recovered"}
+    starts = [e for e in tr["events"] if e["kind"] in incident_kinds]
     assert tr["incidents"] == len(starts)
     assert tr["total_hours_lost"] == pytest.approx(sum(e["cost_hours"] for e in starts), abs=0.2)
     assert [e["minute"] for e in tr["events"]] == sorted(e["minute"] for e in tr["events"])
     for e in tr["events"]:
-        h, i = e["hour"], mods.index(e["module"])
-        prev = tr["states"][h - 1][i] if h else 0
+        h = e["hour"]
         assert h * 60 <= e["minute"] < h * 60 + 60
+        if e["kind"] in markers:  # what happened to the system that day; not a change of any module's state
+            assert e["label"]
+            continue
+        i = mods.index(e["module"])
+        prev = tr["states"][h - 1][i] if h else 0
         if e["kind"] == "recovered":
             assert prev and not tr["states"][h][i]
-        else:
-            assert tr["states"][h][i] == (1 if e["kind"] == "overload" else 2) and not prev
+        else:  # 1 = failed itself (overload, fault, outage, bad deploy), 2 = taken down by a dependency
+            assert tr["states"][h][i] == (2 if e["kind"] == "cascade" else 1) and not prev
+            assert tr["kinds"][h][i] == e["kind"]
         if e["kind"] == "cascade":
             src = next((x for x in tr["events"] if x["hour"] == h and x["module"] == e["from"] and x["kind"] != "recovered"), None)
             assert src is None or src["minute"] < e["minute"]
@@ -513,12 +554,14 @@ def _check_trace(tr, mods, entry):
     for h in range(SPIKE.HOURS):  # inside the hour, changes happen at their minute; by its end, the hour's state holds
         assert SPIKE.state_at(tr, mods, h * 60 + 59) == tr["states"][h]
         assert SPIKE.state_at(tr, mods, h * 60) == [p if any(e["module"] == m and e["hour"] == h and e["minute"] > h * 60
-                                                              for e in tr["events"]) else s
+                                                              and e["kind"] in SPIKE.STATE_KINDS for e in tr["events"]) else s
                                                     for m, s, p in zip(mods, tr["states"][h],
                                                                        tr["states"][h - 1] if h else [0] * n)]
 
 
-@pytest.mark.parametrize("code,event", [("tatkal", "tatkal-bots"), ("stream", None), ("fintech", None), ("broker", "credential-stuffing")])
+@pytest.mark.parametrize("code,event", [("tatkal", "tatkal-bots"), ("stream", None), ("fintech", None), ("broker", "credential-stuffing"),
+                                        ("fintech", "acquirer-outage"), ("exam", "proctor-leak"), ("appointments", "zone-power"),
+                                        ("airline", "payment-release")])
 def test_replay_day_is_typical_and_consistent(code, event):
     snap = scenarios.materialize(code)
     r = engine.spike(snap, event, 40, runs=200, seed=17)
@@ -541,7 +584,8 @@ def test_bot_attacks_are_blocked_only_by_their_fix():
     assert bots["bots"]["blocked_in_plan"] and "DEBT-508" in {x["key"] for x in bots["plan"]["selected"]}
     share, blocked = bots["bots"]["share"], bots["bots"]["blocked"]
     for p, q in zip(bots["profile"], bots["replay"]["profile_after"]):
-        assert q == pytest.approx(p if p <= 1 else 1 + (p - 1) * (1 - share * blocked))
+        # bots adapt: a fifth of the blocked ones get through anyway
+        assert q == pytest.approx(p if p <= 1 else 1 + (p - 1) * (1 - share * blocked * (1 - SPIKE.BOT_ADAPT)), abs=1e-3)
     assert bots["regular_plan"]["blocks_bots"] is False  # the sprint plan does not see the attack coming
     assert bots["saved_hours"]["mean"] > 3 * bots["regular_plan"]["saved_hours"]["mean"]
     none = engine.spike(snap, "tatkal-bots", 0, runs=60, seed=17)  # no time to fix anything: nothing is blocked
@@ -550,7 +594,9 @@ def test_bot_attacks_are_blocked_only_by_their_fix():
     assert main["bots"] is None and main["event"]["kind"] == "traffic" and main["replay"]["profile_after"] == main["profile"]
     model = SPIKE.Model(["a"], [], {"a": 0.5}, {"a": 1.0}, {"a": 1.0}, {"a": 6.0}, {"a": "HIGH"}, [1.0, 11.0] + [1.0] * 22,
                         bots={"share": 0.5, "blocked": 0.8, "mitigated_by": {7}})
-    assert model.for_fixed({7}).profile[1] == pytest.approx(1 + 10 * 0.6) and model.for_fixed({8}).profile[1] == 11.0
+    fixed = model.for_fixed({7})
+    assert fixed.profile[1] == pytest.approx(1 + 10 * (1 - 0.5 * 0.8 * 0.8)) and model.for_fixed({8}).profile[1] == 11.0
+    assert fixed.edge[1] == pytest.approx(10 * 0.32 * SPIKE.REJECT_COST) and fixed.load("a", 1) > 0.5 * 7.8  # turning bots away costs a little
     for code in PK.codes():  # every pack has one bot attack, and the debt that stops it is open
         pack = PK.get(code)
         evs = [e for e in [pack["spike"], *pack.get("events", [])] if e.get("bots")]
@@ -558,6 +604,76 @@ def test_bot_attacks_are_blocked_only_by_their_fix():
         open_keys = {d["key"] for d in pack["debts"] if d.get("status", "IDENTIFIED") != "RESOLVED"}
         assert set(evs[0]["bots"]["mitigated_by"]) <= open_keys
         assert pack["journey"]["steps"] and pack["journey"]["app"]
+
+
+# ----------------------------------------------------------------------------- situations
+
+SYSTEMS = ["fintech", "healthtech", "ecommerce", "college", *PK.codes()]
+
+
+@pytest.mark.parametrize("code", SYSTEMS)
+def test_every_system_has_varied_situations_that_the_right_fix_softens(code):
+    snap = scenarios.materialize(code)
+    evs = scenarios.events(code)
+    assert len(evs) >= 4 and len({SPIKE.kind_of(e) for e in evs[1:]}) >= 3  # the busy day and three kinds of trouble
+    open_keys = {d["key"] for d in snap["debts"] if economics.is_open(d)}
+    for e in evs[1:]:
+        r = engine.spike(snap, e["key"], 40, runs=80, seed=17)
+        b, a = r["before"], r["after"]
+        assert 0 < a["hours_lost"] < b["hours_lost"], e["key"]  # better after the fixes, but never a perfect zero
+        assert sum(v["hours"] for v in b["by_kind"].values()) == pytest.approx(b["hours_lost"], abs=0.6)
+        guards = {k for x in r["effects"] for k in x["mitigated_by"]} | set((r["bots"] or {}).get("mitigated_by") or [])
+        assert guards <= open_keys, e["key"]
+        if guards:  # the situation-aware plan finds a fix that softens this very situation
+            assert guards & {x["key"] for x in r["plan"]["selected"]}, e["key"]
+
+
+def _toy(effects=(), profile=None):
+    mods = ["a", "b"]
+    eff = SPIKE.make_effects(list(effects), mods, {"DEBT-9": 9}, "outage")
+    return SPIKE.Model(mods, [("a", "b")], {"a": 0.2, "b": 0.2}, {"a": 1.0, "b": 1.0}, {"a": 1.0}, {"a": 6.0, "b": 6.0},
+                       {"a": "HIGH", "b": "HIGH"}, profile or [1.0] * SPIKE.HOURS, effects=eff)
+
+
+def test_situation_effects_force_failures_and_the_guarding_fix_softens_them():
+    down = {"type": "down", "module": "b", "start": 10, "hours": 2, "minute": 5, "chance": 1.0,
+            "mitigated_by": ["DEBT-9", "DEBT-404"], "mitigation": 0.8, "label": "b's provider stops answering"}
+    model = _toy([down])
+    assert model.effects[0]["by_keys"] == ["DEBT-9"] and model.blockers() == {9}  # unknown debts are dropped
+    caps, frag = SPIKE.capacities(model, [], {}, set())
+    draws = SPIKE.Draws.make(100, 2, 1, 3, 1)
+    sim = SPIKE._simulate(model, caps, frag, draws, 100)
+    assert sim["down_hours"][1][10] == sim["down_hours"][1][11] == 100  # b is down both hours, every day
+    assert sim["kind_count"]["outage"] >= 100 and sim["effect_hits"] == [100]
+    fixed = model.for_fixed({9})
+    assert fixed.effects[0]["mitigated"] and fixed.effects[0]["chance"] == pytest.approx(0.2)
+    assert model.for_fixed({8}) is model  # a fix that does not guard against it changes nothing
+    after = SPIKE._simulate(fixed, caps, frag, draws, 100)
+    assert 5 <= after["effect_hits"][0] <= 40  # about one day in five it still happens
+    assert after["kind_hours"]["outage"] < 0.5 * sim["kind_hours"]["outage"]
+    # a capacity effect lowers what the module can carry; a ramp gets worse hour by hour (a leak)
+    leak = _toy([{"type": "capacity", "module": "a", "start": 8, "hours": 4, "factor": 0.2, "ramp": True,
+                  "mitigated_by": ["DEBT-9"], "mitigation": 0.6, "label": "a leaks memory"}])
+    rho = SPIKE._rho(leak, [1.0, 1.0])[0]
+    assert rho[7] == pytest.approx(0.2) and rho[8] < rho[9] < rho[10] < rho[11] and rho[11] == pytest.approx(1.0)
+    assert rho[12] == pytest.approx(0.2)  # the situation is over
+    softer = SPIKE._rho(leak.for_fixed({9}), [1.0, 1.0])[0]
+    assert softer[11] == pytest.approx(0.2 / (1 - 0.8 * 0.4))  # the fix removes 60% of the loss, not all of it
+    zone = _toy([{"type": "capacity", "module": "*", "start": 3, "hours": 1, "factor": 0.5, "label": "a zone is lost"}])
+    assert [r[3] for r in SPIKE._rho(zone, [1.0, 1.0])] == [pytest.approx(0.4), pytest.approx(0.4)]
+
+
+def test_background_faults_follow_each_modules_history_and_rise_under_load():
+    snap = scenarios.materialize("fintech")
+    mods = sorted(engine.module_stats(snap))
+    rates = engine.fault_rates(snap, mods)
+    counts = {m: sum(1 for i in snap["incidents"] if (i["module"] or "").lower() == m) for m in mods}
+    busiest, quietest = max(mods, key=lambda m: counts[m]), min(mods, key=lambda m: counts[m])
+    assert rates[busiest] > rates[quietest] > 0  # a module with no history still has a small chance
+    assert rates[quietest] >= 0.25 / (SPIKE.FAULT_WINDOW_DAYS * SPIKE.HOURS)
+    calm = engine.spike(snap, {"peak": 1, "start_hour": 12, "duration": 1}, 0, runs=200, seed=3)["before"]
+    busy = engine.spike(snap, None, 0, runs=200, seed=3)["before"]
+    assert 0 < calm["by_kind"]["fault"]["incidents"] < busy["by_kind"]["fault"]["incidents"]
 
 
 def test_pack_validation_checks_bots_and_the_journey():
