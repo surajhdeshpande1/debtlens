@@ -55,6 +55,9 @@ Examiners can take the **guided tour**, which walks through these features on li
 
 ## Try it
 
+**The full user guide** is [docs/USER_GUIDE.md](docs/USER_GUIDE.md): every page of the website, every terminal
+command, scenario packs (download, edit, upload, write your own) and how to record the scenarios on video.
+
 **Website.** Open the site, pick a scenario (FinTech payments, HealthTech hospital, E-commerce, College ERP, or
 DebtLens auditing its own v1) and a role. You get a private 24-hour copy to change freely. Create a team to
 get real accounts.
@@ -66,7 +69,8 @@ and a stadium ticket on-sale (`tickets`). Open one with a click, download it as 
 pack. Every terminal command takes a pack code or file with `--scenario`. See [docs/PACKS.md](docs/PACKS.md)
 for the format and a live-demo walkthrough.
 
-**Terminal.**
+**Terminal.** The package is not on PyPI yet, so until it is, install it from this repository as
+[docs/USER_GUIDE.md](docs/USER_GUIDE.md) (section 8) describes. Once published:
 
 ```bash
 pipx install debtlens                 # or: pip install debtlens
