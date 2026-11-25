@@ -1121,7 +1121,8 @@
    "refunds": 0.2045,
    "search": 0.0328,
    "seats": 0.0328
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "RailYatra",
@@ -1225,12 +1226,231 @@
     "notify": 0.8
    },
    "bots": {
-    "share": 0.6,
+    "share": 0.75,
     "blocked": 0.9,
     "mitigated_by": [
      "DEBT-508"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "bank-hang",
+   "name": "A bank gateway hangs",
+   "kind": "outage",
+   "description": "Friday evening bookings, three times a normal peak. At 19:10 a large bank's payment gateway stops responding for an hour. Without timeouts, payment threads wait and bookings queue behind them.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "gateway": 1.0,
+    "search": 1.0,
+    "booking": 0.8,
+    "auth": 0.8,
+    "payments": 0.5
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "payments",
+     "start": 19,
+     "hours": 1,
+     "minute": 10,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-504"
+     ],
+     "mitigation": 0.75,
+     "label": "A large bank's payment gateway stops responding",
+     "prevented": "Calls to that bank timed out in 8 seconds; passengers paid through another bank",
+     "recovered": "The bank's gateway responds again"
+    }
+   ]
+  },
+  {
+   "key": "otp-throttle",
+   "name": "OTPs throttled at Sleeper Tatkal",
+   "kind": "outage",
+   "description": "Sleeper Tatkal opens at 11:00, ten times a normal peak. At 11:00 the SMS provider throttles RailYatra, and login OTPs arrive minutes late because they share one queue with booking SMS.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    5.0,
+    10.0,
+    5.0,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "gateway": 1.0,
+    "auth": 1.0,
+    "booking": 1.0,
+    "search": 1.0
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 11,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-507"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS provider throttles RailYatra; login OTPs arrive minutes late",
+     "prevented": "OTPs went out on their own priority queue, ahead of booking SMS",
+     "recovered": "The provider lifts the throttle"
+    }
+   ]
+  },
+  {
+   "key": "chart-rush",
+   "name": "Charts prepared: PNR checks flood the database",
+   "kind": "database",
+   "description": "Charts for the night trains are prepared at 20:00 and lakhs of passengers check their PNR at once. The reads land on the primary database, which also takes the evening's bookings.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    3.0,
+    6.0,
+    6.0,
+    3.0,
+    0.35
+   ],
+   "entry": {
+    "pnr": 1.0,
+    "gateway": 1.0,
+    "search": 0.3
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 20,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.1,
+     "mitigated_by": [
+      "DEBT-509"
+     ],
+     "mitigation": 0.6,
+     "label": "Every PNR check after charting reads from the primary database",
+     "recovered": "PNR checks die down"
+    }
+   ]
+  },
+  {
+   "key": "slow-release",
+   "name": "A release slows booking before Tatkal",
+   "kind": "deploy",
+   "description": "An ordinary AC Tatkal morning, twelve times a normal peak. Last night's release made each booking two and a half times slower, and nobody load-tested it before 10:00.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    6.0,
+    12.0,
+    6.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "gateway": 1.0,
+    "auth": 1.0,
+    "booking": 1.0,
+    "search": 1.0
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "booking",
+     "start": 9,
+     "hours": 3,
+     "minute": 50,
+     "factor": 0.4,
+     "mitigated_by": [
+      "DEBT-512"
+     ],
+     "mitigation": 0.6,
+     "label": "Last night's release made each booking 2.5 times slower",
+     "recovered": "The release is rolled back"
+    }
+   ]
   }
  ]
 }

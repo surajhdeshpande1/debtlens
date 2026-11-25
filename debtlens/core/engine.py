@@ -431,6 +431,20 @@ def debt_playbook(snap: dict, debt_id, overrides: dict | None = None, chosen: di
     return out
 
 
+def fault_rates(snap: dict, modules: list[str]) -> dict[str, float]:
+    """Background faults per module-hour at rest, from each module's own incident history.
+
+    (incidents in the last 180 days + 0.25) / (180 · 24): a module with no history still has a small chance."""
+    now = reference_now(snap)
+    window = SPIKE.FAULT_WINDOW_DAYS
+    count: dict[str, int] = defaultdict(int)
+    for i in snap.get("incidents") or []:
+        r = _dt(i.get("reported_at"))
+        if r is None or 0 <= (now - r).days <= window:
+            count[(i.get("module") or "").lower()] += 1
+    return {m: (count.get(m, 0) + 0.25) / (window * SPIKE.HOURS) for m in modules}
+
+
 def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, runs: int = 300, seed: int = 17,
           params=None, overrides: dict | None = None, chosen: dict | None = None) -> dict:
     """Load-spike simulation for a snapshot: before, the spike-aware fix plan, after, and the regular plan."""
@@ -460,13 +474,14 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     elif preset and event in (None, "", preset["key"], "preset"):
         profile = list(preset["profile"])
         ev = {"key": preset["key"], "name": preset["name"], "description": preset["description"], "preset": True,
-              "kind": "bots" if preset.get("bots") else "traffic"}
+              "kind": SPIKE.kind_of(preset)}
     elif event in (None, "", "preset", "custom"):
         profile = SPIKE.custom_profile(5, 20, 2)
         ev = {"key": "custom", "name": "Custom spike", "preset": False, "description": "5× traffic from 20:00 for 2 h"}
     else:
         raise ValueError(f"unknown spike event {event!r}")
-    entry = dict(preset["entry"]) if preset else SPIKE.default_entry(mods, deps)
+    entry = (dict(preset.get("entry") or (presets[0].get("entry") if presets else None) or {}) if preset
+             else SPIKE.default_entry(mods, deps)) or SPIKE.default_entry(mods, deps)
     entry = {m: w for m, w in entry.items() if m in stats}
     # Utilisation at a normal peak hour belongs to the system, not the event: an event without its own baseline
     # (a bot attack, say) uses the main event's.
@@ -487,16 +502,19 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     factors = playbooks.load_factors(debts, assignment, lib)
     open_debts = [d for d in debts if economics.is_open(d)]
     reg = plan(snap, budget, params, compare=False)
-    bots = None
-    if isinstance(event, (str, type(None))) and preset and preset.get("bots") and ev.get("preset"):
-        keys = {d["key"]: d["id"] for d in open_debts}
-        b = preset["bots"]
-        bots = {"share": float(b.get("share", 0.8)), "blocked": float(b.get("blocked", 0.9)),
-                "mitigated_by": {keys[k] for k in b.get("mitigated_by") or () if k in keys}}
-    model = SPIKE.Model(mods, deps, baseline, expo, entry, cost, severity, profile, bots=bots)
+    bots, effects = None, []
+    keys = {d["key"]: d["id"] for d in open_debts}
+    if isinstance(event, (str, type(None))) and preset and ev.get("preset"):
+        if preset.get("bots"):
+            b = preset["bots"]
+            bots = {"share": float(b.get("share", 0.8)), "blocked": float(b.get("blocked", 0.9)),
+                    "mitigated_by": {keys[k] for k in b.get("mitigated_by") or () if k in keys}}
+        effects = SPIKE.make_effects(preset.get("effects"), mods, keys, ev["kind"])
+    model = SPIKE.Model(mods, deps, baseline, expo, entry, cost, severity, profile, bots=bots, effects=effects,
+                        fault_rate=fault_rates(snap, mods))
     res = SPIKE.simulate(model, open_debts, factors, budget, runs, seed, regular_plan=list(reg["selected"]),
                          playbook_of={d["id"]: assignment[d["id"]]["key"] for d in debts})
-    res["event"] = ev | {"peak": max(profile), "entry": entry}
+    res["event"] = ev | {"peak": max(profile), "entry": entry, "peak_hour": profile.index(max(profile))}
     res["playbook_titles"] = {k: v.title for k, v in lib.items()}
     res["journey"] = proj.get("journey")
     return res

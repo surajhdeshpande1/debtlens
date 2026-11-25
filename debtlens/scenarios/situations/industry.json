@@ -1,0 +1,1001 @@
+{
+ "fintech": [
+  {
+   "key": "acquirer-outage",
+   "name": "Acquiring bank outage",
+   "kind": "outage",
+   "description": "An ordinary weekday evening. At 18:40 the main acquiring bank stops answering card and UPI authorisations for two hours. Without a circuit breaker, every payment waits for its timeout and checkout queues behind it.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.8,
+    1.8,
+    1.8,
+    0.9,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "checkout": 1.0,
+    "gateway": 1.0,
+    "webhooks": 0.8,
+    "auth": 0.6,
+    "settlement": 0.5,
+    "reporting": 0.3
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "gateway",
+     "start": 18,
+     "hours": 2,
+     "minute": 40,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-104"
+     ],
+     "mitigation": 0.85,
+     "label": "The main acquiring bank stops answering authorisations",
+     "prevented": "The circuit breaker tripped in 20 seconds and sent payments to the backup acquirer",
+     "recovered": "The acquiring bank is answering again"
+    }
+   ]
+  },
+  {
+   "key": "batch-overrun",
+   "name": "Month-end batch overruns",
+   "kind": "database",
+   "description": "On the 1st, the month-end settlement batch runs four hours late and holds most database connections from 09:00 to 12:00, just as salary payments start to arrive.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.3,
+    2.6,
+    2.6,
+    2.6,
+    1.3,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "checkout": 1.0,
+    "gateway": 1.0,
+    "webhooks": 0.8,
+    "auth": 0.6,
+    "settlement": 0.5,
+    "reporting": 0.3
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 9,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-101"
+     ],
+     "mitigation": 0.6,
+     "label": "The late settlement batch holds 70% of the database connections",
+     "recovered": "The batch finishes and releases its connections"
+    }
+   ]
+  },
+  {
+   "key": "upi-slowdown",
+   "name": "UPI switch slows down",
+   "kind": "outage",
+   "description": "A weekday evening. At 19:00 the UPI switch starts taking 30 seconds to answer. Without timeouts on the UPI path, every waiting payment holds a gateway thread, and the gateway runs out of them.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.8,
+    1.8,
+    1.8,
+    0.9,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "checkout": 1.0,
+    "gateway": 1.0,
+    "webhooks": 0.8,
+    "auth": 0.6,
+    "settlement": 0.5,
+    "reporting": 0.3
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "gateway",
+     "start": 19,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-105"
+     ],
+     "mitigation": 0.6,
+     "label": "UPI responses take 30 seconds; gateway threads wait on them",
+     "recovered": "The UPI switch answers in time again"
+    }
+   ]
+  },
+  {
+   "key": "replica-lag",
+   "name": "Read replica falls behind",
+   "kind": "database",
+   "description": "At 16:20 the read replica falls 40 seconds behind the primary. Risk checks and merchant reports read stale balances, and risk starts rejecting good payments until someone notices.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    1.5,
+    1.5,
+    1.5,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "checkout": 1.0,
+    "gateway": 1.0,
+    "webhooks": 0.8,
+    "auth": 0.6,
+    "settlement": 0.5,
+    "reporting": 0.3
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "risk",
+     "start": 16,
+     "hours": 2,
+     "minute": 20,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-112"
+     ],
+     "mitigation": 0.85,
+     "label": "Risk checks read 40-second-old balances and reject good payments",
+     "prevented": "The lag alert fired at 10 seconds and reads moved to the primary",
+     "recovered": "The replica catches up"
+    },
+    {
+     "type": "down",
+     "module": "reporting",
+     "start": 16,
+     "hours": 2,
+     "minute": 22,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-112"
+     ],
+     "mitigation": 0.85,
+     "label": "Merchant reports show stale totals"
+    }
+   ]
+  },
+  {
+   "key": "key-rotation",
+   "name": "API-key rotation goes wrong",
+   "kind": "deploy",
+   "description": "A security release rotates merchant API keys at 11:00. The old keys stay cached, so merchants' calls are rejected until someone flushes the cache by hand.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.6,
+    1.6,
+    1.6,
+    1.6,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "checkout": 1.0,
+    "gateway": 1.0,
+    "webhooks": 0.8,
+    "auth": 0.6,
+    "settlement": 0.5,
+    "reporting": 0.3
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "auth",
+     "start": 11,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-108"
+     ],
+     "mitigation": 0.9,
+     "label": "Rotated API keys stay cached; merchants' calls are rejected",
+     "prevented": "Rotation invalidated the key cache; merchants noticed nothing",
+     "recovered": "Someone flushes the key cache by hand"
+    }
+   ]
+  }
+ ],
+ "healthtech": [
+  {
+   "key": "sms-outage",
+   "name": "SMS gateway outage on a Monday",
+   "kind": "outage",
+   "description": "A Monday morning OPD. At 08:25 the SMS gateway stops accepting token and lab-report messages for two hours. Registration waits on each SMS, so the counters slow down and then stop.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    1.4,
+    2.8,
+    2.8,
+    2.8,
+    1.4,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "appointments": 1.0,
+    "identity": 0.9,
+    "notify": 0.8,
+    "emr": 0.7,
+    "billing": 0.6,
+    "lab": 0.5,
+    "pharmacy": 0.5,
+    "vitals": 0.1
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 8,
+     "hours": 2,
+     "minute": 25,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-206"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS gateway stops accepting token and report messages",
+     "prevented": "Messages waited in the queue and went out when the gateway came back",
+     "recovered": "The SMS gateway accepts messages again"
+    }
+   ]
+  },
+  {
+   "key": "hl7-restart",
+   "name": "Interface engine restart",
+   "kind": "outage",
+   "description": "At 14:10 the HL7 interface engine restarts after a memory alarm and loses its in-memory queue. Lab orders, results and vitals stop flowing between systems until the queue is rebuilt.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    1.6,
+    1.6,
+    1.6,
+    1.6,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "appointments": 1.0,
+    "identity": 0.9,
+    "notify": 0.8,
+    "emr": 0.7,
+    "billing": 0.6,
+    "lab": 0.5,
+    "pharmacy": 0.5,
+    "vitals": 0.1
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "hl7",
+     "start": 14,
+     "hours": 1,
+     "minute": 10,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-201"
+     ],
+     "mitigation": 0.8,
+     "label": "The HL7 engine restarts and drops its in-memory message queue",
+     "prevented": "The durable queue kept every message; the restart took 40 seconds",
+     "recovered": "The interface engine is processing messages again"
+    }
+   ]
+  },
+  {
+   "key": "vitals-growth",
+   "name": "Vitals history slows the database",
+   "kind": "database",
+   "description": "The vitals table has passed 400 million rows. On a busy day every query on it gets a little slower each hour, and by the evening rounds the shared database is struggling.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.1,
+    2.2,
+    2.2,
+    2.2,
+    2.2,
+    1.1,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "appointments": 1.0,
+    "identity": 0.9,
+    "notify": 0.8,
+    "emr": 0.7,
+    "billing": 0.6,
+    "lab": 0.5,
+    "pharmacy": 0.5,
+    "vitals": 0.1
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 8,
+     "hours": 12,
+     "minute": 0,
+     "factor": 0.35,
+     "ramp": true,
+     "mitigated_by": [
+      "DEBT-211"
+     ],
+     "mitigation": 0.6,
+     "label": "Queries on the vitals history slow down hour by hour",
+     "recovered": "The evening's load falls away"
+    }
+   ]
+  },
+  {
+   "key": "lab-release",
+   "name": "Lab interface release breaks results",
+   "kind": "deploy",
+   "description": "A new lab interface goes live at 11:00 and maps result codes wrongly. Results are rejected, doctors wait for reports, and the old version has to be restored.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.25,
+    2.5,
+    2.5,
+    2.5,
+    1.25,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "appointments": 1.0,
+    "identity": 0.9,
+    "notify": 0.8,
+    "emr": 0.7,
+    "billing": 0.6,
+    "lab": 0.5,
+    "pharmacy": 0.5,
+    "vitals": 0.1
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "lab",
+     "start": 11,
+     "hours": 2,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-202"
+     ],
+     "mitigation": 0.85,
+     "label": "The new lab interface maps result codes wrongly; results are rejected",
+     "prevented": "Contract tests failed the release before it reached the wards",
+     "recovered": "The previous interface version is restored"
+    }
+   ]
+  }
+ ],
+ "ecommerce": [
+  {
+   "key": "search-reindex",
+   "name": "Full catalogue reindex at noon",
+   "kind": "database",
+   "description": "A sale weekday. A price change at noon triggers a full re-index of the catalogue, and for two hours every search waits behind it.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.3,
+    2.6,
+    2.6,
+    2.6,
+    2.6,
+    1.3,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "catalog": 1.0,
+    "search": 1.0,
+    "cart": 1.0,
+    "checkout": 0.9,
+    "notifications": 0.6,
+    "warehouse": 0.3,
+    "delivery": 0.2
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "search",
+     "start": 12,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-303"
+     ],
+     "mitigation": 0.6,
+     "label": "A full catalogue re-index makes every search wait",
+     "recovered": "The re-index finishes"
+    }
+   ]
+  },
+  {
+   "key": "price-lock",
+   "name": "Bulk price update before the flash sale",
+   "kind": "database",
+   "description": "At 19:00 the bulk price job rewrites 2 lakh prices row by row and locks the catalogue, just as shoppers arrive for the 8 pm flash sale.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    2.5,
+    5.0,
+    5.0,
+    2.5,
+    0.35
+   ],
+   "entry": {
+    "catalog": 1.0,
+    "search": 1.0,
+    "cart": 1.0,
+    "checkout": 0.9,
+    "notifications": 0.6,
+    "warehouse": 0.3,
+    "delivery": 0.2
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "catalog",
+     "start": 19,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-314"
+     ],
+     "mitigation": 0.6,
+     "label": "The bulk price job locks catalogue rows one by one",
+     "recovered": "The price job finishes"
+    }
+   ]
+  },
+  {
+   "key": "coupon-change",
+   "name": "Campaign change breaks coupons",
+   "kind": "deploy",
+   "description": "At 20:05 marketing switches the evening campaign. The coupon cache keeps the old rules, so checkout rejects valid coupons and orders fail until the cache is cleared.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    2.0,
+    4.0,
+    4.0,
+    2.0,
+    0.35
+   ],
+   "entry": {
+    "catalog": 1.0,
+    "search": 1.0,
+    "cart": 1.0,
+    "checkout": 0.9,
+    "notifications": 0.6,
+    "warehouse": 0.3,
+    "delivery": 0.2
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "checkout",
+     "start": 20,
+     "hours": 1,
+     "minute": 5,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-305"
+     ],
+     "mitigation": 0.85,
+     "label": "The coupon cache keeps the old campaign; checkout rejects valid coupons",
+     "prevented": "The campaign change invalidated the coupon cache at once",
+     "recovered": "The coupon cache is cleared"
+    }
+   ]
+  },
+  {
+   "key": "event-replay",
+   "name": "Order events replayed",
+   "kind": "retry",
+   "description": "After a message broker restart at 15:00, six hours of order events are replayed. The warehouse processes them again, double-reserving stock and flooding inventory for three hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "catalog": 1.0,
+    "search": 1.0,
+    "cart": 1.0,
+    "checkout": 0.9,
+    "notifications": 0.6,
+    "warehouse": 0.3,
+    "delivery": 0.2
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "warehouse",
+     "start": 15,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.15,
+     "mitigated_by": [
+      "DEBT-306"
+     ],
+     "mitigation": 0.6,
+     "label": "The warehouse processes six hours of order events twice",
+     "recovered": "The replayed events are processed"
+    },
+    {
+     "type": "capacity",
+     "module": "inventory",
+     "start": 15,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-306"
+     ],
+     "mitigation": 0.6,
+     "label": "Duplicate reservations flood inventory"
+    }
+   ]
+  }
+ ],
+ "college": [
+  {
+   "key": "otp-outage",
+   "name": "OTP SMS fails on revaluation results day",
+   "kind": "outage",
+   "description": "Revaluation results come out at 10:00. At 10:05 the SMS provider stops sending login OTPs for two hours, and because login waits on the OTP, results stop loading too.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    2.0,
+    4.0,
+    4.0,
+    2.0,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "results": 1.0,
+    "auth": 1.0,
+    "notifications": 0.8
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "notifications",
+     "start": 10,
+     "hours": 2,
+     "minute": 5,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-408"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS provider stops sending login OTPs",
+     "prevented": "OTPs were queued and resent as soon as the provider recovered",
+     "recovered": "The SMS provider is sending again"
+    }
+   ]
+  },
+  {
+   "key": "fee-deadline",
+   "name": "Fee deadline evening",
+   "kind": "retry",
+   "description": "The fee deadline is midnight. From 18:00 the bank's callbacks time out and each payment is retried three times, so fees carries four times its usual load all evening.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    2.5,
+    5.0,
+    5.0,
+    5.0,
+    5.0,
+    2.5,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "fees": 1.0,
+    "auth": 0.8,
+    "notifications": 0.5
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "fees",
+     "start": 18,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-406"
+     ],
+     "mitigation": 0.6,
+     "label": "Bank callbacks time out and every payment is retried three times",
+     "recovered": "The bank's callbacks speed up again"
+    }
+   ]
+  },
+  {
+   "key": "attendance-sync",
+   "name": "Biometric sync floods the database",
+   "kind": "database",
+   "description": "At 09:30 the biometric machines sync the morning's attendance, one row and one transaction at a time, while faculty are marking attendance for first period.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.5,
+    3.0,
+    3.0,
+    1.5,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "attendance": 1.0,
+    "auth": 0.8,
+    "timetable": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 9,
+     "hours": 2,
+     "minute": 30,
+     "factor": 0.12,
+     "mitigated_by": [
+      "DEBT-413"
+     ],
+     "mitigation": 0.6,
+     "label": "Ten thousand single-row attendance saves hit the database",
+     "recovered": "The sync finishes"
+    }
+   ]
+  },
+  {
+   "key": "grading-release",
+   "name": "Grading rule change breaks SGPA",
+   "kind": "deploy",
+   "description": "A release at 11:00 changes the grading rules in one of the three places they live. Result pages compute SGPA wrongly and fail until the release is reverted.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "results": 1.0,
+    "auth": 0.9
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "results",
+     "start": 11,
+     "hours": 2,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-411"
+     ],
+     "mitigation": 0.85,
+     "label": "The new grading rules compute SGPA wrongly; result pages fail",
+     "prevented": "With one shared rules module, the change was tested before release",
+     "recovered": "The release is reverted"
+    }
+   ]
+  }
+ ]
+}

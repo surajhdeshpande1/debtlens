@@ -27,6 +27,7 @@ from pathlib import Path
 FORMAT = "debtlens-pack/1"
 PACK_DIR = Path(__file__).resolve().parent.parent / "packs"
 MAX_BYTES = 400_000
+MAX_EVENTS = 7               # situations besides the main event
 LIMITS = {"modules": 40, "dependencies": 300, "files": 300, "satd": 300, "incidents": 300, "debts": 150,
           "people": 20, "whys": 7}
 
@@ -486,14 +487,15 @@ def validate(raw, *, source: str = "pack") -> tuple[dict, list[str]]:
         if not isinstance(extra, list):
             c.bad("events", "must be a list of events shaped like 'spike'")
             extra = []
-        if len(extra) > 4:
-            c.bad("events", "at most 4 extra events")
+        if len(extra) > MAX_EVENTS:
+            c.bad("events", f"at most {MAX_EVENTS} extra situations")
         if extra and not sp:
             c.bad("events", "give the main event in 'spike' first")
         seen_keys = {(out.get("spike") or {}).get("key")}
         evs = []
-        for n, ev in enumerate(extra[:4], 1):
-            e = _spike(ev, names, c, debt_keys, where=f"events[{n}]")
+        for n, ev in enumerate(extra[:MAX_EVENTS], 1):
+            e = _spike(ev, names, c, debt_keys, where=f"events[{n}]",
+                       default_entry=(out.get("spike") or {}).get("entry"))
             if e:
                 if e["key"] in seen_keys:
                     c.bad(f"events[{n}]", f"key '{e['key']}' is used twice")
@@ -561,7 +563,8 @@ def _journey(jr, names: set[str], c: _Checker) -> dict | None:
             "peak_rpm": int(rpm or 20000), "color": color, "steps": steps}
 
 
-def _spike(sp, names: set[str], c: _Checker, debt_keys: set[str] | None = None, where: str = "spike") -> dict | None:
+def _spike(sp, names: set[str], c: _Checker, debt_keys: set[str] | None = None, where: str = "spike",
+           default_entry: dict | None = None) -> dict | None:
     from . import spike as SPIKE
 
     if not isinstance(sp, dict):
@@ -604,7 +607,9 @@ def _spike(sp, names: set[str], c: _Checker, debt_keys: set[str] | None = None, 
             res[nm] = float(v)
         return res
 
-    out["entry"] = table("entry", 0, 1, required=True)
+    out["entry"] = table("entry", 0, 1, required=not default_entry)
+    if sp.get("entry") is None and default_entry:
+        out["entry"] = dict(default_entry)   # a situation on the same system: users come in the same way
     if sp.get("entry") is not None and not out["entry"]:
         c.bad(w, "'entry' needs at least one module")
     out["baseline"] = table("baseline", 0.01, 0.95)
@@ -618,15 +623,80 @@ def _spike(sp, names: set[str], c: _Checker, debt_keys: set[str] | None = None, 
         else:
             share = c.number(bots, "share", f"{w}.bots", lo=0, hi=1, default=0.8)
             blocked = c.number(bots, "blocked", f"{w}.bots", lo=0, hi=1, default=0.9)
-            keys = bots.get("mitigated_by") or []
-            if not isinstance(keys, list):
-                c.bad(f"{w}.bots", "'mitigated_by' must be a list of debt keys")
-                keys = []
-            keys = [str(k).strip().upper() for k in keys if isinstance(k, str)]
-            for k in keys:
-                if debt_keys is not None and k not in debt_keys:
-                    c.bad(f"{w}.bots", f"'mitigated_by' names unknown debt {k}")
-            out["bots"] = {"share": share, "blocked": blocked, "mitigated_by": keys}
+            out["bots"] = {"share": share, "blocked": blocked,
+                           "mitigated_by": _debt_list(bots, f"{w}.bots", c, debt_keys)}
+    kind = sp.get("kind")
+    if kind is not None:
+        if kind not in SPIKE.SITUATION_KINDS:
+            c.bad(w, f"'kind' must be one of: {', '.join(SPIKE.SITUATION_KINDS)}")
+        else:
+            out["kind"] = kind
+    effects = sp.get("effects")
+    if effects is not None:
+        if not isinstance(effects, list) or len(effects) > MAX_EFFECTS:
+            c.bad(w, f"'effects' must be a list of at most {MAX_EFFECTS} effects")
+        else:
+            res = [_effect(e, names, c, debt_keys, f"{w}.effects[{n}]") for n, e in enumerate(effects, 1)]
+            if all(res) and res:
+                out["effects"] = res
+    return out
+
+
+MAX_EFFECTS = 4
+
+
+def _debt_list(obj: dict, where: str, c: _Checker, debt_keys: set[str] | None) -> list[str]:
+    keys = obj.get("mitigated_by") or []
+    if not isinstance(keys, list):
+        c.bad(where, "'mitigated_by' must be a list of debt keys")
+        return []
+    keys = [str(k).strip().upper() for k in keys if isinstance(k, str)]
+    for k in keys:
+        if debt_keys is not None and k not in debt_keys:
+            c.bad(where, f"'mitigated_by' names unknown debt {k}")
+    return keys
+
+
+def _effect(e, names: set[str], c: _Checker, debt_keys: set[str] | None, w: str) -> dict | None:
+    """One thing that goes wrong during a situation: a module forced down, or capacity lost for some hours."""
+    if not isinstance(e, dict):
+        c.bad(w, "must be {type, module, start, hours, ...}")
+        return None
+    typ = e.get("type")
+    if typ not in ("down", "capacity"):
+        c.bad(w, "'type' must be 'down' (the module stops working) or 'capacity' (it keeps only part of its capacity)")
+        return None
+    mod = "*" if e.get("module") == "*" else _module_name(e.get("module"))
+    if mod != "*" and mod not in names:
+        c.bad(w, f"module {str(e.get('module'))[:30]!r} is not listed in modules")
+        return None
+    out = {"type": typ, "module": mod,
+           "start": int(c.number(e, "start", w, lo=0, hi=23, required=True, default=0) or 0),
+           "hours": int(c.number(e, "hours", w, lo=1, hi=24, default=1) or 1),
+           "minute": int(c.number(e, "minute", w, lo=0, hi=59, default=5) or 0)}
+    if typ == "down":
+        out["chance"] = c.number(e, "chance", w, lo=0, hi=1, default=1.0)
+        if e.get("kind") is not None:
+            k = str(e.get("kind")).strip().lower()
+            if k not in ("outage", "deploy"):
+                c.bad(w, "'kind' must be 'outage' or 'deploy'")
+            else:
+                out["kind"] = k
+    else:
+        out["factor"] = c.number(e, "factor", w, lo=0.02, hi=1, required=True, default=0.5)
+        if e.get("ramp") is not None:
+            if not isinstance(e.get("ramp"), bool):
+                c.bad(w, "'ramp' must be true or false")
+            out["ramp"] = bool(e.get("ramp"))
+    keys = _debt_list(e, w, c, debt_keys)
+    if keys:
+        out["mitigated_by"] = keys
+        out["mitigation"] = c.number(e, "mitigation", w, lo=0, hi=1, default=0.8)
+    out["label"] = c.text(e, "label", w, required=True, min_len=3, max_len=140) or "Something goes wrong"
+    for k, n in (("prevented", 160), ("recovered", 140)):
+        v = c.text(e, k, w, max_len=n, default="")
+        if v:
+            out[k] = v
     return out
 
 
@@ -653,8 +723,19 @@ def get(code: str) -> dict:
         raise KeyError(f"unknown pack {code!r}") from None
 
 
+def check_events(events: list, names: set[str], debt_keys: set[str]) -> list[dict]:
+    """Validate a list of situations against a system's modules and debts (used for the industry scenarios)."""
+    c = _Checker()
+    out = [_spike(e, names, c, debt_keys, where=f"events[{n}]") for n, e in enumerate(events or [], 1)]
+    if c.problems:
+        raise PackError(c.problems)
+    return [e for e in out if e]
+
+
 def info(pack: dict) -> dict:
     """Card data for a pack: what it is, how big it is and its busiest day."""
+    from . import spike as SPIKE
+
     sp = pack.get("spike") or {}
     return {"code": pack["code"], "name": pack["name"], "industry": pack["industry"], "tagline": pack.get("tagline", ""),
             "summary": pack.get("summary", ""), "order": pack.get("order", 99), "pack": True,
@@ -664,7 +745,7 @@ def info(pack: dict) -> dict:
                        "peak": max(sp["profile"]), "peak_hour": sp["profile"].index(max(sp["profile"]))}
                       if sp.get("profile") else None),
             "headline": (pack.get("tour") or {}).get("headline"),
-            "events": [{"key": e["key"], "name": e["name"], "peak": max(e["profile"]), "kind": "bots" if e.get("bots") else "traffic"}
+            "events": [{"key": e["key"], "name": e["name"], "peak": max(e["profile"]), "kind": SPIKE.kind_of(e)}
                        for e in [sp, *(pack.get("events") or [])] if e and e.get("profile")]}
 
 

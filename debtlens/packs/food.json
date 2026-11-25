@@ -1099,7 +1099,8 @@
    "partner": 0.0911,
    "payments": 0.0911,
    "search": 0.0911
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "ZaikaNow",
@@ -1216,7 +1217,165 @@
     "mitigated_by": [
      "DEBT-715"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "tablet-reconnect",
+   "name": "Partner tablets reconnect at once",
+   "kind": "retry",
+   "description": "Friday dinner, four times a normal peak. At 20:10 an internet provider's blip disconnects 30,000 restaurant tablets, and they all reconnect at once with no backoff.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    2.0,
+    4.0,
+    4.0,
+    4.0,
+    2.0,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "partner",
+     "start": 20,
+     "hours": 1,
+     "minute": 10,
+     "factor": 0.25,
+     "mitigated_by": [
+      "DEBT-703"
+     ],
+     "mitigation": 0.6,
+     "label": "30,000 restaurant tablets reconnect at the same second",
+     "recovered": "The tablets are reconnected"
+    },
+    {
+     "type": "capacity",
+     "module": "orders",
+     "start": 20,
+     "hours": 1,
+     "minute": 12,
+     "factor": 0.6,
+     "mitigated_by": [
+      "DEBT-703"
+     ],
+     "mitigation": 0.6,
+     "label": "Missed orders are re-sent all together"
+    }
+   ]
+  },
+  {
+   "key": "rain-polling",
+   "name": "Monsoon evening: apps poll order status",
+   "kind": "retry",
+   "description": "Heavy rain from 19:00. Deliveries run late and anxious customers' apps poll order status every two seconds for three hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.75,
+    3.5,
+    3.5,
+    3.5,
+    1.75,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "orders",
+     "start": 19,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.4,
+     "mitigated_by": [
+      "DEBT-706"
+     ],
+     "mitigation": 0.6,
+     "label": "Late deliveries: apps poll order status every two seconds",
+     "recovered": "The rain stops and deliveries catch up"
+    }
+   ]
+  },
+  {
+   "key": "menu-cache",
+   "name": "Menu cache flushed at dinner",
+   "kind": "cache",
+   "description": "At 20:00 a restaurant's price change flushes the whole menu cache instead of one entry, and every menu read goes to the database in the middle of dinner.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    2.0,
+    4.0,
+    4.0,
+    4.0,
+    2.0,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "menu",
+     "start": 20,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-702"
+     ],
+     "mitigation": 0.6,
+     "label": "A full menu-cache flush sends every menu read to the database",
+     "recovered": "The menu cache has filled again"
+    }
+   ]
   }
  ]
 }

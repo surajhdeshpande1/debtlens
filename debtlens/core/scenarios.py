@@ -33,6 +33,13 @@ def _load(code: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=None)
+def _situations() -> dict:
+    """Extra situations for the industry scenarios, kept apart from their labelled datasets."""
+    path = SCENARIO_DIR / "situations" / "industry.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
 def list_scenarios() -> list[dict]:
     out = []
     for f in sorted(SCENARIO_DIR.glob("*.json")):
@@ -100,7 +107,7 @@ def events(code_or_sc) -> list[dict]:
     if is_pack(sc):
         return [e for e in [sc.get("spike"), *(sc.get("events") or [])] if e]
     p = SPIKE.PRESETS.get(sc.get("code") or "")
-    return [p] if p else []
+    return ([p] if p else []) + [e for e in _situations().get(sc.get("code") or "", []) if isinstance(e, dict)]
 
 
 def materialize(code_or_sc, now: datetime | None = None) -> dict:

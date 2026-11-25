@@ -1,0 +1,1331 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "grocery",
+ "order": 11,
+ "key": "TRNT",
+ "name": "TurantMart",
+ "industry": "Quick commerce",
+ "tagline": "Ten-minute grocery delivery where Diwali evening is everyone's emergency",
+ "summary": "TurantMart delivers groceries in ten minutes from 400 dark stores: app, catalogue, search, cart, offers, payments, orders, store picking, riders and notifications. Diwali evening brings ten times a normal peak, a rainy night doubles orders while riders vanish, and limited drops attract scripts. Offers that expire all at once, inventory syncs that choke the database and UPI failures keep coming back.",
+ "repository_url": "https://github.com/example/turantmart (fictional)",
+ "people": {
+  "rohan": {
+   "name": "Rohan Mehta",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "divya": {
+   "name": "Divya Pillai",
+   "role": "tech_lead",
+   "title": "Engineering lead, consumer"
+  },
+  "sameer": {
+   "name": "Sameer Qureshi",
+   "role": "developer",
+   "title": "Developer, cart & offers"
+  },
+  "tanvi": {
+   "name": "Tanvi Kulkarni",
+   "role": "developer",
+   "title": "Developer, stores & riders"
+  },
+  "gaurav": {
+   "name": "Gaurav Bansal",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "isha": {
+   "name": "Isha Agarwal",
+   "role": "manager",
+   "title": "Product manager, growth"
+  },
+  "guest": {
+   "name": "Category team",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "app",
+   "path": "apps/consumer",
+   "description": "Consumer app front door",
+   "churn": 26,
+   "complexity": 72,
+   "loc": 2600,
+   "files": 7,
+   "owner": "sameer"
+  },
+  {
+   "name": "catalog",
+   "path": "services/catalog",
+   "description": "Products, prices and stock per store",
+   "churn": 22,
+   "complexity": 90,
+   "loc": 2900,
+   "files": 6,
+   "owner": "tanvi"
+  },
+  {
+   "name": "search",
+   "path": "services/search",
+   "description": "Product search",
+   "churn": 18,
+   "complexity": 70,
+   "loc": 2100,
+   "files": 5,
+   "owner": "sameer"
+  },
+  {
+   "name": "cart",
+   "path": "services/cart",
+   "description": "Cart and checkout",
+   "churn": 30,
+   "complexity": 104,
+   "loc": 3200,
+   "files": 7,
+   "owner": "sameer"
+  },
+  {
+   "name": "offers",
+   "path": "services/offers",
+   "description": "Offers, coupons and price rules",
+   "churn": 34,
+   "complexity": 128,
+   "loc": 3600,
+   "files": 8,
+   "owner": "sameer"
+  },
+  {
+   "name": "payments",
+   "path": "services/payments",
+   "description": "UPI, cards and wallets",
+   "churn": 14,
+   "complexity": 66,
+   "loc": 1900,
+   "files": 4,
+   "owner": "sameer"
+  },
+  {
+   "name": "orders",
+   "path": "services/orders",
+   "description": "Orders and order status",
+   "churn": 24,
+   "complexity": 92,
+   "loc": 2800,
+   "files": 6,
+   "owner": "tanvi"
+  },
+  {
+   "name": "stores",
+   "path": "services/stores",
+   "description": "Dark-store picking and inventory sync",
+   "churn": 28,
+   "complexity": 110,
+   "loc": 3300,
+   "files": 7,
+   "owner": "tanvi"
+  },
+  {
+   "name": "riders",
+   "path": "services/riders",
+   "description": "Rider assignment and tracking",
+   "churn": 26,
+   "complexity": 116,
+   "loc": 3400,
+   "files": 7,
+   "owner": "tanvi"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "The shared database",
+   "churn": 8,
+   "complexity": 30,
+   "loc": 800,
+   "files": 3,
+   "owner": "rohan"
+  }
+ ],
+ "dependencies": [
+  [
+   "app",
+   "search"
+  ],
+  [
+   "app",
+   "catalog"
+  ],
+  [
+   "app",
+   "cart"
+  ],
+  [
+   "app",
+   "orders"
+  ],
+  [
+   "search",
+   "catalog"
+  ],
+  [
+   "cart",
+   "offers"
+  ],
+  [
+   "cart",
+   "payments"
+  ],
+  [
+   "cart",
+   "orders"
+  ],
+  [
+   "catalog",
+   "db"
+  ],
+  [
+   "offers",
+   "db"
+  ],
+  [
+   "orders",
+   "stores"
+  ],
+  [
+   "orders",
+   "riders"
+  ],
+  [
+   "orders",
+   "db"
+  ],
+  [
+   "stores",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ]
+ ],
+ "files": [
+  [
+   "services/offers/engine.py",
+   "offers",
+   30,
+   39,
+   1200,
+   1680,
+   4
+  ],
+  [
+   "services/offers/cache.py",
+   "offers",
+   14,
+   15,
+   360,
+   410,
+   2
+  ],
+  [
+   "services/stores/sync.py",
+   "stores",
+   24,
+   28,
+   800,
+   1140,
+   3
+  ],
+  [
+   "services/riders/assign.py",
+   "riders",
+   22,
+   35,
+   980,
+   1210,
+   3
+  ],
+  [
+   "services/payments/upi.py",
+   "payments",
+   12,
+   17,
+   470,
+   390,
+   2
+  ],
+  [
+   "services/cart/checkout.py",
+   "cart",
+   26,
+   30,
+   870,
+   1300,
+   3
+  ],
+  [
+   "services/orders/status.py",
+   "orders",
+   18,
+   21,
+   600,
+   720,
+   2
+  ],
+  [
+   "apps/consumer/release.gradle",
+   "app",
+   10,
+   5,
+   120,
+   200,
+   2
+  ],
+  [
+   "services/catalog/stock.py",
+   "catalog",
+   18,
+   22,
+   640,
+   690,
+   3
+  ],
+  [
+   "infra/db/pool.py",
+   "db",
+   6,
+   6,
+   160,
+   120,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "services/offers/cache.py",
+   21,
+   "HACK",
+   "campaign switch flushes the whole offer cache"
+  ],
+  [
+   "services/stores/sync.py",
+   47,
+   "TODO",
+   "full inventory sync from every store at once"
+  ],
+  [
+   "services/riders/assign.py",
+   112,
+   "OPTIMIZE",
+   "assigns riders one order at a time"
+  ],
+  [
+   "services/payments/upi.py",
+   38,
+   "FIXME",
+   "single UPI provider; no automatic switch"
+  ],
+  [
+   "apps/consumer/release.gradle",
+   9,
+   "TODO",
+   "releases go to 100% of users at once"
+  ],
+  [
+   "services/cart/checkout.py",
+   160,
+   "TODO",
+   "no per-account limit on limited drops"
+  ],
+  [
+   "services/orders/status.py",
+   33,
+   "TODO",
+   "apps poll order status every 2 seconds"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1501",
+   "title": "Offers vanished from carts at 19:00",
+   "desc": "A campaign switch flushed the offer cache; carts showed full prices for 15 minutes.",
+   "module": "offers",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 176,
+   "fixed": 175.9,
+   "effort": 8,
+   "by": "gaurav",
+   "group": "G-OFFERS",
+   "whys": [
+    "Offers vanished",
+    "The campaign switch flushed every offer at once",
+    "A campaign switch flushes the whole offer cache"
+   ],
+   "fix": "Re-ran the campaign.",
+   "lesson": "A flush at peak is a stampede."
+  },
+  {
+   "key": "INC-1502",
+   "title": "Inventory sync froze checkout",
+   "desc": "All 400 stores synced inventory at 19:00 and checkout timed out for 20 minutes.",
+   "module": "stores",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 168,
+   "fixed": 167.9,
+   "effort": 10,
+   "by": "tanvi",
+   "group": "G-SYNC",
+   "whys": [
+    "Checkout timed out",
+    "Every store sent its full inventory at the same time",
+    "Every store syncs its full inventory at once"
+   ],
+   "fix": "Moved the sync to 04:00."
+  },
+  {
+   "key": "INC-1503",
+   "title": "UPI payments failed for 35 minutes",
+   "desc": "The UPI provider degraded at 20:00; payments failed and carts were abandoned.",
+   "module": "payments",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.9,
+   "effort": 7,
+   "by": "sameer",
+   "group": "G-UPI",
+   "whys": [
+    "UPI payments failed",
+    "All UPI traffic went to one provider",
+    "UPI runs through a single provider with no automatic switch"
+   ],
+   "fix": "Waited for the provider."
+  },
+  {
+   "key": "INC-1504",
+   "title": "Riders not assigned on a rainy night",
+   "desc": "Orders waited 25 minutes for riders while assignment lagged.",
+   "module": "riders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151.9,
+   "effort": 8,
+   "by": "tanvi",
+   "group": "G-RIDERS",
+   "whys": [
+    "Orders waited for riders",
+    "Assignment ran one order at a time",
+    "Riders are assigned one order at a time"
+   ],
+   "fix": "Added assignment workers."
+  },
+  {
+   "key": "INC-1505",
+   "title": "Limited drop sold out to scripts",
+   "desc": "A limited phone drop sold out in 40 seconds, mostly to scripts.",
+   "module": "cart",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 144,
+   "fixed": 143.9,
+   "effort": 6,
+   "by": "sameer",
+   "group": "G-DROPS",
+   "whys": [
+    "The drop sold out to scripts",
+    "Scripts checked out hundreds of carts a second",
+    "Limited drops have no per-account limit or device check"
+   ],
+   "fix": "Cancelled scripted orders."
+  },
+  {
+   "key": "INC-1506",
+   "title": "App release broke the cart on one Android version",
+   "desc": "A release crashed the cart for 18% of Android users for two hours.",
+   "module": "app",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 136,
+   "fixed": 135.9,
+   "effort": 7,
+   "by": "sameer",
+   "group": "G-RELEASE",
+   "whys": [
+    "The cart crashed",
+    "The release went to every user at once",
+    "App releases go to every user at once with no staged rollout"
+   ],
+   "fix": "Pushed a fix release."
+  },
+  {
+   "key": "INC-1507",
+   "title": "Order status polling overloaded orders",
+   "desc": "During a rain spike apps polled status every 2 seconds and orders slowed.",
+   "module": "orders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 128,
+   "fixed": 127.9,
+   "effort": 6,
+   "by": "tanvi",
+   "group": "G-POLL",
+   "whys": [
+    "Orders slowed",
+    "Apps polled status every 2 seconds",
+    "Apps poll order status instead of receiving pushed updates"
+   ]
+  },
+  {
+   "key": "INC-1508",
+   "title": "Offers flushed again at a campaign switch",
+   "desc": "Full prices showed for 10 minutes at 18:00.",
+   "module": "offers",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 112,
+   "fixed": 111.9,
+   "effort": 6,
+   "by": "gaurav",
+   "group": "G-OFFERS",
+   "whys": [
+    "Offers vanished",
+    "The switch flushed the cache",
+    "A campaign switch flushes the whole offer cache"
+   ]
+  },
+  {
+   "key": "INC-1509",
+   "title": "Inventory sync collided with the evening peak",
+   "desc": "A store sync re-run at 19:30 slowed checkout.",
+   "module": "stores",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103.9,
+   "effort": 6,
+   "by": "tanvi",
+   "group": "G-SYNC",
+   "whys": [
+    "Checkout slowed",
+    "All stores synced at once",
+    "Every store syncs its full inventory at once"
+   ]
+  },
+  {
+   "key": "INC-1510",
+   "title": "UPI failures during the IPL final",
+   "desc": "UPI payments failed for 20 minutes at 21:00.",
+   "module": "payments",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95.9,
+   "effort": 6,
+   "by": "sameer",
+   "group": "G-UPI",
+   "whys": [
+    "UPI failed",
+    "One provider",
+    "UPI runs through a single provider with no automatic switch"
+   ]
+  },
+  {
+   "key": "INC-1511",
+   "title": "Rider assignment lag at Diwali",
+   "desc": "Assignment lagged 15 minutes on Diwali evening.",
+   "module": "riders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87.9,
+   "effort": 6,
+   "by": "tanvi",
+   "group": "G-RIDERS",
+   "whys": [
+    "Orders waited",
+    "One order at a time",
+    "Riders are assigned one order at a time"
+   ]
+  },
+  {
+   "key": "INC-1512",
+   "title": "Scripts bought the console drop",
+   "desc": "A games-console drop went mostly to scripts.",
+   "module": "cart",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79.9,
+   "effort": 5,
+   "by": "sameer",
+   "group": "G-DROPS",
+   "whys": [
+    "Scripts bought the drop",
+    "Hundreds of carts a second",
+    "Limited drops have no per-account limit or device check"
+   ]
+  },
+  {
+   "key": "INC-1513",
+   "title": "Database connections ran out at 20:00",
+   "desc": "Analytics jobs and orders shared the pool.",
+   "module": "db",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 72,
+   "fixed": 71.9,
+   "effort": 6,
+   "by": "rohan",
+   "group": "G-POOL",
+   "whys": [
+    "Connections ran out",
+    "Analytics jobs held them",
+    "Orders and analytics jobs share one connection pool"
+   ]
+  },
+  {
+   "key": "INC-1514",
+   "title": "App release broke checkout for iOS 16",
+   "desc": "Checkout failed for 3 hours for one iOS version.",
+   "module": "app",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 64,
+   "fixed": 63.9,
+   "effort": 6,
+   "by": "sameer",
+   "group": "G-RELEASE",
+   "whys": [
+    "Checkout failed",
+    "Released to everyone",
+    "App releases go to every user at once with no staged rollout"
+   ]
+  },
+  {
+   "key": "INC-1515",
+   "title": "Status polling again in the rain",
+   "desc": "Orders slowed under polling.",
+   "module": "orders",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 56,
+   "fixed": 55.9,
+   "effort": 5,
+   "by": "tanvi",
+   "group": "G-POLL",
+   "whys": [
+    "Orders slowed",
+    "Polling every 2 seconds",
+    "Apps poll order status instead of receiving pushed updates"
+   ]
+  },
+  {
+   "key": "INC-1516",
+   "title": "Offer cache flushed at 19:00",
+   "desc": "Full prices for 12 minutes.",
+   "module": "offers",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 12,
+   "effort": 4,
+   "by": "gaurav",
+   "group": "G-OFFERS",
+   "whys": [
+    "Offers vanished",
+    "Cache flushed",
+    "A campaign switch flushes the whole offer cache"
+   ]
+  },
+  {
+   "key": "INC-1517",
+   "title": "UPI failing intermittently",
+   "desc": "UPI success rate fell to 60% for 30 minutes.",
+   "module": "payments",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 9,
+   "effort": 5,
+   "by": "sameer",
+   "group": "G-UPI",
+   "whys": [
+    "UPI failed",
+    "One provider",
+    "UPI runs through a single provider with no automatic switch"
+   ]
+  },
+  {
+   "key": "INC-1518",
+   "title": "Inventory sync slowed checkout",
+   "desc": "The sync slowed the evening.",
+   "module": "stores",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 7,
+   "effort": 4,
+   "by": "tanvi",
+   "group": "G-SYNC",
+   "whys": [
+    "Checkout slowed",
+    "All stores synced",
+    "Every store syncs its full inventory at once"
+   ]
+  },
+  {
+   "key": "INC-1519",
+   "title": "Rider assignment lag in the rain",
+   "desc": "Assignment lagged 12 minutes.",
+   "module": "riders",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 5,
+   "effort": 4,
+   "by": "tanvi",
+   "group": "G-RIDERS",
+   "whys": [
+    "Orders waited",
+    "One order at a time",
+    "Riders are assigned one order at a time"
+   ]
+  },
+  {
+   "key": "INC-1520",
+   "title": "Cart crash after an app release",
+   "desc": "The cart crashed for some Android users.",
+   "module": "app",
+   "sev": "HIGH",
+   "status": "INVESTIGATING",
+   "ago": 3,
+   "effort": 3,
+   "by": "sameer",
+   "group": "G-RELEASE",
+   "whys": [
+    "The cart crashed",
+    "Released to everyone",
+    "App releases go to every user at once with no staged rollout"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1501",
+   "title": "Precompute the next campaign's offers and switch without flushing the cache",
+   "desc": "Build the next campaign's offers into a new cache version ahead of time and switch to it atomically.",
+   "module": "offers",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1501",
+    "INC-1508",
+    "INC-1516"
+   ],
+   "cause": "A campaign switch flushes the whole offer cache",
+   "ago": 174,
+   "file": "services/offers/cache.py"
+  },
+  {
+   "key": "DEBT-1502",
+   "title": "Delta inventory sync through a queue",
+   "desc": "Send only stock changes from each store, through a queue, spread over the minute.",
+   "module": "stores",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "tanvi",
+   "incidents": [
+    "INC-1502",
+    "INC-1509",
+    "INC-1518"
+   ],
+   "cause": "Every store syncs its full inventory at once",
+   "ago": 166,
+   "file": "services/stores/sync.py"
+  },
+  {
+   "key": "DEBT-1503",
+   "title": "Fail over UPI to a second provider automatically",
+   "desc": "Route UPI through two providers behind a circuit breaker and switch when one's success rate drops.",
+   "module": "payments",
+   "cat": "INFRASTRUCTURE",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1503",
+    "INC-1510",
+    "INC-1517"
+   ],
+   "cause": "UPI runs through a single provider with no automatic switch",
+   "ago": 158,
+   "file": "services/payments/upi.py"
+  },
+  {
+   "key": "DEBT-1504",
+   "title": "Assign riders in bulk: one round trip per store every 10 seconds",
+   "desc": "Assign riders to all of a store's waiting orders in one batch every 10 seconds instead of one order at a time.",
+   "module": "riders",
+   "cat": "CODE_SMELL",
+   "principal": 14,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "tanvi",
+   "incidents": [
+    "INC-1504",
+    "INC-1511",
+    "INC-1519"
+   ],
+   "cause": "Riders are assigned one order at a time",
+   "ago": 150,
+   "file": "services/riders/assign.py"
+  },
+  {
+   "key": "DEBT-1505",
+   "title": "Rate limits per account and device on limited drops",
+   "desc": "One unit per account and device for limited drops, with a queue and a CAPTCHA.",
+   "module": "cart",
+   "cat": "SECURITY_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1505",
+    "INC-1512"
+   ],
+   "cause": "Limited drops have no per-account limit or device check",
+   "ago": 142,
+   "file": "services/cart/checkout.py"
+  },
+  {
+   "key": "DEBT-1506",
+   "title": "Regression tests and a staged rollout for app releases",
+   "desc": "Run regression tests on every release, release to 5% of users first and stop the rollout automatically if crashes rise.",
+   "module": "app",
+   "cat": "TEST_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "sameer",
+   "incidents": [
+    "INC-1506",
+    "INC-1514",
+    "INC-1520"
+   ],
+   "cause": "App releases go to every user at once with no staged rollout",
+   "ago": 134,
+   "file": "apps/consumer/release.gradle"
+  },
+  {
+   "key": "DEBT-1507",
+   "title": "Push order updates to the app as notifications instead of polling",
+   "desc": "Send order changes to the app as push notifications through a message queue, and let it poll at most every 30 seconds.",
+   "module": "orders",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "tanvi",
+   "incidents": [
+    "INC-1507",
+    "INC-1515"
+   ],
+   "cause": "Apps poll order status instead of receiving pushed updates",
+   "ago": 126,
+   "file": "services/orders/status.py"
+  },
+  {
+   "key": "DEBT-1508",
+   "title": "Separate connection pools for orders and analytics jobs",
+   "desc": "Give orders and checkout their own pool; run analytics on a replica.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "rohan",
+   "incidents": [
+    "INC-1513"
+   ],
+   "cause": "Orders and analytics jobs share one connection pool",
+   "ago": 70,
+   "file": "infra/db/pool.py"
+  },
+  {
+   "key": "DEBT-1509",
+   "title": "Precompute store stock per product and serve it cached for 5 seconds",
+   "desc": "Serve catalogue stock from a short-lived cache updated by the delta sync.",
+   "module": "catalog",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "tanvi",
+   "incidents": [],
+   "ago": 60,
+   "file": "services/catalog/stock.py"
+  },
+  {
+   "key": "DEBT-1510",
+   "title": "Load test Diwali evening at 10x",
+   "desc": "Rehearse ten times the normal evening peak before every festival.",
+   "module": "cart",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "gaurav",
+   "incidents": [],
+   "ago": 90
+  },
+  {
+   "key": "DEBT-1511",
+   "title": "Index search by store and availability",
+   "desc": "Add a store-and-availability index for product search.",
+   "module": "search",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sameer",
+   "incidents": [],
+   "ago": 48
+  },
+  {
+   "key": "DEBT-1512",
+   "title": "Idempotency key per checkout",
+   "desc": "Make a retried checkout safe so it never charges twice.",
+   "module": "cart",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sameer",
+   "incidents": [],
+   "ago": 44
+  },
+  {
+   "key": "DEBT-1513",
+   "title": "Use IST for offer validity windows",
+   "desc": "Compare offer windows in IST.",
+   "module": "offers",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "sameer",
+   "incidents": [],
+   "ago": 20
+  }
+ ],
+ "spike": {
+  "key": "diwali-evening",
+  "name": "Diwali evening",
+  "kind": "traffic",
+  "description": "Diwali evening: last-minute sweets, diyas and gifts from 17:00, peaking at ten times a normal peak between 19:00 and 21:00.",
+  "profile": [
+   0.4,
+   0.2,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.5,
+   1.0,
+   1.6,
+   2.0,
+   2.4,
+   2.6,
+   2.8,
+   2.8,
+   3.0,
+   3.5,
+   4.5,
+   6.5,
+   8.0,
+   10.0,
+   10.0,
+   7.0,
+   3.5,
+   1.5
+  ],
+  "entry": {
+   "app": 1.0,
+   "catalog": 1.0,
+   "search": 1.0,
+   "cart": 1.0,
+   "offers": 0.9,
+   "payments": 0.7,
+   "orders": 0.9,
+   "riders": 0.7
+  },
+  "baseline": {
+   "app": 0.082,
+   "catalog": 0.082,
+   "search": 0.082,
+   "cart": 0.082,
+   "offers": 0.082,
+   "payments": 0.082,
+   "orders": 0.082,
+   "stores": 0.082,
+   "riders": 0.082,
+   "db": 0.082
+  }
+ },
+ "journey": {
+  "app": "TurantMart",
+  "who": "Kiran, ordering sweets and diyas at 19:30 on Diwali",
+  "peak_rpm": 45000,
+  "color": "#9333ea",
+  "steps": [
+   {
+    "module": "search",
+    "label": "Search 'kaju katli'",
+    "ok": "18 results near you",
+    "fail": "Search is not working right now.",
+    "slow": "Searching…"
+   },
+   {
+    "module": "cart",
+    "label": "Add 500 g kaju katli",
+    "ok": "Added to cart",
+    "fail": "Could not add to cart.",
+    "slow": "Adding…"
+   },
+   {
+    "module": "offers",
+    "label": "Apply the Diwali offer",
+    "ok": "₹80 off applied",
+    "fail": "Offer could not be applied.",
+    "slow": "Checking offers…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay ₹540 by UPI",
+    "ok": "Payment successful",
+    "fail": "UPI payment failed. Try another method.",
+    "slow": "Waiting for UPI…"
+   },
+   {
+    "module": "riders",
+    "label": "Assign a rider",
+    "ok": "Rohit is on the way: 9 minutes",
+    "fail": "Looking for a rider…",
+    "slow": "Finding a rider…"
+   }
+  ]
+ },
+ "tour": {
+  "incident": "INC-1517",
+  "debt": "DEBT-1503",
+  "module": "payments",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "UPI runs through one provider, so every provider wobble fails payments at the busiest minute; switching automatically to a second provider costs 10 hours."
+ },
+ "events": [
+  {
+   "key": "drop-scripts",
+   "name": "Scripts at a limited drop",
+   "kind": "bots",
+   "description": "A limited games-console drop at 18:00. Scripts check out hundreds of carts a second, on top of everyone trying for the same hundred units.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    7.5,
+    15.0,
+    7.5,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "app": 1.0,
+    "cart": 1.0,
+    "catalog": 1.0,
+    "payments": 0.5
+   },
+   "effects": [],
+   "bots": {
+    "share": 0.8,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1505"
+    ]
+   }
+  },
+  {
+   "key": "upi-outage",
+   "name": "UPI provider degrades",
+   "kind": "outage",
+   "description": "A Friday evening, four times a normal peak. At 20:00 the UPI provider degrades and most UPI payments fail for an hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    2.0,
+    4.0,
+    4.0,
+    4.0,
+    2.0,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "payments",
+     "start": 20,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1503"
+     ],
+     "mitigation": 0.85,
+     "label": "The UPI provider's success rate drops below 40%",
+     "prevented": "UPI traffic switched to the second provider within two minutes",
+     "recovered": "The UPI provider recovers"
+    }
+   ]
+  },
+  {
+   "key": "inventory-sync",
+   "name": "Inventory sync chokes the database",
+   "kind": "database",
+   "description": "At 19:00, during the evening peak, all 400 dark stores send their full inventory at the same time.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    2.5,
+    5.0,
+    5.0,
+    2.5,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 19,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.2,
+     "mitigated_by": [
+      "DEBT-1502"
+     ],
+     "mitigation": 0.6,
+     "label": "Four hundred stores send their full inventory at once",
+     "recovered": "The inventory sync finishes"
+    }
+   ]
+  },
+  {
+   "key": "rain-surge",
+   "name": "A rainy night doubles orders",
+   "kind": "retry",
+   "description": "Heavy rain from 20:00: orders double, riders are scarce, and assignment retries every waiting order again and again, one at a time.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0
+   ],
+   "entry": {
+    "app": 1.0,
+    "cart": 0.8,
+    "orders": 1.0,
+    "riders": 1.0,
+    "search": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "riders",
+     "start": 20,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-1504"
+     ],
+     "mitigation": 0.6,
+     "label": "Assignment retries every waiting order one at a time",
+     "recovered": "The rain eases"
+    }
+   ]
+  },
+  {
+   "key": "offer-flush",
+   "name": "Campaign switch flushes the offers",
+   "kind": "cache",
+   "description": "The evening campaign switches at 19:00 and flushes the whole offer cache, so every cart recalculates its offers from the database.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    3.0,
+    6.0,
+    6.0,
+    3.0,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "offers",
+     "start": 19,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.15,
+     "mitigated_by": [
+      "DEBT-1501"
+     ],
+     "mitigation": 0.6,
+     "label": "The campaign switch flushes every offer at once",
+     "recovered": "The offer cache has filled again"
+    }
+   ]
+  },
+  {
+   "key": "app-release",
+   "name": "App release breaks the cart",
+   "kind": "deploy",
+   "description": "A new app version goes to every user at 18:00 and crashes the cart for one Android version, until a fix is released two hours later.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    2.0,
+    4.0,
+    4.0,
+    4.0,
+    2.0,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "cart",
+     "start": 18,
+     "hours": 2,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-1506"
+     ],
+     "mitigation": 0.85,
+     "label": "The new app version crashes the cart for one Android version",
+     "prevented": "The staged rollout stopped at 5% when crashes rose",
+     "recovered": "A fixed version is released"
+    }
+   ]
+  }
+ ]
+}

@@ -487,6 +487,33 @@ LIBRARY: tuple[Playbook, ...] = (
         verify=("New records pass validation and downstream rules no longer parse free text.",),
         capacity=0.0, resilience=0.0),
     Playbook(
+        key="resource-leaks", title="Find and fix the resource leak",
+        problem="Memory, buffers, file handles or connections are taken and never given back, so the service gets "
+                "a little slower every hour until it is restarted or killed.",
+        keywords=("memory leak", "!leak", "leaks", "leaking", "frame buffers", "buffers", "out of memory", "heap",
+                  "file handles", "soak test", "never released", "never freed"),
+        categories=("CODE_SMELL", "INFRASTRUCTURE"),
+        steps=(
+            "Confirm the leak: chart memory (or open handles) per process over a long, busy day and check that it "
+            "only ever rises.",
+            "Take two heap snapshots an hour apart (tracemalloc in Python, a heap profiler elsewhere) and compare "
+            "them to find what keeps growing.",
+            "Release the resource where it stops being needed: free buffers after upload, close files and "
+            "connections in a finally block or a context manager.",
+            "Add a memory alarm per process at about 80% of its limit, so a leak pages someone before it kills "
+            "the service.",
+            "Until the fix ships, restart the process on a schedule well before memory runs out, outside busy hours.",
+            "Run a soak test: the busy day's traffic for several hours, and check that memory levels off.",
+        ),
+        verify=("Memory per process levels off during a full-length busy day instead of rising until a restart.",
+                "No out-of-memory kills or emergency restarts for 30 days."),
+        risks=("A scheduled restart hides the leak instead of fixing it; keep it only until the fix ships.",),
+        references=(("tracemalloc: trace memory allocations (Python documentation)",
+                     "https://docs.python.org/3/library/tracemalloc.html"),
+                    ("Addressing cascading failures (Google SRE book)",
+                     "https://sre.google/sre-book/addressing-cascading-failures/")),
+        capacity=0.15, resilience=0.20),
+    Playbook(
         key="refactor", title="Refactor in small, tested steps",
         problem="The code works but is hard to change safely.",
         keywords=("refactor", "cleanup", "clean up", "simplify", "extract", "remove", "deprecated", "legacy"),

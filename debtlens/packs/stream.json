@@ -1054,7 +1054,8 @@
    "playback": 0.041,
    "scores": 0.0506,
    "subs": 0.035
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "KhelStream",
@@ -1162,7 +1163,198 @@
     "mitigated_by": [
      "DEBT-814"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "licence-outage",
+   "name": "DRM licence server outage",
+   "kind": "outage",
+   "description": "A league match, six times a normal peak. At 19:30 the DRM licence server stops issuing licences for an hour, and new viewers cannot start the stream.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "drm",
+     "start": 19,
+     "hours": 1,
+     "minute": 30,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-802"
+     ],
+     "mitigation": 0.85,
+     "label": "The DRM licence server stops issuing licences",
+     "prevented": "Players used cached licences until the server came back",
+     "recovered": "The licence server is issuing licences again"
+    }
+   ]
+  },
+  {
+   "key": "ad-server",
+   "name": "Ad server slows at the innings break",
+   "kind": "outage",
+   "description": "At the 21:00 innings break the ad server takes 20 seconds per call. Playback waits for the ad decision, so viewers who press play see a spinner.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "ads",
+     "start": 21,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "label": "The ad server takes 20 seconds per ad call",
+     "recovered": "The ad server is fast again"
+    }
+   ]
+  },
+  {
+   "key": "toss-entitlements",
+   "name": "Entitlement checks at the toss",
+   "kind": "cache",
+   "description": "At the 19:00 toss every viewer's subscription is looked up at once, straight from the database, because entitlements are not cached.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    4.0,
+    8.0,
+    8.0,
+    4.0,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "subs",
+     "start": 19,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.1,
+     "mitigated_by": [
+      "DEBT-801",
+      "DEBT-811"
+     ],
+     "mitigation": 0.6,
+     "label": "Every viewer's entitlement is looked up at the same moment",
+     "recovered": "Entitlement lookups settle down"
+    }
+   ]
+  },
+  {
+   "key": "billing-batch",
+   "name": "Billing batch during the match",
+   "kind": "database",
+   "description": "The monthly renewal batch starts at 20:00, in the middle of the match, and holds most database connections for two hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 20,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-809"
+     ],
+     "mitigation": 0.6,
+     "label": "The renewal batch holds most database connections",
+     "recovered": "The renewal batch finishes"
+    }
+   ]
   }
  ]
 }

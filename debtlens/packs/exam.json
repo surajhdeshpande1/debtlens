@@ -1,0 +1,1383 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "exam",
+ "order": 8,
+ "key": "PRKS",
+ "name": "ParikshaNet",
+ "industry": "Online examinations",
+ "tagline": "Online entrance exams where three lakh candidates log in at 09:30 sharp",
+ "summary": "ParikshaNet runs computer-based entrance and university exams for up to three lakh candidates a session: OTP login, the question paper, answer autosave, webcam proctoring, final submission and results. Every session starts with every candidate logging in within ten minutes and ends with everyone submitting at once. Login storms, lost answers and a proctoring service that slows down as the exam goes on keep coming back.",
+ "repository_url": "https://github.com/example/parikshanet (fictional)",
+ "people": {
+  "meera": {
+   "name": "Meera Joshi",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "arjun": {
+   "name": "Arjun Nair",
+   "role": "tech_lead",
+   "title": "Engineering lead, exam delivery"
+  },
+  "kavya": {
+   "name": "Kavya Reddy",
+   "role": "developer",
+   "title": "Developer, autosave & submission"
+  },
+  "imran": {
+   "name": "Imran Shaikh",
+   "role": "developer",
+   "title": "Developer, proctoring & media"
+  },
+  "pooja": {
+   "name": "Pooja Hegde",
+   "role": "qa",
+   "title": "QA and exam-day on-call"
+  },
+  "rahul": {
+   "name": "Rahul Desai",
+   "role": "manager",
+   "title": "Programme manager, exams"
+  },
+  "guest": {
+   "name": "Exam board",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "login",
+   "path": "services/login",
+   "description": "Candidate login with roll number and OTP",
+   "churn": 24,
+   "complexity": 70,
+   "loc": 2100,
+   "files": 5,
+   "owner": "kavya"
+  },
+  {
+   "name": "notify",
+   "path": "services/notify",
+   "description": "OTP SMS and email",
+   "churn": 12,
+   "complexity": 40,
+   "loc": 1300,
+   "files": 4,
+   "owner": "imran"
+  },
+  {
+   "name": "paper",
+   "path": "services/paper",
+   "description": "Encrypted question paper delivery",
+   "churn": 30,
+   "complexity": 110,
+   "loc": 3400,
+   "files": 7,
+   "owner": "arjun"
+  },
+  {
+   "name": "media",
+   "path": "services/media",
+   "description": "Images and diagrams inside questions",
+   "churn": 14,
+   "complexity": 48,
+   "loc": 1500,
+   "files": 4,
+   "owner": "imran"
+  },
+  {
+   "name": "autosave",
+   "path": "services/autosave",
+   "description": "Saves every answer as the candidate types",
+   "churn": 38,
+   "complexity": 96,
+   "loc": 2600,
+   "files": 6,
+   "owner": "kavya"
+  },
+  {
+   "name": "proctor",
+   "path": "services/proctor",
+   "description": "Webcam snapshots and AI proctoring flags",
+   "churn": 42,
+   "complexity": 150,
+   "loc": 4200,
+   "files": 9,
+   "owner": "imran"
+  },
+  {
+   "name": "submit",
+   "path": "services/submit",
+   "description": "Final submission and answer-sheet generation",
+   "churn": 20,
+   "complexity": 88,
+   "loc": 2300,
+   "files": 5,
+   "owner": "kavya"
+  },
+  {
+   "name": "results",
+   "path": "services/results",
+   "description": "Results and rank cards",
+   "churn": 16,
+   "complexity": 62,
+   "loc": 1800,
+   "files": 4,
+   "owner": "arjun"
+  },
+  {
+   "name": "console",
+   "path": "services/console",
+   "description": "Invigilator and admin console",
+   "churn": 22,
+   "complexity": 84,
+   "loc": 2900,
+   "files": 6,
+   "owner": "arjun"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "The shared exam database",
+   "churn": 10,
+   "complexity": 36,
+   "loc": 900,
+   "files": 3,
+   "owner": "meera"
+  }
+ ],
+ "dependencies": [
+  [
+   "login",
+   "notify"
+  ],
+  [
+   "login",
+   "db"
+  ],
+  [
+   "paper",
+   "media"
+  ],
+  [
+   "paper",
+   "db"
+  ],
+  [
+   "autosave",
+   "db"
+  ],
+  [
+   "proctor",
+   "db"
+  ],
+  [
+   "submit",
+   "autosave"
+  ],
+  [
+   "submit",
+   "db"
+  ],
+  [
+   "results",
+   "db"
+  ],
+  [
+   "console",
+   "proctor"
+  ],
+  [
+   "console",
+   "autosave"
+  ],
+  [
+   "console",
+   "db"
+  ],
+  [
+   "paper",
+   "login"
+  ]
+ ],
+ "files": [
+  [
+   "services/login/session.py",
+   "login",
+   22,
+   24,
+   640,
+   980,
+   3
+  ],
+  [
+   "services/login/otp.py",
+   "login",
+   12,
+   11,
+   260,
+   300,
+   2
+  ],
+  [
+   "services/notify/sms.py",
+   "notify",
+   10,
+   9,
+   310,
+   240,
+   2
+  ],
+  [
+   "services/paper/deliver.py",
+   "paper",
+   26,
+   31,
+   820,
+   1320,
+   3
+  ],
+  [
+   "services/media/images.py",
+   "media",
+   12,
+   14,
+   420,
+   360,
+   2
+  ],
+  [
+   "services/autosave/save.py",
+   "autosave",
+   34,
+   27,
+   590,
+   1510,
+   3
+  ],
+  [
+   "services/proctor/snapshots.py",
+   "proctor",
+   38,
+   36,
+   910,
+   1880,
+   4
+  ],
+  [
+   "services/proctor/flags.py",
+   "proctor",
+   18,
+   22,
+   560,
+   610,
+   2
+  ],
+  [
+   "services/submit/finalise.py",
+   "submit",
+   18,
+   25,
+   700,
+   760,
+   3
+  ],
+  [
+   "services/results/rankcard.py",
+   "results",
+   14,
+   19,
+   520,
+   430,
+   2
+  ],
+  [
+   "services/console/grid.py",
+   "console",
+   20,
+   23,
+   690,
+   820,
+   3
+  ],
+  [
+   "infra/db/pool.py",
+   "db",
+   8,
+   7,
+   180,
+   140,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "services/proctor/snapshots.py",
+   88,
+   "FIXME",
+   "frame buffers are never released after upload"
+  ],
+  [
+   "services/autosave/save.py",
+   41,
+   "TODO",
+   "writes on every keystroke; batch these"
+  ],
+  [
+   "services/login/session.py",
+   120,
+   "HACK",
+   "all centres start at 09:30, no staggering"
+  ],
+  [
+   "services/notify/sms.py",
+   33,
+   "TODO",
+   "single SMS provider, no fallback"
+  ],
+  [
+   "services/paper/deliver.py",
+   205,
+   "OPTIMIZE",
+   "decrypts and renders the paper per request"
+  ],
+  [
+   "services/submit/finalise.py",
+   64,
+   "TODO",
+   "answer sheet PDF built inside the request"
+  ],
+  [
+   "services/results/rankcard.py",
+   17,
+   "TODO",
+   "no rate limit on the results page"
+  ],
+  [
+   "services/console/grid.py",
+   52,
+   "OPTIMIZE",
+   "loads every candidate in the hall on each refresh"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1201",
+   "title": "Candidates could not log in for 9 minutes at 09:30",
+   "desc": "Two lakh candidates logged in within five minutes; login returned errors until 09:39.",
+   "module": "login",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 170,
+   "fixed": 169.9,
+   "effort": 10,
+   "by": "pooja",
+   "group": "G-LOGIN",
+   "whys": [
+    "Login failed at 09:30",
+    "Every centre opened login at the same second",
+    "All centres start the session at 09:30 with no staggered login window"
+   ],
+   "fix": "Gave every candidate 10 extra minutes.",
+   "lesson": "A fixed start second turns every exam into a login storm."
+  },
+  {
+   "key": "INC-1202",
+   "title": "Answers lost when autosave timed out",
+   "desc": "Around 900 candidates found answers missing after a page refresh at 10:45.",
+   "module": "autosave",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 162,
+   "fixed": 161.8,
+   "effort": 14,
+   "by": "kavya",
+   "group": "G-AUTOSAVE",
+   "whys": [
+    "Saved answers were missing",
+    "Autosave calls timed out against the database",
+    "Autosave writes every keystroke straight to the database"
+   ],
+   "fix": "Restored answers from the browser cache where possible.",
+   "lesson": "Every keystroke as a database write cannot scale."
+  },
+  {
+   "key": "INC-1203",
+   "title": "Proctoring snapshots stopped after two hours",
+   "desc": "From 11:30 the proctoring service stopped accepting webcam snapshots and flagged candidates as absent.",
+   "module": "proctor",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 155,
+   "fixed": 154.9,
+   "effort": 8,
+   "by": "imran",
+   "group": "G-PROCTOR",
+   "whys": [
+    "Snapshots were rejected after 11:30",
+    "The proctoring process ran out of memory",
+    "Frame buffers are never released after a snapshot is uploaded"
+   ],
+   "fix": "Restarted the proctoring pods.",
+   "lesson": "A leak shows up in hour three, not in the first test."
+  },
+  {
+   "key": "INC-1204",
+   "title": "OTPs arrived 6 minutes late at a 09:30 session",
+   "desc": "Login OTPs were delayed by the SMS provider; candidates waited at their desks.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 148,
+   "fixed": 147.9,
+   "effort": 5,
+   "by": "pooja",
+   "group": "G-OTP",
+   "whys": [
+    "OTPs arrived late",
+    "The SMS provider throttled the burst",
+    "OTPs go through a single SMS provider with no fallback"
+   ],
+   "fix": "Asked the provider to raise the limit.",
+   "lesson": "One provider is one point of failure on exam morning."
+  },
+  {
+   "key": "INC-1205",
+   "title": "Final submission hung at 12:30",
+   "desc": "When the session ended, submissions took up to 4 minutes and some candidates saw errors.",
+   "module": "submit",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 140,
+   "fixed": 139.9,
+   "effort": 9,
+   "by": "kavya",
+   "group": "G-SUBMIT",
+   "whys": [
+    "Submissions hung at the end of the session",
+    "Every submission built its answer-sheet PDF inside the request",
+    "Answer sheets are generated synchronously during submission"
+   ],
+   "fix": "Extended the submission window.",
+   "lesson": "Everyone submits in the same minute."
+  },
+  {
+   "key": "INC-1206",
+   "title": "Results page down for 40 minutes after publication",
+   "desc": "Results went live at 18:00; the page timed out for most candidates.",
+   "module": "results",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 133,
+   "fixed": 132.9,
+   "effort": 6,
+   "by": "arjun",
+   "group": "G-RESULTS",
+   "whys": [
+    "The results page timed out",
+    "Every request computed the rank card from the database",
+    "Result pages are computed on every request"
+   ],
+   "fix": "Added two more servers.",
+   "lesson": "Results are read a million times and written once."
+  },
+  {
+   "key": "INC-1207",
+   "title": "Question images failed to load in one section",
+   "desc": "Diagrams in the physics section did not load for 20 minutes.",
+   "module": "media",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 126,
+   "fixed": 125.9,
+   "effort": 4,
+   "by": "imran",
+   "group": "G-PAPER",
+   "whys": [
+    "Images did not load",
+    "Media requests overloaded the paper service",
+    "The paper is decrypted and rendered on every request"
+   ],
+   "fix": "Restarted the media service."
+  },
+  {
+   "key": "INC-1208",
+   "title": "Database failover froze autosave for 4 minutes",
+   "desc": "A planned failover at 11:00 stalled every autosave and console refresh.",
+   "module": "db",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 118,
+   "fixed": 117.9,
+   "effort": 7,
+   "by": "meera",
+   "group": "G-DB",
+   "whys": [
+    "Autosave froze during the failover",
+    "Services held connections to the old primary",
+    "Services do not retry on a database failover"
+   ],
+   "fix": "Restarted the services after the failover.",
+   "lesson": "A failover nobody rehearsed is an outage."
+  },
+  {
+   "key": "INC-1209",
+   "title": "Login storm again at the 14:30 session",
+   "desc": "The afternoon session repeated the morning's login failures for 7 minutes.",
+   "module": "login",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103.9,
+   "effort": 9,
+   "by": "pooja",
+   "group": "G-LOGIN",
+   "whys": [
+    "Login failed at 14:30",
+    "Every centre opened login at the same second again",
+    "All centres start the session at 09:30 with no staggered login window"
+   ],
+   "fix": "Gave extra time again."
+  },
+  {
+   "key": "INC-1210",
+   "title": "Autosave errors at the half-way mark",
+   "desc": "Autosave timed out for 15 minutes at 11:00 for about 2,000 candidates.",
+   "module": "autosave",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95.8,
+   "effort": 12,
+   "by": "kavya",
+   "group": "G-AUTOSAVE",
+   "whys": [
+    "Autosave failed again",
+    "Writes per second doubled at the half-way mark",
+    "Autosave writes every keystroke straight to the database"
+   ],
+   "fix": "Added database capacity."
+  },
+  {
+   "key": "INC-1211",
+   "title": "Proctoring flagged a whole hall as absent",
+   "desc": "In the third hour, snapshots failed and 300 candidates were wrongly flagged.",
+   "module": "proctor",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87.9,
+   "effort": 8,
+   "by": "imran",
+   "group": "G-PROCTOR",
+   "whys": [
+    "Snapshots failed in hour three",
+    "Proctoring memory grew until the pods were killed",
+    "Frame buffers are never released after a snapshot is uploaded"
+   ],
+   "fix": "Restarted the pods every hour."
+  },
+  {
+   "key": "INC-1212",
+   "title": "OTP delays during a university exam",
+   "desc": "Login OTPs took up to 8 minutes; invigilators logged candidates in by hand.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79.9,
+   "effort": 5,
+   "by": "pooja",
+   "group": "G-OTP",
+   "whys": [
+    "OTPs arrived late again",
+    "The SMS provider throttled the burst again",
+    "OTPs go through a single SMS provider with no fallback"
+   ],
+   "fix": "Logged candidates in from the console."
+  },
+  {
+   "key": "INC-1213",
+   "title": "Submission errors at 17:30",
+   "desc": "The afternoon session's submissions failed for 3 minutes.",
+   "module": "submit",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 72,
+   "fixed": 71.9,
+   "effort": 7,
+   "by": "kavya",
+   "group": "G-SUBMIT",
+   "whys": [
+    "Submissions failed at the end",
+    "Answer-sheet PDFs were built inside the request",
+    "Answer sheets are generated synchronously during submission"
+   ],
+   "fix": "Retried submissions from the console."
+  },
+  {
+   "key": "INC-1214",
+   "title": "Result scraping slowed the results page",
+   "desc": "Coaching-centre scripts fetched thousands of rank cards a minute after results.",
+   "module": "results",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 64,
+   "fixed": 63.9,
+   "effort": 5,
+   "by": "arjun",
+   "group": "G-RESULTS",
+   "whys": [
+    "The results page slowed down",
+    "Scripts fetched rank cards by roll number in bulk",
+    "The results page has no rate limit or CAPTCHA"
+   ],
+   "fix": "Blocked a few IP addresses.",
+   "lesson": "Scrapers come back with new addresses."
+  },
+  {
+   "key": "INC-1215",
+   "title": "Question paper load took 40 seconds",
+   "desc": "At 09:30 the paper took up to 40 seconds to open.",
+   "module": "paper",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 56,
+   "fixed": 55.9,
+   "effort": 6,
+   "by": "arjun",
+   "group": "G-PAPER",
+   "whys": [
+    "The paper took 40 seconds to load",
+    "Every candidate's request decrypted and rendered the paper",
+    "The paper is decrypted and rendered on every request"
+   ],
+   "fix": "Pre-rendered the paper for that exam by hand."
+  },
+  {
+   "key": "INC-1216",
+   "title": "Autosave failed during a database failover",
+   "desc": "An unplanned failover at 10:10 stalled autosave for 6 minutes.",
+   "module": "db",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 46,
+   "fixed": 45.9,
+   "effort": 9,
+   "by": "meera",
+   "group": "G-DB",
+   "whys": [
+    "Autosave stalled on failover",
+    "Services kept talking to the old primary",
+    "Services do not retry on a database failover"
+   ],
+   "fix": "Restarted services."
+  },
+  {
+   "key": "INC-1217",
+   "title": "Login failures at a 09:30 session",
+   "desc": "The morning session saw login errors for 6 minutes.",
+   "module": "login",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 12,
+   "effort": 6,
+   "by": "pooja",
+   "group": "G-LOGIN",
+   "whys": [
+    "Login failed at 09:30",
+    "All centres opened together",
+    "All centres start the session at 09:30 with no staggered login window"
+   ]
+  },
+  {
+   "key": "INC-1218",
+   "title": "Answers missing after a refresh",
+   "desc": "Some candidates lost the last 5 minutes of answers when autosave timed out.",
+   "module": "autosave",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 9,
+   "effort": 8,
+   "by": "kavya",
+   "group": "G-AUTOSAVE",
+   "whys": [
+    "Answers were missing",
+    "Autosave timed out",
+    "Autosave writes every keystroke straight to the database"
+   ]
+  },
+  {
+   "key": "INC-1219",
+   "title": "Proctoring slowed down in hour three",
+   "desc": "Snapshot uploads slowed after two and a half hours.",
+   "module": "proctor",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 6,
+   "effort": 4,
+   "by": "imran",
+   "group": "G-PROCTOR",
+   "whys": [
+    "Snapshots slowed in hour three",
+    "Proctoring memory kept growing",
+    "Frame buffers are never released after a snapshot is uploaded"
+   ]
+  },
+  {
+   "key": "INC-1220",
+   "title": "Submissions slow at the end of the session",
+   "desc": "Final submissions took two minutes at 12:30.",
+   "module": "submit",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 4,
+   "effort": 4,
+   "by": "kavya",
+   "group": "G-SUBMIT",
+   "whys": [
+    "Submissions were slow",
+    "Answer sheets were generated in the request",
+    "Answer sheets are generated synchronously during submission"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1201",
+   "title": "Queue candidate logins in staggered waves by centre",
+   "desc": "Admit candidates through a login queue in five waves from 09:00, by centre, and scale login up before the first wave.",
+   "module": "login",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "kavya",
+   "incidents": [
+    "INC-1201",
+    "INC-1209",
+    "INC-1217"
+   ],
+   "cause": "All centres start the session at 09:30 with no staggered login window",
+   "ago": 168,
+   "file": "services/login/session.py"
+  },
+  {
+   "key": "DEBT-1202",
+   "title": "Failover to a second SMS provider, with email as the fallback for OTPs",
+   "desc": "Send OTPs through two SMS providers behind a circuit breaker that switches automatically, and by email when both are slow.",
+   "module": "notify",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "imran",
+   "incidents": [
+    "INC-1204",
+    "INC-1212"
+   ],
+   "cause": "OTPs go through a single SMS provider with no fallback",
+   "ago": 146,
+   "file": "services/notify/sms.py"
+  },
+  {
+   "key": "DEBT-1203",
+   "title": "Pre-render the question paper and serve it cached, encrypted per session",
+   "desc": "Render each paper once when it is frozen, encrypt it per session key and serve it from the edge cache.",
+   "module": "paper",
+   "cat": "ARCHITECTURAL",
+   "principal": 14,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-1207",
+    "INC-1215"
+   ],
+   "cause": "The paper is decrypted and rendered on every request",
+   "ago": 124,
+   "file": "services/paper/deliver.py"
+  },
+  {
+   "key": "DEBT-1204",
+   "title": "Keep answers in the browser and sync with backoff",
+   "desc": "Store every answer locally first and sync to the server with exponential backoff, so a stall never loses answers.",
+   "module": "autosave",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "kavya",
+   "incidents": [
+    "INC-1202",
+    "INC-1210",
+    "INC-1218"
+   ],
+   "cause": "Autosave writes every keystroke straight to the database",
+   "ago": 160,
+   "file": "services/autosave/save.py"
+  },
+  {
+   "key": "DEBT-1205",
+   "title": "Batch writes from autosave every 30 seconds",
+   "desc": "Write each candidate's answers in one transaction every 30 seconds instead of one write per keystroke.",
+   "module": "autosave",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "kavya",
+   "incidents": [
+    "INC-1202",
+    "INC-1210"
+   ],
+   "cause": "Autosave writes every keystroke straight to the database",
+   "ago": 94,
+   "file": "services/autosave/save.py"
+  },
+  {
+   "key": "DEBT-1206",
+   "title": "Release frame buffers after each snapshot upload",
+   "desc": "Free the webcam frame buffer once its snapshot is stored, and add a memory alarm per pod.",
+   "module": "proctor",
+   "cat": "CODE_SMELL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "imran",
+   "incidents": [
+    "INC-1203",
+    "INC-1211",
+    "INC-1219"
+   ],
+   "cause": "Frame buffers are never released after a snapshot is uploaded",
+   "ago": 153,
+   "file": "services/proctor/snapshots.py"
+  },
+  {
+   "key": "DEBT-1207",
+   "title": "Upload snapshots asynchronously through a queue to object storage",
+   "desc": "Let the browser upload snapshots to object storage through an upload queue with signed URLs, so the proctoring service only records flags.",
+   "module": "proctor",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "imran",
+   "incidents": [
+    "INC-1211"
+   ],
+   "ago": 86,
+   "file": "services/proctor/snapshots.py"
+  },
+  {
+   "key": "DEBT-1208",
+   "title": "Queue final submissions and build answer sheets asynchronously",
+   "desc": "Accept the submission at once, queue it, and build the answer-sheet PDF in the background.",
+   "module": "submit",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "kavya",
+   "incidents": [
+    "INC-1205",
+    "INC-1213",
+    "INC-1220"
+   ],
+   "cause": "Answer sheets are generated synchronously during submission",
+   "ago": 138,
+   "file": "services/submit/finalise.py"
+  },
+  {
+   "key": "DEBT-1209",
+   "title": "Rate limits and CAPTCHA on the results page",
+   "desc": "Limit rank-card lookups per device and IP and add a CAPTCHA after five lookups.",
+   "module": "results",
+   "cat": "SECURITY_DEBT",
+   "principal": 5,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-1214"
+   ],
+   "cause": "The results page has no rate limit or CAPTCHA",
+   "ago": 62,
+   "file": "services/results/rankcard.py"
+  },
+  {
+   "key": "DEBT-1210",
+   "title": "Precompute result pages and serve them cached",
+   "desc": "Generate every rank card when results are frozen and serve the pages from the cache.",
+   "module": "results",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "arjun",
+   "incidents": [
+    "INC-1206",
+    "INC-1214"
+   ],
+   "cause": "Result pages are computed on every request",
+   "ago": 131,
+   "file": "services/results/rankcard.py"
+  },
+  {
+   "key": "DEBT-1211",
+   "title": "Separate connection pools for exam traffic and admin reports",
+   "desc": "Give candidate-facing services their own pool so console reports cannot starve autosave.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "meera",
+   "incidents": [
+    "INC-1210"
+   ],
+   "ago": 92,
+   "file": "infra/db/pool.py"
+  },
+  {
+   "key": "DEBT-1212",
+   "title": "Regression tests and canary releases for the question-paper service",
+   "desc": "Run regression tests on every paper release and release to one test centre first, rolling back automatically on errors.",
+   "module": "paper",
+   "cat": "TEST_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "arjun",
+   "incidents": [
+    "INC-1215"
+   ],
+   "ago": 54
+  },
+  {
+   "key": "DEBT-1213",
+   "title": "Paginate the live candidate grid in the invigilator console",
+   "desc": "Load 50 candidates per page and refresh only the ones that changed.",
+   "module": "console",
+   "cat": "CODE_SMELL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "LOW",
+   "owner": "arjun",
+   "incidents": [],
+   "ago": 40,
+   "file": "services/console/grid.py"
+  },
+  {
+   "key": "DEBT-1214",
+   "title": "Rehearse database failover and retry connections in every service",
+   "desc": "Run a failover drill every month and make every service reconnect with backoff.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "meera",
+   "incidents": [
+    "INC-1208",
+    "INC-1216"
+   ],
+   "cause": "Services do not retry on a database failover",
+   "ago": 116,
+   "file": "infra/db/pool.py"
+  },
+  {
+   "key": "DEBT-1215",
+   "title": "Use IST for session start times",
+   "desc": "Store and compare session start times in IST.",
+   "module": "login",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "kavya",
+   "incidents": [],
+   "ago": 30
+  }
+ ],
+ "spike": {
+  "key": "entrance-exam",
+  "name": "Entrance exam day",
+  "kind": "traffic",
+  "description": "Two sessions of a national entrance exam: three lakh candidates log in at 09:30 and 14:30, autosave runs all through the paper, and everyone submits at 12:30 and 17:30.",
+  "profile": [
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.3,
+   0.6,
+   1.5,
+   4.0,
+   30.0,
+   14.0,
+   12.0,
+   20.0,
+   3.0,
+   30.0,
+   14.0,
+   12.0,
+   20.0,
+   3.0,
+   1.5,
+   1.0,
+   0.6,
+   0.4,
+   0.3
+  ],
+  "entry": {
+   "login": 1.0,
+   "paper": 1.0,
+   "autosave": 1.0,
+   "proctor": 0.9,
+   "notify": 0.8,
+   "submit": 0.6,
+   "media": 0.8,
+   "console": 0.2
+  },
+  "baseline": {
+   "login": 0.0273,
+   "notify": 0.0273,
+   "paper": 0.0273,
+   "media": 0.0233,
+   "autosave": 0.0273,
+   "proctor": 0.0303,
+   "submit": 0.0446,
+   "results": 0.0734,
+   "console": 0.1206,
+   "db": 0.0273
+  }
+ },
+ "journey": {
+  "app": "ParikshaNet",
+  "who": "Ananya, a candidate at the 09:30 session",
+  "peak_rpm": 60000,
+  "color": "#4338ca",
+  "steps": [
+   {
+    "module": "login",
+    "label": "Log in with roll number and OTP",
+    "ok": "Logged in",
+    "fail": "Login failed. Please contact the invigilator.",
+    "slow": "Verifying OTP…"
+   },
+   {
+    "module": "paper",
+    "label": "Open the question paper",
+    "ok": "Paper loaded: 90 questions",
+    "fail": "Could not load the paper. Retrying…",
+    "slow": "Decrypting paper…"
+   },
+   {
+    "module": "media",
+    "label": "View the diagram in Q12",
+    "ok": "Diagram shown",
+    "fail": "Image failed to load.",
+    "slow": "Loading image…"
+   },
+   {
+    "module": "autosave",
+    "label": "Answer Q12",
+    "ok": "Answer saved",
+    "fail": "Answer not saved. Do not refresh.",
+    "slow": "Saving…"
+   },
+   {
+    "module": "proctor",
+    "label": "Webcam check",
+    "ok": "Webcam check passed",
+    "fail": "Proctoring error: you are marked absent.",
+    "slow": "Uploading snapshot…"
+   },
+   {
+    "module": "submit",
+    "label": "Submit the paper",
+    "ok": "Submitted. Response sheet sent.",
+    "fail": "Submission failed. Please try again.",
+    "slow": "Submitting…"
+   }
+  ]
+ },
+ "tour": {
+  "incident": "INC-1218",
+  "debt": "DEBT-1204",
+  "module": "autosave",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Autosave writes every keystroke to the database, so answers go missing whenever it stalls; keeping answers in the browser costs 12 hours."
+ },
+ "events": [
+  {
+   "key": "result-scrapers",
+   "name": "Result-scraping bots",
+   "kind": "bots",
+   "description": "Results go live at 18:00. Coaching centres' scripts fetch rank cards by roll number in bulk, on top of three lakh candidates checking their own.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    12.5,
+    25.0,
+    12.5,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "results": 1.0,
+    "login": 0.3
+   },
+   "effects": [],
+   "bots": {
+    "share": 0.8,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1209"
+    ]
+   }
+  },
+  {
+   "key": "proctor-leak",
+   "name": "Proctoring memory leak",
+   "kind": "leak",
+   "description": "A three-hour university exam. The proctoring service never frees its frame buffers, so it gets a little slower every hour until snapshots start to fail.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    5.0,
+    10.0,
+    10.0,
+    10.0,
+    10.0,
+    5.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "login": 1.0,
+    "paper": 1.0,
+    "autosave": 1.0,
+    "proctor": 1.0,
+    "submit": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "proctor",
+     "start": 9,
+     "hours": 4,
+     "minute": 30,
+     "factor": 0.2,
+     "ramp": true,
+     "mitigated_by": [
+      "DEBT-1206"
+     ],
+     "mitigation": 0.6,
+     "label": "Proctoring memory grows with every snapshot",
+     "recovered": "The exam ends and the pods are restarted"
+    }
+   ]
+  },
+  {
+   "key": "otp-delay",
+   "name": "OTP delays at login",
+   "kind": "outage",
+   "description": "A 09:30 session. At 09:20 the SMS provider throttles ParikshaNet, and login OTPs stop arriving for an hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    10.0,
+    20.0,
+    10.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "login": 1.0,
+    "notify": 1.0,
+    "paper": 0.8
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 9,
+     "hours": 1,
+     "minute": 20,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1202"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS provider throttles login OTPs",
+     "prevented": "OTPs went out through the second provider and by email",
+     "recovered": "The provider lifts the throttle"
+    }
+   ]
+  },
+  {
+   "key": "db-failover",
+   "name": "Database failover mid-exam",
+   "kind": "database",
+   "description": "At 11:00, half-way through the paper, the primary database fails over. For the next hour, services that do not retry keep failing against the old primary.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    5.0,
+    10.0,
+    10.0,
+    10.0,
+    10.0,
+    5.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "autosave": 1.0,
+    "proctor": 0.9,
+    "paper": 0.5,
+    "console": 0.3
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 11,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.15,
+     "mitigated_by": [
+      "DEBT-1214",
+      "DEBT-1204"
+     ],
+     "mitigation": 0.6,
+     "label": "The primary database fails over; connections to it break",
+     "recovered": "Every service has reconnected"
+    }
+   ]
+  },
+  {
+   "key": "paper-release",
+   "name": "Question-paper release breaks images",
+   "kind": "deploy",
+   "description": "A paper-service release goes out before the 09:30 session and breaks image rendering. The paper opens without its diagrams until the release is rolled back.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    10.0,
+    20.0,
+    20.0,
+    10.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "login": 1.0,
+    "paper": 1.0,
+    "media": 1.0
+   },
+   "effects": [
+    {
+     "type": "down",
+     "module": "paper",
+     "start": 9,
+     "hours": 1,
+     "minute": 25,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-1212"
+     ],
+     "mitigation": 0.85,
+     "label": "The new paper release fails on questions with images",
+     "prevented": "The canary centre showed the errors and the release rolled back at 08:40",
+     "recovered": "The release is rolled back"
+    }
+   ]
+  }
+ ]
+}

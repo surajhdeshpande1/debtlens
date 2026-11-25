@@ -1030,7 +1030,8 @@
    "tickets": 0.0273,
    "waitroom": 0.0273,
    "web": 0.0273
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "ShowPass",
@@ -1137,7 +1138,193 @@
     "mitigated_by": [
      "DEBT-1106"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "email-outage",
+   "name": "Ticket email outage",
+   "kind": "outage",
+   "description": "A smaller on-sale at noon, ten times a normal peak. At 12:20 the email provider stops accepting messages for two hours, and ticket issuing waits on every email.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    5.0,
+    10.0,
+    5.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 12,
+     "hours": 2,
+     "minute": 20,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1109"
+     ],
+     "mitigation": 0.85,
+     "label": "The email provider stops accepting ticket emails",
+     "prevented": "Ticket emails waited in the queue and went out when the provider recovered",
+     "recovered": "The email provider accepts messages again"
+    }
+   ]
+  },
+  {
+   "key": "hot-section",
+   "name": "Everyone wants the front section",
+   "kind": "database",
+   "description": "A smaller on-sale at noon. Everyone goes for the same front section, and the inventory rows for it lock against each other.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    5.0,
+    10.0,
+    5.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "inventory",
+     "start": 12,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-1103"
+     ],
+     "mitigation": 0.6,
+     "label": "Everyone wants the same seats; their rows lock against each other",
+     "recovered": "The front section sells out"
+    }
+   ]
+  },
+  {
+   "key": "zone-outage",
+   "name": "A cloud zone fails during an on-sale",
+   "kind": "zone",
+   "description": "At 12:20, during a smaller on-sale, one of the two cloud zones fails and every service loses half its servers for two hours. Nothing on the debt list prevents this; the fixes decide how far it spreads.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    5.0,
+    10.0,
+    10.0,
+    5.0,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "*",
+     "start": 12,
+     "hours": 2,
+     "minute": 20,
+     "factor": 0.55,
+     "label": "One of two cloud zones fails; every service loses half its servers",
+     "recovered": "The failed zone comes back"
+    }
+   ]
+  },
+  {
+   "key": "payment-gateway",
+   "name": "Payment gateway stops confirming",
+   "kind": "outage",
+   "description": "At 12:10 the payment gateway stops confirming payments for an hour. No fix on the list prevents it; timeouts decide whether checkout waits with it.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    5.0,
+    10.0,
+    5.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "payments",
+     "start": 12,
+     "hours": 1,
+     "minute": 10,
+     "chance": 1.0,
+     "label": "The payment gateway stops confirming payments",
+     "recovered": "The payment gateway confirms payments again"
+    }
+   ]
   }
  ]
 }

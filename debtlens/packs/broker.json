@@ -1077,7 +1077,8 @@
    "orders": 0.0683,
    "portfolio": 0.0683,
    "rms": 0.0683
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "NiveshTrade",
@@ -1172,7 +1173,210 @@
     "mitigated_by": [
      "DEBT-607"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "exchange-line",
+   "name": "Exchange line drops",
+   "kind": "outage",
+   "description": "An ordinary trading day. At 11:30 the leased line to the exchange drops for an hour, and orders hang waiting for confirmations that never come.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "exchange",
+     "start": 11,
+     "hours": 1,
+     "minute": 30,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-603"
+     ],
+     "mitigation": 0.85,
+     "label": "The leased line to the exchange drops",
+     "prevented": "The circuit breaker moved orders to the backup line in three seconds",
+     "recovered": "The primary line is back"
+    }
+   ]
+  },
+  {
+   "key": "volatile-open",
+   "name": "Tick storm at a volatile open",
+   "kind": "retry",
+   "description": "Global markets fell overnight. At 09:15 tick volume jumps six-fold and every connected app redraws at once.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    2.0,
+    4.0,
+    2.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "marketdata": 1.0,
+    "charts": 1.0,
+    "orders": 1.0,
+    "portfolio": 0.8,
+    "auth": 0.8
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "marketdata",
+     "start": 9,
+     "hours": 1,
+     "minute": 15,
+     "factor": 0.25,
+     "mitigated_by": [
+      "DEBT-601"
+     ],
+     "mitigation": 0.6,
+     "label": "Tick volume jumps six-fold at the open",
+     "recovered": "Tick volume settles"
+    }
+   ]
+  },
+  {
+   "key": "contract-notes",
+   "name": "Contract-note batch in market hours",
+   "kind": "database",
+   "description": "A failed overnight job is re-run at 13:00, during market hours. Generating contract notes holds most of the database connections for two hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.25,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    1.25,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 13,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.12,
+     "mitigated_by": [
+      "DEBT-608"
+     ],
+     "mitigation": 0.6,
+     "label": "The contract-note batch holds most database connections",
+     "recovered": "The batch finishes"
+    }
+   ]
+  },
+  {
+   "key": "margin-release",
+   "name": "Emergency margin release",
+   "kind": "deploy",
+   "description": "The exchange changes margin rules at noon. Because the rules are hard-coded, an emergency release goes out, and it breaks the risk checks: orders are rejected for an hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.25,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    1.25,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "rms",
+     "start": 12,
+     "hours": 1,
+     "minute": 5,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-611"
+     ],
+     "mitigation": 0.85,
+     "label": "The emergency release breaks the risk checks; orders are rejected",
+     "prevented": "The margin change was a configuration edit; no release was needed",
+     "recovered": "The release is rolled back"
+    }
+   ]
   }
  ]
 }

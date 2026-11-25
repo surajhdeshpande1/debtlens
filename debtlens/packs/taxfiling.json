@@ -1054,7 +1054,8 @@
    "refunds": 0.2647,
    "upload": 0.0603,
    "validate": 0.0467
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "TaxSetu",
@@ -1156,7 +1157,209 @@
     "mitigated_by": [
      "DEBT-1014"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "otp-outage",
+   "name": "E-verification OTPs fail",
+   "kind": "outage",
+   "description": "An evening in the last week of July, six times a normal peak. At 21:00 the SMS provider fails, so e-verification and login OTPs stop arriving for an hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 21,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1002"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS provider fails; OTPs stop arriving",
+     "prevented": "E-verification OTPs went out through their own priority queue",
+     "recovered": "The SMS provider recovers"
+    }
+   ]
+  },
+  {
+   "key": "reminder-blast",
+   "name": "Reminder SMS blast at 18:00",
+   "kind": "retry",
+   "description": "Two crore reminder SMS go out in one batch at 18:00, and everyone who reads one logs in within the hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    4.0,
+    8.0,
+    4.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "login": 1.0,
+    "prefill": 0.9,
+    "forms": 0.8,
+    "notify": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "notify",
+     "start": 18,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-1011"
+     ],
+     "mitigation": 0.6,
+     "label": "Two crore reminder SMS go out in one batch",
+     "recovered": "The reminder batch is sent"
+    }
+   ]
+  },
+  {
+   "key": "refund-batch",
+   "name": "Refund batch on deadline evening",
+   "kind": "database",
+   "description": "The refund batch starts at 19:00 on a deadline-week evening and holds most database connections for three hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    2.5,
+    5.0,
+    5.0,
+    5.0,
+    5.0,
+    2.5
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 19,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-1009"
+     ],
+     "mitigation": 0.6,
+     "label": "The refund batch holds most database connections",
+     "recovered": "The refund batch finishes"
+    }
+   ]
+  },
+  {
+   "key": "rules-release",
+   "name": "Tax rules release with a rebate bug",
+   "kind": "deploy",
+   "description": "A rules update goes live at 11:00 with a bug in the rebate calculation. Validation rejects correct returns for two hours, until the release is rolled back.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "validate",
+     "start": 11,
+     "hours": 2,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-1012"
+     ],
+     "mitigation": 0.85,
+     "label": "Validation rejects correct returns after the rules release",
+     "prevented": "Unit tests for the rebate edge cases failed the build",
+     "recovered": "The release is rolled back"
+    }
+   ]
   }
  ]
 }

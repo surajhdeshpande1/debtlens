@@ -1051,7 +1051,8 @@
    "rider": 0.1025,
    "safety": 0.1577,
    "trips": 0.0875
-  }
+  },
+  "kind": "traffic"
  },
  "journey": {
   "app": "SawariGo",
@@ -1152,7 +1153,154 @@
     "mitigated_by": [
      "DEBT-914"
     ]
-   }
+   },
+   "kind": "bots"
+  },
+  {
+   "key": "rain-locations",
+   "name": "Rain doubles drivers online",
+   "kind": "database",
+   "description": "Evening rain: twice as many drivers stay online, each sending its location every four seconds, and every location is written straight to the database.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 18,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-902",
+      "DEBT-910"
+     ],
+     "mitigation": 0.6,
+     "label": "Location writes from every driver flood the database",
+     "recovered": "The rain stops and drivers log off"
+    }
+   ]
+  },
+  {
+   "key": "sms-outage",
+   "name": "Ride OTP SMS outage",
+   "kind": "outage",
+   "description": "A Saturday night, three times a normal peak. At 22:15 the SMS provider stops sending ride OTPs for an hour, and trips cannot start.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    1.5,
+    3.0,
+    3.0,
+    3.0
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "notify",
+     "start": 22,
+     "hours": 1,
+     "minute": 15,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-909"
+     ],
+     "mitigation": 0.85,
+     "label": "The SMS provider stops sending ride OTPs",
+     "prevented": "Trip notifications waited in the queue and went out as soon as the provider recovered",
+     "recovered": "The SMS provider is sending again"
+    }
+   ]
+  },
+  {
+   "key": "matching-release",
+   "name": "A release slows driver matching",
+   "kind": "deploy",
+   "description": "A Friday night, four times a normal peak. The afternoon's release made each driver search two and a half times slower, and it was never load-tested.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    2.0,
+    4.0,
+    4.0,
+    4.0,
+    2.0
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "matching",
+     "start": 20,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.4,
+     "mitigated_by": [
+      "DEBT-912"
+     ],
+     "mitigation": 0.6,
+     "label": "The new release made driver search 2.5 times slower",
+     "recovered": "The release is rolled back"
+    }
+   ]
   }
  ]
 }

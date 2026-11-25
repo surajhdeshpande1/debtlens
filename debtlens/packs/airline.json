@@ -1,0 +1,1352 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "airline",
+ "order": 9,
+ "key": "UDAN",
+ "name": "UdanAir",
+ "industry": "Airline booking & check-in",
+ "tagline": "An airline where a noon fare sale and a foggy morning both bring everyone at once",
+ "summary": "UdanAir flies 900 flights a day and sells 1.6 lakh seats online: fare search, booking, seats, payments, web check-in and boarding passes, all fed by the GDS that holds the flights. A fare sale at noon brings twenty times the usual traffic; a foggy morning cancels flights and sends every passenger to rebook at once. Fare searches that time out and boarding passes that never arrive keep coming back.",
+ "repository_url": "https://github.com/example/udanair (fictional)",
+ "people": {
+  "sunita": {
+   "name": "Sunita Rao",
+   "role": "admin",
+   "title": "Platform administrator"
+  },
+  "karan": {
+   "name": "Karan Malhotra",
+   "role": "tech_lead",
+   "title": "Engineering lead, digital"
+  },
+  "neha": {
+   "name": "Neha Kapoor",
+   "role": "developer",
+   "title": "Developer, booking & payments"
+  },
+  "joseph": {
+   "name": "Joseph Thomas",
+   "role": "developer",
+   "title": "Developer, check-in & GDS"
+  },
+  "ritu": {
+   "name": "Ritu Saxena",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "aman": {
+   "name": "Aman Gill",
+   "role": "manager",
+   "title": "Product manager, digital sales"
+  },
+  "guest": {
+   "name": "Revenue team",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "web",
+   "path": "apps/web",
+   "description": "Website and app front door",
+   "churn": 20,
+   "complexity": 64,
+   "loc": 2400,
+   "files": 6,
+   "owner": "neha"
+  },
+  {
+   "name": "search",
+   "path": "services/search",
+   "description": "Fare search across flights",
+   "churn": 34,
+   "complexity": 120,
+   "loc": 3800,
+   "files": 8,
+   "owner": "joseph"
+  },
+  {
+   "name": "fares",
+   "path": "services/fares",
+   "description": "Fare buckets, rules and offers",
+   "churn": 28,
+   "complexity": 136,
+   "loc": 3500,
+   "files": 7,
+   "owner": "neha"
+  },
+  {
+   "name": "booking",
+   "path": "services/booking",
+   "description": "Bookings and PNRs",
+   "churn": 24,
+   "complexity": 102,
+   "loc": 3100,
+   "files": 6,
+   "owner": "neha"
+  },
+  {
+   "name": "seats",
+   "path": "services/seats",
+   "description": "Seat maps and seat holds",
+   "churn": 18,
+   "complexity": 70,
+   "loc": 1900,
+   "files": 4,
+   "owner": "joseph"
+  },
+  {
+   "name": "payments",
+   "path": "services/payments",
+   "description": "Cards, UPI and 3-D Secure",
+   "churn": 16,
+   "complexity": 74,
+   "loc": 2200,
+   "files": 5,
+   "owner": "neha"
+  },
+  {
+   "name": "checkin",
+   "path": "services/checkin",
+   "description": "Web check-in and boarding passes",
+   "churn": 22,
+   "complexity": 90,
+   "loc": 2600,
+   "files": 6,
+   "owner": "joseph"
+  },
+  {
+   "name": "gds",
+   "path": "services/gds",
+   "description": "Connection to the GDS that holds flights and inventory",
+   "churn": 12,
+   "complexity": 58,
+   "loc": 1700,
+   "files": 4,
+   "owner": "joseph"
+  },
+  {
+   "name": "notify",
+   "path": "services/notify",
+   "description": "SMS, email and app notifications",
+   "churn": 14,
+   "complexity": 46,
+   "loc": 1400,
+   "files": 4,
+   "owner": "joseph"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "The shared database",
+   "churn": 8,
+   "complexity": 32,
+   "loc": 800,
+   "files": 3,
+   "owner": "sunita"
+  }
+ ],
+ "dependencies": [
+  [
+   "web",
+   "search"
+  ],
+  [
+   "web",
+   "booking"
+  ],
+  [
+   "web",
+   "checkin"
+  ],
+  [
+   "search",
+   "fares"
+  ],
+  [
+   "search",
+   "gds"
+  ],
+  [
+   "booking",
+   "fares"
+  ],
+  [
+   "booking",
+   "seats"
+  ],
+  [
+   "booking",
+   "payments"
+  ],
+  [
+   "booking",
+   "gds"
+  ],
+  [
+   "booking",
+   "notify"
+  ],
+  [
+   "checkin",
+   "seats"
+  ],
+  [
+   "checkin",
+   "notify"
+  ],
+  [
+   "checkin",
+   "db"
+  ],
+  [
+   "fares",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ],
+  [
+   "seats",
+   "gds"
+  ]
+ ],
+ "files": [
+  [
+   "services/search/query.py",
+   "search",
+   30,
+   33,
+   980,
+   1620,
+   4
+  ],
+  [
+   "services/fares/buckets.py",
+   "fares",
+   24,
+   38,
+   1100,
+   1390,
+   3
+  ],
+  [
+   "services/fares/cache.py",
+   "fares",
+   12,
+   14,
+   330,
+   290,
+   2
+  ],
+  [
+   "services/booking/pnr.py",
+   "booking",
+   20,
+   29,
+   870,
+   940,
+   3
+  ],
+  [
+   "services/seats/hold.py",
+   "seats",
+   16,
+   21,
+   560,
+   610,
+   2
+  ],
+  [
+   "services/payments/threeds.py",
+   "payments",
+   12,
+   18,
+   480,
+   420,
+   2
+  ],
+  [
+   "services/checkin/boarding.py",
+   "checkin",
+   20,
+   27,
+   780,
+   830,
+   3
+  ],
+  [
+   "services/gds/client.py",
+   "gds",
+   10,
+   16,
+   520,
+   310,
+   2
+  ],
+  [
+   "services/notify/disruption.py",
+   "notify",
+   12,
+   13,
+   400,
+   350,
+   2
+  ],
+  [
+   "apps/web/sale.js",
+   "web",
+   14,
+   17,
+   600,
+   480,
+   3
+  ]
+ ],
+ "satd": [
+  [
+   "services/gds/client.py",
+   44,
+   "FIXME",
+   "no circuit breaker; every call waits 30 s on a GDS outage"
+  ],
+  [
+   "services/fares/cache.py",
+   19,
+   "TODO",
+   "whole fare cache expires at once"
+  ],
+  [
+   "services/seats/hold.py",
+   73,
+   "HACK",
+   "unpaid holds never expire for logged-in users"
+  ],
+  [
+   "services/checkin/boarding.py",
+   58,
+   "TODO",
+   "boarding pass PDF built in the request"
+  ],
+  [
+   "services/notify/disruption.py",
+   27,
+   "TODO",
+   "disruption SMS sent in one blast, no priority"
+  ],
+  [
+   "services/payments/threeds.py",
+   90,
+   "TODO",
+   "no tests against the gateway sandbox"
+  ],
+  [
+   "services/search/query.py",
+   140,
+   "OPTIMIZE",
+   "searches every fare bucket on every request"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1301",
+   "title": "Fare search timed out when the noon sale opened",
+   "desc": "At 12:00 searches took over 30 seconds and most returned errors for 25 minutes.",
+   "module": "search",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 175,
+   "fixed": 174.9,
+   "effort": 12,
+   "by": "ritu",
+   "group": "G-SEARCH",
+   "whys": [
+    "Searches timed out at 12:00",
+    "Every search priced every fare bucket from scratch",
+    "Fare buckets are computed on every search instead of precomputed"
+   ],
+   "fix": "Shortened the sale page and added servers.",
+   "lesson": "A sale is a read storm on fares."
+  },
+  {
+   "key": "INC-1302",
+   "title": "Fare cache expired at once during a sale",
+   "desc": "At 12:30 the whole fare cache expired and the fares service fell over for 10 minutes.",
+   "module": "fares",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 168,
+   "fixed": 167.9,
+   "effort": 8,
+   "by": "neha",
+   "group": "G-FARECACHE",
+   "whys": [
+    "The fares service fell over",
+    "Every fare entry expired in the same second",
+    "The whole fare cache expires at once with no jitter"
+   ],
+   "fix": "Restarted fares.",
+   "lesson": "Expiries in step become a stampede."
+  },
+  {
+   "key": "INC-1303",
+   "title": "GDS outage froze booking for 40 minutes",
+   "desc": "The GDS connection dropped at 10:30; booking calls waited 30 seconds each and piled up.",
+   "module": "gds",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 160,
+   "fixed": 159.9,
+   "effort": 10,
+   "by": "joseph",
+   "group": "G-GDS",
+   "whys": [
+    "Bookings froze",
+    "Every call to the GDS waited for its 30-second timeout",
+    "There is no circuit breaker or cached availability when the GDS is down"
+   ],
+   "fix": "Waited for the GDS to recover.",
+   "lesson": "A slow dependency is worse than a dead one."
+  },
+  {
+   "key": "INC-1304",
+   "title": "Boarding passes failed in the morning rush",
+   "desc": "From 05:30 to 06:15 web check-in returned errors at the boarding-pass step.",
+   "module": "checkin",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 152,
+   "fixed": 151.9,
+   "effort": 7,
+   "by": "joseph",
+   "group": "G-BOARDING",
+   "whys": [
+    "Boarding passes failed",
+    "Each boarding pass PDF was built inside the request",
+    "Boarding passes are generated synchronously in the check-in request"
+   ],
+   "fix": "Asked passengers to check in at the airport."
+  },
+  {
+   "key": "INC-1305",
+   "title": "Fog cancellations: SMS blast delayed rebooking links",
+   "desc": "120 flights were cancelled at 06:00; rebooking SMS took 50 minutes to go out.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 144,
+   "fixed": 143.9,
+   "effort": 6,
+   "by": "ritu",
+   "group": "G-DISRUPT",
+   "whys": [
+    "Rebooking SMS went out late",
+    "All disruption messages went out in one blast",
+    "Disruption messages are sent in one blast with no priority or queue"
+   ],
+   "fix": "Sent the remaining SMS by hand.",
+   "lesson": "The passengers on the first flights need their message first."
+  },
+  {
+   "key": "INC-1306",
+   "title": "Seats held by bots during a sale",
+   "desc": "Scripts held thousands of seats without paying, pushing fares up for real passengers.",
+   "module": "seats",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 136,
+   "fixed": 135.9,
+   "effort": 8,
+   "by": "joseph",
+   "group": "G-SEATHOLD",
+   "whys": [
+    "Seats showed as sold but were never paid",
+    "Scripts created thousands of unpaid holds",
+    "Unpaid seat holds never expire and are not limited per account"
+   ],
+   "fix": "Released the holds by hand."
+  },
+  {
+   "key": "INC-1307",
+   "title": "3-D Secure change broke card payments",
+   "desc": "After a payment release, card payments failed at the 3-D Secure step for 45 minutes.",
+   "module": "payments",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 128,
+   "fixed": 127.9,
+   "effort": 7,
+   "by": "neha",
+   "group": "G-PAYREL",
+   "whys": [
+    "Card payments failed",
+    "The new release sent a field the gateway rejects",
+    "Payment changes are not tested against the gateway sandbox"
+   ],
+   "fix": "Rolled back the release.",
+   "lesson": "The gateway's sandbox is free; outages are not."
+  },
+  {
+   "key": "INC-1308",
+   "title": "Search errors again at a sale opening",
+   "desc": "The festive sale saw search errors for 15 minutes.",
+   "module": "search",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 112,
+   "fixed": 111.9,
+   "effort": 9,
+   "by": "ritu",
+   "group": "G-SEARCH",
+   "whys": [
+    "Searches failed at the sale",
+    "Fare buckets were computed per search",
+    "Fare buckets are computed on every search instead of precomputed"
+   ],
+   "fix": "Added servers again."
+  },
+  {
+   "key": "INC-1309",
+   "title": "Fares down after the cache expired",
+   "desc": "The fares cache expired in one go at 13:00.",
+   "module": "fares",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 104,
+   "fixed": 103.9,
+   "effort": 6,
+   "by": "neha",
+   "group": "G-FARECACHE",
+   "whys": [
+    "Fares fell over",
+    "The cache expired in the same second",
+    "The whole fare cache expires at once with no jitter"
+   ],
+   "fix": "Restarted fares."
+  },
+  {
+   "key": "INC-1310",
+   "title": "GDS slowness stalled check-in",
+   "desc": "GDS responses took 20 seconds for an hour; check-in and seat maps stalled.",
+   "module": "gds",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 96,
+   "fixed": 95.9,
+   "effort": 7,
+   "by": "joseph",
+   "group": "G-GDS",
+   "whys": [
+    "Check-in stalled",
+    "Calls waited on the slow GDS",
+    "There is no circuit breaker or cached availability when the GDS is down"
+   ]
+  },
+  {
+   "key": "INC-1311",
+   "title": "Boarding passes failed again at 06:00",
+   "desc": "Check-in errors for 30 minutes at the morning peak.",
+   "module": "checkin",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 88,
+   "fixed": 87.9,
+   "effort": 6,
+   "by": "joseph",
+   "group": "G-BOARDING",
+   "whys": [
+    "Boarding passes failed",
+    "PDFs were built inside the request",
+    "Boarding passes are generated synchronously in the check-in request"
+   ]
+  },
+  {
+   "key": "INC-1312",
+   "title": "Disruption SMS delayed during a storm",
+   "desc": "Thunderstorms cancelled 60 flights; SMS took 35 minutes.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 80,
+   "fixed": 79.9,
+   "effort": 5,
+   "by": "ritu",
+   "group": "G-DISRUPT",
+   "whys": [
+    "Rebooking SMS was late",
+    "One blast for every passenger",
+    "Disruption messages are sent in one blast with no priority or queue"
+   ]
+  },
+  {
+   "key": "INC-1313",
+   "title": "Database connections exhausted at the sale",
+   "desc": "Booking and check-in shared a pool that ran dry at 12:10.",
+   "module": "db",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 70,
+   "fixed": 69.9,
+   "effort": 6,
+   "by": "sunita",
+   "group": "G-POOL",
+   "whys": [
+    "Connections ran out",
+    "Revenue reports ran during the sale",
+    "Sales traffic and revenue reports share one connection pool"
+   ],
+   "fix": "Paused the reports."
+  },
+  {
+   "key": "INC-1314",
+   "title": "Seat-hold bots during a holiday sale",
+   "desc": "Unpaid holds blocked 30% of seats on popular routes for two hours.",
+   "module": "seats",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 62,
+   "fixed": 61.9,
+   "effort": 6,
+   "by": "joseph",
+   "group": "G-SEATHOLD",
+   "whys": [
+    "Seats were blocked",
+    "Scripts held seats again",
+    "Unpaid seat holds never expire and are not limited per account"
+   ]
+  },
+  {
+   "key": "INC-1315",
+   "title": "Payments failed after a gateway change",
+   "desc": "A payment release broke UPI intents for 20 minutes.",
+   "module": "payments",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 54,
+   "fixed": 53.9,
+   "effort": 5,
+   "by": "neha",
+   "group": "G-PAYREL",
+   "whys": [
+    "UPI payments failed",
+    "The release changed the intent format",
+    "Payment changes are not tested against the gateway sandbox"
+   ],
+   "fix": "Rolled back."
+  },
+  {
+   "key": "INC-1316",
+   "title": "Fare search slow at a weekend sale",
+   "desc": "Searches took 15 seconds for 20 minutes at 12:00.",
+   "module": "search",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 14,
+   "effort": 6,
+   "by": "ritu",
+   "group": "G-SEARCH",
+   "whys": [
+    "Searches were slow",
+    "Buckets computed per search",
+    "Fare buckets are computed on every search instead of precomputed"
+   ]
+  },
+  {
+   "key": "INC-1317",
+   "title": "GDS timeout froze bookings",
+   "desc": "Bookings froze for 25 minutes during a GDS slowdown.",
+   "module": "gds",
+   "sev": "CRITICAL",
+   "status": "INVESTIGATING",
+   "ago": 10,
+   "effort": 6,
+   "by": "joseph",
+   "group": "G-GDS",
+   "whys": [
+    "Bookings froze",
+    "Every call waited 30 seconds",
+    "There is no circuit breaker or cached availability when the GDS is down"
+   ]
+  },
+  {
+   "key": "INC-1318",
+   "title": "Boarding pass errors at the morning peak",
+   "desc": "Check-in failed at the boarding pass for 20 minutes.",
+   "module": "checkin",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 7,
+   "effort": 4,
+   "by": "joseph",
+   "group": "G-BOARDING",
+   "whys": [
+    "Boarding passes failed",
+    "PDFs built in the request",
+    "Boarding passes are generated synchronously in the check-in request"
+   ]
+  },
+  {
+   "key": "INC-1319",
+   "title": "Fare cache stampede at 12:00",
+   "desc": "The fare cache expired in one go as a sale opened.",
+   "module": "fares",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 5,
+   "effort": 4,
+   "by": "neha",
+   "group": "G-FARECACHE",
+   "whys": [
+    "Fares fell over",
+    "The cache expired together",
+    "The whole fare cache expires at once with no jitter"
+   ]
+  },
+  {
+   "key": "INC-1320",
+   "title": "Fog: rebooking SMS 40 minutes late",
+   "desc": "Delhi fog cancelled 80 flights; messages lagged.",
+   "module": "notify",
+   "sev": "HIGH",
+   "status": "INVESTIGATING",
+   "ago": 3,
+   "effort": 3,
+   "by": "ritu",
+   "group": "G-DISRUPT",
+   "whys": [
+    "Rebooking SMS was late",
+    "One blast for all passengers",
+    "Disruption messages are sent in one blast with no priority or queue"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1301",
+   "title": "Precompute fare buckets per route and serve them from a cache",
+   "desc": "Price every route's buckets when fares change and serve searches from the cache.",
+   "module": "search",
+   "cat": "ARCHITECTURAL",
+   "principal": 14,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "joseph",
+   "incidents": [
+    "INC-1301",
+    "INC-1308",
+    "INC-1316"
+   ],
+   "cause": "Fare buckets are computed on every search instead of precomputed",
+   "ago": 172,
+   "file": "services/search/query.py"
+  },
+  {
+   "key": "DEBT-1302",
+   "title": "Refresh fares ahead of expiry and serve cached fares",
+   "desc": "Precompute every fare entry in the background before it expires, with expiry times spread at random, so the whole cache never expires at once.",
+   "module": "fares",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "neha",
+   "incidents": [
+    "INC-1302",
+    "INC-1309",
+    "INC-1319"
+   ],
+   "cause": "The whole fare cache expires at once with no jitter",
+   "ago": 166,
+   "file": "services/fares/cache.py"
+  },
+  {
+   "key": "DEBT-1303",
+   "title": "Circuit breaker and cached availability when the GDS is down",
+   "desc": "Trip a circuit breaker after five slow GDS calls and serve cached availability, queueing bookings to confirm later.",
+   "module": "gds",
+   "cat": "ARCHITECTURAL",
+   "principal": 16,
+   "status": "PRIORITIZED",
+   "priority": "CRITICAL",
+   "owner": "joseph",
+   "incidents": [
+    "INC-1303",
+    "INC-1310",
+    "INC-1317"
+   ],
+   "cause": "There is no circuit breaker or cached availability when the GDS is down",
+   "ago": 158,
+   "file": "services/gds/client.py"
+  },
+  {
+   "key": "DEBT-1304",
+   "title": "Generate boarding passes asynchronously",
+   "desc": "Confirm check-in at once and deliver the boarding pass PDF from a queue a few seconds later.",
+   "module": "checkin",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "joseph",
+   "incidents": [
+    "INC-1304",
+    "INC-1311",
+    "INC-1318"
+   ],
+   "cause": "Boarding passes are generated synchronously in the check-in request",
+   "ago": 150,
+   "file": "services/checkin/boarding.py"
+  },
+  {
+   "key": "DEBT-1305",
+   "title": "Send disruption messages through a priority queue",
+   "desc": "Queue disruption SMS with the earliest departures first, and throttle to the provider's limit.",
+   "module": "notify",
+   "cat": "INFRASTRUCTURE",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "joseph",
+   "incidents": [
+    "INC-1305",
+    "INC-1312",
+    "INC-1320"
+   ],
+   "cause": "Disruption messages are sent in one blast with no priority or queue",
+   "ago": 142,
+   "file": "services/notify/disruption.py"
+  },
+  {
+   "key": "DEBT-1306",
+   "title": "Rate-limit unpaid seat holds per account and device",
+   "desc": "Expire unpaid holds after 10 minutes and allow at most two open holds per account and device.",
+   "module": "seats",
+   "cat": "SECURITY_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "joseph",
+   "incidents": [
+    "INC-1306",
+    "INC-1314"
+   ],
+   "cause": "Unpaid seat holds never expire and are not limited per account",
+   "ago": 134,
+   "file": "services/seats/hold.py"
+  },
+  {
+   "key": "DEBT-1307",
+   "title": "Contract tests against the payment gateway sandbox",
+   "desc": "Run every payment change against the gateway's sandbox in CI before release.",
+   "module": "payments",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "neha",
+   "incidents": [
+    "INC-1307",
+    "INC-1315"
+   ],
+   "cause": "Payment changes are not tested against the gateway sandbox",
+   "ago": 126,
+   "file": "services/payments/threeds.py"
+  },
+  {
+   "key": "DEBT-1308",
+   "title": "Separate connection pools for sales traffic and revenue reports",
+   "desc": "Give booking and check-in their own pool and run revenue reports on a replica.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "sunita",
+   "incidents": [
+    "INC-1313"
+   ],
+   "cause": "Sales traffic and revenue reports share one connection pool",
+   "ago": 68
+  },
+  {
+   "key": "DEBT-1309",
+   "title": "Precompute seat maps per flight and serve them cached",
+   "desc": "Keep each flight's seat map in a cache updated on every hold and sale.",
+   "module": "seats",
+   "cat": "ARCHITECTURAL",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "joseph",
+   "incidents": [],
+   "ago": 50
+  },
+  {
+   "key": "DEBT-1310",
+   "title": "Load test the noon sale at 20x",
+   "desc": "Rehearse a sale opening at twenty times normal traffic before every sale.",
+   "module": "booking",
+   "cat": "TEST_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "ritu",
+   "incidents": [
+    "INC-1308"
+   ],
+   "ago": 108
+  },
+  {
+   "key": "DEBT-1311",
+   "title": "Idempotency keys on booking and payment calls",
+   "desc": "Make retried bookings and payments safe so double clicks never double-charge.",
+   "module": "booking",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "neha",
+   "incidents": [],
+   "ago": 44
+  },
+  {
+   "key": "DEBT-1312",
+   "title": "Pre-render the sale page and fare calendar at the edge",
+   "desc": "Serve the sale landing page and fare calendar pre-rendered from the edge for 30 seconds.",
+   "module": "web",
+   "cat": "ARCHITECTURAL",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "neha",
+   "incidents": [
+    "INC-1301"
+   ],
+   "ago": 100,
+   "file": "apps/web/sale.js"
+  },
+  {
+   "key": "DEBT-1313",
+   "title": "Use IST for flight cut-off times",
+   "desc": "Compare web check-in cut-offs in IST.",
+   "module": "checkin",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "joseph",
+   "incidents": [],
+   "ago": 20
+  }
+ ],
+ "spike": {
+  "key": "noon-sale",
+  "name": "Fare sale at noon",
+  "kind": "traffic",
+  "description": "A three-day fare sale opens at 12:00: twenty times a normal peak on search and booking in the first hour, and busy all afternoon.",
+  "profile": [
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.3,
+   0.6,
+   0.9,
+   1.2,
+   1.5,
+   1.8,
+   2.5,
+   6.0,
+   20.0,
+   12.0,
+   6.0,
+   4.0,
+   3.0,
+   2.6,
+   2.4,
+   2.2,
+   1.8,
+   1.2,
+   0.7,
+   0.4
+  ],
+  "entry": {
+   "web": 1.0,
+   "search": 1.0,
+   "booking": 1.0,
+   "seats": 0.8,
+   "payments": 0.6,
+   "checkin": 0.2,
+   "notify": 0.5
+  },
+  "baseline": {
+   "web": 0.041,
+   "search": 0.041,
+   "fares": 0.041,
+   "booking": 0.041,
+   "seats": 0.041,
+   "payments": 0.041,
+   "checkin": 0.041,
+   "gds": 0.041,
+   "notify": 0.041,
+   "db": 0.041
+  }
+ },
+ "journey": {
+  "app": "UdanAir",
+  "who": "Shreya, booking Delhi to Goa in the noon sale",
+  "peak_rpm": 50000,
+  "color": "#b91c1c",
+  "steps": [
+   {
+    "module": "web",
+    "label": "Open the sale page",
+    "ok": "Sale is live",
+    "fail": "Something went wrong. Please try again.",
+    "slow": "Loading…"
+   },
+   {
+    "module": "search",
+    "label": "Search Delhi to Goa",
+    "ok": "12 flights from ₹2,199",
+    "fail": "No flights found. Please try again.",
+    "slow": "Searching flights…"
+   },
+   {
+    "module": "seats",
+    "label": "Pick seat 14A",
+    "ok": "Seat 14A held for 10 minutes",
+    "fail": "Seat map unavailable.",
+    "slow": "Loading seat map…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay ₹2,199 by UPI",
+    "ok": "Payment received",
+    "fail": "Payment failed. Money will be refunded if debited.",
+    "slow": "Waiting for UPI approval…"
+   },
+   {
+    "module": "booking",
+    "label": "Get the PNR",
+    "ok": "PNR UD7K2Q confirmed",
+    "fail": "Booking failed. Please check My Trips.",
+    "slow": "Confirming booking…"
+   }
+  ]
+ },
+ "tour": {
+  "incident": "INC-1317",
+  "debt": "DEBT-1303",
+  "module": "gds",
+  "budget": 40,
+  "cascade_module": "gds",
+  "headline": "Every call to the GDS waits 30 seconds when it is down, so one slow dependency freezes booking and check-in; a circuit breaker with cached availability costs 16 hours."
+ },
+ "events": [
+  {
+   "key": "seat-spinning",
+   "name": "Seat-spinning bots",
+   "kind": "bots",
+   "description": "In the first hour of the sale, scripts hold thousands of seats without paying, to push fares up for real passengers.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    10.0,
+    20.0,
+    10.0,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "web": 1.0,
+    "search": 1.0,
+    "seats": 1.0,
+    "booking": 0.6
+   },
+   "effects": [],
+   "bots": {
+    "share": 0.7,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1306"
+    ]
+   }
+  },
+  {
+   "key": "fog-rebooking",
+   "name": "Fog cancels the morning flights",
+   "kind": "traffic",
+   "description": "Dense fog in Delhi cancels 120 flights at 06:00. Every passenger on them tries to rebook at once, and the disruption SMS goes out in one blast.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    5.0,
+    10.0,
+    10.0,
+    5.0,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "web": 1.0,
+    "booking": 1.0,
+    "search": 1.0,
+    "notify": 1.0,
+    "checkin": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "notify",
+     "start": 6,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.3,
+     "mitigated_by": [
+      "DEBT-1305"
+     ],
+     "mitigation": 0.6,
+     "label": "Rebooking messages for 18,000 passengers go out in one blast",
+     "recovered": "The disruption messages are sent"
+    }
+   ]
+  },
+  {
+   "key": "gds-outage",
+   "name": "GDS connection drops",
+   "kind": "outage",
+   "description": "An ordinary afternoon. At 15:20 the connection to the GDS that holds flights and seats drops for an hour, and every call waits 30 seconds for its timeout.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    1.25,
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    1.25,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "gds",
+     "start": 15,
+     "hours": 1,
+     "minute": 20,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1303"
+     ],
+     "mitigation": 0.85,
+     "label": "The connection to the GDS drops",
+     "prevented": "The circuit breaker served cached availability and queued bookings to confirm later",
+     "recovered": "The GDS connection is back"
+    }
+   ]
+  },
+  {
+   "key": "fare-stampede",
+   "name": "Fare cache stampede",
+   "kind": "cache",
+   "description": "On the sale's second day the whole fare cache expires at 12:00, and every search reprices every fare at once.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    4.0,
+    8.0,
+    8.0,
+    4.0,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "fares",
+     "start": 12,
+     "hours": 1,
+     "minute": 0,
+     "factor": 0.15,
+     "mitigated_by": [
+      "DEBT-1302"
+     ],
+     "mitigation": 0.6,
+     "label": "Every fare in the cache expires in the same second",
+     "recovered": "The fare cache has filled again"
+    }
+   ]
+  },
+  {
+   "key": "checkin-rush",
+   "name": "Morning check-in rush",
+   "kind": "traffic",
+   "description": "The first wave of morning flights: 40,000 passengers check in between 05:00 and 07:00, and each boarding pass PDF is built inside the request.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    4.0,
+    8.0,
+    8.0,
+    4.0,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "web": 1.0,
+    "checkin": 1.0,
+    "seats": 0.6,
+    "notify": 0.6
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "checkin",
+     "start": 5,
+     "hours": 2,
+     "minute": 0,
+     "factor": 0.35,
+     "mitigated_by": [
+      "DEBT-1304"
+     ],
+     "mitigation": 0.6,
+     "label": "Boarding pass PDFs are built inside every check-in request",
+     "recovered": "The morning wave has checked in"
+    }
+   ]
+  },
+  {
+   "key": "payment-release",
+   "name": "Payment release breaks 3-D Secure",
+   "kind": "deploy",
+   "description": "A payment release goes out at 13:00, in the middle of the sale, and sends a field the gateway rejects at the 3-D Secure step.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    3.0,
+    6.0,
+    6.0,
+    6.0,
+    3.0,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "payments",
+     "start": 13,
+     "hours": 1,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-1307"
+     ],
+     "mitigation": 0.85,
+     "label": "Card payments fail at the 3-D Secure step after the release",
+     "prevented": "The sandbox tests failed the release before it shipped",
+     "recovered": "The release is rolled back"
+    }
+   ]
+  }
+ ]
+}

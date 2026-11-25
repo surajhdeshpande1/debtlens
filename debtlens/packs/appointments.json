@@ -1,0 +1,1329 @@
+{
+ "format": "debtlens-pack/1",
+ "code": "appointments",
+ "order": 10,
+ "key": "SLOT",
+ "name": "SlotSetu",
+ "industry": "Government appointments",
+ "tagline": "A state appointments portal where new slots open at 17:00 and vanish in minutes",
+ "summary": "SlotSetu books appointments for passports, driving licences and certificates across a state: login with Aadhaar e-KYC, slot search, booking, document upload, fee payment and SMS confirmations. New slots for the next fortnight open at 17:00 every day, and agents' scripts compete with citizens for them. Slot pages that hang at 17:00, e-KYC failures and uploads that never finish keep coming back.",
+ "repository_url": "https://github.com/example/slotsetu (fictional)",
+ "people": {
+  "venkatesh": {
+   "name": "Venkatesh Iyer",
+   "role": "admin",
+   "title": "State platform administrator"
+  },
+  "lakshmi": {
+   "name": "Lakshmi Narayan",
+   "role": "tech_lead",
+   "title": "Engineering lead"
+  },
+  "faizan": {
+   "name": "Faizan Ahmed",
+   "role": "developer",
+   "title": "Developer, slots & booking"
+  },
+  "shalini": {
+   "name": "Shalini Gupta",
+   "role": "developer",
+   "title": "Developer, e-KYC & documents"
+  },
+  "deepak": {
+   "name": "Deepak Yadav",
+   "role": "qa",
+   "title": "QA and on-call"
+  },
+  "priyanka": {
+   "name": "Priyanka Chauhan",
+   "role": "manager",
+   "title": "Project manager, e-governance"
+  },
+  "guest": {
+   "name": "Department officers",
+   "role": "viewer",
+   "title": "Read-only stakeholders"
+  }
+ },
+ "modules": [
+  {
+   "name": "portal",
+   "path": "apps/portal",
+   "description": "Citizen portal front door",
+   "churn": 18,
+   "complexity": 60,
+   "loc": 2200,
+   "files": 6,
+   "owner": "faizan"
+  },
+  {
+   "name": "login",
+   "path": "services/login",
+   "description": "Citizen login and sessions",
+   "churn": 20,
+   "complexity": 66,
+   "loc": 1900,
+   "files": 5,
+   "owner": "shalini"
+  },
+  {
+   "name": "ekyc",
+   "path": "services/ekyc",
+   "description": "Aadhaar e-KYC through the state gateway",
+   "churn": 10,
+   "complexity": 52,
+   "loc": 1500,
+   "files": 4,
+   "owner": "shalini"
+  },
+  {
+   "name": "slots",
+   "path": "services/slots",
+   "description": "Slot calendar and availability",
+   "churn": 32,
+   "complexity": 118,
+   "loc": 3300,
+   "files": 7,
+   "owner": "faizan"
+  },
+  {
+   "name": "booking",
+   "path": "services/booking",
+   "description": "Appointment booking",
+   "churn": 26,
+   "complexity": 96,
+   "loc": 2800,
+   "files": 6,
+   "owner": "faizan"
+  },
+  {
+   "name": "documents",
+   "path": "services/documents",
+   "description": "Document upload and checks",
+   "churn": 22,
+   "complexity": 84,
+   "loc": 2500,
+   "files": 5,
+   "owner": "shalini"
+  },
+  {
+   "name": "payments",
+   "path": "services/payments",
+   "description": "Fee payment through the treasury gateway",
+   "churn": 12,
+   "complexity": 58,
+   "loc": 1600,
+   "files": 4,
+   "owner": "faizan"
+  },
+  {
+   "name": "notify",
+   "path": "services/notify",
+   "description": "SMS confirmations and reminders",
+   "churn": 10,
+   "complexity": 40,
+   "loc": 1200,
+   "files": 3,
+   "owner": "shalini"
+  },
+  {
+   "name": "reports",
+   "path": "services/reports",
+   "description": "District MIS reports",
+   "churn": 16,
+   "complexity": 76,
+   "loc": 2400,
+   "files": 5,
+   "owner": "faizan"
+  },
+  {
+   "name": "db",
+   "path": "infra/db",
+   "description": "The shared database",
+   "churn": 8,
+   "complexity": 30,
+   "loc": 800,
+   "files": 3,
+   "owner": "venkatesh"
+  }
+ ],
+ "dependencies": [
+  [
+   "portal",
+   "login"
+  ],
+  [
+   "portal",
+   "slots"
+  ],
+  [
+   "portal",
+   "booking"
+  ],
+  [
+   "login",
+   "ekyc"
+  ],
+  [
+   "login",
+   "db"
+  ],
+  [
+   "slots",
+   "db"
+  ],
+  [
+   "booking",
+   "slots"
+  ],
+  [
+   "booking",
+   "documents"
+  ],
+  [
+   "booking",
+   "payments"
+  ],
+  [
+   "booking",
+   "notify"
+  ],
+  [
+   "documents",
+   "db"
+  ],
+  [
+   "payments",
+   "db"
+  ],
+  [
+   "reports",
+   "db"
+  ]
+ ],
+ "files": [
+  [
+   "services/slots/calendar.py",
+   "slots",
+   28,
+   34,
+   960,
+   1540,
+   3
+  ],
+  [
+   "services/slots/release.py",
+   "slots",
+   14,
+   18,
+   410,
+   520,
+   2
+  ],
+  [
+   "services/booking/allocate.py",
+   "booking",
+   22,
+   29,
+   780,
+   1090,
+   3
+  ],
+  [
+   "services/ekyc/client.py",
+   "ekyc",
+   8,
+   14,
+   430,
+   260,
+   2
+  ],
+  [
+   "services/documents/upload.py",
+   "documents",
+   20,
+   24,
+   640,
+   870,
+   3
+  ],
+  [
+   "services/reports/mis.py",
+   "reports",
+   14,
+   31,
+   900,
+   640,
+   2
+  ],
+  [
+   "services/notify/sms.py",
+   "notify",
+   8,
+   9,
+   280,
+   200,
+   2
+  ],
+  [
+   "apps/portal/slots.js",
+   "portal",
+   12,
+   15,
+   520,
+   430,
+   2
+  ],
+  [
+   "services/login/session.py",
+   "login",
+   16,
+   19,
+   520,
+   610,
+   2
+  ],
+  [
+   "infra/db/pool.py",
+   "db",
+   6,
+   6,
+   160,
+   120,
+   2
+  ]
+ ],
+ "satd": [
+  [
+   "services/slots/release.py",
+   22,
+   "HACK",
+   "all slots released at 17:00:00 for every office"
+  ],
+  [
+   "services/booking/allocate.py",
+   87,
+   "FIXME",
+   "no unique constraint; double bookings possible"
+  ],
+  [
+   "services/ekyc/client.py",
+   31,
+   "TODO",
+   "no fallback when the e-KYC gateway is down"
+  ],
+  [
+   "services/documents/upload.py",
+   58,
+   "TODO",
+   "uploads go through the app server; no resume"
+  ],
+  [
+   "services/reports/mis.py",
+   12,
+   "OPTIMIZE",
+   "MIS report scans the bookings table on the primary"
+  ],
+  [
+   "apps/portal/slots.js",
+   140,
+   "TODO",
+   "no CAPTCHA before showing slots"
+  ],
+  [
+   "services/slots/calendar.py",
+   210,
+   "OPTIMIZE",
+   "availability computed per request"
+  ]
+ ],
+ "incidents": [
+  {
+   "key": "INC-1401",
+   "title": "Slot page hung at 17:00",
+   "desc": "When new slots opened, the slot page timed out for 20 minutes and slots were gone when it came back.",
+   "module": "slots",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 178,
+   "fixed": 177.9,
+   "effort": 10,
+   "by": "deepak",
+   "group": "G-SLOTS",
+   "whys": [
+    "The slot page hung at 17:00",
+    "Every request computed availability for every office",
+    "Slot availability is computed on every request"
+   ],
+   "fix": "Asked citizens to try later.",
+   "lesson": "17:00 is a read storm on one page."
+  },
+  {
+   "key": "INC-1402",
+   "title": "Agents' scripts took most slots in two minutes",
+   "desc": "Touts' scripts booked 70% of new passport slots before citizens saw them.",
+   "module": "booking",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 170,
+   "fixed": 169.9,
+   "effort": 9,
+   "by": "faizan",
+   "group": "G-TOUTS",
+   "whys": [
+    "Slots vanished in two minutes",
+    "Scripts booked slots faster than people",
+    "The portal has no CAPTCHA, per-Aadhaar limits or randomised slot release"
+   ],
+   "fix": "Cancelled suspicious bookings."
+  },
+  {
+   "key": "INC-1403",
+   "title": "e-KYC gateway down: no one could log in",
+   "desc": "The state e-KYC gateway was down for 90 minutes; every login failed.",
+   "module": "ekyc",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 162,
+   "fixed": 161.9,
+   "effort": 8,
+   "by": "shalini",
+   "group": "G-EKYC",
+   "whys": [
+    "Logins failed",
+    "Every login waited on the e-KYC gateway",
+    "Login depends on live e-KYC with no fallback"
+   ],
+   "fix": "Waited for the gateway.",
+   "lesson": "A citizen should not depend on a gateway to log in."
+  },
+  {
+   "key": "INC-1404",
+   "title": "Document uploads failed in the evening",
+   "desc": "Uploads of PDFs over 1 MB timed out for an hour and were retried again and again.",
+   "module": "documents",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 154,
+   "fixed": 153.9,
+   "effort": 6,
+   "by": "shalini",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Uploads failed",
+    "Large uploads went through the app servers and timed out",
+    "Uploads pass through the app server with no resumable upload"
+   ],
+   "fix": "Raised the timeout."
+  },
+  {
+   "key": "INC-1405",
+   "title": "MIS report slowed the portal before 17:00",
+   "desc": "The district MIS report ran at 16:30 and the portal crawled at the slot release.",
+   "module": "reports",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 146,
+   "fixed": 145.9,
+   "effort": 6,
+   "by": "faizan",
+   "group": "G-MIS",
+   "whys": [
+    "The portal crawled",
+    "The MIS report scanned bookings on the primary",
+    "MIS reports run on the primary database"
+   ],
+   "fix": "Moved the report to the night."
+  },
+  {
+   "key": "INC-1406",
+   "title": "Double-booked slots after a release",
+   "desc": "A release of the slot calendar allowed two citizens to book the same slot.",
+   "module": "booking",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 138,
+   "fixed": 137.9,
+   "effort": 8,
+   "by": "faizan",
+   "group": "G-DOUBLE",
+   "whys": [
+    "Two citizens had the same slot",
+    "The new allocation code raced",
+    "Slot allocation has no unique constraint or idempotent check"
+   ],
+   "fix": "Cancelled duplicates by hand."
+  },
+  {
+   "key": "INC-1407",
+   "title": "SMS confirmations delayed by 2 hours",
+   "desc": "Confirmation SMS went out in a burst and the provider throttled them.",
+   "module": "notify",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 130,
+   "fixed": 129.9,
+   "effort": 4,
+   "by": "deepak",
+   "group": "G-SMS",
+   "whys": [
+    "Confirmations were late",
+    "Every confirmation went out at once",
+    "SMS is sent in bursts with no queue"
+   ]
+  },
+  {
+   "key": "INC-1408",
+   "title": "Slot page timed out again at 17:00",
+   "desc": "Twenty minutes of errors when slots opened.",
+   "module": "slots",
+   "sev": "CRITICAL",
+   "status": "RESOLVED",
+   "ago": 118,
+   "fixed": 117.9,
+   "effort": 8,
+   "by": "deepak",
+   "group": "G-SLOTS",
+   "whys": [
+    "The slot page hung",
+    "Availability computed per request",
+    "Slot availability is computed on every request"
+   ]
+  },
+  {
+   "key": "INC-1409",
+   "title": "Scripts booked the driving-licence slots",
+   "desc": "Most new DL test slots went to scripts within 3 minutes.",
+   "module": "booking",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 110,
+   "fixed": 109.9,
+   "effort": 7,
+   "by": "faizan",
+   "group": "G-TOUTS",
+   "whys": [
+    "Slots vanished",
+    "Scripts booked them",
+    "The portal has no CAPTCHA, per-Aadhaar limits or randomised slot release"
+   ]
+  },
+  {
+   "key": "INC-1410",
+   "title": "e-KYC slow: logins took 2 minutes",
+   "desc": "The e-KYC gateway answered slowly for an hour.",
+   "module": "ekyc",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 100,
+   "fixed": 99.9,
+   "effort": 6,
+   "by": "shalini",
+   "group": "G-EKYC",
+   "whys": [
+    "Logins were slow",
+    "Every login waited on e-KYC",
+    "Login depends on live e-KYC with no fallback"
+   ]
+  },
+  {
+   "key": "INC-1411",
+   "title": "Upload retries flooded the documents service",
+   "desc": "Retried uploads tripled the load on documents.",
+   "module": "documents",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 92,
+   "fixed": 91.9,
+   "effort": 6,
+   "by": "shalini",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Documents was overloaded",
+    "Failed uploads were retried from the start",
+    "Uploads pass through the app server with no resumable upload"
+   ]
+  },
+  {
+   "key": "INC-1412",
+   "title": "MIS report ran into the slot release",
+   "desc": "A re-run of the MIS report collided with 17:00.",
+   "module": "reports",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 84,
+   "fixed": 83.9,
+   "effort": 5,
+   "by": "faizan",
+   "group": "G-MIS",
+   "whys": [
+    "The portal crawled",
+    "The report ran on the primary",
+    "MIS reports run on the primary database"
+   ]
+  },
+  {
+   "key": "INC-1413",
+   "title": "Data centre lost one zone for 40 minutes",
+   "desc": "A power fault in one zone halved the portal's servers during the evening.",
+   "module": "portal",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 76,
+   "fixed": 75.9,
+   "effort": 8,
+   "by": "venkatesh",
+   "group": "G-ZONE",
+   "whys": [
+    "Half the servers went down",
+    "The portal runs in one zone at a time",
+    "The portal is not deployed across both data-centre zones"
+   ],
+   "fix": "Moved traffic by hand."
+  },
+  {
+   "key": "INC-1414",
+   "title": "Double bookings again",
+   "desc": "Two citizens got the same passport slot.",
+   "module": "booking",
+   "sev": "HIGH",
+   "status": "RESOLVED",
+   "ago": 66,
+   "fixed": 65.9,
+   "effort": 5,
+   "by": "faizan",
+   "group": "G-DOUBLE",
+   "whys": [
+    "Two citizens had one slot",
+    "Allocation raced",
+    "Slot allocation has no unique constraint or idempotent check"
+   ]
+  },
+  {
+   "key": "INC-1415",
+   "title": "Fee payment pending for an hour",
+   "desc": "The treasury gateway confirmed payments late.",
+   "module": "payments",
+   "sev": "MEDIUM",
+   "status": "RESOLVED",
+   "ago": 58,
+   "fixed": 57.9,
+   "effort": 4,
+   "by": "faizan",
+   "group": "G-PAY",
+   "whys": [
+    "Payments stayed pending",
+    "Confirmations arrived late",
+    "Payment status is only updated by the gateway's callback"
+   ]
+  },
+  {
+   "key": "INC-1416",
+   "title": "Slot page hung at the 17:00 release",
+   "desc": "Errors for 15 minutes.",
+   "module": "slots",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 12,
+   "effort": 6,
+   "by": "deepak",
+   "group": "G-SLOTS",
+   "whys": [
+    "The slot page hung",
+    "Availability computed per request",
+    "Slot availability is computed on every request"
+   ]
+  },
+  {
+   "key": "INC-1417",
+   "title": "Touts' scripts again took the slots",
+   "desc": "Passport slots in two districts went to scripts.",
+   "module": "booking",
+   "sev": "HIGH",
+   "status": "INVESTIGATING",
+   "ago": 9,
+   "effort": 5,
+   "by": "faizan",
+   "group": "G-TOUTS",
+   "whys": [
+    "Slots vanished",
+    "Scripts booked them",
+    "The portal has no CAPTCHA, per-Aadhaar limits or randomised slot release"
+   ]
+  },
+  {
+   "key": "INC-1418",
+   "title": "e-KYC down for 40 minutes",
+   "desc": "Logins failed during the outage.",
+   "module": "ekyc",
+   "sev": "CRITICAL",
+   "status": "OPEN",
+   "ago": 7,
+   "effort": 4,
+   "by": "shalini",
+   "group": "G-EKYC",
+   "whys": [
+    "Logins failed",
+    "Login waited on e-KYC",
+    "Login depends on live e-KYC with no fallback"
+   ]
+  },
+  {
+   "key": "INC-1419",
+   "title": "Uploads timing out",
+   "desc": "Large uploads time out in the evening.",
+   "module": "documents",
+   "sev": "HIGH",
+   "status": "OPEN",
+   "ago": 5,
+   "effort": 3,
+   "by": "shalini",
+   "group": "G-UPLOAD",
+   "whys": [
+    "Uploads failed",
+    "They pass through the app servers",
+    "Uploads pass through the app server with no resumable upload"
+   ]
+  },
+  {
+   "key": "INC-1420",
+   "title": "Portal slow while the MIS report ran",
+   "desc": "The weekly report slowed the evening.",
+   "module": "reports",
+   "sev": "MEDIUM",
+   "status": "OPEN",
+   "ago": 3,
+   "effort": 2,
+   "by": "faizan",
+   "group": "G-MIS",
+   "whys": [
+    "The portal was slow",
+    "The report ran on the primary",
+    "MIS reports run on the primary database"
+   ]
+  }
+ ],
+ "debts": [
+  {
+   "key": "DEBT-1401",
+   "title": "Precompute availability per office and serve it cached",
+   "desc": "Compute each office's availability when it changes and serve the page from the cache.",
+   "module": "slots",
+   "cat": "ARCHITECTURAL",
+   "principal": 12,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "faizan",
+   "incidents": [
+    "INC-1401",
+    "INC-1408",
+    "INC-1416"
+   ],
+   "cause": "Slot availability is computed on every request",
+   "ago": 176,
+   "file": "services/slots/calendar.py"
+  },
+  {
+   "key": "DEBT-1402",
+   "title": "Rate limits, CAPTCHA and per-Aadhaar caps on booking",
+   "desc": "Show availability only after a CAPTCHA, rate-limit each device, allow two bookings per Aadhaar a month and release new appointments at random minutes after 17:00.",
+   "module": "booking",
+   "cat": "SECURITY_DEBT",
+   "principal": 8,
+   "status": "IDENTIFIED",
+   "priority": "CRITICAL",
+   "owner": "faizan",
+   "incidents": [
+    "INC-1402",
+    "INC-1409",
+    "INC-1417"
+   ],
+   "cause": "The portal has no CAPTCHA, per-Aadhaar limits or randomised slot release",
+   "ago": 168,
+   "file": "apps/portal/slots.js"
+  },
+  {
+   "key": "DEBT-1403",
+   "title": "Fallback to mobile OTP login when e-KYC is down",
+   "desc": "Degrade gracefully: let citizens log in with a mobile OTP and complete Aadhaar e-KYC later when the gateway is down.",
+   "module": "ekyc",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "shalini",
+   "incidents": [
+    "INC-1403",
+    "INC-1410",
+    "INC-1418"
+   ],
+   "cause": "Login depends on live e-KYC with no fallback",
+   "ago": 160,
+   "file": "services/ekyc/client.py"
+  },
+  {
+   "key": "DEBT-1404",
+   "title": "Resumable uploads with retry limits and backoff",
+   "desc": "Upload documents in chunks straight to object storage and retry only the failed chunk, with backoff and a retry limit, instead of starting again.",
+   "module": "documents",
+   "cat": "ARCHITECTURAL",
+   "principal": 10,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "shalini",
+   "incidents": [
+    "INC-1404",
+    "INC-1411",
+    "INC-1419"
+   ],
+   "cause": "Uploads pass through the app server with no resumable upload",
+   "ago": 152,
+   "file": "services/documents/upload.py"
+  },
+  {
+   "key": "DEBT-1405",
+   "title": "Run MIS reports from a read replica",
+   "desc": "Move district MIS reports to a read replica and schedule them away from 17:00.",
+   "module": "reports",
+   "cat": "INFRASTRUCTURE",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "faizan",
+   "incidents": [
+    "INC-1405",
+    "INC-1412",
+    "INC-1420"
+   ],
+   "cause": "MIS reports run on the primary database",
+   "ago": 144,
+   "file": "services/reports/mis.py"
+  },
+  {
+   "key": "DEBT-1406",
+   "title": "Unique constraint and idempotent slot allocation",
+   "desc": "Add a unique constraint per slot and an idempotency key per booking request.",
+   "module": "booking",
+   "cat": "CODE_SMELL",
+   "principal": 6,
+   "status": "PRIORITIZED",
+   "priority": "HIGH",
+   "owner": "faizan",
+   "incidents": [
+    "INC-1406",
+    "INC-1414"
+   ],
+   "cause": "Slot allocation has no unique constraint or idempotent check",
+   "ago": 136,
+   "file": "services/booking/allocate.py"
+  },
+  {
+   "key": "DEBT-1407",
+   "title": "Queue SMS confirmations with retries",
+   "desc": "Send confirmations from a queue at the provider's rate, with retries.",
+   "module": "notify",
+   "cat": "INFRASTRUCTURE",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "shalini",
+   "incidents": [
+    "INC-1407"
+   ],
+   "cause": "SMS is sent in bursts with no queue",
+   "ago": 128,
+   "file": "services/notify/sms.py"
+  },
+  {
+   "key": "DEBT-1408",
+   "title": "Run in both data-centre zones with automatic failover",
+   "desc": "Run every service in both zones behind one load balancer and fail over automatically, so losing a zone halves capacity instead of stopping the portal.",
+   "module": "portal",
+   "cat": "ARCHITECTURAL",
+   "principal": 20,
+   "status": "IDENTIFIED",
+   "priority": "HIGH",
+   "owner": "venkatesh",
+   "incidents": [
+    "INC-1413"
+   ],
+   "cause": "The portal is not deployed across both data-centre zones",
+   "ago": 74
+  },
+  {
+   "key": "DEBT-1409",
+   "title": "Reconcile pending payments with the treasury gateway",
+   "desc": "A reconciliation job checks pending payments every two minutes instead of waiting for the callback.",
+   "module": "payments",
+   "cat": "ARCHITECTURAL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "faizan",
+   "incidents": [
+    "INC-1415"
+   ],
+   "cause": "Payment status is only updated by the gateway's callback",
+   "ago": 56
+  },
+  {
+   "key": "DEBT-1410",
+   "title": "Separate connection pools for citizens and back-office jobs",
+   "desc": "Give citizen-facing services their own database pool.",
+   "module": "db",
+   "cat": "INFRASTRUCTURE",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "venkatesh",
+   "incidents": [
+    "INC-1405"
+   ],
+   "ago": 90,
+   "file": "infra/db/pool.py"
+  },
+  {
+   "key": "DEBT-1411",
+   "title": "Load test the 17:00 release at 25x",
+   "desc": "Rehearse a slot release at 25 times normal traffic every month.",
+   "module": "slots",
+   "cat": "TEST_DEBT",
+   "principal": 6,
+   "status": "IDENTIFIED",
+   "priority": "MEDIUM",
+   "owner": "deepak",
+   "incidents": [
+    "INC-1408"
+   ],
+   "ago": 112
+  },
+  {
+   "key": "DEBT-1412",
+   "title": "Pre-render the portal's static pages and serve them cached from a CDN",
+   "desc": "Cache the portal's pages and scripts on a CDN.",
+   "module": "portal",
+   "cat": "ARCHITECTURAL",
+   "principal": 4,
+   "status": "IDENTIFIED",
+   "priority": "LOW",
+   "owner": "faizan",
+   "incidents": [],
+   "ago": 40
+  },
+  {
+   "key": "DEBT-1413",
+   "title": "Use IST for every release time",
+   "desc": "Store and compare release times in IST (Asia/Kolkata).",
+   "module": "slots",
+   "cat": "CODE_SMELL",
+   "principal": 2,
+   "status": "REMEDIATED",
+   "priority": "LOW",
+   "owner": "faizan",
+   "incidents": [],
+   "ago": 22
+  }
+ ],
+ "spike": {
+  "key": "slot-release",
+  "name": "New slots open at 17:00",
+  "kind": "traffic",
+  "description": "Slots for the next fortnight open at 17:00: twenty-five times a normal peak on the slot page and booking in the first hour, with a smaller rush at 09:00.",
+  "profile": [
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.4,
+   0.8,
+   1.4,
+   3.0,
+   1.6,
+   1.4,
+   1.3,
+   1.2,
+   1.2,
+   1.4,
+   3.0,
+   25.0,
+   8.0,
+   2.5,
+   1.5,
+   0.9,
+   0.5,
+   0.2
+  ],
+  "entry": {
+   "portal": 1.0,
+   "slots": 1.0,
+   "booking": 1.0,
+   "login": 0.9,
+   "documents": 0.4,
+   "payments": 0.4,
+   "notify": 0.5
+  },
+  "baseline": {
+   "portal": 0.0328,
+   "login": 0.028,
+   "ekyc": 0.0328,
+   "slots": 0.0328,
+   "booking": 0.0328,
+   "documents": 0.0328,
+   "payments": 0.0328,
+   "notify": 0.0328,
+   "reports": 0.82,
+   "db": 0.0328
+  }
+ },
+ "journey": {
+  "app": "SlotSetu",
+  "who": "Mr Prakash, booking a passport appointment at 17:00",
+  "peak_rpm": 30000,
+  "color": "#0e7490",
+  "steps": [
+   {
+    "module": "login",
+    "label": "Log in with Aadhaar OTP",
+    "ok": "Logged in",
+    "fail": "Login failed. Please try again.",
+    "slow": "Verifying…"
+   },
+   {
+    "module": "slots",
+    "label": "Find a slot at the Pune office",
+    "ok": "Slot 12 Dec, 10:30 available",
+    "fail": "Slots could not be loaded.",
+    "slow": "Loading slots…"
+   },
+   {
+    "module": "documents",
+    "label": "Upload proof of address",
+    "ok": "Document uploaded",
+    "fail": "Upload failed. Please try again.",
+    "slow": "Uploading…"
+   },
+   {
+    "module": "payments",
+    "label": "Pay the ₹1,500 fee",
+    "ok": "Fee paid",
+    "fail": "Payment pending. Do not pay again.",
+    "slow": "Waiting for the treasury…"
+   },
+   {
+    "module": "booking",
+    "label": "Confirm the appointment",
+    "ok": "Appointment confirmed: ARN 24PUN81273",
+    "fail": "Booking failed. The slot is no longer available.",
+    "slow": "Confirming…"
+   }
+  ]
+ },
+ "tour": {
+  "incident": "INC-1417",
+  "debt": "DEBT-1402",
+  "module": "booking",
+  "budget": 40,
+  "cascade_module": "db",
+  "headline": "Agents' scripts take most new slots within minutes because nothing stops them; a CAPTCHA, per-Aadhaar limits and randomised release cost 8 hours."
+ },
+ "events": [
+  {
+   "key": "tout-scripts",
+   "name": "Agents' slot-grabbing scripts",
+   "kind": "bots",
+   "description": "At 17:00 agents' scripts refresh the slot page hundreds of times a second and book slots for their clients, on top of the citizens' own rush.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    12.5,
+    25.0,
+    12.5,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "portal": 1.0,
+    "slots": 1.0,
+    "booking": 1.0,
+    "login": 0.6
+   },
+   "effects": [],
+   "bots": {
+    "share": 0.75,
+    "blocked": 0.9,
+    "mitigated_by": [
+     "DEBT-1402"
+    ]
+   }
+  },
+  {
+   "key": "ekyc-outage",
+   "name": "Aadhaar e-KYC gateway outage",
+   "kind": "outage",
+   "description": "A weekday morning. At 10:15 the state e-KYC gateway goes down for two hours, and every login waits on it.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "ekyc",
+     "start": 10,
+     "hours": 2,
+     "minute": 15,
+     "chance": 1.0,
+     "mitigated_by": [
+      "DEBT-1403"
+     ],
+     "mitigation": 0.85,
+     "label": "The e-KYC gateway stops answering",
+     "prevented": "Citizens logged in with a mobile OTP; e-KYC will be completed later",
+     "recovered": "The e-KYC gateway is answering again"
+    }
+   ]
+  },
+  {
+   "key": "mis-overrun",
+   "name": "MIS report runs into the slot release",
+   "kind": "database",
+   "description": "The weekly district MIS report starts late, at 16:30, and is still scanning bookings on the primary database when slots open at 17:00.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    6.0,
+    12.0,
+    6.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "db",
+     "start": 16,
+     "hours": 2,
+     "minute": 30,
+     "factor": 0.2,
+     "mitigated_by": [
+      "DEBT-1405"
+     ],
+     "mitigation": 0.6,
+     "label": "The MIS report scans the bookings table on the primary database",
+     "recovered": "The MIS report finishes"
+    }
+   ]
+  },
+  {
+   "key": "upload-retries",
+   "name": "Last day for documents: uploads retried",
+   "kind": "retry",
+   "description": "The last evening to upload documents for this month's appointments, ten times a normal peak from 18:00. Large uploads time out and every citizen retries from the start, tripling the load on documents.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    0.9,
+    5.0,
+    10.0,
+    10.0,
+    10.0,
+    5.0,
+    0.5,
+    0.35
+   ],
+   "entry": {
+    "portal": 1.0,
+    "documents": 1.0,
+    "login": 0.7,
+    "booking": 0.5,
+    "payments": 0.4
+   },
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "documents",
+     "start": 18,
+     "hours": 3,
+     "minute": 0,
+     "factor": 0.25,
+     "mitigated_by": [
+      "DEBT-1404"
+     ],
+     "mitigation": 0.6,
+     "label": "Failed uploads are retried from the start",
+     "recovered": "The evening's uploads are done"
+    }
+   ]
+  },
+  {
+   "key": "zone-power",
+   "name": "A data-centre zone loses power",
+   "kind": "zone",
+   "description": "At 17:10, in the middle of the slot release, one of the state data centre's two zones loses power for an hour.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.0,
+    1.0,
+    0.95,
+    0.9,
+    0.85,
+    0.85,
+    6.0,
+    12.0,
+    6.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "capacity",
+     "module": "*",
+     "start": 17,
+     "hours": 1,
+     "minute": 10,
+     "factor": 0.5,
+     "mitigated_by": [
+      "DEBT-1408"
+     ],
+     "mitigation": 0.6,
+     "label": "One zone loses power; the portal loses half its servers",
+     "recovered": "Power is back in the zone"
+    }
+   ]
+  },
+  {
+   "key": "allocation-release",
+   "name": "Release double-books slots",
+   "kind": "deploy",
+   "description": "A slot-calendar release goes out at 12:00. Allocation races and books two citizens into the same slot, so booking is paused for two hours.",
+   "profile": [
+    0.25,
+    0.2,
+    0.15,
+    0.15,
+    0.2,
+    0.3,
+    0.45,
+    0.65,
+    0.85,
+    0.95,
+    1.5,
+    3.0,
+    3.0,
+    3.0,
+    1.5,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.7,
+    0.5,
+    0.35
+   ],
+   "effects": [
+    {
+     "type": "down",
+     "module": "booking",
+     "start": 12,
+     "hours": 2,
+     "minute": 0,
+     "chance": 1.0,
+     "kind": "deploy",
+     "mitigated_by": [
+      "DEBT-1406"
+     ],
+     "mitigation": 0.85,
+     "label": "The new allocation code double-books slots; booking is paused",
+     "prevented": "The unique constraint rejected the second booking at once",
+     "recovered": "Booking reopens"
+    }
+   ]
+  }
+ ]
+}
