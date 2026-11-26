@@ -174,7 +174,7 @@ MiniLM on the live site:
 | `tickets` | ShowPass | Stadium tour on-sale at noon (30×) | 1.00 | 0.90 | 129 → 53.8 h | 75.3 h (70.8–79.7) | 51.3 h |
 | `exam` | ParikshaNet | Entrance exam day (30×) | 0.90 | 1.00 | 305.9 → 137 h | 168.9 h (161.8–176) | 137.2 h |
 | `airline` | UdanAir | Fare sale at noon (20×) | 1.00 | 1.00 | 130.8 → 50.9 h | 79.9 h (76.2–83.5) | 42.3 h |
-| `appointments` | SlotSetu | New slots open at 17:00 (25×) | 1.00 | 1.00 | 108.6 → 35.2 h | 73.4 h (69.8–77) | 42 h |
+| `appointments` | SlotSetu | New slots open at 17:00 (25×) | 1.00 | 1.00 | 103.9 → 29.9 h | 74 h (70.4–77.6) | 42.6 h |
 | `grocery` | TurantMart | Diwali evening (10×) | 1.00 | 1.00 | 131.7 → 63.1 h | 68.6 h (64.2–73) | 40.7 h |
 
 The four packs added in v3 (`exam`, `airline`, `appointments`, `grocery`) reuse more of the same wording within a
@@ -195,7 +195,7 @@ once fixed (same settings as above):
 | `tickets` | Scalper bots at the drop (50×) | DEBT-1106 | 163.7 → 55.6 h | 108.1 h (103.7–112.5) | 7.6 h |
 | `exam` | Result-scraping bots (25×) | DEBT-1209 | 36.6 → 8.2 h | 28.4 h (26.3–30.6) | 15 h |
 | `airline` | Seat-spinning bots (20×) | DEBT-1306 | 127.5 → 3.7 h | 123.9 h (120.8–126.9) | 118.6 h |
-| `appointments` | Agents' slot-grabbing scripts (25×) | DEBT-1402 | 108 → 7.8 h | 100.2 h (97–103.3) | 41.6 h |
+| `appointments` | Agents' slot-grabbing scripts (25×) | DEBT-1402 | 103.4 → 4.1 h | 99.3 h (96.1–102.5) | 42.3 h |
 | `grocery` | Scripts at a limited drop (15×) | DEBT-1505 | 150 → 6.1 h | 144 h (142.3–145.6) | 132.2 h |
 
 `test_bot_attacks_are_blocked_only_by_their_fix` checks that only the mitigating debt removes the bots' share of
@@ -215,21 +215,27 @@ The 15 systems have 88 situations of nine kinds. With 40 hours of fixes, on an a
 | Rush | 17 | 41% to 89% less | 58% |
 | Bots | 11 | 42% to 97% less | 78% |
 | Outage | 18 | 17% to 87% less | 73% |
-| Bad release | 12 | 65% to 87% less | 74% |
-| Database | 15 | 71% to 95% less | 89% |
+| Bad release | 12 | 65% to 87% less | 75% |
+| Database | 15 | 71% to 95% less | 90% |
 | Cache | 4 | 85% to 89% less | 86% |
 | Memory leak | 1 | 85% to 85% less | 85% |
-| Zone lost | 2 | 70% to 89% less | 79% |
-| Retry storm | 8 | 80% to 94% less | 88% |
+| Zone lost | 2 | 70% to 95% less | 82% |
+| Retry storm | 8 | 80% to 94% less | 90% |
 | **All** | **88** | **17% to 97% less** | **78%** |
 
 The smallest cut is ShowPass's payment-gateway outage (32.2 → 26.6 h), which nothing in its debt list guards against on
 purpose: its report says so and recommends adding a fix. No situation reaches zero after the fixes; the lowest
 average is 3 h.
 
+Checking every module of every situation found one data error, now fixed: SlotSetu's MIS reports module had a
+`baseline` of 0.82 instead of 0.082, so it ran at 91% of its capacity all day, went down on about three days in four
+and stayed down, and pulled DEBT-1405 into four plans where it did not belong. Now it fails only when the database
+under it fails or by a rare random fault, and SlotSetu's numbers above are from the fixed pack. The first test below
+now checks every module of every system for this.
+
 | Check | Test |
 |---|---|
-| Every system has its busiest day and at least three other kinds of trouble; each situation is better after the fixes but never a perfect zero; hours by kind add up; the plan contains a fix that guards against the situation whenever the debt list has one | `test_every_system_has_varied_situations_that_the_right_fix_softens` |
+| Every system has its busiest day and at least three other kinds of trouble; each situation is better after the fixes but never a perfect zero; hours by kind add up; no module sits near its limit around the clock; the plan contains a fix that guards against the situation whenever the debt list has one | `test_every_system_has_varied_situations_that_the_right_fix_softens` |
 | A "down" effect forces its failures; a guarding fix makes it happen on about one day in five; a capacity effect lowers what the module can carry, a ramp gets worse hour by hour, and a fix removes part of the loss, not all of it; an effect on `*` reaches every module | `test_situation_effects_force_failures_and_the_guarding_fix_softens_them` |
 | Random faults follow each module's own incident history, a module with no history still has a small chance, and faults rise under load | `test_background_faults_follow_each_modules_history_and_rise_under_load` |
 | The report keeps the average and the watched day apart and labels them; its timeline holds every incident of the watched day in order, with recovery times and the situation's own moments; hours by kind add up; it names which guarding fix is in the plan and which others would also help | `test_run_report_says_what_happened_why_and_what_to_do_next` |

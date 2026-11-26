@@ -167,6 +167,7 @@ Likely questions:
 - *Why not just use the sprint plan?* The sprint plan ranks debt by its monthly interest. A situation stresses different things: on PayCore's acquiring bank outage the plan for the day saves 28.5 h, the regular plan only 3 h.
 - *Why logistic and not a hard limit?* Real systems degrade before 100% and some survive a little above it. A hard cliff would make the result jump on tiny changes.
 - *Where do capacity and fragility numbers come from?* From the playbook that matches the debt (e.g. a shared connection pool: 30% capacity lost). They are assumptions, shown on each playbook and editable per project.
+- *Did checking ever find a mistake?* Yes. A scan of every module in all 88 situations found SlotSetu's MIS reports module at 91% load all day: a `baseline` of 0.82 typed for 0.082. It went down on most simulated days and pulled an unrelated fix into four plans. We fixed the pack, and a test now checks that no module of any system sits near its limit around the clock.
 - *Is it validated?* It is a model, not a measurement. The tests check its logic: more traffic never loses fewer hours, effects force their failures and a guarding fix softens them but never removes them, random faults follow each module's history, the plan fits the hours and its prerequisites, and the report's numbers add up to the simulation's.
 
 ## Sushma Hiremath — M2 incidents, M3 5 Whys and causal graph, M6 intelligence

@@ -618,11 +618,13 @@ def test_every_system_has_varied_situations_that_the_right_fix_softens(code):
     evs = scenarios.events(code)
     assert len(evs) >= 4 and len({SPIKE.kind_of(e) for e in evs[1:]}) >= 3  # the busy day and three kinds of trouble
     open_keys = {d["key"] for d in snap["debts"] if economics.is_open(d)}
-    for e in evs[1:]:
+    for e in evs:
         r = engine.spike(snap, e["key"], 40, runs=80, seed=17)
         b, a = r["before"], r["after"]
         assert 0 < a["hours_lost"] < b["hours_lost"], e["key"]  # better after the fixes, but never a perfect zero
         assert sum(v["hours"] for v in b["by_kind"].values()) == pytest.approx(b["hours_lost"], abs=0.6)
+        for m in r["modules"]:  # no module sits near its limit around the clock (a stray 0.82 once did that to SlotSetu)
+            assert sum(u >= 0.85 for u in m["utilisation_before"]) < 12, (e["key"], m["module"])
         guards = {k for x in r["effects"] for k in x["mitigated_by"]} | set((r["bots"] or {}).get("mitigated_by") or [])
         assert guards <= open_keys, e["key"]
         if guards:  # the situation-aware plan finds a fix that softens this very situation

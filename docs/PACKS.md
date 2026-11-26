@@ -25,7 +25,7 @@ seed 17): the average day today → after the fixes. The website and the termina
 | `tickets` | ShowPass, event ticketing | Stadium tour on-sale at noon, 30× at 12:00 | 129 → 53.8 h (30.7% → 12.6%) | 75.3 h vs 51.3 h |
 | `exam` | ParikshaNet, online examinations | Entrance exam day, 30× at 09:00 | 305.9 → 137 h (25.4% → 12.4%) | 168.9 h vs 137.2 h |
 | `airline` | UdanAir, airline booking & check-in | Fare sale at noon, 20× at 12:00 | 130.8 → 50.9 h (26% → 9.4%) | 79.9 h vs 42.3 h |
-| `appointments` | SlotSetu, government appointments | New slots open at 17:00, 25× at 17:00 | 108.6 → 35.2 h (29.7% → 8%) | 73.4 h vs 42 h |
+| `appointments` | SlotSetu, government appointments | New slots open at 17:00, 25× at 17:00 | 103.9 → 29.9 h (29.7% → 8%) | 74 h vs 42.6 h |
 | `grocery` | TurantMart, quick commerce | Diwali evening, 10× at 19:00 | 131.7 → 63.1 h (22.7% → 7.2%) | 68.6 h vs 40.7 h |
 
 In every pack the plan for the day beats the regular sprint plan on that day. The regular plan ranks debt by
@@ -50,7 +50,7 @@ door a little, so a bot day is never perfectly clean.
 | `tickets` | Scalper bots at the drop, 50× at 12:00 | 60% · 90% | 163.7 → 55.6 h (49.7% → 11.4%) | DEBT-1106 (10 h) |
 | `exam` | Result-scraping bots, 25× at 18:00 | 80% · 90% | 36.6 → 8.2 h (62.1% → 7.6%) | DEBT-1209 (5 h) |
 | `airline` | Seat-spinning bots, 20× at 12:00 | 70% · 90% | 127.5 → 3.7 h (37.1% → 0.1%) | DEBT-1306 (6 h) |
-| `appointments` | Agents' slot-grabbing scripts, 25× at 17:00 | 75% · 90% | 108 → 7.8 h (32.3% → 0.3%) | DEBT-1402 (8 h) |
+| `appointments` | Agents' slot-grabbing scripts, 25× at 17:00 | 75% · 90% | 103.4 → 4.1 h (32.3% → 0.3%) | DEBT-1402 (8 h) |
 | `grocery` | Scripts at a limited drop, 15× at 18:00 | 80% · 90% | 150 → 6.1 h (45.5% → 0.6%) | DEBT-1505 (6 h) |
 
 Each pack's other situations (an outage, a bad release, a database or cache problem, a memory leak, a lost zone or
@@ -179,4 +179,6 @@ be one of the 25 playbook keys: `pool-isolation`, `timeouts`, `circuit-breaker`,
 * **Give each situation one clear guard** in `mitigated_by`, so the report can say what fixes it. A situation with
   no guard is fine too: its report says that nothing in the debt list guards against it and recommends adding one.
 * **Tune the busiest day.** For a module with debt that limits capacity, a good `baseline` is about
-  0.82 ÷ (1 + (peak − 1) × exposure). Then the module overloads today but holds after its fix.
+  0.82 ÷ (1 + (peak − 1) × exposure). Then the module overloads today but holds after its fix. This is only for
+  modules the day's traffic reaches: a module it does not reach (exposure 0, such as a nightly report) carries its
+  `baseline` all day, so keep that below about 0.3, or the module sits near its limit around the clock.

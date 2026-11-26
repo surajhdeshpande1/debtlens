@@ -462,11 +462,11 @@ The point to make: for “New Year's Eve”, the plan for the day saves 57.2 h a
     - 23:05 notify overloaded: 109% of its capacity. About 7.5 engineer-hours to handle.
     - 23:06 trips failing: it depends on notify, which is down. Paging on-call. About 16.3 engineer-hours to handle.
     - 23:08 db overloaded: 117% of its capacity. About 20 engineer-hours to handle.
-    - Day over: 103.6 h lost, 6 incidents; the worst hour is 23:00, with 83% of requests failing.
+    - Day over: 103.6 h lost, 6 incidents; the worst hour is 23:00, with 83% of requests failing; db, driver, matching and more are still down at midnight.
 8. Press **▶ Same day, after the fixes**:
     - 23:09 driver overloaded: 102% of its capacity. Paging on-call. About 22.8 engineer-hours to handle.
     - 23:12 matching failing: it depends on driver, which is down. About 23 engineer-hours to handle.
-    - Day over: 45.8 h lost, 2 incidents; the worst hour is 23:00, with 28% of requests failing. Then **Side by side** (3).
+    - Day over: 45.8 h lost, 2 incidents; the worst hour is 23:00, with 28% of requests failing; driver and matching are still down at midnight. Then **Side by side** (3).
 9. Press **Read the report →**. Its first recommendation: To be ready for “New Year's Eve”, fix in this order: DEBT-910 (8 h), DEBT-906 (6 h), DEBT-901 (12 h), DEBT-911 (8 h), DEBT-909 (5 h).
 
 **The second situation: Fare-scraping bots** (Bots)
@@ -479,7 +479,7 @@ The point to make: for “New Year's Eve”, the plan for the day saves 57.2 h a
     - 21:26 matching crashed on its own (a random fault). About 23 engineer-hours to handle.
     - 22:09 pricing overloaded: 145% of its capacity. Paging on-call. About 18.7 engineer-hours to handle.
     - 23:01 maps overloaded: 140% of its capacity. Paging on-call. About 17.5 engineer-hours to handle.
-    - Day over: 113.9 h lost, 7 incidents; the worst hour is 23:00, with 100% of requests failing; everything is back by 11:09.
+    - Day over: 113.9 h lost, 7 incidents; the worst hour is 23:00, with 100% of requests failing; db, driver, maps and more are still down at midnight.
 13. Press **▶ Same day, after the fixes**:
     - 10:31 notify crashed on its own (a random fault). About 4.5 engineer-hours to handle.
     - 21:26 matching crashed on its own (a random fault). About 23 engineer-hours to handle.
@@ -510,12 +510,12 @@ The point to make: for “ITR deadline night (31 July)”, the plan for the day 
     - 22:01 db overloaded: 117% of its capacity. About 10 engineer-hours to handle.
     - 22:05 everify overloaded: 109% of its capacity. Paging on-call. About 18.7 engineer-hours to handle.
     - 22:08 notify went down at 96% load, too close to its limit. About 10 engineer-hours to handle.
-    - Day over: 141.4 h lost, 7 incidents; the worst hour is 23:00, with 87% of requests failing.
+    - Day over: 141.4 h lost, 7 incidents; the worst hour is 23:00, with 87% of requests failing; db, everify, forms and more are still down at midnight.
 8. Press **▶ Same day, after the fixes**:
     - 22:08 login went down at 96% load, too close to its limit. Paging on-call. About 17.5 engineer-hours to handle. The phone freezes: “TaxSetu isn't responding”.
     - 22:08 notify went down at 96% load, too close to its limit. About 10 engineer-hours to handle.
     - 23:02 forms overloaded: 101% of its capacity. Paging on-call. About 24.5 engineer-hours to handle.
-    - Day over: 52 h lost, 3 incidents; the worst hour is 23:00, with 44% of requests failing. Then **Side by side** (3).
+    - Day over: 52 h lost, 3 incidents; the worst hour is 23:00, with 44% of requests failing; forms, login and notify are still down at midnight. Then **Side by side** (3).
 9. Press **Read the report →**. Its first recommendation: To be ready for “ITR deadline night (31 July)”, fix in this order: DEBT-1009 (8 h), DEBT-1006 (12 h), DEBT-1001 (12 h), DEBT-1002 (6 h), DEBT-1008 (2 h).
 
 **The second situation: Credential stuffing on PAN login** (Bots)
@@ -528,7 +528,7 @@ The point to make: for “ITR deadline night (31 July)”, the plan for the day 
     - 20:06 db overloaded: 141% of its capacity. About 10 engineer-hours to handle.
     - 20:06 login overloaded: 154% of its capacity. Paging on-call. About 17.5 engineer-hours to handle. The phone freezes: “TaxSetu isn't responding”.
     - 20:08 payments crashed on its own (a random fault). About 8 engineer-hours to handle.
-    - Day over: 133.4 h lost, 10 incidents; the worst hour is 23:00, with 100% of requests failing; everything is back by 23:22.
+    - Day over: 133.4 h lost, 10 incidents; the worst hour is 23:00, with 100% of requests failing; db, everify, forms and more are still down at midnight.
 13. Press **▶ Same day, after the fixes**:
     - 20:08 payments crashed on its own (a random fault). About 8 engineer-hours to handle.
     - Day over: 8 h lost, 1 incident; everything is back by 21:20. Then **Side by side** (3).
@@ -686,7 +686,7 @@ The point to make: for “Fare sale at noon”, the plan for the day saves 79.9 
 
 ## SlotSetu (`appointments`): New slots open at 17:00 · A data-centre zone loses power
 
-The point to make: for “New slots open at 17:00”, the plan for the day saves 73.4 h a day where the regular sprint plan saves 42 h. “A data-centre zone loses power” (zone lost) costs 105.5 h on an average day today and 11.9 h after its fixes.
+The point to make: for “New slots open at 17:00”, the plan for the day saves 74 h a day where the regular sprint plan saves 42.6 h. “A data-centre zone loses power” (zone lost) costs 98.2 h on an average day today and 4.8 h after its fixes.
 
 **Open it**
 
@@ -698,40 +698,38 @@ The point to make: for “New slots open at 17:00”, the plan for the day saves
 **The busiest day: New slots open at 17:00** (Rush)
 
 5. **Simulate → Run a scenario** → **New slots open at 17:00** → **Run this day →**, with 40 hours and 300 days.
-6. Average day: 108.6 → 35.2 engineer-hours lost, 29.7% → 8% of requests failing. The plan (40 h): DEBT-1401 Precompute availability per office and serve it cached (12 h); DEBT-1412 Pre-render the portal's static pages and serve them cached from a CDN (4 h); DEBT-1410 Separate connection pools for citizens and back-office jobs (6 h); DEBT-1402 Rate limits, CAPTCHA and per-Aadhaar caps on booking (8 h); DEBT-1407 Queue SMS confirmations with retries (4 h); DEBT-1411 Load test the 17:00 release at 25x (6 h). It saves 73.4 h a day (95% CI 69.8–77), against 42 h for the regular sprint plan.
-7. The replay opens on day 47 of 300. It plays 00:00 to midnight, about 80 seconds at 1×. Press **▶ Start the day**, then F. The first alerts today:
-    - 04:02 reports went down at 91% load, too close to its limit. About 6.5 engineer-hours to handle.
+6. Average day: 103.9 → 29.9 engineer-hours lost, 29.7% → 8% of requests failing. The plan (40 h): DEBT-1401 Precompute availability per office and serve it cached (12 h); DEBT-1412 Pre-render the portal's static pages and serve them cached from a CDN (4 h); DEBT-1410 Separate connection pools for citizens and back-office jobs (6 h); DEBT-1402 Rate limits, CAPTCHA and per-Aadhaar caps on booking (8 h); DEBT-1407 Queue SMS confirmations with retries (4 h); DEBT-1411 Load test the 17:00 release at 25x (6 h). It saves 74 h a day (95% CI 70.4–77.6), against 42.6 h for the regular sprint plan.
+7. The replay opens on day 126 of 300. It plays 07:00 to 23:00, about 45 seconds at 1×. Press **▶ Start the day**, then F. The first alerts today:
     - 17:02 portal overloaded: 137% of its capacity. Paging on-call. About 28 engineer-hours to handle.
     - 17:04 db overloaded: 117% of its capacity. About 10 engineer-hours to handle.
+    - 17:05 reports failing: it depends on db, which is down. About 6.5 engineer-hours to handle.
     - 17:07 notify overloaded: 109% of its capacity. About 10 engineer-hours to handle.
-    - 17:08 booking overloaded: 101% of its capacity. Paging on-call. About 23.8 engineer-hours to handle.
-    - Day over: 106.3 h lost, 6 incidents; the worst hour is 17:00, with 67% of requests failing; everything is back by 18:23.
+    - 17:08 slots overloaded: 152% of its capacity. Paging on-call. About 28 engineer-hours to handle.
+    - Day over: 106.3 h lost, 6 incidents; the worst hour is 17:00, with 67% of requests failing; everything is back by 19:23.
 8. Press **▶ Same day, after the fixes**:
-    - 04:02 reports went down at 91% load, too close to its limit. About 6.5 engineer-hours to handle.
-    - 17:02 portal went down at 82% load, too close to its limit. Paging on-call. About 28 engineer-hours to handle.
-    - Day over: 34.5 h lost, 2 incidents; the worst hour is 17:00, with 19% of requests failing; everything is back by 18:10. Then **Side by side** (3).
+    - 18:24 slots crashed on its own (a random fault). Paging on-call. About 28 engineer-hours to handle.
+    - Day over: 28 h lost, 1 incident; the worst hour is 18:00, with 19% of requests failing; everything is back by 19:23. Then **Side by side** (3).
 9. Press **Read the report →**. Its first recommendation: To be ready for “New slots open at 17:00”, fix in this order: DEBT-1401 (12 h), DEBT-1412 (4 h), DEBT-1410 (6 h), DEBT-1402 (8 h), DEBT-1407 (4 h), DEBT-1411 (6 h).
 
 **The second situation: A data-centre zone loses power** (Zone lost)
 
 10. In the report, press **Try another situation** → **A data-centre zone loses power** → **Run this day →**.
-11. Average day: 105.5 → 11.9 engineer-hours lost, 20.3% → 0.3% of requests failing. The plan (36 of the 40 hours): DEBT-1408 Run in both data-centre zones with automatic failover (20 h); DEBT-1401 Precompute availability per office and serve it cached (12 h); DEBT-1412 Pre-render the portal's static pages and serve them cached from a CDN (4 h). It saves 93.6 h a day (95% CI 90.6–96.7), against 43 h for the regular sprint plan. What goes wrong at 17:10 (1 hour): One zone loses power; the portal loses half its servers. DEBT-1408 guards against it and is in the plan.
-12. The replay opens on day 210 of 300. It plays 00:00 to midnight, about 80 seconds at 1×. Press **▶ Start the day**, then F. The first alerts today:
+11. Average day: 98.2 → 4.8 engineer-hours lost, 20.3% → 0.3% of requests failing. The plan (36 of the 40 hours): DEBT-1408 Run in both data-centre zones with automatic failover (20 h); DEBT-1401 Precompute availability per office and serve it cached (12 h); DEBT-1412 Pre-render the portal's static pages and serve them cached from a CDN (4 h). It saves 93.4 h a day (95% CI 90.1–96.7), against 44.2 h for the regular sprint plan. What goes wrong at 17:10 (1 hour): One zone loses power; the portal loses half its servers. DEBT-1408 guards against it and is in the plan.
+12. The replay opens on day 183 of 300. It plays 14:00 to midnight, about 30 seconds at 1×. Press **▶ Start the day**, then F. The first alerts today:
     - 17:10 ⚠ One zone loses power; the portal loses half its servers. Every module is down to 50% of its capacity.
-    - 17:12 reports overloaded: 182% of its capacity. About 6.5 engineer-hours to handle.
     - 17:15 db overloaded: 112% of its capacity. About 10 engineer-hours to handle.
-    - 17:15 documents went down at 93% load, too close to its limit. About 12.5 engineer-hours to handle.
+    - 17:15 notify overloaded: 105% of its capacity. About 10 engineer-hours to handle.
+    - 17:16 documents failing: it depends on db, which is down. About 12.5 engineer-hours to handle.
     - 17:16 portal overloaded: 131% of its capacity. Paging on-call. About 28 engineer-hours to handle.
-    - Day over: 105.5 h lost, 7 incidents; the worst hour is 17:00, with 64% of requests failing; everything is back by 22:25.
+    - Day over: 101.5 h lost, 7 incidents; the worst hour is 17:00, with 56% of requests failing; the reports module is still down at midnight.
 13. Press **▶ Same day, after the fixes**:
     - 17:10 ⚠ One zone loses power; the portal loses half its servers. Every module is down to 80% of its capacity (softened by the fix).
-    - 17:12 reports overloaded: 114% of its capacity. About 6.5 engineer-hours to handle.
-    - 21:03 reports went down at 91% load, too close to its limit. About 6.5 engineer-hours to handle.
-    - Day over: 13 h lost, 2 incidents; everything is back by 22:25. Then **Side by side** (3).
+    - 23:21 reports crashed on its own (a random fault). About 6.5 engineer-hours to handle.
+    - Day over: 6.5 h lost, 1 incident; the reports module is still down at midnight. Then **Side by side** (3).
 
 **In the terminal**
 
-14. `python -m debtlens simulate spike -s appointments -e zone-power --live --side` plays the same day 210, then prints the same report.
+14. `python -m debtlens simulate spike -s appointments -e zone-power --live --side` plays the same day 183, then prints the same report.
 
 ## TurantMart (`grocery`): Diwali evening · Scripts at a limited drop
 
@@ -829,5 +827,5 @@ Engineer-hours lost: the average over 300 simulated days with 40 hours to fix be
 | ShowPass `tickets` | Stadium tour on-sale at noon | 129 → 53.8 | 75.3 vs 51.3 | #292: 138.8 → 51.8 | Scalper bots at the drop (`scalper-bots`) | 163.7 → 55.6 | 108.1 vs 7.6 | #141: 168.1 → 54.3 |
 | ParikshaNet `exam` | Entrance exam day | 305.9 → 137 | 168.9 vs 137.2 | #240: 301.4 → 139.9 | Database failover mid-exam (`db-failover`) | 58 → 3.7 | 54.4 vs 54.5 | #1: 58.3 → 0 |
 | UdanAir `airline` | Fare sale at noon | 130.8 → 50.9 | 79.9 vs 42.3 | #107: 125.8 → 50.3 | Seat-spinning bots (`seat-spinning`) | 127.5 → 3.7 | 123.9 vs 118.6 | #22: 126.7 → 0 |
-| SlotSetu `appointments` | New slots open at 17:00 | 108.6 → 35.2 | 73.4 vs 42 | #47: 106.3 → 34.5 | A data-centre zone loses power (`zone-power`) | 105.5 → 11.9 | 93.6 vs 43 | #210: 105.5 → 13 |
+| SlotSetu `appointments` | New slots open at 17:00 | 103.9 → 29.9 | 74 vs 42.6 | #126: 106.3 → 28 | A data-centre zone loses power (`zone-power`) | 98.2 → 4.8 | 93.4 vs 44.2 | #183: 101.5 → 6.5 |
 | TurantMart `grocery` | Diwali evening | 131.7 → 63.1 | 68.6 vs 40.7 | #10: 131.8 → 64.9 | Scripts at a limited drop (`drop-scripts`) | 150 → 6.1 | 144 vs 132.2 | #45: 152.3 → 10 |

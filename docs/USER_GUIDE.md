@@ -386,7 +386,7 @@ Limits: 400 KB, 40 modules, 300 dependencies, 300 files, 300 markers, 300 incide
 - A family member reported after an earlier one was resolved, in the same module, is flagged as a regression by itself.
 - The debt title picks its fix playbook (“connection pool”, “rate limit”, “timeout”, “circuit breaker”, “queue”, “cache”, “memory leak”, “regression tests”…), and the playbook decides how much the fix helps. After uploading, **Debt → Debt items → Fix playbooks** shows which playbook each item got.
 - Give each situation one clear guard in `mitigated_by`, so the report can say what fixes it. A situation with no guard is fine too: its report recommends adding one.
-- For a module that should overload on the busiest day but hold after its fix, a good `baseline` is about 0.82 ÷ (1 + (peak − 1) × exposure).
+- For a module that should overload on the busiest day but hold after its fix, a good `baseline` is about 0.82 ÷ (1 + (peak − 1) × exposure). Not for a module the day's traffic does not reach (exposure 0): it carries its `baseline` all day, so keep that below about 0.3.
 
 The full reference is `docs/PACKS.md` in the repository.
 
@@ -786,8 +786,8 @@ A good set is each system's busiest day plus its most striking situation, in **S
 | ParikshaNet (`exam`) | Database failover mid-exam (`db-failover`) | 58 → 3.7 h | 58.3 → 0 h | DEBT-1204 |
 | UdanAir (`airline`) | Fare sale at noon (`noon-sale`) | 130.8 → 50.9 h | 125.8 → 50.3 h | DEBT-1301, DEBT-1309, DEBT-1302… |
 | UdanAir (`airline`) | Seat-spinning bots (`seat-spinning`) | 127.5 → 3.7 h | 126.7 → 0 h | DEBT-1306, DEBT-1301, DEBT-1309… |
-| SlotSetu (`appointments`) | New slots open at 17:00 (`slot-release`) | 108.6 → 35.2 h | 106.3 → 34.5 h | DEBT-1401, DEBT-1412, DEBT-1410… |
-| SlotSetu (`appointments`) | A data-centre zone loses power (`zone-power`) | 105.5 → 11.9 h | 105.5 → 13 h | DEBT-1408, DEBT-1401, DEBT-1412 |
+| SlotSetu (`appointments`) | New slots open at 17:00 (`slot-release`) | 103.9 → 29.9 h | 106.3 → 28 h | DEBT-1401, DEBT-1412, DEBT-1410… |
+| SlotSetu (`appointments`) | A data-centre zone loses power (`zone-power`) | 98.2 → 4.8 h | 101.5 → 6.5 h | DEBT-1408, DEBT-1401, DEBT-1412 |
 | TurantMart (`grocery`) | Diwali evening (`diwali-evening`) | 131.7 → 63.1 h | 131.8 → 64.9 h | DEBT-1508, DEBT-1509, DEBT-1507… |
 | TurantMart (`grocery`) | Scripts at a limited drop (`drop-scripts`) | 150 → 6.1 h | 152.3 → 10 h | DEBT-1505, DEBT-1509, DEBT-1508… |
 

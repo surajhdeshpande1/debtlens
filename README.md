@@ -55,7 +55,7 @@ With 40 hours of fixes, an average day:
 | PayCore | Acquiring bank outage | Outage | 38.9 → 10.4 h (73% less) | DEBT-104 |
 | ParikshaNet | Database failover mid-exam | Database | 58 → 3.7 h (94% less) | DEBT-1204 |
 | TurantMart | UPI provider degrades | Outage | 26.5 → 6.2 h (77% less) | DEBT-1503 |
-| SlotSetu | A data-centre zone loses power | Zone lost | 105.5 → 11.9 h (89% less) | DEBT-1408, DEBT-1401, DEBT-1412 |
+| SlotSetu | A data-centre zone loses power | Zone lost | 98.2 → 4.8 h (95% less) | DEBT-1408, DEBT-1401, DEBT-1412 |
 | CampusOne ERP | Exam results day | Rush | 48.7 → 8.1 h (83% less) | DEBT-401, DEBT-413, DEBT-408, DEBT-411 |
 
 Across all 88 situations the fixes cut the loss by 17% to 97% (median 78%), and never to zero.
