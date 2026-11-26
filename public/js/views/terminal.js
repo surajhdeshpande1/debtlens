@@ -1,4 +1,4 @@
-// Terminal (CLI) guide: the same engine as a pip-installable command-line tool.
+// Terminal guide: the same engine as a command-line tool, installed from the GitHub repository.
 import { codeBlock, copyButtons, html } from "../lib.js";
 import { S } from "../app.js";
 import { card, head } from "./_parts.js";
@@ -24,57 +24,63 @@ ok   regressions in the last 30 days: 3 (no limit)
 export async function render(root, ctx) {
   const url = location.origin;
   const signedIn = !!(S.me && S.me.principal.kind === "user");
-  root.innerHTML = String(html`${head("DebtLens in your terminal", "Engineers live in the terminal. The CLI runs the exact same analysis engine as this website — offline on your own repository, or connected to your team's project.")}
+  root.innerHTML = String(html`${head("DebtLens in your terminal", "The same engine as this website, as a command-line tool: run any built-in system and situation offline, scan your own repository, or work on your team's project.")}
     <div class="grid c2">
       <div class="stack">
-        ${card("1 · Install", html`${codeBlock("pipx install debtlens        # or: pip install debtlens")}<p class="small muted" style="margin:0">Python 3.10+. Works on Windows, macOS and Linux. <code>debtlens model download</code> fetches the 23 MB MiniLM model once for semantic similarity (optional — TF-IDF works without it).</p>`)}
-        ${card("2 · Try it offline (no account)", codeBlock(`debtlens scenarios                       # 5 industry scenarios + 7 scenario packs
-debtlens demo healthtech                 # dashboard of a scenario
-debtlens similar "lab results not showing" --scenario healthtech
-debtlens plan --scenario fintech --budget 40
-debtlens simulate forecast --scenario college --sprints 12
-debtlens simulate cascade db --scenario fintech
-debtlens simulate spike --scenario tatkal  # Tatkal at 10 AM, hour by hour
+        ${card("1 · Install from GitHub", html`${codeBlock(`git clone https://github.com/surajhdeshpande1/debtlens
+cd debtlens
+python -m venv .venv
+.venv\\Scripts\\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt "typer>=0.12" "rich>=13"
+python -m debtlens --version`)}<p class="small muted" style="margin:0">Python 3.10 or newer. DebtLens is not on PyPI yet, so install it from the repository; on Windows <code>scripts\\windows\\setup.bat</code> does all of this. <code>python -m debtlens model download</code> fetches the 23 MB MiniLM model once (optional; TF-IDF works without it). The user guide in the repository explains every step.</p>`)}
+        ${card("2 · Run a situation (no account needed)", html`${codeBlock(`debtlens scenarios                          # 15 systems: 4 industry scenarios, 11 packs
+debtlens simulate spike -s tatkal --list     # the situations this system can run
 debtlens simulate spike -s tatkal -e tatkal-bots --live --side
-                                         # the bot attack, live: today vs after the fixes`))}
-        ${card("Scenario packs", html`${codeBlock(`debtlens pack list                       # the 7 bundled packs and their busiest day
-debtlens pack show broker                # what a pack contains
-debtlens pack export tickets -o my.json  # copy one to edit
-debtlens pack validate my.json           # every problem at once
-debtlens simulate spike -s my.json --budget 60
-debtlens plan -s my.json --budget 40`)}
-          <p class="small muted" style="margin:0">A pack is a whole system in one JSON file: modules, dependencies, files, TODO markers, incidents with 5 Whys, debt with prerequisites and its own load-spike event. Every command accepts a pack code or file with <code>--scenario</code>, and the website opens a pack file from its home page. Format: <code>docs/PACKS.md</code>.</p>`)}
-        ${card("3 · Your own repository", codeBlock(`cd my-project
+                                            # watch the day, then read the report
+debtlens simulate spike -s fintech -e acquirer-outage --report -o report.txt
+debtlens simulate spike -s exam --peak 8 --start 9 --hours 2   # your own rush`)}
+          <p class="small muted" style="margin:0">The report is the same one the website shows: what happened minute by minute, why each module failed, what to fix first and what to do next. Your own scenario pack files are opened on the website (start page → <b>Upload a scenario pack</b>); the terminal runs the built-in systems by name.</p>`)}
+        ${card("3 · Look around a system", codeBlock(`debtlens pack list                       # the 11 packs and their busiest day
+debtlens pack show grocery               # modules, incidents, debt and situations
+debtlens demo healthtech                 # the dashboard
+debtlens similar "lab results not showing" -s healthtech
+debtlens plan -s fintech --budget 40     # what to fix this sprint
+debtlens simulate forecast -s college --sprints 12
+debtlens simulate cascade db -s fintech  # fail one module on purpose`))}
+        ${card("4 · Your own repository", codeBlock(`cd my-project
 debtlens scan .                          # churn, complexity, TODO/FIXME, import graph
 debtlens scan . --since 180 --json > scan.json
 debtlens ingest logs/app.log             # group errors into incident candidates`))}
-        ${card("4 · Connect to the website", html`${codeBlock(`debtlens login ${url} --token <your API token>
+        ${card("5 · Connect to the website", html`${codeBlock(`debtlens login ${url} --token <your API token>
 debtlens projects
 debtlens use <project-id>                # default project for later commands
 debtlens scan . --push                   # upload the full local git history
-debtlens incidents new                   # interactive report + 5 Whys
+debtlens simulate spike -e <situation> --report
 debtlens ci --max-open-critical 0 --max-regressions 3`)}
-          <p class="small muted" style="margin:0">${signedIn ? html`Create a token under <b>Team &amp; settings → API tokens</b>.` : html`API tokens need a team account — <a href="#/register">create one</a>; sandboxes are anonymous.`}</p>`)}
+          <p class="small muted" style="margin:0">${signedIn ? html`Create a token under <b>⚙ → Team &amp; settings → API tokens</b>.` : html`API tokens need a team account (sign in or create a team on the start page); sandboxes are anonymous.`}</p>`)}
       </div>
       <div class="stack">
         ${card("What it looks like", SAMPLE)}
         ${card("Commands", html`<table class="data"><tbody>
-          ${[["scan [path]", "Mine a repo: churn, McCabe complexity, SATD, dependencies (--push, --json)"],
+          ${[["scenarios", "Every built-in system: 4 industry scenarios and 11 scenario packs"],
+            ["simulate spike -s CODE --list", "The situations a system can run: rushes, bots, outages, bad releases…"],
+            ["simulate spike -e KEY [--live] [--report]", "Run a situation: what fails, why, what to fix first; --live plays the day"],
+            ["pack list | show CODE", "The bundled packs and what each contains"],
+            ["scan [path]", "Mine a repo: churn, McCabe complexity, SATD, dependencies (--push, --json)"],
             ["similar \"text\"", "Has this happened before? Hybrid TF-IDF + MiniLM search"],
             ["incidents list | show | new", "Browse and report incidents, record 5 Whys"],
-            ["debt / ledger", "Debt items with principal, interest, risk, break-even"],
+            ["debt / ledger / playbook KEY", "Debt items priced in hours, and how to fix each one"],
             ["plan --budget H", "Exact precedence-constrained knapsack (--approve to save)"],
-            ["simulate whatif | forecast | cascade | spike", "The Simulation Lab from the terminal"],
-            ["pack list | show | validate | export", "Scenario packs: bundled systems or your own .json file"],
+            ["simulate whatif | forecast | cascade", "What-if costs, Monte Carlo forecast, failure injection"],
             ["ingest app.log", "Logs → grouped incident candidates (--push)"],
             ["import file.csv|json", "Bring in a Jira/ServiceNow backlog"],
             ["ci", "Quality gate: exit code 1 when a limit is crossed"],
             ["report / export / analyse", "PDF report, JSON snapshot, offline analysis of a snapshot"],
-            ["serve", "Run this whole website locally (MySQL or SQLite) — the offline demo"]].map(([c, d]) => html`<tr><td class="mono small nowrap">debtlens ${c}</td><td class="small">${d}</td></tr>`)}
+            ["serve", "Run this whole website on your own laptop (MySQL or SQLite)"]].map(([c, d]) => html`<tr><td class="mono small nowrap">debtlens ${c}</td><td class="small">${d}</td></tr>`)}
           </tbody></table>`, { flush: true })}
-        ${card("Run the whole website offline", codeBlock(`pip install "debtlens[server]"
-debtlens serve --db mysql+pymysql://debtlens:debtlens@localhost/debtlens
-# or without MySQL:  debtlens serve            (SQLite file)
+        ${card("Run the whole website on your laptop", codeBlock(`pip install "waitress>=3.0"
+debtlens serve                           # SQLite file, no setup
+debtlens serve --db mysql+pymysql://debtlens:debtlens@localhost:3306/debtlens
 # then open http://localhost:8000`))}
       </div></div>`);
   copyButtons(root);

@@ -263,35 +263,43 @@ def build(res: dict, system: dict | None = None, *, deps: list | None = None, ru
             watched_kinds.setdefault(r["module"], set()).add(r["kind"])
     causes = []
     mods = sorted(res.get("modules") or [], key=lambda m: (-m["p_incident_before"], m["module"]))
+    by_mod = {m["module"]: m for m in mods}
     for m in mods:
         if m["p_incident_before"] < 0.05 and m["module"] not in watched_kinds:
             continue
         mod = m["module"]
+        seen = watched_kinds.get(mod, set())
         own = [d for d in debts.values() if d["module"] == mod and (d["capacity_effect"] or d["resilience_effect"])]
         reasons = []
         peak = m["peak_utilisation_before"]
+        loaded = m.get("first_overload_hour") is not None or peak >= 0.85 or "overload" in seen
         if m.get("first_overload_hour") is not None:
             reasons.append(f"Overloads from {hour(m['first_overload_hour'])}: its busiest hour needs "
                            f"{fmt(100 * peak, 0)}% of what it can carry.")
         elif peak >= 0.85:
             reasons.append(f"Runs close to its limit: {fmt(100 * peak, 0)}% at the busiest hour.")
         cap_debts = [d for d in own if d["capacity_effect"]]
-        if cap_debts and m["capacity_before"] < 0.999:
+        if loaded and cap_debts and m["capacity_before"] < 0.999:
             reasons.append(f"Open debt leaves it {fmt(100 * m['capacity_before'], 0)}% of its capacity ("
                            + ", ".join(f"{d['key']} −{fmt(100 * d['capacity_effect'], 0)}%" for d in cap_debts) + ").")
-        ups = depends_on.get(mod) or []
-        if ups and ("cascade" in watched_kinds.get(mod, set()) or m["fragility_before"] > 0.3):
+        ups = sorted(depends_on.get(mod) or [])
+        failing_ups = [u for u in ups if by_mod.get(u, {}).get("p_incident_before", 0) >= 0.1] or ups
+        if ups and ("cascade" in seen or not loaded):
             frag = [d for d in own if d["resilience_effect"]]
-            reasons.append(f"Fails when something it depends on fails ({_join(sorted(ups)[:4])})"
+            reasons.append(f"Goes down when something it depends on fails ({_join(failing_ups[:4])})"
                            + (f"; open debt makes that more likely ({', '.join(d['key'] for d in frag)})." if frag else "."))
         for e in effects:
             if e["module"] in (mod, "*"):
                 reasons.append(f"The situation: {e['label'][0].lower() + e['label'][1:]} "
                                f"({clock(60 * e['start'] + int(e.get('minute') or 0))}, {_plural(e['hours'], 'hour')}).")
                 break
-        if "fault" in watched_kinds.get(mod, set()) and len(reasons) == 0:
+        if "fault" in seen and not reasons:
             reasons.append("Failed at random on the day you watched (its incident history makes that more likely).")
         fixed_here = [x["key"] for x in sel if x["module"] == mod]
+        safer = [u for u in failing_ups if by_mod.get(u) and by_mod[u]["p_incident_after"] < 0.5 * by_mod[u]["p_incident_before"]]
+        if not fixed_here and ups and safer and m["p_incident_after"] < 0.5 * m["p_incident_before"]:
+            reasons.append(f"After the fixes it is safer because {_join(safer[:3])} "
+                           f"{'fails' if len(safer[:3]) == 1 else 'fail'} far less often.")
         causes.append({"module": mod, "p_incident_before": m["p_incident_before"],
                        "p_incident_after": m["p_incident_after"], "peak_before": m["peak_utilisation_before"],
                        "peak_after": m["peak_utilisation_after"], "capacity_before": m["capacity_before"],

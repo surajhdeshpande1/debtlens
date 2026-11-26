@@ -8,7 +8,7 @@ const TABS = [["", "Knowledge search"], ["similar", "Similar incidents"], ["regr
 
 export async function render(root, ctx) {
   const tab = ctx.sub[0] || "";
-  root.innerHTML = String(html`${head("Intelligence", "Hybrid similarity = α · TF-IDF (shared words) + (1 − α) · MiniLM sentence embeddings (shared meaning). It powers duplicate checks, the knowledge base and regression detection.")}
+  root.innerHTML = String(html`${head("Similar & regressions", "Find incidents like a new one (by shared words and by meaning), catch fixed incidents that came back, and see how accurate that is.")}
     <div class="tabs">${TABS.map(([k, l]) => html`<a href="${link("intel")}${k ? "/" + k : ""}" class="${k === tab ? "active" : ""}">${l}</a>`)}</div><div data-tab></div>`);
   const box = $("[data-tab]", root);
   if (tab === "similar") return similarTab(box);

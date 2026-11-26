@@ -1,32 +1,34 @@
 // DebtLens single-page app: landing, auth, shell, hash router.
-import { $, api, ApiError, auth, codeBlock, copyButtons, el, fail, html, modal, on, store, toast, ago, n } from "./lib.js";
+import { $, api, ApiError, auth, el, fail, html, on, store, toast, ago } from "./lib.js";
 import * as tour from "./tour.js";
 
-export const S = { meta: null, me: null, project: null, projects: [], view: null };
+export const S = { meta: null, me: null, project: null, projects: [], view: null, lastRun: null };
 
-export const NAV = [
-  { group: "Overview" },
-  { id: "home", label: "Home", m: "⌂" },
-  { group: "Operate" },
-  { id: "incidents", label: "Incidents", m: "M2" },
-  { id: "causal", label: "Causal analysis", m: "M3" },
-  { id: "debts", label: "Debt registry", m: "M4" },
-  { id: "evidence", label: "Repository evidence", m: "M5" },
-  { id: "intel", label: "Intelligence", m: "M6" },
-  { id: "ledger", label: "Ledger & optimiser", m: "M7" },
-  { id: "sim", label: "Simulation Lab", m: "SIM" },
-  { id: "reports", label: "Knowledge & reports", m: "M8" },
-  { group: "Workspace" },
-  { id: "workspace", label: "Team & settings", m: "M1" },
-  { id: "terminal", label: "Terminal (CLI)", m: ">_" },
+// Five pages. Each tab is a view module (views/<view>.js), optionally with a fixed first sub-route.
+export const PAGES = [
+  { id: "overview", label: "Overview", tabs: [{ view: "home", label: "Overview" }] },
+  { id: "incidents", label: "Incidents", tabs: [{ view: "incidents", label: "Incidents" }, { view: "causal", label: "Root causes" },
+    { view: "intel", label: "Similar & regressions" }] },
+  { id: "debt", label: "Debt", tabs: [{ view: "debts", label: "Debt items" }, { view: "ledger", label: "Plan & ledger" },
+    { view: "evidence", label: "Code evidence" }] },
+  { id: "simulate", label: "Simulate", tabs: [{ view: "run", label: "Run a scenario" }, { view: "sim", sub: "forecast", label: "Sprint forecast" },
+    { view: "sim", sub: "cascade", label: "Failure injection" }, { view: "sim", sub: "whatif", label: "What-if costs" },
+    { view: "sim", sub: "", label: "Compare industries" }] },
+  { id: "reports", label: "Reports", tabs: [{ view: "runs", label: "Run reports" }, { view: "reports", label: "Lessons & exports" }] },
 ];
+const EXTRA = { workspace: "Team & settings", terminal: "Terminal guide" };  // reached from the ⚙ menu
+const VIEWS = new Set([...PAGES.flatMap((p) => p.tabs.map((t) => t.view)), ...Object.keys(EXTRA)]);
 
 export const can = (perm) => !!S.me && S.me.principal.permissions.includes(perm);
 export const pid = () => S.project && S.project.id;
 export const go = (path) => { if (location.hash !== "#" + path) location.hash = path; else route(); };
 export const link = (view, id) => `#/p/${pid()}/${view}${id !== undefined ? "/" + id : ""}`;
+export const isSandbox = () => !!S.me && S.me.principal.kind === "sandbox";
 
 const app = () => $("#app");
+const KIND = { traffic: "Rush", bots: "Bots", outage: "Outage", deploy: "Bad release", database: "Database", cache: "Cache",
+  leak: "Memory leak", zone: "Zone lost", retry: "Retry storm" };
+export const kindLabel = (k) => KIND[k] || k;
 
 auth.onExpired = (msg, code) => {
   auth.token = null;
@@ -37,7 +39,7 @@ auth.onExpired = (msg, code) => {
 
 // ------------------------------------------------------------------ boot
 async function boot() {
-  try { S.meta = await api("/meta"); } catch (e) { S.meta = { scenarios: [], roles: [] }; fail(e); }
+  try { S.meta = await api("/meta"); } catch (e) { S.meta = { scenarios: [], roles: [], packs: [] }; fail(e); }
   window.addEventListener("hashchange", route);
   route();
 }
@@ -89,78 +91,59 @@ async function goHome(me) {
 }
 
 // ------------------------------------------------------------------ landing
-function scenarioCard(s) {
-  const roles = S.meta.roles || [];
-  return html`<div class="scen" data-scen="${s.code}">
+export const allSystems = () => [...(S.meta.scenarios || []).filter((s) => (s.events || []).length), ...(S.meta.packs || [])];
+
+export function systemCard(s, { current = false, action = "Open" } = {}) {
+  const evs = s.events || [];
+  const kinds = [...new Set(evs.map((e) => e.kind))];
+  return html`<div class="sys ${current ? "current" : ""}" data-scen="${s.code}">
     <div class="ind">${s.industry}</div>
     <h3>${s.name}</h3>
-    <div class="tag">${s.tagline}</div>
-    <div class="stats">${s.counts.incidents} incidents · ${s.counts.debts} debt items · ${s.counts.modules} modules</div>
-    <div class="row tight">
-      <select aria-label="Role" data-role>${roles.map((r) => html`<option value="${r.code}" ${r.code === "tech_lead" ? "selected" : ""}>${r.label}</option>`)}</select>
-      <button class="btn primary" data-open="${s.code}">Open</button>
-    </div>
-    <button class="btn sm ghost" data-tour="${s.code}">▶ Guided tour for examiners</button>
+    <p class="tag">${s.tagline}</p>
+    <div class="sys-kinds">${kinds.slice(0, 5).map((k) => html`<span class="kind k-${k}">${kindLabel(k)}</span>`)}</div>
+    <div class="row between sys-foot"><span class="muted small">${evs.length} situations · ${s.counts.incidents} incidents${s.pack ? html` · <a class="dl" href="/api/v1/packs/${s.code}" download="${s.code}.debtlens-pack.json" title="Download this system as a pack file to edit and upload">pack file</a>` : ""}</span>
+      ${current ? html`<span class="badge accent">Open now</span>` : html`<button class="btn sm primary" data-open="${s.code}">${action}</button>`}</div>
   </div>`;
 }
 
-function roleSelect() {
-  return html`<select aria-label="Role" data-role>${(S.meta.roles || []).map((r) => html`<option value="${r.code}" ${r.code === "tech_lead" ? "selected" : ""}>${r.label}</option>`)}</select>`;
-}
-
-function hourLabel(h) { return `${String(h).padStart(2, "0")}:00`; }
-
-function packCard(s) {
-  const ev = s.event;
-  return html`<div class="scen pack" data-scen="${s.code}">
-    <div class="ind">${s.industry}</div>
-    <h3>${s.name}</h3>
-    <div class="tag">${s.tagline}</div>
-    ${ev ? html`<div class="event-pill" title="${ev.description}">⚡ ${ev.name} · ${ev.peak}× at ${hourLabel(ev.peak_hour)}</div>` : ""}
-    <div class="stats">${s.counts.incidents} incidents · ${s.counts.debts} debt items · ${s.counts.modules} modules</div>
-    <div class="row tight">${roleSelect()}<button class="btn primary" data-open="${s.code}">Open</button></div>
-    <div class="row tight pack-links">
-      <button class="btn sm ghost" data-tour="${s.code}">▶ Guided tour</button>
-      <a class="btn sm ghost" href="/api/v1/packs/${s.code}" download="${s.code}.debtlens-pack.json" title="Download this pack as a .json file">⬇ .json</a>
-    </div>
-  </div>`;
-}
-
-function uploadCard() {
+export function uploadCard() {
   const fmt = S.meta.pack_format || {};
-  return html`<div class="scen pack upload" data-upload>
+  return html`<div class="sys upload" data-upload>
     <div class="ind">Your own system</div>
-    <h3>Open a pack file</h3>
-    <div class="tag">Upload any DebtLens pack (.json, up to ${fmt.max_kb || 400} KB) — one of the seven above after editing it, or one your team wrote.
-      It is checked completely and opened as a private sandbox.</div>
-    <label class="file-drop" data-drop><input type="file" accept=".json,application/json" data-file hidden>
-      <span data-file-label>Choose or drop a .json file</span></label>
-    <div class="row tight">${roleSelect()}<button class="btn primary" data-open-file disabled>Open pack</button></div>
+    <h3>Upload a scenario pack</h3>
+    <p class="tag">A .json pack (up to ${fmt.max_kb || 400} KB): one of these after editing it, or one your team wrote. It is checked and opened as a private copy.</p>
+    <label class="file-drop" data-drop><input type="file" accept=".json,application/json" data-file hidden><span data-file-label>Choose or drop a .json file</span></label>
+    <button class="btn primary" data-open-file disabled>Open pack</button>
     <div class="pack-problems hidden" data-problems></div>
-    <a class="small" href="#/cli">Pack format and terminal commands →</a>
   </div>`;
 }
+
+const STEPS = [["Pick a system", "A payments platform, an exam portal, an airline — 15 to choose from."],
+  ["Pick a situation", "A rush of users, bots, an outage, a bad release, a failing database…"],
+  ["Watch it happen", "The day plays out live: what users see and what the on-call engineer sees."],
+  ["Read the report", "What happened, why, what to fix first, and what changes after the fixes."]];
 
 function renderLanding(tab) {
-  document.title = "DebtLens — Developer Incident & Technical Debt Management";
+  document.title = "DebtLens — see what breaks on your busiest day, and what to fix first";
+  const systems = allSystems();
   const v = el(html`<header class="topbar"><a class="brand" href="#/"><span class="mark">D</span>DebtLens</a><span class="grow"></span>
-      <a class="btn ghost" href="#/cli">Terminal</a><a class="btn" href="#/login">Sign in</a></header>
+      <a class="btn ghost sm" href="#/cli">Terminal guide</a><a class="btn sm" href="#login" data-auth-open>Sign in</a></header>
     <main class="landing">
-      <section class="hero">
-        <div>
-          <h1>Developer Incident &amp; Technical Debt Management</h1>
-          <p class="lead">DebtLens links every production incident to the root cause behind it and the technical debt that made it possible —
-            then prices that debt in hours lost per month and tells you exactly what to fix in your next sprint.</p>
-          <ul class="points">
-            <li>5 Whys that converge: one root cause, many incidents, measured on a causal graph</li>
-            <li>Evidence from your own Git history: churn, complexity hotspots, TODO/FIXME debt</li>
-            <li>Interest ledger, exact knapsack sprint planner, Monte Carlo forecast, failure injection</li>
-            <li>Load-spike simulation: which debt to fix before salary day, a sale or results day</li>
-            <li>Seven scenario packs — Tatkal, Budget day, IPL final, World Cup final, New Year's Eve, ITR deadline, a stadium on-sale — and your own as a .json file</li>
-            <li>A fix playbook for every debt item: steps, how to verify, references</li>
-            <li>Same engine in the browser and in your terminal: <code>pipx install debtlens</code></li>
-          </ul>
-        </div>
+      <section class="hero2">
+        <h1>See what breaks on your busiest day — and what to fix first.</h1>
+        <p class="lead">DebtLens links every incident to the technical debt behind it, prices that debt in hours, and simulates a hard day
+          for your system: before the fixes and after them.</p>
+        <div class="row"><a class="btn primary lg" href="#systems" data-scroll>Run a scenario</a>
+          <button class="btn lg" data-tour-open>Take the 3-minute tour</button><span class="muted small">No account needed.</span></div>
+        <ol class="howto">${STEPS.map(([t, d], i) => html`<li><span class="num">${i + 1}</span><div><b>${t}</b><div class="small muted">${d}</div></div></li>`)}</ol>
+      </section>
+      <section id="systems">
+        <div class="section-title"><h2>1 · Pick a system</h2><span class="muted small">You get a private copy for 24 hours.</span></div>
+        <div class="sys-grid">${systems.map((s) => systemCard(s))}${uploadCard()}</div>
+      </section>
+      <section class="auth-row" id="login">
+        <div><h2>Using DebtLens with your team?</h2><p class="muted">Sign in to your team's projects, or create a team and invite people.
+          Each project keeps its own incidents, debt, plans and run reports.</p></div>
         <div class="auth-card">
           <div class="tabs" role="tablist"><button class="${tab === "login" ? "active" : ""}" data-tab="login">Sign in</button>
             <button class="${tab === "register" ? "active" : ""}" data-tab="register">Create a team</button></div>
@@ -181,23 +164,13 @@ function renderLanding(tab) {
           </form>
         </div>
       </section>
-      <div class="section-title"><h2>Try a live scenario</h2><span class="muted small">No account needed — you get a private copy for 24 hours. Pick the role you want to play.</span></div>
-      <div class="scen-grid">${(S.meta.scenarios || []).map(scenarioCard)}</div>
-      ${(S.meta.packs || []).length ? html`<div class="section-title" id="packs"><h2>Scenario packs — seven systems on their busiest day</h2>
-        <span class="muted small">Each pack is a whole system in one file: modules, incidents with 5 Whys, debt and its own load-spike event.
-          Open one, run the load spike, failure injection and forecast live — or download it and upload your own.</span></div>
-      <div class="scen-grid">${S.meta.packs.map(packCard)}${uploadCard()}</div>` : ""}
-      <div class="section-title"><h2>Works in your terminal too</h2><span class="muted small"><a href="#/cli">Full CLI guide →</a></span></div>
-      <div class="grid c2">
-        <div>${codeBlock("pipx install debtlens\ndebtlens scan .              # mine your repo's git history\ndebtlens similar \"payment timeout\"\ndebtlens plan --budget 40     # what to fix this sprint\ndebtlens simulate forecast\ndebtlens ci --max-open-critical 0")}</div>
-        <div class="callout"><b>Why a CLI?</b> Engineers live in the terminal. <code>debtlens scan</code> reads the full local git history (no GitHub limits),
-          <code>debtlens ingest app.log</code> turns error logs into incidents, and <code>debtlens ci</code> fails a build when risk crosses your limit.
-          Push results to this website with <code>--push</code>.</div>
-      </div>
-      <div class="footer">DebtLens v${S.meta.version || "2"} · Basaveshwar Engineering College, Bagalkot · Dept. of ISE · Mini Project BISA531P (2026–27)</div>
+      <div class="footer">DebtLens v${S.meta.version || "2"} · Basaveshwar Engineering College, Bagalkot · Dept. of ISE · Mini Project BISA531P (2026–27)
+        · <a href="#/cli">Terminal guide</a></div>
     </main>`);
   const w = mount(v);
-  copyButtons(w);
+  if (tab === "register" || location.hash === "#/login") $("#login", w).scrollIntoView();
+  on(w, "click", "[data-scroll]", (e) => { e.preventDefault(); $("#systems", w).scrollIntoView({ behavior: "smooth" }); });
+  on(w, "click", "[data-auth-open]", (e) => { e.preventDefault(); $("#login", w).scrollIntoView({ behavior: "smooth" }); $("#le", w).focus({ preventScroll: true }); });
   on(w, "click", "[data-tab]", (e, b) => {
     w.querySelectorAll("[data-tab]").forEach((x) => x.classList.toggle("active", x === b));
     w.querySelectorAll("[data-form]").forEach((f) => f.classList.toggle("hidden", f.dataset.form !== b.dataset.tab));
@@ -217,20 +190,20 @@ function renderLanding(tab) {
       go("/");
     } catch (ex) { err.textContent = ex.message; } finally { btn.disabled = false; }
   });
-  on(w, "click", "[data-open],[data-tour]", async (e, b) => {
-    const card = b.closest("[data-scen]");
-    const code = card.dataset.scen;
-    const role = b.dataset.tour ? "tech_lead" : $("[data-role]", card).value;
+  on(w, "click", "[data-open]", async (e, b) => {
     b.disabled = true;
-    try {
-      await openSandbox(code, role);
-      if (b.dataset.tour) tour.start();
-    } catch (ex) { fail(ex); } finally { b.disabled = false; }
+    try { await openSandbox(b.dataset.open, "tech_lead"); } catch (ex) { fail(ex); b.disabled = false; }
+  });
+  on(w, "click", "[data-tour-open]", async (e, b) => {
+    b.disabled = true;
+    try { await openSandbox((systems[0] || {}).code || "fintech", "tech_lead", null, false); tour.start(); }
+    catch (ex) { fail(ex); b.disabled = false; }
   });
   wirePackUpload(w);
 }
 
-function wirePackUpload(w) {
+/** The pack upload card: check the file on the server first, show every problem, then open it as a sandbox. */
+export function wirePackUpload(w, { onOpen = null } = {}) {
   const card = $("[data-upload]", w);
   if (!card) return;
   const input = $("[data-file]", card), label = $("[data-file-label]", card), btn = $("[data-open-file]", card);
@@ -252,7 +225,7 @@ function wirePackUpload(w) {
       const r = await api("/packs/validate", { method: "POST", body: { pack }, quiet: true });
       if (!r.valid) { pack = null; return show(`${file.name} has ${r.problems.length} problem${r.problems.length === 1 ? "" : "s"} to fix:`, r.problems); }
       const i = r.info;
-      label.textContent = `${file.name} — ${i.name}: ${i.counts.incidents} incidents, ${i.counts.debts} debt items${i.event ? `, ${i.event.name}` : ""}`;
+      label.textContent = `${file.name} — ${i.name}: ${i.counts.incidents} incidents, ${i.counts.debts} debt items, ${(i.events || []).length} situations`;
       if (r.warnings && r.warnings.length) show("Opens fine. Notes:", r.warnings, true);
       btn.disabled = false;
     } catch (ex) { pack = null; show("Could not check the file.", [ex.message]); }
@@ -264,17 +237,26 @@ function wirePackUpload(w) {
   btn.addEventListener("click", async () => {
     if (!pack) return;
     btn.disabled = true;
-    try { await openSandbox(null, $("[data-role]", card).value, pack); }
+    try { if (onOpen) await onOpen(pack); else await openSandbox(null, "tech_lead", pack); }
     catch (ex) { show(ex.message, (ex.data && ex.data.problems) || []); btn.disabled = false; }
   });
 }
 
-export async function openSandbox(code, role, pack = null) {
+/** A private sandbox of a scenario, a bundled pack or an uploaded pack; lands on "pick a situation". */
+export async function openSandbox(code, role, pack = null, toRun = true) {
   const r = await api("/sandbox", { method: "POST", body: pack ? { pack, role } : { scenario: code, role } });
   auth.token = r.token;
-  S.me = null; S.project = null;
+  S.me = null; S.project = null; S.lastRun = null;
   toast(r.persona ? `You are ${r.persona.name} — ${r.persona.title}` : "Sandbox ready", "ok");
-  go(`/p/${r.project.id}/home`);
+  go(`/p/${r.project.id}/${toRun ? "run/situation" : "home"}`);
+}
+
+/** In a sandbox: switch to another system (or an uploaded pack) without leaving. */
+export async function switchSystem(code, pack = null) {
+  const r = await api("/sandbox/reset", { method: "POST", body: pack ? { pack } : { scenario: code } });
+  auth.token = r.token; S.me = null; S.project = null; S.lastRun = null; tour.stop();
+  toast(`Opened ${r.project.name}${r.persona ? ` — you are ${r.persona.name}` : ""}`, "ok");
+  go(`/p/${r.project.id}/run/situation`);
 }
 
 // ------------------------------------------------------------------ project list (real teams)
@@ -283,15 +265,15 @@ async function renderProjects() {
   let projects = [];
   try { projects = (await api("/projects")).projects; } catch (e) { fail(e); }
   S.projects = projects;
-  const v = el(html`${topbar()}<main class="landing">
-    <div class="page-head"><div><h1>${me.org ? me.org.name : "Your projects"}</h1><div class="sub">Each project is one product or service with its own repository, incidents and debt ledger.</div></div></div>
-    ${projects.length ? html`<div class="scen-grid">${projects.map((p) => html`<a class="scen" href="#/p/${p.id}/home" style="color:inherit;text-decoration:none">
-        <div class="ind">${p.industry || p.key}</div><h3>${p.name}</h3><div class="tag">${p.description || ""}</div>
-        <div class="stats">${p.counts.open_incidents} open incidents · ${p.counts.open_debts} open debts · ${p.counts.modules} modules</div></a>`)}</div>`
-      : html`<div class="callout">No projects yet.${can("project.manage") ? " Create one below — start from an industry scenario or an empty project." : " Ask your admin to add you to a project."}</div>`}
+  const v = el(html`${topbar(null)}<main class="landing">
+    <div class="page-head"><div><h1>${me.org ? me.org.name : "Your projects"}</h1><div class="sub">Each project is one product or service with its own incidents, debt and run reports.</div></div></div>
+    ${projects.length ? html`<div class="sys-grid">${projects.map((p) => html`<a class="sys" href="#/p/${p.id}/home" style="color:inherit;text-decoration:none">
+        <div class="ind">${p.industry || p.key}</div><h3>${p.name}</h3><p class="tag">${p.description || ""}</p>
+        <div class="muted small">${p.counts.open_incidents} open incidents · ${p.counts.open_debts} open debts · ${p.counts.modules} modules</div></a>`)}</div>`
+      : html`<div class="callout">No projects yet.${can("project.manage") ? " Create one below — start from a system or an empty project." : " Ask your admin to add you to a project."}</div>`}
     ${can("project.manage") ? html`<div class="section-title"><h2>New project</h2></div>
       <form class="card" data-new><div class="card-body"><div class="inline-fields">
-        <div class="field"><label>Start from</label><select name="scenario"><option value="">Empty project</option><optgroup label="Industry scenarios">${S.meta.scenarios.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry} scenario</option>`)}</optgroup>${(S.meta.packs || []).length ? html`<optgroup label="Scenario packs">${S.meta.packs.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry} pack</option>`)}</optgroup>` : ""}</select></div>
+        <div class="field"><label>Start from</label><select name="scenario"><option value="">Empty project</option><optgroup label="Industry scenarios">${S.meta.scenarios.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry}</option>`)}</optgroup>${(S.meta.packs || []).length ? html`<optgroup label="Scenario packs">${S.meta.packs.map((s) => html`<option value="${s.code}">${s.name} — ${s.industry}</option>`)}</optgroup>` : ""}</select></div>
         <div class="field"><label>Name</label><input name="name" type="text" placeholder="e.g. Payments API"></div>
         <div class="field"><label>Repository URL (optional)</label><input name="repository_url" type="url" placeholder="https://github.com/org/repo"></div>
       </div><button class="btn primary" type="submit">Create project</button></div></form>` : ""}
@@ -311,41 +293,43 @@ async function renderProjects() {
 }
 
 // ------------------------------------------------------------------ shell
-function topbar() {
+export function pageOf(view) { return PAGES.find((p) => p.tabs.some((t) => t.view === view)) || null; }
+
+function tabActive(t, view, sub) {
+  if (t.view !== view) return false;
+  if (t.sub === undefined) return true;
+  const s = sub[0] || "";
+  return view === "sim" ? (["forecast", "cascade", "whatif"].includes(s) ? s : "") === t.sub : s === t.sub;
+}
+
+function topbar(view) {
   const me = S.me, p = S.project;
-  const sandbox = me && me.principal.kind === "sandbox";
+  const sandbox = isSandbox();
   const roles = S.meta.roles || [];
+  const page = view ? pageOf(view) : null;
   return html`<header class="topbar">
     <a class="brand" href="#/"><span class="mark">D</span>DebtLens</a>
-    ${p ? html`<span class="sep"></span><span class="proj">${p.name}</span><span class="badge accent">${p.key}</span>
-      ${p.scenario_info ? html`<span class="muted small">${p.scenario_info.industry} ${p.scenario_info.pack ? "pack" : "scenario"}</span>` : ""}
-      ${!sandbox && S.projects.length > 1 ? html`<select data-switch aria-label="Switch project">${S.projects.map((x) => html`<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${x.name}</option>`)}</select>` : ""}` : ""}
+    ${p ? html`<span class="proj" title="${p.description || ""}">${p.name}</span>
+      ${!sandbox && S.projects.length > 1 ? html`<select data-switch aria-label="Switch project">${S.projects.map((x) => html`<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${x.name}</option>`)}</select>` : ""}
+      <nav class="topnav" aria-label="Pages">${PAGES.map((pg) => html`<a href="${link(pg.tabs[0].view)}${pg.tabs[0].sub ? "/" + pg.tabs[0].sub : ""}"
+        class="${page && page.id === pg.id ? "active" : ""}" data-nav="${pg.id}">${pg.label}</a>`)}</nav>` : ""}
     <span class="grow"></span>
-    ${sandbox ? html`<span class="sandbox-pill" title="Private copy — changes are yours only">Sandbox · ${p && p.persona ? p.persona.name : "visitor"} as
-        <select data-role aria-label="Play as role">${roles.map((r) => html`<option value="${r.code}" ${r.code === me.principal.role ? "selected" : ""}>${r.label}</option>`)}</select>
-        <span class="tiny">expires ${ago(p && p.expires_at)}</span></span>
-      ${scenarioSwitch(p)}<button class="btn sm" data-tourbtn>▶ Tour</button><button class="btn sm" data-reset>Reset</button><button class="btn sm ghost" data-exit>Exit</button>`
-    : me ? html`<span class="small">${me.principal.name}</span><span class="badge">${me.principal.role_label}</span>
-      <a class="btn sm ghost" href="#/projects">Projects</a><button class="btn sm ghost" data-exit>Sign out</button>` : ""}
+    ${sandbox && p ? html`<label class="role-pick" title="Play this system as another role">as
+        <select data-role aria-label="Play as role">${roles.map((r) => html`<option value="${r.code}" ${r.code === me.principal.role ? "selected" : ""}>${r.label}</option>`)}</select></label>` : ""}
+    ${me && !sandbox ? html`<span class="small muted">${me.principal.name} · ${me.principal.role_label}</span>` : ""}
+    ${me ? html`<details class="menu"><summary class="btn sm ghost" aria-label="Menu">⚙</summary><div class="menu-list">
+      ${p ? html`<a href="${link("workspace")}">Team & settings</a>` : ""}
+      ${p ? html`<a href="${link("terminal")}">Terminal guide</a>` : html`<a href="#/cli">Terminal guide</a>`}
+      ${p && p.tour ? html`<button data-tourbtn>▶ Guided tour</button>` : ""}
+      ${sandbox ? html`<button data-reset>Reset this sandbox</button><div class="menu-note">Private copy · expires ${ago(p && p.expires_at)}</div>` : html`<a href="#/projects">All projects</a>`}
+      <button data-exit>${sandbox ? "Exit to the start page" : "Sign out"}</button></div></details>` : ""}
   </header>`;
 }
 
-/** In a sandbox: jump to any industry scenario or pack in one step (handy on stage). */
-function scenarioSwitch(p) {
-  const cur = p && p.scenario_info ? p.scenario_info : null;
-  const opt = (s) => html`<option value="${s.code}" ${cur && !cur.uploaded && cur.code === s.code ? "selected" : ""}>${s.name}</option>`;
-  return html`<select data-scenario-switch aria-label="Open another scenario or pack" title="Open another scenario or pack">
-    ${cur && cur.uploaded ? html`<option value="" selected>${cur.name} (uploaded)</option>` : ""}
-    <optgroup label="Industry scenarios">${(S.meta.scenarios || []).map(opt)}</optgroup>
-    ${(S.meta.packs || []).length ? html`<optgroup label="Scenario packs">${S.meta.packs.map(opt)}</optgroup>` : ""}
-  </select>`;
-}
-
-function sidebar(view) {
-  return html`<nav class="sidebar"><div class="nav">${NAV.map((x) => x.group ? html`<div class="nav-group">${x.group}</div>`
-    : html`<a href="${link(x.id)}" class="${x.id === view ? "active" : ""}" data-nav="${x.id}"><span class="mtag">${x.m}</span>${x.label}</a>`)}</div>
-    <div class="nav-group" style="margin-top:18px">Signed in as</div>
-    <div class="small" style="padding:0 10px">${S.me.principal.name}<br><span class="muted">${S.me.principal.role_label}</span></div></nav>`;
+function pagebar(view, sub) {
+  const page = pageOf(view);
+  if (!page || page.tabs.length < 2) return "";
+  return html`<div class="pagebar"><div class="pagebar-in"><nav class="pagetabs" aria-label="${page.label}">${page.tabs.map((t) => html`<a href="${link(t.view)}${t.sub ? "/" + t.sub : ""}" class="${tabActive(t, view, sub) ? "active" : ""}">${t.label}</a>`)}</nav></div></div>`;
 }
 
 function wireTopbar(root) {
@@ -362,26 +346,17 @@ function wireTopbar(root) {
     } catch (ex) { fail(ex); }
   });
   on(root, "click", "[data-reset]", async () => {
-    if (!confirm("Reset the sandbox to the original scenario? Your changes will be discarded.")) return;
+    if (!confirm("Reset the sandbox to the original system? Your changes will be discarded.")) return;
     try {
       const r = await api("/sandbox/reset", { method: "POST", body: {} });
-      auth.token = r.token; S.me = null; S.project = null;
+      auth.token = r.token; S.me = null; S.project = null; S.lastRun = null;
       toast("Sandbox reset", "ok");
       go(`/p/${r.project.id}/home`);
     } catch (ex) { fail(ex); }
   });
-  on(root, "change", "[data-scenario-switch]", async (e, s) => {
-    if (!s.value) return;
-    s.disabled = true;
-    try {
-      const r = await api("/sandbox/reset", { method: "POST", body: { scenario: s.value } });
-      auth.token = r.token; S.me = null; S.project = null; tour.stop();
-      toast(`Opened ${r.project.name}${r.persona ? ` — you are ${r.persona.name}` : ""}`, "ok");
-      go(`/p/${r.project.id}/home`);
-    } catch (ex) { s.disabled = false; fail(ex); }
-  });
-  on(root, "click", "[data-exit]", () => { auth.token = null; S.me = null; S.project = null; tour.stop(); go("/"); });
+  on(root, "click", "[data-exit]", () => { auth.token = null; S.me = null; S.project = null; S.lastRun = null; tour.stop(); go("/"); });
   on(root, "click", "[data-tourbtn]", () => tour.start());
+  on(root, "click", ".menu-list a, .menu-list button", (e, b) => { const d = b.closest("details"); if (d) d.open = false; });
 }
 
 /** Swap the whole screen.  Listeners attach to the returned wrapper, which is thrown away on the next mount. */
@@ -395,10 +370,12 @@ function mount(node) {
 }
 
 async function renderShell(view, sub) {
-  if (!NAV.find((x) => x.id === view)) view = "home";
+  if (!VIEWS.has(view)) view = "home";
   store.set("debtlens.project", String(S.project.id));
-  document.title = `${NAV.find((x) => x.id === view).label} · ${S.project.name} · DebtLens`;
-  const frame = el(html`${topbar()}<div class="layout">${sidebar(view)}<main class="content" id="content"><div class="loading"><span class="spinner"></span></div></main></div>`);
+  const page = pageOf(view);
+  const tab = page ? page.tabs.find((t) => tabActive(t, view, sub)) : null;
+  document.title = `${tab ? tab.label : EXTRA[view] || "DebtLens"} · ${S.project.name} · DebtLens`;
+  const frame = el(html`${topbar(view)}${pagebar(view, sub)}<main class="content" id="content"><div class="loading"><span class="spinner"></span></div></main>`);
   const w = mount(frame);
   wireTopbar(w);
   const content = $("#content", w);
@@ -418,7 +395,7 @@ async function renderShell(view, sub) {
 
 async function renderPublic(view) {
   const mod = await import(`./views/${view}.js`);
-  const frame = el(html`<header class="topbar"><a class="brand" href="#/"><span class="mark">D</span>DebtLens</a><span class="grow"></span><a class="btn" href="#/">Back to the website</a></header><main class="landing" id="content"></main>`);
+  const frame = el(html`<header class="topbar"><a class="brand" href="#/"><span class="mark">D</span>DebtLens</a><span class="grow"></span><a class="btn sm" href="#/">Back to the website</a></header><main class="landing" id="content"></main>`);
   const w = mount(frame);
   const node = document.createElement("div");
   $("#content", w).replaceChildren(node);

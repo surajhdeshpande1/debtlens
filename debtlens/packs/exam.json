@@ -1374,7 +1374,7 @@
      ],
      "mitigation": 0.85,
      "label": "The new paper release fails on questions with images",
-     "prevented": "The canary centre showed the errors and the release rolled back at 08:40",
+     "prevented": "The canary centre showed the errors, and the release was rolled back before the other centres opened the paper",
      "recovered": "The release is rolled back"
     }
    ]

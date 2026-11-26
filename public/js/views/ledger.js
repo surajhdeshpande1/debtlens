@@ -11,7 +11,7 @@ export async function render(root, ctx) {
   const open = led.rows.filter((r) => r.is_open);
   const budget0 = (S.project.tour && S.project.tour.budget) || 40;
   const cats = Object.keys(sm.by_category);
-  root.innerHTML = String(html`${head("Ledger & optimiser", "Every open debt item priced as principal (hours to fix) and interest (hours lost per month). The optimiser picks the set with the largest risk reduction that fits your sprint budget, respecting prerequisites.")}
+  root.innerHTML = String(html`${head("Plan & ledger", "What to fix this sprint: the set of fixes that lowers risk most within your hours, doing prerequisites first.")}
     <div class="kpis">
       <div class="kpi"><div class="v">${n(sm.total_principal)} h</div><div class="l">Principal</div><div class="d">${sm.open_items} open items</div></div>
       <div class="kpi bad"><div class="v">${n(sm.total_interest)} h</div><div class="l">Interest / month</div><div class="d">I(d) = Σ w·effort + λ₁·churn + λ₂·blast</div></div>

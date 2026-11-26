@@ -141,9 +141,13 @@ def spike(pid: int):
         raise ApiError(400, str(e)) from e
     report = E.spike_report(snap, out, run_by=me().name, generated_at=iso(utcnow()))
     out["report"] = report
+    if data.get("save") is False:  # replaying a saved run again: same seed, same day, nothing new to keep
+        out["run_id"] = None
+        return ok(out)
     out["run_id"] = _save(proj, "spike", {"event": out["event"]["key"], "event_name": out["event"]["name"],
                                           "kind": out["event"].get("kind"), "peak": out["peak"], "budget": budget,
-                                          "runs": runs, "seed": seed},
+                                          "runs": runs, "seed": seed,
+                                          **({"custom": event} if isinstance(event, dict) else {})},
                           {"before_hours": out["before"]["hours_lost"], "after_hours": out["after"]["hours_lost"],
                            "failed_traffic_before": out["before"]["failed_traffic_pct"],
                            "failed_traffic_after": out["after"]["failed_traffic_pct"],

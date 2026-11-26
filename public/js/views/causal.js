@@ -9,7 +9,7 @@ const CAT = { SYMPTOM: "#d9480f", MECHANISM: "#a86400", ROOT: "#2457c5", PROCESS
 export async function render(root, ctx) {
   const [g, cl] = await Promise.all([api(`${P()}/causal-graph`), api(`${P()}/clusters`)]);
   const ranked = g.nodes.slice(0, 10);  // server order: incidents converging, then paths through (betweenness)
-  root.innerHTML = String(html`${head("Causal analysis", "Each 5 Whys answer is a reusable cause node; arrows point from a symptom to the deeper cause behind it. Causes reached by many incidents — and sitting on many paths (betweenness) — are systemic.",
+  root.innerHTML = String(html`${head("Root causes", "Every 5 Whys answer as one graph, from symptom to deeper cause. Causes that many incidents share are worth fixing once.",
       html`<div class="row tight"><button class="btn sm" data-layout="cose">Clusters</button><button class="btn sm" data-layout="breadthfirst">Layered</button><button class="btn sm" data-fit>Fit</button></div>`)}
     <div class="grid side"><div>
       <div class="graph" data-tour="graph" data-graph></div>

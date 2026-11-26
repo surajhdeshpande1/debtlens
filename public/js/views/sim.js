@@ -1,21 +1,24 @@
-// Simulation Lab: industry scenarios side by side, what-if economics, Monte Carlo forecast, failure injection, load spikes.
-import { $, api, ago, bar, chart, COLORS, debounce, fail, html, hrs, label, loadCytoscape, n, on, pct, toast } from "../lib.js";
+// Simulate: sprint forecast, failure injection, what-if costs and the industry comparison.
+// (Situations on a hard day are the guided run in run.js; their reports live in runs.js.)
+import { $, api, bar, chart, COLORS, debounce, fail, html, label, loadCytoscape, n, on, pct, toast } from "../lib.js";
 import { can, go, link, openSandbox, S } from "../app.js";
-import { card, empty, head } from "./_parts.js";
+import { card, empty } from "./_parts.js";
 
 const P = () => `/projects/${S.project.id}`;
-const TABS = [["", "Industry scenarios"], ["whatif", "What-if economics"], ["forecast", "Sprint forecast"], ["cascade", "Failure injection"], ["spike", "Load spike"], ["history", "Run history"]];
+const INTRO = {
+  forecast: "Many possible next sprints: how much each policy for paying down debt saves, with a 95% confidence interval.",
+  cascade: "Fail one module on purpose and see which modules go down with it, and which debt makes that likely.",
+  whatif: "Change what an hour of work or an incident costs, and see which debt items move past break-even.",
+  "": "The same engine on every industry system, side by side.",
+};
 
 export async function render(root, ctx) {
-  const tab = ctx.sub[0] || "";
-  root.innerHTML = String(html`${head("Simulation Lab", "Run the same analysis engine under different conditions: another industry, other cost assumptions, many possible futures, or a deliberate failure.")}
-    <div class="tabs">${TABS.map(([k, l]) => html`<a href="${link("sim")}${k ? "/" + k : ""}" class="${k === tab ? "active" : ""}">${l}</a>`)}</div><div data-tab></div>`);
+  const tab = ["forecast", "cascade", "whatif"].includes(ctx.sub[0]) ? ctx.sub[0] : "";
+  root.innerHTML = String(html`<p class="intro-line muted">${INTRO[tab]}</p><div data-tab></div>`);
   const box = $("[data-tab]", root);
   if (tab === "whatif") return whatif(box);
   if (tab === "forecast") return forecast(box);
   if (tab === "cascade") return cascade(box);
-  if (tab === "spike") return spike(box);
-  if (tab === "history") return history(box);
   return scenarios(box);
 }
 
@@ -216,122 +219,4 @@ async function cascade(box) {
   on(box, "change", "[name=p],[name=module]", () => run());
   on(box, "click", "[data-drill]", () => run(true));
   run();
-}
-
-// ------------------------------------------------------------------ 5. load spike
-const HOURS = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, "0")}:00`);
-const heatLevel = (u) => (u < 0.5 ? 0 : u < 0.7 ? 1 : u < 0.85 ? 2 : u < 1 ? 3 : u < 1.2 ? 4 : 5);
-
-async function spike(box) {
-  const { events } = await api(`${P()}/simulate/spike/events`);
-  const q = new URLSearchParams(location.hash.split("?")[1] || "");
-  const start = q.get("event") || events[0].key;
-  const opt = (e) => html`<option value="${e.key}" ${e.key === start ? "selected" : ""}>${e.name}${e.preset ? ` (${n(e.peak)}× peak)` : ""}</option>`;
-  let autoLive = q.get("live");
-  box.innerHTML = String(html`<form class="card" data-f><div class="card-body inline-fields" style="align-items:end">
-      <div class="field"><label>Event</label><select name="event">${[["traffic", "Rush-hour traffic"], ["bots", "Bot attacks"]].map(([k, l]) => {
-        const xs = events.filter((e) => e.preset && (e.kind || "traffic") === k);
-        return xs.length ? html`<optgroup label="${l}">${xs.map(opt)}</optgroup>` : "";
-      })}${events.filter((e) => !e.preset).map(opt)}</select></div>
-      <div class="field" data-custom><label>Peak traffic ×</label><input name="peak" type="number" min="1" max="50" step="0.5" value="5"></div>
-      <div class="field" data-custom><label>Starts at (hour)</label><input name="start_hour" type="number" min="0" max="23" value="20"></div>
-      <div class="field" data-custom><label>Lasts (hours)</label><input name="duration" type="number" min="1" max="24" value="2"></div>
-      <div class="field"><label>Hours to fix before it</label><input name="budget" type="number" min="0" max="500" value="${(S.project.tour && S.project.tour.budget) || 40}"></div>
-      <div class="field"><label>Simulated days</label><input name="runs" type="number" min="50" max="1000" value="300"></div>
-      <div class="field"><button class="btn primary" type="submit">Simulate the day</button></div></div>
-      <div class="card-body" style="padding-top:0"><p class="small muted" style="margin:0" data-desc></p></div></form>
-    <div data-out style="margin-top:16px"></div>`);
-  const form = $("[data-f]", box);
-  const sync = () => {
-    const ev = events.find((e) => e.key === form.event.value) || events[0];
-    box.querySelectorAll("[data-custom]").forEach((el) => { el.style.display = ev.preset ? "none" : ""; });
-    $("[data-desc]", box).textContent = ev.description;
-  };
-  sync();
-  const run = async () => {
-    const d = Object.fromEntries(new FormData(form));
-    const ev = events.find((e) => e.key === d.event) || events[0];
-    const body = { budget: +d.budget, runs: +d.runs, event: ev.preset ? ev.key : { peak: +d.peak, start_hour: +d.start_hour, duration: +d.duration } };
-    $("[data-out]", box).innerHTML = String(html`<div class="loading"><span class="spinner"></span> Simulating ${d.runs} days of traffic and every combination of fixes…</div>`);
-    try { show(await api(`${P()}/simulate/spike`, { method: "POST", body })); } catch (e) { fail(e); $("[data-out]", box).innerHTML = ""; }
-  };
-  const show = (r) => {
-    const b = r.before, a = r.after, sv = r.saved_hours, pl = r.plan, reg = r.regular_plan;
-    const titles = r.playbook_titles || {};
-    const kpi = (cls, now, after, label, unit = "") => html`<div class="kpi ${cls}"><div class="v">${now}${unit}</div><div class="l">${label}</div><div class="d">after the fixes: <b style="color:var(--ok)">${after}${unit}</b></div></div>`;
-    const relevant = r.debts.filter((x) => x.capacity_effect > 0 || x.resilience_effect > 0);
-    const rp = r.replay;
-    const who = r.journey ? `${r.journey.who} on ${r.journey.app}` : "Your users";
-    $("[data-out]", box).innerHTML = String(html`<div data-tour="spike">
-      ${rp ? html`<div class="replay-cta" data-tour="replay"><div><b><span class="dot"></span>Watch this day live</b>
-        <div class="small">Minute by minute${r.bots ? " through the bot attack" : ""}: ${who}, and what the on-call engineer sees. The same simulated day both ways: ${n(rp.before.total_hours_lost)} engineer-hours lost today, ${n(rp.after.total_hours_lost)} h after the fixes.</div></div>
-        <div class="row tight"><button class="btn live" data-replay="before">▶ Live replay</button><button class="btn" data-replay="side">Side by side</button></div></div>` : ""}
-      <div class="kpis">
-        ${kpi("bad", n(b.incidents, 1), n(a.incidents, 1), "Incidents expected")}
-        ${kpi("bad", n(b.hours_lost, 0), n(a.hours_lost, 0), "Engineer hours lost", " h")}
-        ${kpi("warn", n(b.failed_traffic_pct, 1), n(a.failed_traffic_pct, 1), "Requests failing", "%")}
-        ${kpi("", n(b.p_no_incident * 100, 0), n(a.p_no_incident * 100, 0), "Chance of a clean day", "%")}</div>
-      <div class="grid c2">
-        ${card(`${r.event.name}: traffic and modules down, hour by hour`, html`<div class="chart-box tall"><canvas data-c></canvas></div>`)}
-        ${card(html`What to fix before the event <span class="muted small" style="font-weight:400">· ${n(pl.hours_used)} of ${n(r.budget)} h</span>`, pl.selected.length ? html`<table class="data"><thead><tr><th>Debt</th><th>Module</th><th class="num">Hours</th><th class="num">Protects</th><th>Playbook</th></tr></thead><tbody>
-            ${pl.selected.map((x) => html`<tr><td><a class="key" href="${link("debts", x.id)}">${x.key}</a> <span class="small">${x.title}</span></td><td>${x.module}</td><td class="num">${n(x.principal)}</td>
-              <td class="num">${x.prerequisite_of && x.prerequisite_of.length && !x.protects_hours ? html`<span class="small muted">needed for ${x.prerequisite_of.join(", ")}</span>` : html`<b>${n(x.protects_hours)} h</b>`}</td>
-              <td class="small"><a href="${link("debts", x.id)}">${titles[x.playbook] || x.playbook || ""}</a></td></tr>`)}</tbody></table>
-            <p class="small" style="margin:10px 12px 4px">Saves <b style="color:var(--ok)">${n(sv.mean)} h</b> on this day (95% CI ${n(sv.ci95[0])}–${n(sv.ci95[1])}), better in ${sv.better_runs} of ${sv.runs} simulated days.</p>
-            ${reg ? html`<p class="vs" style="margin:0 12px 10px">The regular sprint plan (ranked by monthly interest and risk) would save ${n(reg.saved_hours.mean)} h here: ${reg.saved_hours.mean + 0.05 < sv.mean ? html`preparing for the spike is worth <b>${n(sv.mean - reg.saved_hours.mean)} h</b> more.` : "it already covers this event."}</p>` : ""}`
-          : empty("No open debt changes the outcome of this event — the modules have enough headroom."), { flush: !!pl.selected.length })}</div>
-      <div style="margin-top:16px">${card(html`Load against capacity <span class="row tight" style="display:inline-flex;margin-left:10px"><button class="btn sm" data-view="before" aria-pressed="true">Now</button><button class="btn sm" data-view="after">After the fixes</button></span>`, html`<div class="table-wrap" data-heat></div>
-        <div class="heat-legend"><span><i class="h0" style="background:#eef6f1"></i>under 50%</span><span><i style="background:#cfe9da"></i>50–70%</span><span><i style="background:#fbe7b5"></i>70–85%</span><span><i style="background:#f6c27a"></i>85–100%</span><span><i style="background:#e8826f"></i>100–120% overloaded</span><span><i style="background:#b42318"></i>over 120%</span></div>`)}</div>
-      <div class="grid c2" style="margin-top:16px">
-        ${card("Modules under pressure", html`<table class="data"><thead><tr><th>Module</th><th class="num">Spike share</th><th class="num">Peak load</th><th class="num">P(incident)</th></tr></thead><tbody>
-          ${r.modules.filter((m) => m.p_incident_before > 0.005 || m.peak_utilisation_before >= 0.7).slice(0, 10).map((m) => html`<tr><td><b>${m.module}</b>${m.first_overload_hour !== null ? html` <span class="badge bad">overloads ${HOURS[m.first_overload_hour]}</span>` : ""}</td>
-            <td class="num">${n(m.exposure * 100, 0)}%</td><td class="num nowrap">${n(m.peak_utilisation_before * 100, 0)}% → <b style="color:var(--ok)">${n(m.peak_utilisation_after * 100, 0)}%</b></td>
-            <td class="num nowrap"><span style="color:${m.p_incident_before > 0.3 ? "var(--bad)" : "inherit"}">${n(m.p_incident_before * 100, 0)}%</span> → <b style="color:var(--ok)">${n(m.p_incident_after * 100, 0)}%</b></td></tr>`)}</tbody></table>
-          <p class="tiny muted" style="margin:6px 12px 10px">Now → after the fixes. P(incident) counts failures from overload and from failures spreading out of modules this one depends on.</p>`, { flush: true })}
-        ${card("Debt that matters on this day", relevant.length ? html`<table class="data"><thead><tr><th>Debt</th><th>Module</th><th>Effect while open</th><th class="num">Alone saves</th><th></th></tr></thead><tbody>
-          ${relevant.map((x) => html`<tr><td><a class="key" href="${link("debts", x.id)}">${x.key}</a> <span class="small">${x.title}</span></td><td>${x.module}</td>
-            <td class="small">${x.capacity_effect ? `−${n(x.capacity_effect * 100, 0)}% capacity` : ""}${x.capacity_effect && x.resilience_effect ? ", " : ""}${x.resilience_effect ? `+${n(x.resilience_effect, 2)} fragility` : ""}</td>
-            <td class="num">${n(x.protects_hours)} h</td><td>${x.in_plan ? html`<span class="badge ok">in plan</span>` : ""}</td></tr>`)}</tbody></table>` : empty("No open debt affects capacity or resilience."), { flush: !!relevant.length })}</div>
-      <p class="tiny muted" style="margin-top:10px">Load = normal-peak utilisation × (1 + (traffic × − 1) × share of the spike reaching the module) ÷ capacity left after open debt; each hour a module fails with probability 1 / (1 + e<sup>−(load − 1)/0.05</sup>) and stays down until load falls below 90%. A failure spreads to each caller with probability ${r.assumptions.p_cascade} × fragility. Capacity and fragility come from each debt's fix playbook. Fix combinations are valued per module by simulation on the same ${r.value_runs} days and chosen with an exact multiple-choice knapsack (${pl.combinations_simulated} combinations). ${r.runs} simulated days, ${r.seconds}s.</p></div>`);
-    const heat = (which) => {
-      const key = which === "after" ? "utilisation_after" : "utilisation_before";
-      const down = which === "after" ? "down_probability_after" : "down_probability_before";
-      const mods = r.modules.filter((m) => m.exposure > 0 || m.p_incident_before > 0.01);
-      $("[data-heat]", box).innerHTML = String(html`<table class="heat"><thead><tr><th></th>${HOURS.map((h, i) => html`<th>${i % 3 === 0 ? h.slice(0, 2) : ""}</th>`)}</tr></thead><tbody>
-        ${mods.map((m) => html`<tr><th class="m">${m.module}</th>${m[key].map((u, t) => html`<td class="h${heatLevel(u)}" title="${m.module} · ${HOURS[t]} · load ${Math.round(u * 100)}% · down in ${Math.round(m[down][t] * 100)}% of days">${Math.round(u * 100)}</td>`)}</tr>`)}</tbody></table>`);
-      box.querySelectorAll("[data-view]").forEach((btn) => btn.setAttribute("aria-pressed", String(btn.dataset.view === which)));
-    };
-    heat("before");
-    const downs = (k) => HOURS.map((_, t) => r.modules.reduce((acc, m) => acc + m[k][t], 0));
-    chart($("[data-c]", box), { data: { labels: HOURS, datasets: [
-        { type: "bar", label: "Traffic (× normal peak)", data: r.profile, backgroundColor: COLORS.accent2 + "99", yAxisID: "y" },
-        { type: "line", label: "Modules down now (expected)", data: downs("down_probability_before"), borderColor: COLORS.bad, backgroundColor: COLORS.bad, tension: 0.25, pointRadius: 0, yAxisID: "y1" },
-        { type: "line", label: "After the fixes", data: downs("down_probability_after"), borderColor: COLORS.ok, backgroundColor: COLORS.ok, tension: 0.25, pointRadius: 0, yAxisID: "y1" }] },
-      options: { scales: { y: { beginAtZero: true, title: { display: true, text: "traffic ×" }, grid: { color: COLORS.grid } },
-        y1: { beginAtZero: true, position: "right", title: { display: true, text: "modules down" }, grid: { display: false } }, x: { grid: { display: false } } } } });
-    on(box, "click", "[data-view]", (e, btn) => heat(btn.dataset.view));
-    on(box, "click", "[data-replay]", (e, btn) => live(r, btn.dataset.replay, btn));
-    if (autoLive && rp) { live(r, q.get("view") || "before", null); autoLive = null; }
-  };
-  const live = async (r, mode, btn) => {
-    try {
-      const { openReplay } = await import("./replay.js");
-      openReplay(r, { mode, project: S.project, opener: btn });
-    } catch (e) { fail(e); }
-  };
-  on(box, "submit", "[data-f]", (e) => { e.preventDefault(); run(); });
-  on(box, "change", "[name=event]", () => { sync(); run(); });
-  run();
-}
-
-// ------------------------------------------------------------------ 6. history
-async function history(box) {
-  const r = await api(`${P()}/simulations`);
-  box.innerHTML = String(card("Simulation runs in this project", r.runs.length ? html`<table class="data"><thead><tr><th>When</th><th>Kind</th><th>By</th><th>Parameters</th><th>Result</th></tr></thead><tbody>
-    ${r.runs.map((x) => html`<tr><td class="nowrap">${ago(x.created_at)}</td><td><span class="badge accent">${x.kind}</span></td><td class="small">${x.run_by || "—"}</td>
-      <td class="small mono">${summarise(x.params)}</td><td class="small mono">${summarise(x.summary)}</td></tr>`)}</tbody></table>` : empty("No simulations run yet."), { flush: true }));
-}
-function summarise(o) {
-  if (!o) return "";
-  return Object.entries(o).filter(([, v]) => typeof v !== "object" || Array.isArray(v)).slice(0, 6).map(([k, v]) => `${k}=${Array.isArray(v) ? v.slice(0, 4).join(",") : v}`).join("  ");
 }

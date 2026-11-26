@@ -41,13 +41,17 @@ def _situations() -> dict:
 
 
 def list_scenarios() -> list[dict]:
+    from . import spike as SPIKE  # spike imports this module
+
     out = []
     for f in sorted(SCENARIO_DIR.glob("*.json")):
         sc = _load(f.stem)
         out.append({"code": sc["code"], "name": sc["name"], "industry": sc["industry"], "tagline": sc["tagline"],
                     "summary": sc["summary"], "order": sc.get("order", 99),
                     "counts": {"modules": len(sc["modules"]), "incidents": len(sc["incidents"]),
-                               "debts": len(sc["debts"])}})
+                               "debts": len(sc["debts"])},
+                    "events": [{"key": e["key"], "name": e["name"], "peak": max(e["profile"]), "kind": SPIKE.kind_of(e)}
+                               for e in events(sc["code"])]})
     return sorted(out, key=lambda s: s["order"])
 
 

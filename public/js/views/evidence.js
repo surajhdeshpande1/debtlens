@@ -10,7 +10,7 @@ export async function render(root, ctx) {
   const tab = ctx.sub[0] || "";
   const ev = await api(`${P()}/evidence?limit=300`);
   const last = ev.scans[0];
-  root.innerHTML = String(html`${head("Repository evidence", "Objective evidence of structural weakness, mined from the repository itself — no manual documentation needed.",
+  root.innerHTML = String(html`${head("Code evidence", "Hotspots, TODO/FIXME markers and dependencies, mined from the repository itself.",
       can("evidence.write") ? html`<button class="btn primary" data-mine>Mine a GitHub repo</button>` : "")}
     ${last ? html`<div class="callout"><b>Last scan:</b> ${last.repository || "repository"} ${last.branch ? html`<span class="chip">${last.branch}</span>` : ""} ${last.commit ? html`<span class="mono small">${last.commit.slice(0, 8)}</span>` : ""}
         · ${last.commits_analyzed} commits · ${last.files_analyzed} files · via ${last.source === "github" ? "GitHub API" : last.source === "git" ? "local git (CLI)" : last.source} · ${ago(last.scanned_at)} by ${last.scanned_by || "—"}

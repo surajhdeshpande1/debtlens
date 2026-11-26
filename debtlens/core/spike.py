@@ -167,7 +167,10 @@ def events_for(scenario: str | dict | list | None) -> list[dict]:
         ev |= {"peak": max(p["profile"]), "peak_hour": p["profile"].index(max(p["profile"])), "preset": True,
                "kind": kind_of(p)}
         if p.get("effects"):
-            ev["effects"] = [{k: e.get(k) for k in ("type", "module", "start", "hours", "label")} for e in p["effects"]]
+            ev["effects"] = [{k: e.get(k) for k in ("type", "module", "start", "minute", "hours", "label", "mitigated_by")}
+                             for e in p["effects"]]
+        if p.get("bots"):
+            ev["bots"] = {"share": p["bots"].get("share"), "mitigated_by": list(p["bots"].get("mitigated_by") or [])}
         out.append(ev)
     out.append({"key": "custom", "name": "Custom spike", "preset": False, "kind": "traffic",
                 "description": "Choose the peak multiplier, the hour it starts and how long it lasts.",

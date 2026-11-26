@@ -11,6 +11,8 @@ from typer.testing import CliRunner
 os.environ.setdefault("DEBTLENS_DISABLE_ML", "1")
 
 from debtlens.cli.main import app  # noqa: E402
+from debtlens.core import packs as PK  # noqa: E402
+from debtlens.core import report as REPORT  # noqa: E402
 
 runner = CliRunner()
 
@@ -105,31 +107,40 @@ def test_live_replay_in_the_terminal(monkeypatch):
     assert LIVE.count(4500) == "4,500" and LIVE.count(3.2e5) == "3.2 lakh" and LIVE.count(1.4e7) == "1.4 crore"
 
 
-def test_scenario_pack_commands(tmp_path):
+def test_scenario_packs_run_by_name_and_pack_files_open_on_the_website(tmp_path):
     packs = json.loads(run("pack", "list", "--json").output)
-    assert [p["code"] for p in packs] == ["tatkal", "broker", "food", "stream", "rides", "taxfiling", "tickets"]
+    assert [p["code"] for p in packs] == ["tatkal", "broker", "food", "stream", "rides", "taxfiling", "tickets", "exam",
+                                          "airline", "appointments", "grocery"]
     listed = {s["code"] for s in json.loads(run("scenarios", "--json").output)}
-    assert listed >= {"fintech", "tatkal", "tickets"}
+    assert listed >= {"fintech", "tatkal", "tickets", "exam", "grocery"}
     r = run("pack", "show", "food")
-    assert r.exit_code == 0 and "IPL final night" in r.output and "dispatch" in r.output, r.output
-    out = tmp_path / "rail.json"
-    assert run("pack", "export", "tatkal", "-o", str(out)).exit_code == 0 and out.stat().st_size > 10_000
-    r = run("pack", "validate", str(out))
-    assert r.exit_code == 0 and "valid pack" in r.output, r.output
-    s = json.loads(run("simulate", "spike", "-s", str(out), "--runs", "60", "--json").output)
-    assert s["event"]["key"] == "tatkal-10am" and s["plan"]["hours_used"] <= 40
+    assert r.exit_code == 0 and "IPL final night" in r.output and "dispatch" in r.output and "Situations" in r.output, r.output
+    evs = json.loads(run("simulate", "spike", "-s", "grocery", "--list", "--json").output)
+    assert [e["key"] for e in evs][:2] == ["diwali-evening", "drop-scripts"] and {e["kind"] for e in evs} >= {"bots", "outage", "deploy"}
+    s = json.loads(run("simulate", "spike", "-s", "rides", "--runs", "60", "--json").output)
+    assert s["event"]["kind"] == "traffic" and s["plan"]["hours_used"] <= 40
     assert json.loads(run("plan", "-s", "rides", "--budget", "40", "--json").output)["total_weight"] <= 40
-    r = run("demo", str(out))
-    assert r.exit_code == 0 and "RailYatra" in r.output, r.output
-    broken = json.loads(out.read_text())
-    broken["debts"][0]["module"] = "space"
-    bad = tmp_path / "broken.json"
-    bad.write_text(json.dumps(broken))
-    r = run("pack", "validate", str(bad))
-    assert r.exit_code == 1 and "space" in r.output
-    r = run("plan", "-s", str(bad))
-    assert r.exit_code != 0 and "not a usable pack" in (r.output + str(r.exception))
+    # a pack file is not opened in the terminal: the website checks it and opens it
+    f = tmp_path / "rail.json"
+    f.write_text(PK.dump(PK.get("tatkal")), encoding="utf-8")
+    for args in (("demo", str(f)), ("plan", "-s", str(f)), ("simulate", "spike", "-s", str(f)), ("pack", "show", str(f))):
+        r = run(*args)
+        assert r.exit_code != 0 and "opened on the website" in (r.output + str(r.exception)), args
+    assert run("pack", "validate", str(f)).exit_code != 0 and run("pack", "export", "tatkal").exit_code != 0
     assert run("pack", "show", "nope").exit_code != 0
+
+
+def test_a_situation_ends_with_the_same_report_as_the_website(tmp_path):
+    dest = tmp_path / "report.txt"
+    r = run("simulate", "spike", "-s", "fintech", "-e", "acquirer-outage", "--runs", "80", "--report", "-o", str(dest))
+    assert r.exit_code == 0, r.output
+    for needle in ("DebtLens run report: Acquiring bank outage — PayCore", "WHAT HAPPENED ON THE DAY YOU WATCHED",
+                   "WHY IT FAILED", "WHAT TO DO NEXT", "DEBT-104"):
+        assert needle in r.output, needle
+    text = dest.read_text(encoding="utf-8")
+    assert text.startswith("DebtLens run report") and "HOW THIS WAS WORKED OUT" in text
+    j = json.loads(run("simulate", "spike", "-s", "fintech", "-e", "acquirer-outage", "--runs", "80", "--json").output)
+    assert REPORT.hours(j["before"]["hours_lost"]) in text and REPORT.hours(j["after"]["hours_lost"]) in text
 
 
 def test_ci_exit_codes():

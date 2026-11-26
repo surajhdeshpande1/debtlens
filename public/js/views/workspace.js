@@ -11,7 +11,7 @@ export async function render(root) {
   const p = S.project;
   const perms = S.meta.permissions || {};
   const roles = S.meta.roles || [];
-  root.innerHTML = String(html`${head("Team & settings", "Organisation → project → members. Every permission below is checked by the server on each request, not just hidden in the page.")}
+  root.innerHTML = String(html`${head("Team & settings", "People, roles, API tokens and project settings. The server checks every permission on every request.")}
     <div class="grid c2">
       ${card("Project", html`<form data-proj>
           <div class="field"><label>Name</label><input name="name" type="text" value="${p.name}" ${can("settings.write") ? "" : "disabled"}></div>

@@ -23,7 +23,7 @@ async function renderList(root) {
   const filters = { status: q.get("status") || "", severity: q.get("severity") || "", module: q.get("module") || "", q: q.get("q") || "", source: q.get("source") || "" };
   const qs = new URLSearchParams(Object.entries(filters).filter(([, v]) => v)).toString();
   const [list, mods] = await Promise.all([api(`${P()}/incidents?limit=500${qs ? "&" + qs : ""}`), modules()]);
-  root.innerHTML = String(html`${head("Incidents", "Every production failure, its severity, module and lifecycle (Open → Investigating → Resolved). Click one to see its 5 Whys chain and similar past incidents.",
+  root.innerHTML = String(html`${head("Incidents", "Every production failure with its severity and status. Open one for its 5 Whys and similar past incidents.",
       html`${can("import.write") ? html`<a class="btn" href="${link("evidence", "import")}">Import</a>` : ""}<button class="btn" data-csv>Export CSV</button>
       ${can("incident.write") ? html`<a class="btn primary" href="${link("incidents", "new")}">Report incident</a>` : ""}`)}
     <section class="card"><form class="table-tools" data-filters>

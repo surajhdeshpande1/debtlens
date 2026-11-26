@@ -14,6 +14,7 @@ from typing import List, Optional
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
@@ -23,7 +24,9 @@ from ..core import engine as E
 from ..core import ingest as ING
 from ..core import mining as MIN
 from ..core import packs as PK
+from ..core import report as REPORT
 from ..core import scenarios as SC
+from ..core import spike as SPIKE
 from ..core import similarity as SIM
 from .client import Api, CliError, config_dir, load_config, save_config
 
@@ -44,8 +47,8 @@ out = Console(highlight=False)
 err = Console(stderr=True, highlight=False)
 
 ProjectOpt = typer.Option(None, "--project", "-p", help="Website project id (needs `debtlens login`).")
-ScenarioOpt = typer.Option(None, "--scenario", "-s", help="Bundled scenario (fintech, healthtech, ecommerce, college, "
-                           "self), a scenario pack code (`debtlens pack list`) or a pack .json file.")
+ScenarioOpt = typer.Option(None, "--scenario", "-s", help="Built-in system: fintech, healthtech, ecommerce, college, self, "
+                           "or a scenario pack code (`debtlens pack list`). Your own pack files open on the website.")
 SnapshotOpt = typer.Option(None, "--snapshot", help="A JSON snapshot exported from the website.")
 JsonOpt = typer.Option(False, "--json", help="Print JSON instead of tables.")
 
@@ -108,17 +111,12 @@ class Source:
                 err.print("[dim]offline: using the bundled fintech scenario (pass --scenario, --project or --snapshot)[/]")
 
     def _load_scenario(self, code: str):
-        path = Path(code).expanduser()
-        if code.lower().endswith(".json") or path.is_file():
-            pack = read_pack(path)
-            self._snap = SC.materialize(pack)
-            self.kind, self.label, self.code = "scenario", f"pack {pack['name']} ({path.name})", pack["code"]
-            self.pack = pack
-            return
+        if code.lower().endswith(".json") or Path(code).expanduser().is_file():
+            raise CliError(PACK_FILES_ON_WEB)
         code = code.lower()
         if not SC.known(code):
             raise CliError(f"unknown scenario '{code}' — try: "
-                           f"{', '.join([s['code'] for s in SC.list_scenarios()] + PK.codes())}, or a pack .json file")
+                           f"{', '.join([s['code'] for s in SC.list_scenarios()] + PK.codes())}")
         self._snap = SC.materialize(code)
         kind = "pack" if code in PK.codes() else "scenario"
         self.kind, self.label, self.code = "scenario", f"{kind} {code}", code
@@ -148,16 +146,8 @@ class Source:
         return f"{p.get('name', 'Project')} · {p.get('industry') or self.label}"
 
 
-def read_pack(path: Path) -> dict:
-    """Load and check a pack file; every problem is reported at once."""
-    try:
-        pack, warnings = PK.load_file(path)
-    except PK.PackError as e:
-        raise CliError(f"{path} is not a usable pack:\n  " + "\n  ".join(e.problems[:40])
-                       + ("\n  …" if len(e.problems) > 40 else "")) from None
-    for w in warnings[:10]:
-        err.print(f"[yellow]note[/] {w}")
-    return pack
+PACK_FILES_ON_WEB = ("pack files are opened on the website: on the start page, Pick a system → Upload a scenario "
+                     "pack. The terminal runs the built-in systems by name (`debtlens scenarios`).")
 
 def embedder():
     """MiniLM if it has been downloaded (`debtlens model download`), else None (char n-gram fallback)."""
@@ -239,23 +229,22 @@ def pack_list(as_json: bool = JsonOpt):
                   f"{ev['peak']:g}× at {ev['peak_hour']:02d}:00" if ev else "—",
                   str(s["counts"]["incidents"]), str(s["counts"]["debts"]))
     out.print(t)
-    out.print("[dim]Open one: debtlens demo tatkal · debtlens simulate spike -s tatkal · "
-              "copy one to edit: debtlens pack export tatkal[/]")
+    out.print("[dim]Open one: debtlens demo tatkal · its situations: debtlens pack show tatkal · "
+              "your own pack: upload it on the website[/]")
 
 
 def _pack_arg(ref: str) -> dict:
-    p = Path(ref).expanduser()
-    if ref.lower().endswith(".json") or p.is_file():
-        return read_pack(p)
+    if ref.lower().endswith(".json") or Path(ref).expanduser().is_file():
+        raise CliError(PACK_FILES_ON_WEB)
     try:
         return PK.get(ref.lower())
     except KeyError:
-        raise CliError(f"no pack '{ref}' — try: {', '.join(PK.codes())}, or a .json file") from None
+        raise CliError(f"no pack '{ref}' — try: {', '.join(PK.codes())}") from None
 
 
 @pack_app.command("show")
-def pack_show(ref: str = typer.Argument(..., help="Pack code or .json file."), as_json: bool = JsonOpt):
-    """What a pack contains: modules, incidents, debt and its load-spike event."""
+def pack_show(ref: str = typer.Argument(..., help="Pack code (`debtlens pack list`)."), as_json: bool = JsonOpt):
+    """What a pack contains: modules, incidents, debt and the situations it can run."""
     pack = _pack_arg(ref)
     if as_json:
         return emit_json(PK.info(pack))
@@ -266,13 +255,9 @@ def pack_show(ref: str = typer.Argument(..., help="Pack code or .json file."), a
     out.print(f"{i['counts']['modules']} modules · {len(pack['dependencies'])} dependencies · "
               f"{i['counts']['incidents']} incidents · {i['counts']['debts']} debt items · "
               f"{len(pack['files'])} files · {len(pack['satd'])} TODO/FIXME markers")
-    ev = i.get("event")
-    if ev:
-        out.print(f"Busiest day: [bold]{ev['name']}[/] — {ev['peak']:g}× a normal peak at {ev['peak_hour']:02d}:00")
-        if ev.get("description"):
-            out.print(f"[dim]{ev['description']}[/]")
     if i.get("headline"):
         out.print(f"Story: {i['headline']}")
+    _situations_table(SPIKE.events_for(SC.events(pack)), pack["code"])
     t = table("module", ("incidents", "right"), ("debts", "right"), "owner")
     for m in pack["modules"]:
         t.add_row(m["name"], str(sum(1 for x in pack["incidents"] if x["module"] == m["name"])),
@@ -281,41 +266,22 @@ def pack_show(ref: str = typer.Argument(..., help="Pack code or .json file."), a
     out.print(t)
 
 
-@pack_app.command("validate")
-def pack_validate(file: Path = typer.Argument(..., help="Pack .json file."), as_json: bool = JsonOpt):
-    """Check a pack file: every problem at once, so it can be fixed in one pass."""
-    try:
-        pack, warnings = PK.load_file(file)
-    except PK.PackError as e:
-        if as_json:
-            emit_json({"valid": False, "problems": e.problems})
-        else:
-            err.print(f"[red]✗ {file} has {len(e.problems)} problem{'s' if len(e.problems) != 1 else ''}[/]")
-            for p in e.problems:
-                err.print(f"  • {p}")
-        raise typer.Exit(1) from None
-    if as_json:
-        return emit_json({"valid": True, "warnings": warnings, "info": PK.info(pack)})
-    i = PK.info(pack)
-    out.print(f"[green]✓ {file} is a valid pack[/]: {pack['name']} — {i['counts']['modules']} modules, "
-              f"{i['counts']['incidents']} incidents, {i['counts']['debts']} debt items"
-              + (f", event: {i['event']['name']}" if i.get("event") else ", no load-spike event"))
-    for w in warnings:
-        out.print(f"  [yellow]note[/] {w}")
-    out.print(f"[dim]Use it: debtlens demo {file} · debtlens simulate spike -s {file} · or upload it on the website[/]")
+KIND_STYLE = {"traffic": "blue", "bots": "magenta", "outage": "red", "deploy": "red", "database": "green",
+              "cache": "yellow", "leak": "cyan", "zone": "white", "retry": "magenta"}
 
 
-@pack_app.command("export")
-def pack_export(code: str = typer.Argument(..., help="Bundled pack code."),
-                output: Optional[Path] = typer.Option(None, "--output", "-o", help="File to write (default <code>.json).")):
-    """Write a bundled pack to a file — edit it, then upload it or pass it back with --scenario."""
-    try:
-        pack = PK.get(code.lower())
-    except KeyError:
-        raise CliError(f"no pack '{code}' — try: {', '.join(PK.codes())}") from None
-    dest = output or Path(f"{pack['code']}.json")
-    dest.write_text(PK.dump(pack), encoding="utf-8")
-    out.print(f"[green]✓[/] wrote {dest} ({dest.stat().st_size // 1000} KB)")
+def _situations_table(events: list[dict], code: str) -> None:
+    t = table("situation (-e)", "kind", "name", ("peak", "right"), "what goes wrong", title="Situations")
+    for e in events:
+        if e["key"] == "custom":
+            continue
+        what = "; ".join(x["label"] for x in e.get("effects") or [])
+        if e.get("bots"):
+            what = f"bots are {100 * e['bots']['share']:.0f}% of the extra traffic"
+        t.add_row(f"[cyan]{e['key']}[/]", f"[{KIND_STYLE.get(e['kind'], '')}]{e['kind']}[/]", e["name"],
+                  f"{e['peak']:g}× at {e['peak_hour']:02d}:00", what or "a rush of real users")
+    out.print(t)
+    out.print(f"[dim]Run one: debtlens simulate spike -s {code} -e <situation> --report   (add --live to watch it)[/]")
 
 
 @app.command()
@@ -856,7 +822,7 @@ def sim_cascade(module: str = typer.Argument(..., help="Module to fail."), p: fl
 
 
 @simulate_app.command("spike")
-def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="Preset event key (default: the scenario's own)."),
+def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="Situation key (default: the system's busiest day); see --list."),
               peak: Optional[float] = typer.Option(None, help="Custom spike: traffic multiplier at the peak."),
               start: int = typer.Option(20, help="Custom spike: start hour (0-23)."),
               hours: int = typer.Option(2, help="Custom spike: hours at the peak."),
@@ -867,12 +833,20 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
               after: bool = typer.Option(False, "--after", help="With --live: play the day after the fixes."),
               speed: float = typer.Option(2.0, "--speed", min=0.25, max=8.0, help="With --live: playback speed."),
               no_freeze: bool = typer.Option(False, "--no-freeze", help="With --live: no frozen-screen effects."),
+              report: bool = typer.Option(False, "--report", help="Print the full report: what happened, why, what to fix first, what next."),
+              output: Optional[Path] = typer.Option(None, "--output", "-o", help="Also write the report to this text file."),
+              list_: bool = typer.Option(False, "--list", help="List this system's situations and exit."),
               project: Optional[int] = ProjectOpt, scenario: Optional[str] = ScenarioOpt, snapshot: Optional[Path] = SnapshotOpt,
               as_json: bool = JsonOpt):
-    """Load spike: which modules overload hour by hour, and what to fix before the event."""
+    """Run a situation (a rush, bots, an outage, a bad release…) on a system: what fails, why, and what to fix first."""
     if live and as_json:
         raise CliError("--live draws in the terminal; leave out --json")
     src = Source(project, scenario, snapshot)
+    if list_:
+        evs = _events_of(src)
+        if as_json:
+            return emit_json(evs)
+        return _situations_table(evs, getattr(src, "code", None) or (scenario or "<code>"))
     ev = {"peak": peak, "start_hour": start, "duration": hours} if peak else event
     with out.status(f"Simulating {runs} days of traffic…", spinner="dots") if not as_json else _null():
         if src.remote:
@@ -882,10 +856,23 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
                 r = E.spike(src.snap(), ev, budget, runs, seed, src.params(), _playbook_edits(src))
             except ValueError as e:
                 raise CliError(str(e)) from None
+    rep = r.get("report") or E.spike_report(src.snap(), r)
+    if output:
+        output.write_text(REPORT.to_text(rep), encoding="utf-8")
     if as_json:
         return emit_json(r)
     if live:
-        return _live_spike(r, "side" if side else "after" if after else "before", speed, not no_freeze)
+        _live_spike(r, "side" if side else "after" if after else "before", speed, not no_freeze)
+        out.print()
+        _print_report(rep)
+        if output:
+            out.print(f"[dim]Report written to {output}[/]")
+        return
+    if report:
+        _print_report(rep)
+        if output:
+            out.print(f"[dim]Report written to {output}[/]")
+        return
     e = r["event"]
     out.print(f"[bold]{e['name']}[/] — peak {r['peak']:g}× normal traffic. {e.get('description', '')}\n")
     b, a = r["before"], r["after"]
@@ -920,7 +907,33 @@ def sim_spike(event: Optional[str] = typer.Option(None, "--event", "-e", help="P
         t.add_row(m["module"], f"{100 * m['peak_utilisation_before']:.0f}%", f"{100 * m['p_incident_before']:.0f}%",
                   spark(m["utilisation_before"]), f"{100 * m['peak_utilisation_after']:.0f}% · {100 * m['p_incident_after']:.0f}%")
     out.print(t)
-    out.print("[dim]Columns run 00:00 → 23:00. Load = traffic ÷ capacity left after open debt.[/]")
+    out.print("[dim]Columns run 00:00 → 23:00. Load = traffic ÷ capacity left after open debt. "
+              "Add --report for what happened, why and what to do next.[/]")
+    if output:
+        out.print(f"[dim]Report written to {output}[/]")
+
+
+def _events_of(src: "Source") -> list[dict]:
+    """The situations a source can run (its busiest day first)."""
+    if src.remote:
+        return src.api.get(src.path("/simulate/spike/events"))["events"]
+    if getattr(src, "code", None):
+        return SPIKE.events_for(SC.events(src.code))
+    p = src.snap().get("project") or {}
+    evs = [p["spike"], *(p.get("events") or [])] if isinstance(p.get("spike"), dict) else []
+    return SPIKE.events_for(evs or (p.get("scenario") or ""))
+
+
+def _print_report(rep: dict) -> None:
+    """The end-of-run report, the same text as the website's report and its PDF."""
+    width = max(72, min(110, out.width - 2))
+    for line in REPORT.to_text(rep, width=width).splitlines():
+        if line and line.isupper() and not line.startswith("─"):
+            out.print(f"[bold]{escape(line)}[/]")
+        elif line.startswith("DebtLens run report"):
+            out.print(f"[bold cyan]{escape(line)}[/]")
+        else:
+            out.print(escape(line), soft_wrap=True)
 
 
 def _live_spike(r: dict, mode: str, speed: float, effects: bool) -> None:
@@ -940,7 +953,7 @@ def _live_spike(r: dict, mode: str, speed: float, effects: bool) -> None:
                   f"worst hour {100 * max(tr['failed_share']):.0f}% of requests failing{played}.")
     keys = ", ".join(x["key"] for x in r["plan"]["selected"]) or "nothing"
     out.print(f"Fix before the event: [cyan]{keys}[/] ({r['plan']['hours_used']:g} h). Simulated day {rp['run'] + 1} of {r['runs']}; "
-              f"on average the plan saves {r['saved_hours']['mean']:,.1f} h. [dim]Run without --live for the full report.[/]")
+              f"on average the plan saves {r['saved_hours']['mean']:,.1f} h. The full report follows.")
 
 
 @simulate_app.command("whatif")

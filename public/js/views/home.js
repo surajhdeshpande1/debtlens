@@ -80,9 +80,14 @@ export async function render(root, ctx) {
       ${card("Recent regressions", regTable(dash.regressions), { flush: true })}</div>`;
   }
   const scen = p.scenario_info;
-  root.innerHTML = String(html`${head(`${first ? "Hello, " + first : "Home"} — ${d.role_label} view`, INTRO[role] || "",
-      html`<a class="btn" href="${link("incidents", "new")}">Report incident</a>`)}
-    ${p.is_sandbox && scen ? html`<div class="callout"><b>${scen.name} · ${scen.industry}.</b> ${scen.summary}</div>` : ""}
+  let last = null;
+  try { last = (await api(`/projects/${S.project.id}/simulations?kind=spike`)).runs.find((x) => x.has_report) || null; } catch { last = null; }
+  const ls = last && last.report_summary;
+  root.innerHTML = String(html`${head(`${first ? "Hello, " + first : "Overview"} · ${d.role_label}`, INTRO[role] || "",
+      html`<a class="btn primary" href="${link("run", "situation")}">Run a scenario</a><a class="btn" href="${link("incidents", "new")}">Report incident</a>`)}
+    ${p.is_sandbox && scen ? html`<div class="callout system-line"><b>${scen.name}</b> · ${scen.industry}. ${scen.tagline || ""}</div>` : ""}
+    ${ls ? html`<a class="last-run" href="${link("runs", last.id)}"><span class="muted small">Last run report · ${ago(last.created_at)}</span>
+      <b>${ls.situation}</b><span>${n(ls.before_hours)} h → ${n(ls.after_hours)} h lost a day after ${ls.plan.join(", ") || "no fixes"}</span><span class="go">Open →</span></a>` : ""}
     ${kpis(dash)}${body}
     <p class="tiny faint" style="margin-top:16px">Similarity engine: ${d.semantic_method === "minilm" ? "MiniLM sentence embeddings + TF-IDF (hybrid)" : "character n-gram fallback + TF-IDF (MiniLM not loaded)"} · computed ${ago(d.generated_at)}</p>`);
   const trend = root.querySelector("[data-trend]");

@@ -10,7 +10,7 @@ export async function render(root) {
   const byId = Object.fromEntries(snap.incidents.map((i) => [i.id, i]));
   const lessons = snap.resolutions.filter((r) => (r.lessons || "").trim()).map((r) => ({ ...r, inc: byId[r.incident_id] })).filter((r) => r.inc)
     .sort((a, b) => (b.resolved_at || "").localeCompare(a.resolved_at || ""));
-  root.innerHTML = String(html`${head("Knowledge & reports", "What the team has learned, ready to share: lessons from every fixed incident, downloadable reports, and a quality gate for your CI pipeline.",
+  root.innerHTML = String(html`${head("Lessons & exports", "Lessons from every fixed incident, the project report as a PDF, data exports and a quality gate for CI.",
       html`<a class="btn" href="${link("intel")}">Search the knowledge base</a>`)}
     <div class="grid c2">
       ${card("Reports & exports", html`<div class="stack">
@@ -42,10 +42,8 @@ jobs:
         with: { fetch-depth: 0 }          # full history for churn
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install debtlens
-      - run: debtlens scan . --push --project ${S.project.id}
-        env: { DEBTLENS_URL: ${location.origin}, DEBTLENS_TOKEN: \${{ secrets.DEBTLENS_TOKEN }} }
-      - run: debtlens ci --project ${S.project.id} --max-open-critical 0 --max-regressions 3
+      - uses: surajhdeshpande1/debtlens@main   # scans this repo, then runs the gate
+        with: { project: ${S.project.id}, max-open-critical: 0, max-regressions: 3 }
         env: { DEBTLENS_URL: ${location.origin}, DEBTLENS_TOKEN: \${{ secrets.DEBTLENS_TOKEN }} }`)}`)}</div>`);
   copyButtons(root);
   on(root, "click", "[data-pdf]", (e, b) => { b.disabled = true; download(`${P()}/report.pdf?budget=${$("[data-budget]", root).value}`, `${S.project.key}-debtlens-report.pdf`).catch(fail).finally(() => (b.disabled = false)); });

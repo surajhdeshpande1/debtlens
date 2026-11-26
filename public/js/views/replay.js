@@ -62,7 +62,7 @@ function makeLane(r, side) {
   const entry = r.event.entry || {};
   const share = mods.map((m) => +entry[m] || 0);
   const change = Array.from({ length: 24 }, () => ({}));
-  tr.events.forEach((e) => { change[e.hour][e.module] = e.minute; });
+  tr.events.forEach((e) => { if (STATE_KINDS.has(e.kind)) change[e.hour][e.module] = e.minute; });
   return {
     side, tr, mods, util, share, total: share.reduce((a, b) => a + b, 0) || 1, change,
     profile: side === "after" && r.replay.profile_after ? r.replay.profile_after : r.profile,
@@ -70,14 +70,21 @@ function makeLane(r, side) {
   };
 }
 
-/** Each module's state at a minute: {s: 0 up / 1 overloaded / 2 failing because a dependency failed, from}. */
+// Trace events that change a module's state; the rest ("situation", "situation_end", "prevented") only tell the story.
+const STATE_KINDS = new Set(["overload", "cascade", "outage", "deploy", "fault", "recovered"]);
+const INCIDENT_KINDS = new Set(["overload", "cascade", "outage", "deploy", "fault"]);
+
+/** Each module's state at a minute: {s: 0 up / 1 failed itself / 2 failing because a dependency failed, from, kind}. */
 function statesAt(L, min) {
   const h = Math.max(0, Math.min(23, Math.floor(min / 60)));
   const now = L.tr.states[h], prev = h ? L.tr.states[h - 1] : null;
+  const kinds = L.tr.kinds || [];
   return L.mods.map((m, i) => {
     const s = now[i], p = prev ? prev[i] : 0, c = L.change[h][m];
-    if (s !== p && (s === 0 || p === 0) && c !== undefined && min < c) return { s: p, from: p === 2 ? L.tr.cause[h - 1][i] : null };
-    return { s, from: s === 2 ? L.tr.cause[h][i] : null };
+    if (s !== p && (s === 0 || p === 0) && c !== undefined && min < c) {
+      return { s: p, from: p === 2 ? L.tr.cause[h - 1][i] : null, kind: p && kinds[h - 1] ? kinds[h - 1][i] : null };
+    }
+    return { s, from: s === 2 ? L.tr.cause[h][i] : null, kind: s && kinds[h] ? kinds[h][i] : null };
   });
 }
 const failingShare = (L, st) => Math.min(1, st.reduce((a, x, i) => a + (x.s ? L.share[i] : 0), 0) / L.total);
@@ -86,7 +93,7 @@ const failingShare = (L, st) => Math.min(1, st.reduce((a, x, i) => a + (x.s ? L.
 /**
  * Open the live replay for a load-spike result.
  * @param {object} r  POST /simulate/spike result (needs r.replay)
- * @param {{mode?: "before"|"after"|"side", project?: object, opener?: Element}} opts
+ * @param {{mode?: "before"|"after"|"side", project?: object, opener?: Element, onReport?: Function, onClose?: Function}} opts
  */
 export function openReplay(r, opts = {}) {
   if (!r || !r.replay) return () => {};
@@ -271,9 +278,10 @@ export function openReplay(r, opts = {}) {
     const evs = L.tr.events;
     while (X.evIx < evs.length && evs[X.evIx].minute <= toMin) {
       const e = evs[X.evIx++];
-      if (e.kind !== "recovered") { X.inc += 1; X.hours += +e.cost_hours || 0; }
-      pushAlert(X, alertFor(e), silent);
-      if (!silent && e.kind !== "recovered") {
+      if (INCIDENT_KINDS.has(e.kind)) { X.inc += 1; X.hours += +e.cost_hours || 0; }
+      pushAlert(X, alertFor(e, X.side), silent);
+      if (!INCIDENT_KINDS.has(e.kind)) { if (!silent && e.kind === "situation") beep([440, 440], 0.1, 0.04); continue; }
+      if (!silent) {
         if (e.severity === "CRITICAL") { beep([880, 660]); if (fx && !reducedMotion() && !X.frozen) shake(X); } else beep([660]);
       } else if (!silent) beep([523], 0.08, 0.03);
     }
@@ -311,8 +319,14 @@ export function openReplay(r, opts = {}) {
     }
   }
 
-  function alertFor(e) {
+  function alertFor(e, side) {
     const t = clock(e.minute);
+    if (e.kind === "situation") {
+      const what = e.effect === "capacity" ? ` ${e.module === "*" ? "Every module" : e.module} is down to ${Math.round((e.factor || 0) * 100)}% of its capacity${e.mitigated ? " (softened by the fix)" : ""}.` : "";
+      return { t, cls: "high", text: `⚠ ${e.label}.${what}` };
+    }
+    if (e.kind === "situation_end") return { t, cls: "info", text: `${e.label}.` };
+    if (e.kind === "prevented") return { t, cls: "ok", text: `✓ ${e.label}` };
     const cls = e.kind === "recovered" ? "ok" : (e.severity || "MEDIUM").toLowerCase();
     const page = e.severity === "CRITICAL" ? " Paging on-call." : "";
     const cost = ` About ${n(e.cost_hours)} engineer-hours to handle.`;
@@ -321,6 +335,9 @@ export function openReplay(r, opts = {}) {
       return { t, cls, text: (u >= 100 ? `${e.module} overloaded: ${u}% of its capacity.` : `${e.module} went down at ${u}% load, too close to its limit.`) + page + cost };
     }
     if (e.kind === "cascade") return { t, cls, text: `${e.module} failing: it depends on ${e.from}, which is down.${page}${cost}` };
+    if (e.kind === "outage") return { t, cls, text: `${e.module} stopped answering: what it depends on outside is down.${page}${cost}` };
+    if (e.kind === "deploy") return { t, cls, text: `${e.module} broken by a new release.${page}${cost}` };
+    if (e.kind === "fault") return { t, cls, text: `${e.module} crashed on its own (a random fault).${page}${cost}` };
     return { t, cls, text: `${e.module} recovered.` };
   }
 
@@ -392,7 +409,8 @@ export function openReplay(r, opts = {}) {
       if (!t) continue;
       const s = X.st[i].s, u = X.cur[i];
       const cls = s === 1 ? "down" : s === 2 ? "cascade" : u >= 0.85 ? "hot" : "ok";
-      if (t.dataset.s !== cls) { t.dataset.s = cls; t.className = `rp-tile ${cls}`; t.querySelector(".rp-chip").textContent = { ok: "OK", hot: "HOT", down: "DOWN", cascade: "FAILING" }[cls]; }
+      const chip = s === 1 ? ({ outage: "OUTAGE", deploy: "BAD RELEASE", fault: "CRASHED" }[X.st[i].kind] || "DOWN") : { ok: "OK", hot: "HOT", cascade: "FAILING" }[cls];
+      if (t.dataset.s !== cls + chip) { t.dataset.s = cls + chip; t.className = `rp-tile ${cls}`; t.querySelector(".rp-chip").textContent = chip; }
       t.querySelector(".rp-meter i").style.width = `${Math.min(100, (u / 1.5) * 100)}%`;
       t.querySelector("[data-load]").textContent = `load ${Math.round(u * 100)}%`;
       t.querySelector("[data-why]").textContent = s === 2 && X.st[i].from ? `← ${X.st[i].from}` : "";
@@ -449,8 +467,9 @@ export function openReplay(r, opts = {}) {
       <p>${X.side === "before" ? (saved > 0.05 ? `With the fixes, the same day costs ${n(other.total_hours_lost)} h: ${n(saved)} h saved.` : "The fixes would not change this day.")
         : `Fixed before the event: ${planKeys.join(", ") || "nothing"}. Today this day costs ${n(other.total_hours_lost)} h.`}
         Over all ${r.runs} simulated days the plan saves ${n(r.saved_hours.mean)} h on average.</p>
-      ${mode === "side" ? "" : html`<div class="rp-end-go">${X.side === "before" ? html`<button data-mode="after" class="rp-big">▶ Same day, after the fixes</button>` : html`<button data-mode="before">▶ Today again</button>`}
-        <button data-mode="side">Side by side</button><button data-act="restart">↺ Replay</button></div>`}</div>`;
+      <div class="rp-end-go">${mode === "side" ? "" : X.side === "before" ? html`<button data-mode="after" class="rp-big">▶ Same day, after the fixes</button>` : html`<button data-mode="before">▶ Today again</button>`}
+        ${mode === "side" ? "" : html`<button data-mode="side">Side by side</button>`}<button data-act="restart">↺ Replay</button>
+        ${opts.onReport ? html`<button data-act="report" class="${X.side === "after" || mode === "side" ? "rp-big" : ""}">Read the report →</button>` : ""}</div></div>`;
   }
 
   function drawStrip(force = false) {
@@ -583,6 +602,7 @@ export function openReplay(r, opts = {}) {
       b.setAttribute("aria-pressed", String(sound)); b.textContent = sound ? "Sound on" : "Sound off";
       if (sound) beep([660], 0.06, 0.03);
     } else if (a === "full") toggleFull();
+    else if (a === "report") { const f = opts.onReport; close(); if (f) f(); }
     else if (a === "close") close();
   }
 
@@ -613,6 +633,7 @@ export function openReplay(r, opts = {}) {
     if (ac) ac.close().catch(() => {});
     root.remove();
     if (opts.opener && opts.opener.focus) opts.opener.focus();
+    if (opts.onClose) opts.onClose();
   }
 
   const prevOverflow = document.body.style.overflow;

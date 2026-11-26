@@ -20,7 +20,7 @@ async function renderList(root) {
   const st = q.get("status") || "";
   const d = await api(`${P()}/debts${st ? "?status=" + st : ""}`);
   const maxRisk = Math.max(1, ...d.items.map((r) => r.risk || 0));
-  root.innerHTML = String(html`${head("Debt registry", "Each item is a structural weakness with a price: principal (hours to fix) and interest (hours it costs every month). Sorted by risk.",
+  root.innerHTML = String(html`${head("Debt items", "Each weakness with its price: hours to fix it (principal) and hours it costs every month (interest). Riskiest first.",
       html`<a class="btn" href="${link("debts", "playbooks")}">Fix playbooks</a><button class="btn" data-csv>Export ledger CSV</button>${can("debt.write") ? html`<a class="btn primary" href="${link("debts", "new")}">Add debt</a>` : ""}`)}
     <section class="card"><div class="table-tools"><div class="tabs" style="margin:0;border:0">${["", ...STATUSES].map((s) => html`<a href="${link("debts")}${s ? "?status=" + s : ""}" class="${s === st ? "active" : ""}">${s ? label(s) : "All"}</a>`)}</div>
       <span class="grow"></span><span class="muted small">${d.total} item${d.total === 1 ? "" : "s"}</span></div>
@@ -136,7 +136,7 @@ async function playbookCard(box, x) {
   const m = pb.match || {};
   const why = m.chosen ? "chosen by the team" : (m.matched || []).length ? `matched on “${m.matched.slice(0, 4).join("”, “")}”` : "general guidance (no specific pattern found)";
   const edit = can("debt.write");
-  const effect = pb.capacity || pb.resilience ? html`<p class="tiny muted" style="margin:10px 0 0">While open, this kind of debt costs the module ${n(pb.capacity * 100, 0)}% of its capacity and adds ${n(pb.resilience, 2)} to its fragility in the <a href="${link("sim", "spike")}">load-spike simulation</a>.</p>` : "";
+  const effect = pb.capacity || pb.resilience ? html`<p class="tiny muted" style="margin:10px 0 0">While open, this kind of debt costs the module ${n(pb.capacity * 100, 0)}% of its capacity and adds ${n(pb.resilience, 2)} to its fragility in the <a href="${link("run", "situation")}">situation runs</a>.</p>` : "";
   box.innerHTML = String(card(html`Fix playbook <span class="muted small" style="font-weight:400">· ${pb.title}</span>`, html`<div data-tour="playbook">
       <div class="row tight" style="margin-bottom:8px"><span class="small muted">${why}</span><span class="grow"></span>
         ${edit ? html`<select data-choose aria-label="Use another playbook" style="width:auto;max-width:260px"><option value="">Automatic match</option>${pb.choices.map((c) => html`<option value="${c.key}" ${m.chosen && c.key === pb.key ? "selected" : ""}>${c.title}</option>`)}</select>` : ""}
