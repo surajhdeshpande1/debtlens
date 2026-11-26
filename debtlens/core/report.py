@@ -21,6 +21,8 @@ INCIDENT_LABEL = {"overload": "Overload", "cascade": "Knock-on failure", "outage
 SITUATION_LABEL = {"traffic": "Rush of real users", "bots": "Bot attack", "outage": "Provider outage",
                    "deploy": "Bad release", "database": "Database trouble", "cache": "Cache stampede",
                    "leak": "Memory leak", "zone": "Data-centre zone lost", "retry": "Retry storm"}
+KIND_SHORT = {"traffic": "Rush", "bots": "Bots", "outage": "Outage", "deploy": "Bad release", "database": "Database",
+              "cache": "Cache", "leak": "Memory leak", "zone": "Zone lost", "retry": "Retry storm"}  # as on the website
 KIND_ORDER = ("overload", "cascade", "outage", "deploy", "fault")
 
 

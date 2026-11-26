@@ -278,7 +278,7 @@ def _situations_table(events: list[dict], code: str) -> None:
         what = "; ".join(x["label"] for x in e.get("effects") or [])
         if e.get("bots"):
             what = f"bots are {100 * e['bots']['share']:.0f}% of the extra traffic"
-        t.add_row(f"[cyan]{e['key']}[/]", f"[{KIND_STYLE.get(e['kind'], '')}]{e['kind']}[/]", e["name"],
+        t.add_row(f"[cyan]{e['key']}[/]", f"[{KIND_STYLE.get(e['kind'], '')}]{REPORT.KIND_SHORT.get(e['kind'], e['kind'])}[/]", e["name"],
                   f"{e['peak']:g}× at {e['peak_hour']:02d}:00", what or "a rush of real users")
     out.print(t)
     out.print(f"[dim]Run one: debtlens simulate spike -s {code} -e <situation> --report   (add --live to watch it)[/]")
