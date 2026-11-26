@@ -1,6 +1,6 @@
 // Run a scenario, in four steps: 1 pick a system → 2 pick a situation → 3 watch it happen → 4 read the report.
 import { $, api, fail, html, n, on } from "../lib.js";
-import { allSystems, go, isSandbox, kindLabel, link, S, switchSystem, systemCard, uploadCard, wirePackUpload } from "../app.js";
+import { allSystems, busy, go, isSandbox, kindLabel, link, S, switchSystem, systemCard, uploadCard, wirePackUpload } from "../app.js";
 import { empty } from "./_parts.js";
 import { loadReport, reportHtml, wireReport } from "./report.js";
 
@@ -50,8 +50,8 @@ function pickSystem(root) {
       ${cur.uploaded ? html`<div class="sys current"><div class="ind">Uploaded pack</div><h3>${cur.name}</h3><p class="tag">The pack you uploaded.</p><span class="badge accent">Open now</span></div>` : ""}
       ${uploadCard()}</div>`);
   on(root, "click", "[data-open]", async (e, b) => {
-    b.disabled = true;
-    try { await switchSystem(b.dataset.open); } catch (ex) { fail(ex); b.disabled = false; }
+    busy(b, "Opening…");
+    try { await switchSystem(b.dataset.open); } catch (ex) { fail(ex); busy(b, null); }
   });
   wirePackUpload(root, { onOpen: (pack) => switchSystem(null, pack) });
 }

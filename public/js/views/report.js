@@ -7,9 +7,9 @@ const KIND_TONE = { overload: "bad", cascade: "warn", outage: "bad", deploy: "ba
 const pctf = (v, d = 1) => (v === null || v === undefined ? "–" : `${n(v, d)}%`);
 const h = (v) => `${n(v)} h`;
 
-function change(before, after, unit = "", lowerIsBetter = true) {
+function change(before, after, unit = "", lowerIsBetter = true, d = 1) {
   const better = lowerIsBetter ? after < before : after > before;
-  return html`<span class="from">${n(before)}${unit}</span><span class="arrow">→</span><span class="to ${better ? "good" : after === before ? "" : "worse"}">${n(after)}${unit}</span>`;
+  return html`<span class="from">${n(before, d)}${unit}</span><span class="arrow">→</span><span class="to ${better ? "good" : after === before ? "" : "worse"}">${n(after, d)}${unit}</span>`;
 }
 
 function timeline(rows, story, title) {
@@ -50,7 +50,7 @@ export function reportHtml(rep, { runId = null, actions = "" } = {}) {
       <div class="rk"><div class="rk-l">Engineering hours lost</div><div class="rk-v">${change(b.hours_lost, a.hours_lost, " h")}</div><div class="rk-d">${n(sv.less_pct, 0)}% less</div></div>
       <div class="rk"><div class="rk-l">Requests failing</div><div class="rk-v">${change(b.failed_traffic_pct, a.failed_traffic_pct, "%")}</div><div class="rk-d">share of the day's requests</div></div>
       <div class="rk"><div class="rk-l">Incidents a day</div><div class="rk-v">${change(b.incidents, a.incidents)}</div><div class="rk-d">${n(b.incidents_p90, 0)} on a bad day today</div></div>
-      <div class="rk"><div class="rk-l">Days with no incident</div><div class="rk-v">${change(100 * b.p_no_incident, 100 * a.p_no_incident, "%", false)}</div><div class="rk-d">chance of a clean day</div></div>
+      <div class="rk"><div class="rk-l">Days with no incident</div><div class="rk-v">${change(100 * b.p_no_incident, 100 * a.p_no_incident, "%", false, 0)}</div><div class="rk-d">chance of a clean day</div></div>
       <div class="rk ok"><div class="rk-l">Saved by the fixes</div><div class="rk-v"><span class="to good">${h(sv.mean)}</span></div><div class="rk-d">a day · 95% confidence ${n(sv.ci95[0])}–${n(sv.ci95[1])} h</div></div>
     </section>
     <p class="small muted rep-note">These are averages over ${n(st.runs, 0)} simulated days. ${wd.label}: ${h(wd.before.hours_lost)} lost and ${n(wd.before.incidents, 0)} incidents today,

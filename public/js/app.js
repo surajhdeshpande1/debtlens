@@ -191,13 +191,13 @@ function renderLanding(tab) {
     } catch (ex) { err.textContent = ex.message; } finally { btn.disabled = false; }
   });
   on(w, "click", "[data-open]", async (e, b) => {
-    b.disabled = true;
-    try { await openSandbox(b.dataset.open, "tech_lead"); } catch (ex) { fail(ex); b.disabled = false; }
+    busy(b, "Opening…");
+    try { await openSandbox(b.dataset.open, "tech_lead"); } catch (ex) { fail(ex); busy(b, null); }
   });
   on(w, "click", "[data-tour-open]", async (e, b) => {
-    b.disabled = true;
+    busy(b, "Opening…");
     try { await openSandbox((systems[0] || {}).code || "fintech", "tech_lead", null, false); tour.start(); }
-    catch (ex) { fail(ex); b.disabled = false; }
+    catch (ex) { fail(ex); busy(b, null); }
   });
   wirePackUpload(w);
 }
@@ -236,10 +236,16 @@ export function wirePackUpload(w, { onOpen = null } = {}) {
   drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); read(e.dataTransfer.files[0]); });
   btn.addEventListener("click", async () => {
     if (!pack) return;
-    btn.disabled = true;
+    busy(btn, "Opening…");
     try { if (onOpen) await onOpen(pack); else await openSandbox(null, "tech_lead", pack); }
-    catch (ex) { show(ex.message, (ex.data && ex.data.problems) || []); btn.disabled = false; }
+    catch (ex) { show(ex.message, (ex.data && ex.data.problems) || []); busy(btn, null); }
   });
+}
+
+/** Show that a button is working (the first request after a quiet spell can take a few seconds). */
+export function busy(b, label) {
+  if (label) { b.dataset.label = b.textContent; b.disabled = true; b.innerHTML = `<span class="spinner sm"></span> ${label}`; }
+  else { b.disabled = false; if (b.dataset.label) b.textContent = b.dataset.label; }
 }
 
 /** A private sandbox of a scenario, a bundled pack or an uploaded pack; lands on "pick a situation". */

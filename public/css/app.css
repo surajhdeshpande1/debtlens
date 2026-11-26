@@ -195,6 +195,7 @@ table.data .title-cell { min-width: 220px; }
 .toast.bad { background: var(--bad); } .toast.ok { background: var(--ok); }
 .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.spinner.sm { width: 12px; height: 12px; border-width: 2px; border-color: rgba(255,255,255,.45); border-top-color: #fff; }
 .loading { padding: 40px; text-align: center; color: var(--muted); }
 
 /* ---------------------------------------------------------------- domain widgets */
