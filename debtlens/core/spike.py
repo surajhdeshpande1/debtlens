@@ -642,12 +642,43 @@ def plan_fixes(model: Model, open_debts: list[dict], factors: dict, budget: floa
             if lost(fixed2) < lost(fixed1) - 1e-9:
                 chosen = second
     fixed = frozenset().union(*chosen.values()) if chosen else frozenset()
+
+    def needs(i: int) -> frozenset:
+        """``i`` and every planned fix that cannot be done without it."""
+        return frozenset(j for j in fixed if i in _closure({j}, by_id))
+
+    # Leave out fixes that change next to nothing on this day: the knapsack would spend spare hours on them, but a
+    # plan for the day should only hold what protects it. The hours stay free for other work.
+    pruned = 0.0
+    while fixed:
+        gain = {i: lost(fixed - needs(i)) - lost(fixed) for i in fixed}
+        i = min(fixed, key=lambda x: (gain[x], by_id[x]["key"]))
+        if gain[i] >= MIN_GAIN or pruned + max(0.0, gain[i]) > MAX_PRUNED:
+            break
+        pruned += max(0.0, gain[i])
+        fixed = fixed - needs(i)
     standalone = {i: (round(max(0.0, base - lost(frozenset(_closure({i}, by_id)))), 2) if i in cand_ids else 0.0)
                   for i in by_id}
     in_plan = {i: round(max(0.0, lost(fixed - {i}) - lost(fixed)), 2) for i in fixed}
     order = sorted(fixed, key=lambda i: (-in_plan[i], by_id[i]["key"]))
+    # What would help most next, given the plan: the extra hours each further fix saves on top of it.
+    after = lost(fixed)
+    nxt = []
+    for i in sorted((i for i in cand_ids if i not in fixed), key=lambda x: (-standalone[x], by_id[x]["key"]))[:NEXT_CANDIDATES]:
+        more = frozenset(_closure({i}, by_id)) | fixed
+        extra = sum(hours[j] for j in more - fixed)
+        g = after - lost(more)
+        if g >= MIN_GAIN:
+            nxt.append({"id": i, "gain": round(g, 1), "extra_hours": round(extra, 1)})
+    nxt.sort(key=lambda x: (-x["gain"], x["extra_hours"]))
     return {"ids": order, "hours": round(sum(hours[i] for i in fixed), 1), "value": round(base - lost(fixed), 1),
-            "standalone": standalone, "in_plan": in_plan, "rounds": rounds, "simulations": len(cache)}
+            "standalone": standalone, "in_plan": in_plan, "rounds": rounds, "simulations": len(cache),
+            "next": nxt[:3]}
+
+
+MIN_GAIN = 0.5          # engineer-hours: a planned fix that protects less than this on the day is left out
+MAX_PRUNED = 1.0        # ... as long as everything left out adds up to less than this
+NEXT_CANDIDATES = 6     # further fixes valued on top of the plan, for "what next"
 
 
 def _jitter(name: str, hour: int, span: int) -> int:
@@ -834,7 +865,12 @@ def simulate(model: Model, open_debts: list[dict], factors: dict, budget: float,
         "saved_hours": _paired(before["hours_lost"], after["hours_lost"]),
         "plan": {"method": "multiple-choice knapsack over simulated fix combinations", "selected": selected,
                  "hours_used": plan["hours"], "protects_hours": plan["value"], "rounds": plan["rounds"],
-                 "combinations_simulated": plan["simulations"]},
+                 "combinations_simulated": plan["simulations"],
+                 "next": [{"id": x["id"], "key": by_id[x["id"]]["key"], "title": by_id[x["id"]].get("title"),
+                           "module": by_id[x["id"]]["module"], "principal": by_id[x["id"]].get("principal"),
+                           "extra_hours": x["extra_hours"], "gain_hours": x["gain"],
+                           "fits": plan["hours"] + x["extra_hours"] <= budget + 1e-9,
+                           "guards_situation": x["id"] in blockers} for x in plan["next"]]},
         "regular_plan": regular,
         "replay": replay,
         "bots": ({"share": model.bots.get("share"), "blocked": model.bots.get("blocked"), "adapt": BOT_ADAPT,

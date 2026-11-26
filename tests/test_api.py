@@ -300,6 +300,30 @@ def test_load_spike_simulation(client):
     assert [x["kind"] for x in runs].count("spike") == 2
 
 
+def test_every_situation_run_saves_a_report_to_read_and_download(client):
+    tok, pid = sandbox(client, "fintech")
+    r = api(client, "post", f"/projects/{pid}/simulate/spike", tok, json={"event": "acquirer-outage", "budget": 40, "runs": 60}).json
+    rep = r["report"]
+    assert r["run_id"] and rep["situation"]["key"] == "acquirer-outage" and rep["system"]["name"] == "PayCore"
+    assert rep["numbers"]["average"]["before"]["hours_lost"] == r["before"]["hours_lost"]
+    runs = api(client, "get", f"/projects/{pid}/simulations?kind=spike", tok).json["runs"]
+    assert runs[0]["id"] == r["run_id"] and runs[0]["has_report"] and "report" not in runs[0]["summary"]
+    assert runs[0]["report_summary"]["situation"] == "Acquiring bank outage"
+    viewer = as_role(client, tok, "viewer")  # anyone on the team can read and download it
+    got = api(client, "get", f"/projects/{pid}/simulations/{r['run_id']}", viewer).json
+    assert got["report"] == rep and got["run"]["params"]["event_name"] == "Acquiring bank outage"
+    pdf = client.get(f"/api/v1/projects/{pid}/simulations/{r['run_id']}/report.pdf", headers={"Authorization": f"Bearer {viewer}"})
+    assert pdf.status_code == 200 and pdf.data[:4] == b"%PDF" and "acquirer-outage" in pdf.headers["Content-Disposition"]
+    txt = client.get(f"/api/v1/projects/{pid}/simulations/{r['run_id']}/report.txt", headers={"Authorization": f"Bearer {tok}"})
+    assert txt.status_code == 200 and "WHAT TO DO NEXT" in txt.get_data(as_text=True)
+    assert api(client, "post", f"/projects/{pid}/simulate/whatif", tok, json={"budgets": [8, 40]}).status_code == 200
+    oid = api(client, "get", f"/projects/{pid}/simulations", tok).json["runs"][0]["id"]
+    assert oid != r["run_id"] and api(client, "get", f"/projects/{pid}/simulations/{oid}", tok).status_code == 404
+    assert api(client, "get", f"/projects/{pid}/simulations/999999", tok).status_code == 404
+    tok2, pid2 = sandbox(client, "college")  # another team cannot read it
+    assert api(client, "get", f"/projects/{pid}/simulations/{r['run_id']}", tok2).status_code in (403, 404)
+
+
 def test_spike_events_bot_attacks_and_the_live_replay(client):
     tok, pid = sandbox(client, "tatkal")
     r = api(client, "get", f"/projects/{pid}/simulate/spike/events", tok).json

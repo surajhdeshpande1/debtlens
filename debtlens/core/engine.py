@@ -29,6 +29,7 @@ from typing import Callable
 
 from . import clustering, economics, evaluation, graph, optimiser, playbooks, similarity, simulation
 from . import spike as SPIKE
+from . import report as REPORT
 from . import text as T
 
 EmbedFn = Callable[[list[str]], list[list[float]]]
@@ -518,6 +519,13 @@ def spike(snap: dict, event: str | dict | None = None, budget: float = 40.0, run
     res["playbook_titles"] = {k: v.title for k, v in lib.items()}
     res["journey"] = proj.get("journey")
     return res
+
+
+def spike_report(snap: dict, res: dict, run_by: str | None = None, generated_at: str | None = None) -> dict:
+    """The end-of-run report for a ``spike`` result: what happened, why, what the fixes change, what to do next."""
+    stats = module_stats(snap)
+    deps = [(a, b) for a, b in dependency_pairs(snap) if a in stats and b in stats]
+    return REPORT.build(res, snap.get("project") or {}, deps=deps, run_by=run_by, generated_at=generated_at)
 
 
 # ----------------------------------------------------------------------------- dashboard

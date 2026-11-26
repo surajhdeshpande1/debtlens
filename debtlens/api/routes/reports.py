@@ -235,3 +235,142 @@ def build_pdf(name: str, who: str, dash: dict, led: dict, plan: dict, graph: dic
                         "boosted ×1.2 past break-even.", small))
     doc.build(el)
     return buf.getvalue()
+
+
+def build_run_pdf(rep: dict) -> bytes:
+    """The end-of-run report (``core.report``) as a PDF, in the same order as the website shows it."""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    from xml.sax.saxutils import escape as esc
+
+    from ...core.report import fmt, hours, pct
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=16 * mm, rightMargin=16 * mm, topMargin=14 * mm,
+                            bottomMargin=14 * mm, title=f"DebtLens run report — {rep['title']}", author="DebtLens")
+    ss = getSampleStyleSheet()
+    h1 = ParagraphStyle("h1", parent=ss["Heading1"], fontSize=15, leading=19, spaceAfter=3)
+    h2 = ParagraphStyle("h2", parent=ss["Heading2"], fontSize=11.5, spaceBefore=10, spaceAfter=4)
+    body = ParagraphStyle("b", parent=ss["BodyText"], fontSize=9, leading=12.2)
+    lead = ParagraphStyle("lead", parent=body, fontSize=10, leading=13.5, textColor=colors.HexColor("#1a1e24"))
+    cell = ParagraphStyle("c", parent=body, fontSize=8.2, leading=10)
+    small = ParagraphStyle("s", parent=body, fontSize=8, leading=10.4, textColor=colors.HexColor("#555555"))
+    bullet = ParagraphStyle("bl", parent=body, leftIndent=10, firstLineIndent=-8)
+
+    def table(rows, widths, header=True, shade=None):
+        # a cell is plain text (escaped here) or ("raw", markup) when it carries its own <b>/<br/> markup
+        t = Table([[Paragraph(c[1] if isinstance(c, tuple) else esc(str(c)), cell) for c in r]
+                   for r in rows], colWidths=[w * mm for w in widths], repeatRows=1 if header else 0)
+        style = [("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cccccc")), ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                 ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]
+        if header:
+            style.append(("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eef2fb")))
+        for row in shade or []:
+            style.append(("BACKGROUND", (0, row), (-1, row), colors.HexColor("#f6f7f9")))
+        t.setStyle(TableStyle(style))
+        return t
+
+    st, sysinfo, sit = rep["settings"], rep["system"], rep["situation"]
+    el = [Paragraph(f"Run report: {esc(sit['name'])} — {esc(sysinfo['name'])}", h1),
+          Paragraph(f"{esc(sysinfo.get('industry') or '')} · {esc(sit['kind_label'])} · budget {hours(st['budget'])} · "
+                    f"{st['runs']} simulated days · seed {st['seed']} · generated "
+                    f"{esc(rep['generated_at'][:16].replace('T', ' '))} UTC"
+                    + (f" by {esc(rep['run_by'])}" if rep.get("run_by") else "") + f" · DebtLens {__version__}", small),
+          Spacer(1, 6), Paragraph(esc(rep["headline"]), lead)]
+
+    el.append(Paragraph("Summary", h2))
+    el += [Paragraph("• " + esc(s), bullet) for s in rep["summary"]]
+
+    el.append(Paragraph("The numbers", h2))
+    av, wd, sv = rep["numbers"]["average"], rep["numbers"]["watched"], rep["numbers"]["saved"]
+    b, a = av["before"], av["after"]
+    rows = [["", "Before the fixes", "After the fixes"],
+            [("raw", f"<b>{esc(av['label'])}</b>"), "", ""],
+            ["Engineering hours lost", hours(b["hours_lost"]), hours(a["hours_lost"])],
+            ["…on a good day / a bad day (p10–p90)", f"{fmt(b['hours_lost_p10'])}–{hours(b['hours_lost_p90'])}",
+             f"{fmt(a['hours_lost_p10'])}–{hours(a['hours_lost_p90'])}"],
+            ["Incidents", fmt(b["incidents"]), fmt(a["incidents"])],
+            ["Requests failing", pct(b["failed_traffic_pct"]), pct(a["failed_traffic_pct"])],
+            ["Chance of a day with no incident", pct(100 * b["p_no_incident"], 0), pct(100 * a["p_no_incident"], 0)],
+            [("raw", f"<b>{esc(wd['label'])}</b>"), "", ""],
+            ["Engineering hours lost", hours(wd["before"]["hours_lost"]), hours(wd["after"]["hours_lost"])],
+            ["Incidents", fmt(wd["before"]["incidents"], 0), fmt(wd["after"]["incidents"], 0)],
+            ["Requests failing", pct(wd["before"]["failed_traffic_pct"]), pct(wd["after"]["failed_traffic_pct"])]]
+    el.append(table(rows, [90, 44, 44], shade=[1, 7]))
+    el.append(Paragraph(f"The fixes save {hours(sv['mean'])} a day on average (95% confidence {fmt(sv['ci95'][0])}–"
+                        f"{fmt(sv['ci95'][1])} h), {fmt(sv['less_pct'], 0)}% less; {sv['better_runs']} of {sv['runs']} "
+                        f"simulated days are better" + (f", {sv['worse_runs']} worse." if sv.get("worse_runs") else "."),
+                        small))
+
+    el.append(Paragraph(f"What happened on the day you watched (day {wd['day']})", h2))
+    for side, label in (("before", "Today, with the open debt"), ("after", "After the fixes")):
+        el.append(Paragraph(f"<b>{label}.</b> {esc(rep['timeline']['story_' + side])}", body))
+        tl = rep["timeline"][side]
+        if tl:
+            rows = [["Time", "What happened", "Kind", "Hours"]]
+            for r in tl:
+                when = f"{r['start']}–{r['end']}" if r.get("end") else (f"{r['start']}–end" if r["type"] == "incident"
+                                                                         else r["start"])
+                kind = r["kind_label"] + (f" ({r['severity'].lower()})" if r["type"] == "incident" else "")
+                rows.append([when, r["text"], kind, hours(r["cost_hours"]) if r["type"] == "incident" else ""])
+            el.append(table(rows, [24, 108, 30, 16]))
+        el.append(Spacer(1, 5))
+
+    el.append(Paragraph("Hours lost by kind of incident (average day)", h2))
+    rows = [["Kind", "Hours before", "Hours after", "Incidents before → after"]]
+    rows += [[k["label"], hours(k["before_hours"]), hours(k["after_hours"]),
+              f"{fmt(k['before_incidents'])} → {fmt(k['after_incidents'])}"] for k in rep["impact"]]
+    el.append(table(rows, [60, 35, 35, 48]))
+
+    if rep["situation_effects"] or rep.get("bots"):
+        el.append(Paragraph("What the situation did", h2))
+        for e in rep["situation_effects"]:
+            g = (f"guarded by {', '.join(e['guarded_by'])} ({'in the plan' if e['guard_in_plan'] else 'not in the plan'})"
+                 if e["guarded_by"] else "nothing in the debt list guards against it")
+            line = f"• {e['start']}, {e['hours']} h: {esc(e['label'])} — {esc(g)}."
+            if e["prevented"] and e["guard_in_plan"]:
+                line += f" After the fix: {esc(e['prevented'].rstrip('.'))}."
+            el.append(Paragraph(line, bullet))
+        bt = rep.get("bots")
+        if bt:
+            el.append(Paragraph(f"• Bots make up {fmt(100 * bt['share'], 0)}% of the extra traffic; "
+                                + (f"{esc(', '.join(bt['mitigated_by']))} blocks most of them"
+                                   + (" and is in the plan." if bt["blocked_in_plan"] else ", but it is not in the plan.")
+                                   if bt["mitigated_by"] else "nothing in the debt list blocks them."), bullet))
+
+    if rep["causes"]:
+        el.append(Paragraph("Why it failed", h2))
+        rows = [["Module", "Incident on % of days", "Why"]]
+        for c in rep["causes"]:
+            why = "<br/>".join(esc(r) for r in c["reasons"])
+            if c["fixed_by"]:
+                why += f"<br/><b>Fixed by:</b> {esc(', '.join(c['fixed_by']))}"
+            rows.append([("raw", f"<b>{esc(c['module'])}</b>"),
+                         f"{fmt(100 * c['p_incident_before'], 0)}% → {fmt(100 * c['p_incident_after'], 0)}%", ("raw", why)])
+        el.append(table(rows, [26, 30, 122]))
+
+    fx = rep["fixes"]
+    el.append(Paragraph(f"What to fix first ({hours(fx['hours_used'])} of the {hours(fx['budget'])} budget)", h2))
+    if fx["items"]:
+        rows = [["Key", "Fix", "Module", "Hours", "Protects", "Playbook"]]
+        for x in fx["items"]:
+            prot = (f"needed for {', '.join(x['prerequisite_of'])}" if x["prerequisite_of"] and x["protects_hours"] < 0.05
+                    else hours(x["protects_hours"]))
+            rows.append([x["key"], x["title"] + (" (guards against the situation)" if x["guards_situation"] else ""),
+                         x["module"], hours(x["hours"]), prot, x["playbook"] or ""])
+        el.append(table(rows, [18, 64, 20, 14, 18, 44]))
+    else:
+        el.append(Paragraph("No fix within the budget changes this day.", body))
+    if fx.get("regular"):
+        el.append(Paragraph(esc(fx["regular"]["note"]), small))
+
+    el.append(Paragraph("What to do next", h2))
+    el += [Paragraph(f"{i}. {esc(r)}", bullet) for i, r in enumerate(rep["recommendations"], 1)]
+
+    el.append(KeepTogether([Paragraph("How this was worked out", h2)]
+                           + [Paragraph("• " + esc(m), small) for m in rep["method"]]))
+    doc.build(el)
+    return buf.getvalue()

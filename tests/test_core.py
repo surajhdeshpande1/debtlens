@@ -10,6 +10,7 @@ import pytest
 
 from debtlens.core import clustering, economics, engine, graph, ingest, mining, optimiser, playbooks, scenarios, simulation
 from debtlens.core import packs as PK
+from debtlens.core import report as REPORT
 from debtlens.core import spike as SPIKE
 from debtlens.core import text as T
 from debtlens.core.tfidf import TfidfModel, cosine_matrix
@@ -626,6 +627,43 @@ def test_every_system_has_varied_situations_that_the_right_fix_softens(code):
         assert guards <= open_keys, e["key"]
         if guards:  # the situation-aware plan finds a fix that softens this very situation
             assert guards & {x["key"] for x in r["plan"]["selected"]}, e["key"]
+
+
+def test_run_report_says_what_happened_why_and_what_to_do_next():
+    snap = scenarios.materialize("fintech")
+    res = engine.spike(snap, "acquirer-outage", 40, runs=120, seed=17)
+    rep = engine.spike_report(snap, res, run_by="Asha")
+    av, wd = rep["numbers"]["average"], rep["numbers"]["watched"]
+    # the average and the watched day are kept apart, labelled, and match the result they came from
+    assert av["label"] == "Average of 120 simulated days" and wd["label"].startswith("The day you watched (day ")
+    assert av["before"]["hours_lost"] == res["before"]["hours_lost"] and av["after"]["hours_lost"] == res["after"]["hours_lost"]
+    assert wd["before"]["hours_lost"] == res["replay"]["before"]["total_hours_lost"]
+    # the timeline holds every incident of the watched day, in order, with when it recovered
+    tl = rep["timeline"]["before"]
+    inc = [r for r in tl if r["type"] == "incident"]
+    assert len(inc) == res["replay"]["before"]["incidents"] and [r["minute"] for r in tl] == sorted(r["minute"] for r in tl)
+    assert sum(r["cost_hours"] for r in inc) == pytest.approx(wd["before"]["hours_lost"], abs=0.3)
+    assert all(r["end"] is None or r["end_minute"] > r["minute"] for r in inc)
+    assert any(r["type"] == "situation" for r in tl) and rep["timeline"]["story_before"]
+    # hours by kind add up, and the outage is what the fix shrinks
+    assert sum(k["before_hours"] for k in rep["impact"]) == pytest.approx(av["before"]["hours_lost"], abs=0.6)
+    out = next(k for k in rep["impact"] if k["kind"] == "outage")
+    assert out["before_hours"] > 2 * out["after_hours"]
+    eff = rep["situation_effects"][0]
+    assert eff["guarded_by"] == ["DEBT-104"] and eff["guard_in_plan"] and eff["start"] == "18:40"
+    assert "DEBT-104" in [x["key"] for x in rep["fixes"]["items"]] and rep["causes"][0]["module"] == "gateway"
+    assert rep["recommendations"][0].startswith("To be ready for “Acquiring bank outage”")
+    # every planned fix earns its place on the day, and "next" fixes are valued on top of the plan
+    assert all(x["protects_hours"] >= SPIKE.MIN_GAIN or x["prerequisite_of"] for x in res["plan"]["selected"])
+    assert all(x["gain_hours"] >= SPIKE.MIN_GAIN and x["extra_hours"] > 0 for x in res["plan"]["next"])
+    text = REPORT.to_text(rep)
+    for needle in ("WHAT HAPPENED ON THE DAY YOU WATCHED", "WHY IT FAILED", "WHAT TO DO NEXT", "DEBT-104", "18:40"):
+        assert needle in text
+    row = REPORT.summary_row(rep)
+    assert row["situation"] == "Acquiring bank outage" and row["before_hours"] == av["before"]["hours_lost"]
+    # numbers look the same in the report, the PDF, the terminal and the website (en-IN, half away from zero)
+    assert [REPORT.fmt(x) for x in (58.0, 3.25, 0.05, 123456.75, 1234, -2.5)] == ["58", "3.3", "0.1", "1,23,456.8", "1,234", "-2.5"]
+    assert REPORT.clock(664) == "11:04" and REPORT.hours(12.0) == "12 h"
 
 
 def _toy(effects=(), profile=None):

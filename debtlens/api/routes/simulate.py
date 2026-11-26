@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, request
+from flask import Blueprint, Response, request
 from sqlalchemy import select
 
 from ...core import engine as E
+from ...core import report as REPORT
 from ...core import simulation as SIM
 from ...core import spike as SPIKE
 from .. import serial
@@ -13,17 +14,19 @@ from .. import services as S
 from .. import validation as V
 from ..deps import db, me, ok, project
 from ..errors import ApiError
-from ..models import SimulationRun
+from ..models import SimulationRun, utcnow
 from ..security import require
 from ..services import iso
 
 bp = Blueprint("simulate", __name__)
 
 
-def _save(proj, kind: str, params: dict, summary: dict) -> None:
+def _save(proj, kind: str, params: dict, summary: dict) -> int:
     s = db()
-    s.add(SimulationRun(project_id=proj.id, kind=kind, params=params, summary=summary, run_by=me().name))
+    run = SimulationRun(project_id=proj.id, kind=kind, params=params, summary=summary, run_by=me().name)
+    s.add(run)
     s.commit()
+    return run.id
 
 
 @bp.post("/projects/<int:pid>/simulate/whatif")
@@ -136,19 +139,74 @@ def spike(pid: int):
         out = E.spike(snap, event, budget, runs, seed, S.project_params(proj), edits, chosen)
     except ValueError as e:
         raise ApiError(400, str(e)) from e
-    _save(proj, "spike", {"event": out["event"]["key"], "peak": out["peak"], "budget": budget, "runs": runs},
-          {"before_hours": out["before"]["hours_lost"], "after_hours": out["after"]["hours_lost"],
-           "failed_traffic_before": out["before"]["failed_traffic_pct"],
-           "failed_traffic_after": out["after"]["failed_traffic_pct"],
-           "plan": [x["key"] for x in out["plan"]["selected"]]})
+    report = E.spike_report(snap, out, run_by=me().name, generated_at=iso(utcnow()))
+    out["report"] = report
+    out["run_id"] = _save(proj, "spike", {"event": out["event"]["key"], "event_name": out["event"]["name"],
+                                          "kind": out["event"].get("kind"), "peak": out["peak"], "budget": budget,
+                                          "runs": runs, "seed": seed},
+                          {"before_hours": out["before"]["hours_lost"], "after_hours": out["after"]["hours_lost"],
+                           "failed_traffic_before": out["before"]["failed_traffic_pct"],
+                           "failed_traffic_after": out["after"]["failed_traffic_pct"],
+                           "plan": [x["key"] for x in out["plan"]["selected"]], "report": report})
     return ok(out)
+
+
+def _row(r: SimulationRun) -> dict:
+    summary = dict(r.summary or {})
+    report = summary.pop("report", None)
+    out = {"id": r.id, "kind": r.kind, "params": r.params, "summary": summary, "run_by": r.run_by,
+           "created_at": iso(r.created_at), "has_report": bool(report)}
+    if report:
+        out["report_summary"] = REPORT.summary_row(report)
+    return out
 
 
 @bp.get("/projects/<int:pid>/simulations")
 @require("read")
 def history(pid: int):
     proj = project(pid)
-    rows = db().execute(select(SimulationRun).where(SimulationRun.project_id == proj.id)
-                        .order_by(SimulationRun.id.desc()).limit(50)).scalars()
-    return ok({"runs": [{"id": r.id, "kind": r.kind, "params": r.params, "summary": r.summary, "run_by": r.run_by,
-                         "created_at": iso(r.created_at)} for r in rows]})
+    q = select(SimulationRun).where(SimulationRun.project_id == proj.id)
+    kind = request.args.get("kind")
+    if kind:
+        q = q.where(SimulationRun.kind == kind[:15])
+    rows = db().execute(q.order_by(SimulationRun.id.desc()).limit(50)).scalars()
+    return ok({"runs": [_row(r) for r in rows]})
+
+
+def _report(pid: int, rid: int) -> tuple:
+    proj = project(pid)
+    run = db().get(SimulationRun, rid)
+    if run is None or run.project_id != proj.id:
+        raise ApiError(404, "no such run in this project")
+    report = (run.summary or {}).get("report")
+    if not report:
+        raise ApiError(404, "this run has no report (only load-spike and situation runs have one)")
+    return proj, run, report
+
+
+@bp.get("/projects/<int:pid>/simulations/<int:rid>")
+@require("read")
+def run_report(pid: int, rid: int):
+    """One saved run with its full report: what happened, why, what the fixes change and what to do next."""
+    _, run, report = _report(pid, rid)
+    return ok({"run": _row(run), "report": report})
+
+
+@bp.get("/projects/<int:pid>/simulations/<int:rid>/report.pdf")
+@require("read")
+def run_report_pdf(pid: int, rid: int):
+    from .reports import build_run_pdf
+
+    proj, run, report = _report(pid, rid)
+    pdf = build_run_pdf(report)
+    name = f"{proj.project_key}-run-{run.id}-{report['situation']['key']}.pdf"
+    return Response(pdf, mimetype="application/pdf", headers={"Content-Disposition": f"attachment; filename={name}"})
+
+
+@bp.get("/projects/<int:pid>/simulations/<int:rid>/report.txt")
+@require("read")
+def run_report_text(pid: int, rid: int):
+    proj, run, report = _report(pid, rid)
+    name = f"{proj.project_key}-run-{run.id}-{report['situation']['key']}.txt"
+    return Response(REPORT.to_text(report), mimetype="text/plain; charset=utf-8",
+                    headers={"Content-Disposition": f"attachment; filename={name}"})
