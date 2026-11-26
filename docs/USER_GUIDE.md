@@ -43,7 +43,7 @@ Open [debtlens-bec.vercel.app](https://debtlens-bec.vercel.app) in Chrome, Edge 
 ### Run a scenario without an account
 
 1. Under **1 · Pick a system**, press **Open** on any card. Each card shows the system, its industry and the kinds of situation it can run (Rush, Bots, Outage, Bad release and so on).
-2. DebtLens opens a private copy of that system for you and takes you straight to **Pick a situation**. The first request after a quiet spell can take up to 20 seconds while the server wakes; the button says **Opening…** meanwhile.
+2. DebtLens opens a private copy of that system for you and takes you straight to **Pick a situation**. The first request after a quiet spell can take up to 30 seconds while the server wakes; the button says **Opening…** meanwhile.
 3. You play the system's Tech Lead, a named person from its story. Change the role in the top bar at any time.
 
 **Take the 3-minute tour** at the top of the start page opens the first system and walks through every page.
@@ -801,7 +801,7 @@ Most problems on the day come from a cold server, a hidden replay tab or a narro
 
 | Problem | Fix |
 | --- | --- |
-| **Opening…** takes 10 to 20 seconds, or Overview says “character n-gram fallback + TF-IDF (MiniLM not loaded)” | The server was asleep. Ten minutes before the demo, open [debtlens-bec.vercel.app/api/v1/health?warm=1](https://debtlens-bec.vercel.app/api/v1/health?warm=1) and look for `"available":true`. It wakes the server and loads the model |
+| **Opening…** takes 10 to 30 seconds, or Overview says “character n-gram fallback + TF-IDF (MiniLM not loaded)” | The server was asleep. Ten minutes before the demo, open [debtlens-bec.vercel.app/api/v1/health?warm=1](https://debtlens-bec.vercel.app/api/v1/health?warm=1) and look for `"available":true`. It wakes the server and loads the model |
 | “That project is not available to you.” | The sandbox expired after 24 hours, or you signed out. Open the system again from the start page |
 | A button is missing, or “your role (…) cannot do this” | Switch to Tech Lead in the top bar (sandbox), or ask the team admin to change your role |
 | The replay did not open after **Run this day →** | Press **▶ Watch the day** on step 3 |

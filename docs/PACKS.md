@@ -2,140 +2,81 @@
 
 A scenario pack is a whole system in one JSON file: its modules and how they call each other, file metrics and
 TODO/FIXME markers, incidents with 5 Whys chains and resolutions, debt items with prerequisites, the people who
-own them, a guided-tour story and **the system's busiest day** (a load-spike event). Nothing in a pack is a
-result. DebtLens computes every page and simulation from it, exactly as it does for a real project.
+own them, a guided-tour story, **the system's busiest day** and **its other situations** (bots, an outage, a bad
+release, a starved database and so on, each with what goes wrong). Nothing in a pack is a result. DebtLens
+computes every page, simulation and report from it, exactly as it does for a real project.
 
-DebtLens ships seven packs, and any pack file can be opened on the website or passed to the terminal.
+**Pack files are opened on the website only.** The terminal runs the built-in systems by code
+(`-s tatkal`) and refuses a pack file with a pointer to the website.
 
-## The seven packs
+## The eleven built-in packs
 
-Numbers are what DebtLens computes with the default settings (40 hours to prepare, 300 simulated days,
-seed 17). The website shows the same numbers.
+Numbers are what DebtLens computes with the defaults (40 hours to fix before the day, 300 simulated days,
+seed 17): the average day today → after the fixes. The website and the terminal show the same numbers.
 
-| Code | System | Busiest day | Hours lost on the day: now → after the spike plan | Spike plan saves vs the regular sprint plan |
+| Code | System | Busiest day | Engineer-hours lost: today → after (requests failing) | Plan for the day saves vs the regular sprint plan |
 |---|---|---|---|---|
-| `tatkal` | RailYatra, train ticketing | Tatkal opening at 10 AM, 25× | 131.7 → 46.1 h (30.4% → 7.5% of requests failing) | 85.7 h vs 34.6 h |
-| `broker` | NiveshTrade, stock broking | Union Budget day, 12× at 11:00 | 141.1 → 59.7 h (18.3% → 8.5%) | 81.4 h vs 45.3 h |
-| `food` | ZaikaNow, food delivery | IPL final night, 9× at 21:00 | 157.4 → 67.1 h (21.6% → 12.4%) | 90.3 h vs 59.6 h |
-| `stream` | KhelStream, cricket streaming | World Cup final, 20× in the last overs | 152.6 → 63.3 h (26.0% → 11.0%) | 89.3 h vs 39.8 h |
-| `rides` | SawariGo, ride-hailing | New Year's Eve, 8× at 23:00 | 113.1 → 33.5 h (15.6% → 5.2%) | 79.6 h vs 53.9 h |
-| `taxfiling` | TaxSetu, income-tax e-filing | ITR deadline night, 15× from 22:00 | 151.9 → 47.1 h (27.0% → 8.8%) | 104.8 h vs 63.4 h |
-| `tickets` | ShowPass, event ticketing | Stadium tour on-sale, 30× at noon | 146.8 → 42.0 h (36.8% → 11.9%) | 104.7 h vs 67.4 h |
+| `tatkal` | RailYatra, railways & ticketing | Tatkal opening at 10 AM, 25× at 10:00 | 124.5 → 61.8 h (28.4% → 10.4%) | 62.7 h vs 24.3 h |
+| `broker` | NiveshTrade, stock broking | Union Budget day, 12× at 11:00 | 128.6 → 66 h (18.7% → 10.5%) | 62.6 h vs 34.9 h |
+| `food` | ZaikaNow, food delivery | IPL final night, 9× at 21:00 | 145.6 → 85.4 h (20.6% → 14.1%) | 60.2 h vs 41.9 h |
+| `stream` | KhelStream, sports streaming (OTT) | World Cup final, 20× at 21:00 | 156 → 77.8 h (25.7% → 11.7%) | 78.3 h vs 50.9 h |
+| `rides` | SawariGo, ride-hailing | New Year's Eve, 8× at 23:00 | 102.7 → 45.5 h (14.9% → 5.7%) | 57.2 h vs 39.1 h |
+| `taxfiling` | TaxSetu, government e-services | ITR deadline night (31 July), 15× at 22:00 | 140.2 → 53.5 h (24.3% → 9%) | 86.7 h vs 51.8 h |
+| `tickets` | ShowPass, event ticketing | Stadium tour on-sale at noon, 30× at 12:00 | 129 → 53.8 h (30.7% → 12.6%) | 75.3 h vs 51.3 h |
+| `exam` | ParikshaNet, online examinations | Entrance exam day, 30× at 09:00 | 305.9 → 137 h (25.4% → 12.4%) | 168.9 h vs 137.2 h |
+| `airline` | UdanAir, airline booking & check-in | Fare sale at noon, 20× at 12:00 | 130.8 → 50.9 h (26% → 9.4%) | 79.9 h vs 42.3 h |
+| `appointments` | SlotSetu, government appointments | New slots open at 17:00, 25× at 17:00 | 108.6 → 35.2 h (29.7% → 8%) | 73.4 h vs 42 h |
+| `grocery` | TurantMart, quick commerce | Diwali evening, 10× at 19:00 | 131.7 → 63.1 h (22.7% → 7.2%) | 68.6 h vs 40.7 h |
 
-In every pack the spike plan beats the regular sprint plan. The regular plan ranks debt by the interest it
-charged in the past, while the spike plan ranks it by what it protects on the day. The right debt to fix depends
-on what is coming.
+In every pack the plan for the day beats the regular sprint plan on that day. The regular plan ranks debt by
+the interest it charged in the past; the plan for the day ranks it by what it protects on that day. The right
+debt to fix depends on what is coming.
 
 ### Bot attacks
 
-Each pack also has a second event: a bot attack on the same day. Bots add traffic like real users do, but one
-debt item (a missing rate limit or bot check) decides whether they reach the servers at all. Fixing it blocks
-most of the bots' share of the extra traffic before it reaches any module.
+Every pack has a bot attack among its situations. Bots add traffic like real users do, but one debt item (a
+missing rate limit or bot check) decides how many reach the servers. Once it is fixed, most bots are turned away
+at the edge. A fifth of the blocked ones adapt and get through anyway, and turning bots away still costs the front
+door a little, so a bot day is never perfectly clean.
 
-| Code | Bot attack | Bots in the extra traffic · blocked once fixed | Hours lost: now → after | Spike plan saves vs the regular sprint plan |
+| Code | Bot attack | Bots in the extra traffic · blocked once fixed | Engineer-hours lost: today → after (requests failing) | Fix that blocks them |
 |---|---|---|---|---|
-| `tatkal` | Tatkal booking bots, 60× at 10:00 | 60% · 90% by DEBT-508 (8 h) | 180.7 → 85.2 h (71.8% → 19.8% failing) | 95.5 h vs 4.9 h |
-| `broker` | Credential-stuffing attack from 02:00, 30× on login | 97% · 95% by DEBT-607 (5 h) | 107.6 → 0.0 h (92.4% → 0.0%) | 107.6 h vs 107.6 h |
-| `food` | Coupon-abuse bots from 19:00, up to 20× | 85% · 90% by DEBT-715 (8 h) | 109.1 → 0.1 h (69.6% → 0.0%) | 109.0 h vs 23.4 h |
-| `stream` | Restreaming bots from the toss, up to 32× | 50% · 90% by DEBT-814 (10 h) | 269.2 → 36.1 h (55.2% → 2.1%) | 233.1 h vs 68.1 h |
-| `rides` | Fare-scraping bots on New Year's Eve, up to 16× | 60% · 90% by DEBT-914 (6 h) | 112.0 → 0.7 h (42.0% → 0.2%) | 111.2 h vs 14.8 h |
-| `taxfiling` | Credential stuffing on PAN login, up to 25× | 70% · 90% by DEBT-1014 (6 h) | 123.7 → 0.1 h (53.4% → 0.0%) | 123.6 h vs 22.3 h |
-| `tickets` | Scalper bots at the drop, 50× at noon | 60% · 90% by DEBT-1106 (10 h) | 159.2 → 2.6 h (49.3% → 0.7%) | 156.6 h vs 5.8 h |
+| `tatkal` | Tatkal booking bots, 60× at 10:00 | 75% · 90% | 183.9 → 106 h (71% → 25.2%) | DEBT-508 (8 h) |
+| `broker` | Credential-stuffing attack, 32× at 09:00 | 97% · 95% | 107.7 → 7.1 h (92.4% → 6.1%) | DEBT-607 (5 h) |
+| `food` | Coupon-abuse bots, 20× at 21:00 | 85% · 90% | 112.9 → 28.3 h (68.9% → 9.1%) | DEBT-715 (8 h) |
+| `stream` | Restreaming bots, 32× at 21:00 | 50% · 90% | 241.7 → 65.4 h (53.7% → 10.4%) | DEBT-814 (10 h) |
+| `rides` | Fare-scraping bots, 16× at 23:00 | 60% · 90% | 109 → 27 h (40.8% → 7.3%) | DEBT-914 (6 h) |
+| `taxfiling` | Credential stuffing on PAN login, 25× at 22:00 | 70% · 90% | 119.7 → 8.7 h (51.4% → 2%) | DEBT-1014 (6 h) |
+| `tickets` | Scalper bots at the drop, 50× at 12:00 | 60% · 90% | 163.7 → 55.6 h (49.7% → 11.4%) | DEBT-1106 (10 h) |
+| `exam` | Result-scraping bots, 25× at 18:00 | 80% · 90% | 36.6 → 8.2 h (62.1% → 7.6%) | DEBT-1209 (5 h) |
+| `airline` | Seat-spinning bots, 20× at 12:00 | 70% · 90% | 127.5 → 3.7 h (37.1% → 0.1%) | DEBT-1306 (6 h) |
+| `appointments` | Agents' slot-grabbing scripts, 25× at 17:00 | 75% · 90% | 108 → 7.8 h (32.3% → 0.3%) | DEBT-1402 (8 h) |
+| `grocery` | Scripts at a limited drop, 15× at 18:00 | 80% · 90% | 150 → 6.1 h (45.5% → 0.6%) | DEBT-1505 (6 h) |
 
-The broker pack is the exception worth showing: its regular sprint plan already contains DEBT-607 (login rate
-limits), a 5-hour fix whose login incidents already cost about 34 hours a month. There the two plans agree.
+Each pack's other situations (an outage, a bad release, a database or cache problem, a memory leak, a lost zone or
+a retry storm) are listed in the user guide, section 5, and the demo script for each system, with its numbers and
+alerts, is in [PACK_MANUAL.md](PACK_MANUAL.md).
 
-Each pack has 10 modules, 20 incidents (with 6 or 7 families of repeated incidents and the regressions they
-imply), 13 to 15 debt items and 7 people (one for each role).
+## Opening a pack on the website
 
-A step-by-step demo script for every pack, with the times and numbers to expect, is in
-[PACK_MANUAL.md](PACK_MANUAL.md).
+* **Open** on a system's card on the start page opens a private 24-hour sandbox on **Pick a situation**, as the
+  system's Tech Lead. **Take the 3-minute tour** walks through the first system.
+* **pack file** on a pack's card downloads it as `<code>.debtlens-pack.json`.
+* **Upload a scenario pack**, the last card under *1 · Pick a system* (also in **Simulate → Run a scenario →
+  1 Pick a system** inside a sandbox), takes any pack file up to 400 KB. It is checked completely before anything is
+  stored. If something is wrong, every problem is listed at once (the first 12, then "…and N more"), so the file
+  can be fixed in one pass. **Open pack** opens a valid pack as a sandbox, and **⚙ → Reset this sandbox** puts it
+  back to the file you uploaded. An uploaded pack is never stored as a team project.
 
-## Live replay: watch the day happen
-
-After **Simulation Lab → Load spike → Simulate the day**, press **▶ Live replay**. DebtLens plays one simulated
-day minute by minute:
-
-* **The customer's phone.** A named customer (Priya booking Tatkal tickets, Rahul buying shares at the open, …)
-  goes through the app step by step. When a module is close to its limit the step is slow; when it is down the
-  customer sees the app's own error message ("503 Service Unavailable", "OTP not received", "Payment pending");
-  when the entry point is down the app freezes with an "isn't responding" dialog. The customer keeps retrying.
-* **The on-call engineer's screens.** Requests per minute, the share failing right now, requests failed so far,
-  engineer hours lost and incidents; a tile for each module with its load and state (OK, HOT, DOWN, or FAILING
-  because a dependency is down); and the alerts as they fire. In a bot attack, a bar shows how much of the traffic
-  is bots and how much the fix blocks at the edge.
-* **A frozen device.** While most requests fail, the screen behaves like a hung device: it stops updating for a
-  second or two, turns pale, shows "(Not Responding)" and a wait cursor, then catches up all at once. Nothing is
-  really blocked: pause, close and Esc always work, and no extra requests reach the server.
-
-Choose **Today**, **After the fixes** (the same day with the plan in place: same customers, same luck) or **Side
-by side**. Keys: Space play/pause, R restart, 1 2 3 view, S speed (½×, 1×, 2×, 4×), E freeze effects, M sound,
-F full screen, Esc close. At 1× a whole replay takes 15 to 80 seconds.
-
-The replayed day is the one simulated day (of the 300) that is closest to the average both before and after the
-fixes, so it is typical rather than the worst case. The model works in whole hours; the minutes at which things
-happen inside an hour are spread out only so the replay is readable.
-
-In the terminal:
+In the terminal, the built-in packs run by code:
 
 ```bash
-debtlens simulate spike -s tatkal -e tatkal-bots --live          # today
-debtlens simulate spike -s tatkal -e tatkal-bots --live --after  # the same day after the fixes
-debtlens simulate spike -s tatkal -e tatkal-bots --live --side   # both (120+ columns)
+debtlens pack list                                   # the eleven packs and their busiest day
+debtlens pack show grocery                           # what a pack contains, with its situations
+debtlens simulate spike -s grocery --list            # its situations and their keys
+debtlens simulate spike -s grocery -e upi-outage --report      # run one, print the report
+debtlens simulate spike -s tatkal -e tatkal-bots --live --side # watch it, then the report
 ```
-
-`--speed` sets the speed (default 2), `--no-freeze` turns the frozen-screen effect off, and Ctrl+C stops.
-
-## Opening a pack
-
-**On the website** (home page → *Scenario packs*):
-
-* **Open** on a card opens a private 24-hour sandbox in the role you pick. **Guided tour** walks through it.
-  Inside a sandbox, the drop-down in the top bar jumps straight to any other scenario or pack.
-* **⬇ .json** downloads the pack file.
-* **Open a pack file** takes any pack (.json, up to 400 KB). It is checked completely before anything is stored.
-  If something is wrong, every problem is listed at once, so the file can be fixed in one pass. **Reset** in the
-  top bar puts an uploaded pack back to the file you uploaded.
-
-**In the terminal**, every command that takes `--scenario` (`-s`) accepts a pack code or a pack file:
-
-```bash
-debtlens pack list                        # the seven packs and their busiest day
-debtlens pack show broker                 # what a pack contains
-debtlens demo tatkal                      # dashboard
-debtlens simulate spike -s tatkal         # the busiest day, hour by hour
-debtlens simulate cascade db -s taxfiling # fail a module and watch it spread
-debtlens plan -s rides --budget 40        # what to fix this sprint
-debtlens pack export tickets -o my.json   # copy a pack to edit
-debtlens pack validate my.json            # every problem at once
-debtlens simulate spike -s my.json --budget 60
-```
-
-## A live demo with a pack (about 6 minutes)
-
-1. Open **RailYatra** as Tech Lead and press **Guided tour**. The home screen tells the story: Tatkal at
-   10:00 double-books berths, and passengers are charged without tickets.
-2. **Incidents → INC-519**. It is flagged as a regression of INC-503. Its 5 Whys meet the same root cause as
-   two earlier incidents.
-3. **Causal analysis**. The berth-locking cause, the shared OTP queue and the missing reconciliation each
-   reach three incidents.
-4. **Simulation Lab → Load spike → Simulate the day**. At 10:00 search, the gateway, SMS and PNR overload, and
-   131.7 engineer hours and 30% of requests are lost. The plan is a waiting room, an availability cache, an OTP
-   queue and a PNR index (37 h). It cuts the loss to 46.1 h and saves 85.7 h, against 34.6 h for the regular
-   sprint plan.
-5. Pick **Tatkal booking bots** under *Bot attacks* (it simulates at once), then press **▶ Live replay** and
-   **Start the day**. Press F for full screen. At about 10:03 search and seats go down, Priya's app freezes
-   ("RailYatra isn't responding"), the screen hangs, and the alerts pile up: 185.4 engineer hours lost on this
-   day. Press **Same day, after the fixes**: DEBT-508 blocks most of the bots at the edge and the day costs
-   85.8 h. Then **Side by side**.
-6. Change **Hours to fix before it** to 80, or pick **Custom spike** (say 40× at 09:00) and simulate again.
-   Judges can choose the numbers.
-7. **Failure injection → db**. The central database takes down about 1.4 dependent modules on average and 7 in
-   the worst case.
-8. In the terminal, run `debtlens simulate spike -s tatkal -e tatkal-bots --live --side`. It is the same day.
-
-To show that DebtLens is not tied to the bundled data, download a pack, change it in front of the judges (rename
-the system, raise the spike peak, add an incident) and upload it with **Open a pack file**.
 
 ## Format
 
@@ -157,22 +98,35 @@ the system, raise the spike peak, add an incident) and upload it with **Open a p
   "incidents": [{"key": "INC-1", "title": "…", "desc": "…", "module": "orders",
                  "sev": "HIGH", "status": "RESOLVED", "ago": 30, "fixed": 29, "effort": 6, "by": "asha",
                  "group": "G-DUP",                                  // same group = the same problem again
-                 "whys": ["symptom", "mechanism", "root cause"],    // 1-7 answers
+                 "whys": ["symptom", "mechanism", "root cause"],    // up to 7 answers
                  "fix": "what was done", "lesson": "what was learned"}],
   "debts": [{"key": "DEBT-1", "title": "…", "desc": "…", "module": "orders", "cat": "ARCHITECTURAL",
              "principal": 12, "status": "IDENTIFIED", "priority": "HIGH", "owner": "asha",
              "incidents": ["INC-1"], "needs": [], "cause": "root cause", "ago": 28,
              "file": "svc/orders/place.py", "playbook": "idempotency"}],   // playbook is optional
-  "spike": {"key": "sale", "name": "Flash sale", "description": "…",
-            "profile": [24 hourly multipliers of a normal peak hour],       // or: "peak", "start_hour", "duration"
+  "spike": {"key": "sale", "name": "Flash sale", "kind": "traffic", "description": "…",
+            "profile": [24 hourly multipliers of a normal peak hour],      // or: "peak", "start_hour", "duration"
             "entry": {"orders": 1.0},       // modules users enter through, 0-1
             "baseline": {"orders": 0.08},   // utilisation at a normal peak hour (default 0.15)
-            "exposure": {"reports": 0.0}},  // optional: pin how much of the spike reaches a module
-  "events": [{"key": "sale-bots", "name": "Sale bots", "description": "…",   // up to 4 more events, shaped like "spike"
-              "profile": [24 numbers], "entry": {"orders": 1.0},
-              "bots": {"share": 0.6,        // share of the extra traffic that is bots, 0-1
-                       "blocked": 0.9,      // share of the bots stopped once a mitigating debt is fixed
-                       "mitigated_by": ["DEBT-1"]}}],  // debt keys that block them (a rate limit, a bot check)
+            "exposure": {"reports": 0.0}},  // optional: pin how much of the extra traffic reaches a module
+  "events": [                             // up to 7 more situations, shaped like "spike"
+    {"key": "sale-bots", "name": "Sale bots", "kind": "bots", "description": "…",
+     "peak": 30, "start_hour": 12, "duration": 1, "entry": {"orders": 1.0},
+     "bots": {"share": 0.6,               // share of the extra traffic that is bots, 0-1
+              "blocked": 0.9,             // share of the bots stopped once a mitigating debt is fixed
+              "mitigated_by": ["DEBT-1"]}},
+    {"key": "provider-down", "name": "Payment provider down", "kind": "outage", "description": "…",
+     "peak": 3, "start_hour": 18, "duration": 3,
+     "effects": [                         // up to 4 things that go wrong that day
+       {"type": "down", "module": "orders", "start": 19, "minute": 10, "hours": 2,
+        "chance": 1.0, "kind": "outage",  // "down": the module stops (kind outage or deploy) with this chance
+        "label": "The payment provider stops answering",
+        "mitigated_by": ["DEBT-1"], "mitigation": 0.8,   // how much a fixed guard helps (0.8 by default)
+        "prevented": "The circuit breaker switched to the second provider",
+        "recovered": "The provider is back"},
+       {"type": "capacity", "module": "db", "start": 18, "hours": 1, "factor": 0.3,
+        "ramp": false,                    // "capacity": the module keeps this share of its capacity;
+        "label": "A report holds the database"}]}],       // ramp: true makes it worse hour by hour (a leak)
   "journey": {"app": "MyShop", "who": "Asha, buying a phone in the sale", "peak_rpm": 20000, "color": "#1f6feb",
               "steps": [{"module": "orders", "label": "Place the order",       // 1-8 steps, in order
                          "ok": "Order placed", "slow": "Placing your order…",
@@ -190,18 +144,25 @@ Times are **days ago** (`ago`, `fixed`), so a pack always looks current. Allowed
 * `cat`: ARCHITECTURAL, CODE_SMELL, TEST_DEBT, INFRASTRUCTURE, SECURITY_DEBT or DOCUMENTATION.
 * Debt `status`: IDENTIFIED, PRIORITIZED, IN_PROGRESS, DEFERRED or REMEDIATED.
 * `role`: admin, tech_lead, developer, qa, manager or viewer.
+* Situation `kind`: traffic, bots, outage, deploy, database, cache, leak, zone or retry. The website shows them as
+  Rush, Bots, Outage, Bad release, Database, Cache, Memory leak, Zone lost and Retry storm.
+* Effect `type`: `down` or `capacity`. An effect's `module` can be `*` for every module; `start` is an hour
+  (0–23), `minute` 0–59, and `hours` how long it lasts.
 
-`events` without `bots` are extra traffic events. An event without its own `baseline` uses the main event's.
-`journey` drives the customer's phone in the live replay; `peak_rpm` is requests per minute at a normal peak
-hour, so the replay can show requests per minute. Without a journey, the replay builds a simple one from the
-entry modules.
+A situation without its own `entry` or `baseline` uses the busiest day's. `journey` drives the customer's phone
+in the live replay; `peak_rpm` is requests per minute at a normal peak hour. Without a journey, the replay builds
+a simple one from the entry modules.
 
-Every module named in an incident, debt, file, dependency, spike table or journey step must be listed in `modules`. Every key
-in `incidents`, `needs` and `tour` must exist. `playbook` must be one of the 24 playbook keys
-(`debtlens playbooks`).
+Every module named in an incident, debt, file, dependency, situation table, effect or journey step must be listed
+in `modules`. Every key in `incidents`, `needs`, `mitigated_by` and `tour` must exist. `playbook`, if given, must
+be one of the 25 playbook keys: `pool-isolation`, `timeouts`, `circuit-breaker`, `retry-backoff`, `idempotency`,
+`durable-queue`, `cache-precompute`, `cache-invalidation`, `query-indexing`, `pagination-archival`, `batching`,
+`concurrency-control`, `replica-fallback`, `load-testing`, `test-coverage`, `time-and-calendar`, `configuration`,
+`single-source`, `reconciliation`, `access-control`, `audit-trail`, `documentation`, `data-quality`,
+`resource-leaks` or `refactor`.
 
 **Limits:** 400 KB, 40 modules, 300 dependencies, 300 files, 300 markers, 300 incidents, 150 debt items,
-20 people and 7 whys per incident.
+20 people, 7 whys per incident, 7 extra situations and 4 effects per situation.
 
 ## Writing a pack that tells a good story
 
@@ -209,10 +170,13 @@ in `incidents`, `needs` and `tour` must exist. `playbook` must be one of the 24 
   exactly the same root-cause sentence. Use that sentence as the `cause` of the debt that fixes it. Reuse one
   root cause across modules to create a systemic cause.
 * **Regressions appear by themselves.** A family member reported in the same module after an earlier member was
-  resolved is a regression. DebtLens should flag it, and the Intelligence page measures whether it did.
+  resolved is a regression. DebtLens should flag it, and **Incidents → Similar & regressions → Evaluation
+  (measured)** shows whether it did.
 * **Playbooks are matched from the words.** "connection pool", "durable queue", "precomputed cache", "index",
-  "row-level lock", "timeout", "circuit breaker", "rate limit", "reconcile", "idempotency key" and so on pick
-  the playbook. That playbook decides how much capacity or resilience a fix adds on the busiest day. Run
-  `debtlens playbooks -s my.json` to check what was matched.
+  "row-level lock", "timeout", "circuit breaker", "rate limit", "reconcile", "idempotency key", "memory leak" and so
+  on pick the playbook. The playbook decides how much capacity or resilience a fix adds in a situation. After
+  uploading, **Debt → Debt items → Fix playbooks** shows which playbook each item got.
+* **Give each situation one clear guard** in `mitigated_by`, so the report can say what fixes it. A situation with
+  no guard is fine too: its report says that nothing in the debt list guards against it and recommends adding one.
 * **Tune the busiest day.** For a module with debt that limits capacity, a good `baseline` is about
-  0.82 ÷ (1 + (peak − 1) × exposure). Then the module overloads now but holds after its fix.
+  0.82 ÷ (1 + (peak − 1) × exposure). Then the module overloads today but holds after its fix.

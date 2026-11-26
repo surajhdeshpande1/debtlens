@@ -208,27 +208,32 @@ export function wirePackUpload(w, { onOpen = null } = {}) {
   if (!card) return;
   const input = $("[data-file]", card), label = $("[data-file-label]", card), btn = $("[data-open-file]", card);
   const box = $("[data-problems]", card), drop = $("[data-drop]", card);
-  let pack = null;
+  let pack = null, seq = 0;  // seq: only the newest file's check may change the card
   const show = (title, items, note = false) => {
     box.innerHTML = String(html`<b>${title}</b>${items && items.length ? html`<ul>${items.slice(0, 12).map((p) => html`<li>${p}</li>`)}</ul>${items.length > 12 ? html`<div class="muted small">…and ${items.length - 12} more</div>` : ""}` : ""}`);
     box.classList.toggle("note", note);
     box.classList.remove("hidden");
   };
   const read = async (file) => {
+    const my = ++seq;
     pack = null; btn.disabled = true; box.classList.add("hidden");
     if (!file) return;
     label.textContent = file.name;
     const max = ((S.meta.pack_format || {}).max_kb || 400) * 1000;
     if (file.size > max) return show(`${file.name} is larger than ${max / 1000} KB.`);
-    try { pack = JSON.parse(await file.text()); } catch (ex) { return show(`${file.name} is not valid JSON.`, [ex.message]); }
+    let parsed;
+    try { parsed = JSON.parse(await file.text()); } catch (ex) { return my === seq && show(`${file.name} is not valid JSON.`, [ex.message]); }
+    if (my !== seq) return;
     try {
-      const r = await api("/packs/validate", { method: "POST", body: { pack }, quiet: true });
-      if (!r.valid) { pack = null; return show(`${file.name} has ${r.problems.length} problem${r.problems.length === 1 ? "" : "s"} to fix:`, r.problems); }
+      const r = await api("/packs/validate", { method: "POST", body: { pack: parsed }, quiet: true });
+      if (my !== seq) return;  // a newer file was chosen while this one was being checked
+      if (!r.valid) return show(`${file.name} has ${r.problems.length} problem${r.problems.length === 1 ? "" : "s"} to fix:`, r.problems);
+      pack = parsed;
       const i = r.info;
       label.textContent = `${file.name} — ${i.name}: ${i.counts.incidents} incidents, ${i.counts.debts} debt items, ${(i.events || []).length} situations`;
       if (r.warnings && r.warnings.length) show("Opens fine. Notes:", r.warnings, true);
       btn.disabled = false;
-    } catch (ex) { pack = null; show("Could not check the file.", [ex.message]); }
+    } catch (ex) { if (my === seq) { pack = null; show("Could not check the file.", [ex.message]); } }
   };
   input.addEventListener("change", () => read(input.files[0]));
   drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });

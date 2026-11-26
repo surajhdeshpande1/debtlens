@@ -9,7 +9,7 @@ This is the script for showing DebtLens live: for each of the 15 built-in system
 1. **The day before.** Rehearse each situation you plan to show at 2× (press S once in the replay), including the report. Check that your numbers match this manual.
 2. **Laptop.** Chrome or Edge, zoom at 100% (Ctrl + 0), other tabs closed, notifications off, charger in. On a projector, press F in the replay for full screen; 1366×768 and 1920×1080 both work.
 3. **Ten minutes before.** Open `https://debtlens-bec.vercel.app/api/v1/health?warm=1` once. It wakes the server and loads the MiniLM model: look for `"available":true`. Then open `https://debtlens-bec.vercel.app`.
-4. **Open the first system early**, before the judges arrive, so the first open (up to 20 seconds on a cold server) is not in front of them.
+4. **Open the first system early**, before the judges arrive, so the first open (up to 30 seconds on a cold server) is not in front of them.
 5. **Keep the defaults** (40 hours, 300 days) unless a judge asks for something else. Other values give other numbers, which are just as correct.
 6. **Terminal (optional).** In the project folder, with the `.venv` from the user guide (section 8), use Windows Terminal, maximised. `--side` needs at least 120 columns.
 7. **No internet?** `scripts\windows\start-sqlite.bat` runs the same website on the laptop at `http://localhost:8000`. Run `python -m debtlens model download` beforehand, while you still have internet.
@@ -798,7 +798,7 @@ The file format, with every field, is in `docs/PACKS.md`; the user guide (sectio
 
 | What you see | What to do |
 | --- | --- |
-| The first system takes up to 20 seconds to open | The free server was asleep. Open the health link from "Before the demo" ten minutes early. |
+| The first system takes up to 30 seconds to open | The free server was asleep. Open the health link from "Before the demo" ten minutes early. |
 | The replay does not move | It is paused: press Space. If you switched tabs or minimised the browser, it paused on its own. |
 | The replay did not open after **Run this day →** | Press **▶ Watch the day** on step 3. |
 | Your numbers differ from this manual | The hours or the simulated days were changed. Set them back to 40 and 300 and run the day again. |
