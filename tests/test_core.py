@@ -651,6 +651,12 @@ def test_run_report_says_what_happened_why_and_what_to_do_next():
     assert out["before_hours"] > 2 * out["after_hours"]
     eff = rep["situation_effects"][0]
     assert eff["guarded_by"] == ["DEBT-104"] and eff["guard_in_plan"] and eff["start"] == "18:40"
+    assert eff["guards_planned"] == ["DEBT-104"] and REPORT.guard_text(eff) == "guarded by DEBT-104 (in the plan)"
+    # with two guards and one of them planned, the report names which one the plan fixes
+    two = dict(eff, guarded_by=["DEBT-1214", "DEBT-1204"], guards_planned=["DEBT-1204"])
+    assert REPORT.guard_text(two) == "guarded by DEBT-1204 (in the plan); DEBT-1214 would also help"
+    assert REPORT.guard_text(dict(eff, guards_planned=[])) == "guarded by DEBT-104 (not in the plan)"
+    assert REPORT.guard_text(dict(eff, guarded_by=[], guards_planned=[])).startswith("nothing in the debt list")
     assert "DEBT-104" in [x["key"] for x in rep["fixes"]["items"]] and rep["causes"][0]["module"] == "gateway"
     assert rep["recommendations"][0].startswith("To be ready for “Acquiring bank outage”")
     # every planned fix earns its place on the day, and "next" fixes are valued on top of the plan

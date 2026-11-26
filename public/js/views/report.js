@@ -64,11 +64,23 @@ export function reportHtml(rep, { runId = null, actions = "" } = {}) {
     <section class="rep-sec"><h2>Hours lost by kind of incident <span class="muted small">(average day)</span></h2>${kindBars(rep.impact)}</section>
 
     ${rep.situation_effects.length || rep.bots ? html`<section class="rep-sec"><h2>What the situation did</h2><ul class="rep-list">
-      ${rep.situation_effects.map((e) => html`<li><b>${e.start}, ${e.hours} h:</b> ${e.label}.
-        ${e.guarded_by.length ? html`<span class="badge ${e.guard_in_plan ? "ok" : "warn"}">${e.guard_in_plan ? "fixed by" : "not in the plan:"} ${e.guarded_by.join(", ")}</span>` : html`<span class="badge bad">nothing guards against it</span>`}
-        ${e.prevented && e.guard_in_plan ? html`<div class="small muted">After the fix: ${e.prevented}</div>` : ""}</li>`)}
-      ${rep.bots ? html`<li><b>Bots</b> make up ${n(100 * rep.bots.share, 0)}% of the extra traffic.
-        ${rep.bots.mitigated_by.length ? html`<span class="badge ${rep.bots.blocked_in_plan ? "ok" : "warn"}">${rep.bots.blocked_in_plan ? "blocked by" : "not in the plan:"} ${rep.bots.mitigated_by.join(", ")}</span>` : html`<span class="badge bad">nothing blocks them</span>`}</li>` : ""}
+      ${rep.situation_effects.map((e) => {
+        const planned = e.guards_planned || (e.guard_in_plan ? e.guarded_by : []);
+        const rest = e.guarded_by.filter((k) => !planned.includes(k));
+        return html`<li><b>${e.start}, ${e.hours} h:</b> ${e.label}.
+        ${planned.length ? html`<span class="badge ok">fixed by ${planned.join(", ")}</span>` : ""}
+        ${rest.length ? html`<span class="badge ${planned.length ? "" : "warn"}">${planned.length ? "would also help:" : "not in the plan:"} ${rest.join(", ")}</span>` : ""}
+        ${e.guarded_by.length ? "" : html`<span class="badge bad">nothing guards against it</span>`}
+        ${e.prevented && e.guard_in_plan ? html`<div class="small muted">After the fix: ${e.prevented}</div>` : ""}</li>`;
+      })}
+      ${rep.bots ? (() => {
+        const inPlan = new Set((fx.items || []).map((x) => x.key));
+        const by = rep.bots.mitigated_by, planned = by.filter((k) => inPlan.has(k)), rest = by.filter((k) => !inPlan.has(k));
+        return html`<li><b>Bots</b> make up ${n(100 * rep.bots.share, 0)}% of the extra traffic.
+        ${planned.length ? html`<span class="badge ok">blocked by ${planned.join(", ")}</span>` : ""}
+        ${rest.length ? html`<span class="badge ${planned.length ? "" : "warn"}">${planned.length ? "would also help:" : "not in the plan:"} ${rest.join(", ")}</span>` : ""}
+        ${by.length ? "" : html`<span class="badge bad">nothing blocks them</span>`}</li>`;
+      })() : ""}
     </ul></section>` : ""}
 
     ${rep.causes.length ? html`<section class="rep-sec"><h2>Why it failed</h2><div class="causes">${rep.causes.map((c) => html`<div class="cause">

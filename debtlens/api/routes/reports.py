@@ -10,6 +10,7 @@ from sqlalchemy import select
 
 from ... import __version__
 from ...core import engine as E
+from ...core import report as REPORT
 from .. import services as S
 from ..deps import args_float, args_int, db, me, ok, project
 from ..models import AuditLog, utcnow
@@ -328,9 +329,7 @@ def build_run_pdf(rep: dict) -> bytes:
     if rep["situation_effects"] or rep.get("bots"):
         el.append(Paragraph("What the situation did", h2))
         for e in rep["situation_effects"]:
-            g = (f"guarded by {', '.join(e['guarded_by'])} ({'in the plan' if e['guard_in_plan'] else 'not in the plan'})"
-                 if e["guarded_by"] else "nothing in the debt list guards against it")
-            line = f"• {e['start']}, {e['hours']} h: {esc(e['label'])} — {esc(g)}."
+            line = f"• {e['start']}, {e['hours']} h: {esc(e['label'])} — {esc(REPORT.guard_text(e))}."
             if e["prevented"] and e["guard_in_plan"]:
                 line += f" After the fix: {esc(e['prevented'].rstrip('.'))}."
             el.append(Paragraph(line, bullet))

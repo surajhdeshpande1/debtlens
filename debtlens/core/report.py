@@ -75,6 +75,20 @@ def _join(items: list[str]) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
+def guard_text(e: dict) -> str:
+    """Which debt items guard against one of the situation's effects, and which of them the plan fixes."""
+    guards = e.get("guarded_by") or []
+    if not guards:
+        return "nothing in the debt list guards against it"
+    planned = e.get("guards_planned")
+    if planned is None:  # a report saved before this field existed
+        planned = guards if e.get("guard_in_plan") else []
+    rest = [k for k in guards if k not in planned]
+    if not planned:
+        return f"guarded by {_join(rest)} (not in the plan)"
+    return f"guarded by {_join(planned)} (in the plan)" + (f"; {_join(rest)} would also help" if rest else "")
+
+
 def _less(before: float, after: float) -> float:
     return 0.0 if before <= 0 else max(0.0, 100.0 * (before - after) / before)
 
@@ -316,12 +330,15 @@ def build(res: dict, system: dict | None = None, *, deps: list | None = None, ru
 
     # ---- the situation's own effects
     sit_effects = []
+    planned = {x["key"] for x in sel}
     for e in effects:
+        guards = list(e.get("mitigated_by") or [])
         sit_effects.append({
             "label": e["label"], "module": e["module"], "type": e["type"],
             "start": clock(60 * e["start"] + int(e.get("minute") or 0)),
             "hours": e["hours"], "chance": e.get("chance", 1.0), "factor": e.get("factor"),
-            "guarded_by": list(e.get("mitigated_by") or []), "guard_in_plan": bool(e.get("guarded_in_plan")),
+            "guarded_by": guards, "guard_in_plan": bool(e.get("guarded_in_plan")),
+            "guards_planned": [k for k in guards if k in planned],
             "mitigation": e.get("mitigation"), "prevented": e.get("prevented") or "",
             "happened_before": e.get("happened_before"), "happened_after": e.get("happened_after"),
         })
@@ -553,9 +570,7 @@ def to_text(rep: dict, width: int = 96) -> str:
     if rep["situation_effects"] or rep.get("bots"):
         h("What the situation did")
         for e in rep["situation_effects"]:
-            g = (f"guarded by {', '.join(e['guarded_by'])}" + (" (in the plan)" if e["guard_in_plan"] else " (not in the plan)")
-                 if e["guarded_by"] else "nothing guards against it")
-            para(f"• {e['start']}, {_plural(e['hours'], 'hour')}: {e['label']} — {g}.")
+            para(f"• {e['start']}, {_plural(e['hours'], 'hour')}: {e['label']} — {guard_text(e)}.")
             if e["prevented"] and e["guard_in_plan"]:
                 para(f"After the fix: {e['prevented'].rstrip('.')}.", "    ")
         bt = rep.get("bots")
