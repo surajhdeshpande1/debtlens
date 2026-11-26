@@ -277,6 +277,9 @@ released to `main` (deployment `dpl_G7e6Knj4Xit1sPmrKgPJRZK9pz1u`, commit `a6746
 - The evaluation for the four new packs (section 5a) and for RailYatra (P@1 0.93, regression F1 0.90, the same as on
   19 November).
 - The previous production deployment (`dpl_GVVr58NDMSpFL1wrtRTShpmYEEYR`) is kept for an instant rollback.
+- **Later the same day** the SlotSetu fix (section 5b, commit `5579fb6`) went live as deployment
+  `dpl_9rkb3Y8MorzD3ddARH7Jnz6XXcxo`, after GitHub Actions passed on it: the health check reported TiDB and MiniLM,
+  and SlotSetu's pack file on the live site has the corrected `baseline` of 0.082 for the reports module.
 
 ## 8. Not yet covered
 
