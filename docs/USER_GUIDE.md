@@ -9,7 +9,7 @@ DebtLens links each production incident to the technical debt that caused it, pr
 On the website, [debtlens-bec.vercel.app](https://debtlens-bec.vercel.app), a run takes four steps:
 
 1. **Pick a system**: a payments platform, an exam portal, an airline and twelve more, or your own scenario pack.
-2. **Pick a situation**: each system has four to seven, from its busiest day to an outage or a bad release.
+2. **Pick a situation**: each system has five to seven, from its busiest day to an outage or a bad release.
 3. **Watch it happen**: the day plays live, as the customer's phone and the on-call engineer's screens see it.
 4. **Read the report**: what happened minute by minute, why each part failed, what to fix first and what to do next.
 

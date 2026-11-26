@@ -293,7 +293,12 @@ export function openReplay(r, opts = {}) {
     }
     X.st = statesAt(L, toMin);
     X.fail = failingShare(L, X.st);
-    X.cur = L.util.map((u, i) => hourly(u, toMin) * wobble(toMin, i));
+    const hr = Math.min(23, Math.floor(toMin / 60));
+    // A module that overloaded this hour shows at least that hour's load, so the tile agrees with its alert.
+    X.cur = L.util.map((u, i) => {
+      const v = hourly(u, toMin) * wobble(toMin, i);
+      return X.st[i].s === 1 && X.st[i].kind === "overload" ? Math.max(v, u[hr]) : v;
+    });
     X.severe = X.fail >= 0.5 || (entryIdx >= 0 && X.st[entryIdx].s > 0);
   }
 

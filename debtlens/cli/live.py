@@ -117,7 +117,16 @@ class Lane:
         prev_h = max(0, h - 1)
         self.cause = [self.tr["cause"][h][i] if s == 2 and self.tr["states"][h][i] == 2 else
                       (self.tr["cause"][prev_h][i] if s == 2 else None) for i, s in enumerate(self.states)]
-        self.load = [hourly(u, minute) * (1 + 0.03 * math.sin(minute * 0.83 + i * 1.7)) for i, u in enumerate(self.util)]
+        kinds = self.tr.get("kinds") or []
+
+        def overloaded(i: int) -> bool:
+            if self.states[i] != 1 or not kinds:
+                return False
+            return (kinds[h][i] if self.tr["states"][h][i] == 1 else kinds[prev_h][i]) == "overload"
+        # a module that overloaded shows at least this hour's load, so its tile agrees with its alert
+        self.load = [max(v, u[h]) if overloaded(i) else v
+                     for i, (u, v) in enumerate((u, hourly(u, minute) * (1 + 0.03 * math.sin(minute * 0.83 + i * 1.7)))
+                                                for i, u in enumerate(self.util))]
         self.failing = min(1.0, sum(s for s, x in zip(self.share, self.states) if x) / self.total)
 
     def entry_down(self) -> bool:
